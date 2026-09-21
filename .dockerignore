@@ -1,0 +1,11 @@
+.git
+.github
+.cursor
+books
+data
+node_modules
+target
+apps/web/dist
+*.db
+*.db-shm
+*.db-wal

@@ -1,0 +1,17 @@
+{
+  "name": "margin",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "dev": "pnpm --filter @margin/web dev",
+    "dev:api": "cargo run -p margin-api",
+    "dev:desktop": "pnpm --filter @margin/desktop dev",
+    "build": "pnpm -r build && cargo build --workspace",
+    "check": "pnpm -r check && cargo check --workspace",
+    "lint": "pnpm -r lint && cargo clippy --workspace --all-targets -- -D warnings",
+    "test": "pnpm -r test && cargo test -p margin-domain -p margin-application -p margin-storage -p margin-diagnostics -p margin-api",
+    "format": "pnpm -r format && cargo fmt --all",
+    "format:check": "pnpm -r format:check && cargo fmt --all -- --check"
+  }
+}

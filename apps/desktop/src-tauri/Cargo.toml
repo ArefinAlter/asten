@@ -1,0 +1,19 @@
+[package]
+name = "margin-desktop"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+margin-application = { path = "../../../crates/margin-application" }
+margin-domain = { path = "../../../crates/margin-domain" }
+margin-storage = { path = "../../../crates/margin-storage" }
+tauri.workspace = true
+uuid.workspace = true
+
+[build-dependencies]
+tauri-build.workspace = true
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

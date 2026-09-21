@@ -1,0 +1,26 @@
+# Research source material is managed outside the Margin repository.
+/books/
+
+# Local/editor artifacts
+.DS_Store
+Thumbs.db
+.cursor/
+.idea/
+.vscode/
+
+# JavaScript
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Rust
+/target/
+
+# Runtime data and secrets
+.env
+.env.local
+*.db
+*.db-shm
+*.db-wal
+/data/

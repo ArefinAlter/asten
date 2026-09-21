@@ -1,0 +1,8 @@
+[package]
+name = "margin-diagnostics"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+margin-domain = { path = "../margin-domain" }

@@ -1,0 +1,23 @@
+{
+  "name": "@margin/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "lint": "oxlint src",
+    "test": "vitest run --passWithNoTests",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "oxlint": "^1.81.0",
+    "prettier": "^3.6.2",
+    "typescript": "~6.0.2",
+    "vitest": "^4.0.0"
+  }
+}

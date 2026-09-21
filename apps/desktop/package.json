@@ -1,0 +1,17 @@
+{
+  "name": "@margin/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "check": "tauri info",
+    "lint": "echo Rust linting is handled by Cargo",
+    "test": "echo Rust tests are handled by Cargo",
+    "format": "echo Rust formatting is handled by Cargo",
+    "format:check": "echo Rust formatting is handled by Cargo"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.8.0"
+  }
+}
