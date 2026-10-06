@@ -48,18 +48,16 @@ apps/
   addin-word/             Word task pane (local API)
   addin-docs/             Docs add-on notes
 crates/
-  margin-domain/          Transport-independent data types
-  margin-application/     Use cases and repository boundary
-  margin-storage/         SQLite adapter and migrations
-  margin-diagnostics/     Rule engine
+  asten-domain/          Transport-independent data types
+  asten-application/     Use cases and repository boundary
+  asten-storage/         SQLite adapter and migrations
+  asten-diagnostics/     Rule engine
 packages/
   contracts/              Shared TypeScript API contracts
   brand/                  Ink and paper tokens
 services/
-  margin-api/             Axum HTTP transport
+  asten-api/             Axum HTTP transport
 ```
-
-Crate folder names still say `margin-*` in this tree; the product name is Asten.
 
 ## Quality checks
 

@@ -1,11 +1,11 @@
 [package]
-name = "margin-diagnostics"
+name = "asten-diagnostics"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-margin-domain = { path = "../margin-domain" }
+asten-domain = { path = "../asten-domain" }
 
 [dev-dependencies]
 chrono.workspace = true

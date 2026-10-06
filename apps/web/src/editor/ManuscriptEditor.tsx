@@ -4,12 +4,12 @@ import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
 import Underline from "@tiptap/extension-underline";
 import { useEffect, useState } from "react";
-import type { MarginDocument } from "@asten/contracts";
+import type { AstenDocument } from "@asten/contracts";
 import { Deletion, Insertion, SceneBreak } from "./marks";
 import { countWords, toEditorDoc } from "../lib/pm";
 
 interface Props {
-  document: MarginDocument;
+  document: AstenDocument;
   pageView: boolean;
   trackChanges: boolean;
   findQuery: string;

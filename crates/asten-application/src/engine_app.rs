@@ -2,10 +2,11 @@ use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::{ApplicationError, Result};
-use margin_domain::{
-    CanonEntity, Comment, CommentId, DocumentId, DocumentSnapshot, EntityId, EntityKind, MethodPack,
-    MethodPackId, ProjectId, SnapshotId, Suppression, SuppressionId, TimelineEvent, TimelineEventId,
-    TrackedChange, TrackedChangeId, TrackedKind, entity_key_from_title, normalize_key,
+use asten_domain::{
+    CanonEntity, Comment, CommentId, DocumentId, DocumentSnapshot, EntityId, EntityKind,
+    MethodPack, MethodPackId, ProjectId, SnapshotId, Suppression, SuppressionId, TimelineEvent,
+    TimelineEventId, TrackedChange, TrackedChangeId, TrackedKind, entity_key_from_title,
+    normalize_key,
 };
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -111,10 +112,7 @@ pub struct ResolveTrackedChange {
 }
 
 impl crate::Application {
-    pub async fn list_entities(
-        &self,
-        project_id: ProjectId,
-    ) -> Result<Vec<CanonEntity>> {
+    pub async fn list_entities(&self, project_id: ProjectId) -> Result<Vec<CanonEntity>> {
         self.get_project(project_id).await?;
         self.repository.list_entities(project_id).await
     }
@@ -320,15 +318,12 @@ impl crate::Application {
         Ok(comment)
     }
 
-    pub async fn list_ops(&self, document_id: DocumentId) -> Result<Vec<margin_domain::DocumentOp>> {
+    pub async fn list_ops(&self, document_id: DocumentId) -> Result<Vec<asten_domain::DocumentOp>> {
         self.get_document(document_id).await?;
         self.repository.list_ops(document_id).await
     }
 
-    pub async fn list_snapshots(
-        &self,
-        document_id: DocumentId,
-    ) -> Result<Vec<DocumentSnapshot>> {
+    pub async fn list_snapshots(&self, document_id: DocumentId) -> Result<Vec<DocumentSnapshot>> {
         self.get_document(document_id).await?;
         self.repository.list_snapshots(document_id).await
     }
@@ -350,14 +345,15 @@ impl crate::Application {
         Ok(snapshot)
     }
 
-    pub async fn restore_snapshot(&self, snapshot_id: SnapshotId) -> Result<margin_domain::Document> {
+    pub async fn restore_snapshot(
+        &self,
+        snapshot_id: SnapshotId,
+    ) -> Result<asten_domain::Document> {
         let snapshot = self
             .repository
             .find_snapshot(snapshot_id)
             .await?
-            .ok_or(ApplicationError::NotFound {
-                entity: "snapshot",
-            })?;
+            .ok_or(ApplicationError::NotFound { entity: "snapshot" })?;
         self.update_document(
             snapshot.document_id,
             crate::UpdateDocument {
@@ -428,10 +424,7 @@ impl crate::Application {
         self.repository.list_tracked_changes(document_id).await
     }
 
-    pub async fn create_tracked_change(
-        &self,
-        input: CreateTrackedChange,
-    ) -> Result<TrackedChange> {
+    pub async fn create_tracked_change(&self, input: CreateTrackedChange) -> Result<TrackedChange> {
         self.get_document(input.document_id).await?;
         let text = input.text.trim();
         if text.is_empty() {
@@ -460,13 +453,13 @@ impl crate::Application {
         id: TrackedChangeId,
         input: ResolveTrackedChange,
     ) -> Result<TrackedChange> {
-        let mut change = self
-            .repository
-            .find_tracked_change(id)
-            .await?
-            .ok_or(ApplicationError::NotFound {
-                entity: "tracked change",
-            })?;
+        let mut change =
+            self.repository
+                .find_tracked_change(id)
+                .await?
+                .ok_or(ApplicationError::NotFound {
+                    entity: "tracked change",
+                })?;
         change.accepted = Some(input.accepted);
         self.repository.update_tracked_change(&change).await?;
         Ok(change)

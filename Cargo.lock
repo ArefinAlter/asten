@@ -63,6 +63,85 @@ dependencies = [
 ]
 
 [[package]]
+name = "asten-api"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "asten-application",
+ "asten-domain",
+ "asten-storage",
+ "axum",
+ "http",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+]
+
+[[package]]
+name = "asten-application"
+version = "0.1.0"
+dependencies = [
+ "asten-diagnostics",
+ "asten-domain",
+ "async-trait",
+ "base64 0.22.1",
+ "chrono",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+ "zip",
+]
+
+[[package]]
+name = "asten-desktop"
+version = "0.1.0"
+dependencies = [
+ "asten-application",
+ "asten-domain",
+ "asten-storage",
+ "tauri",
+ "tauri-build",
+ "uuid",
+]
+
+[[package]]
+name = "asten-diagnostics"
+version = "0.1.0"
+dependencies = [
+ "asten-domain",
+ "chrono",
+ "serde_json",
+]
+
+[[package]]
+name = "asten-domain"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "uuid",
+]
+
+[[package]]
+name = "asten-storage"
+version = "0.1.0"
+dependencies = [
+ "asten-application",
+ "asten-domain",
+ "async-trait",
+ "chrono",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
 name = "async-compression"
 version = "0.4.48"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2096,85 +2175,6 @@ name = "log"
 version = "0.4.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
-
-[[package]]
-name = "margin-api"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "axum",
- "http",
- "margin-application",
- "margin-domain",
- "margin-storage",
- "serde",
- "serde_json",
- "tokio",
- "tower-http",
- "tracing",
- "tracing-subscriber",
- "uuid",
-]
-
-[[package]]
-name = "margin-application"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "base64 0.22.1",
- "chrono",
- "margin-diagnostics",
- "margin-domain",
- "serde",
- "serde_json",
- "thiserror 2.0.20",
- "zip",
-]
-
-[[package]]
-name = "margin-desktop"
-version = "0.1.0"
-dependencies = [
- "margin-application",
- "margin-domain",
- "margin-storage",
- "tauri",
- "tauri-build",
- "uuid",
-]
-
-[[package]]
-name = "margin-diagnostics"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "margin-domain",
- "serde_json",
-]
-
-[[package]]
-name = "margin-domain"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "serde",
- "serde_json",
- "uuid",
-]
-
-[[package]]
-name = "margin-storage"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "chrono",
- "margin-application",
- "margin-domain",
- "serde_json",
- "sqlx",
- "tokio",
- "uuid",
-]
 
 [[package]]
 name = "markup5ever"

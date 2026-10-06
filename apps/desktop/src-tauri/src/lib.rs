@@ -1,12 +1,12 @@
 use std::sync::Arc;
 
-use margin_application::{
+use asten_application::{
     Application, CompileRequest, CreateCanonEntity, CreateComment, CreateDocument, CreateFact,
     CreateProject, CreateSnapshot, CreateSuppression, CreateTimelineEvent, CreateTrackedChange,
     CreateWorldEntry, ImportRequest, ResolveTrackedChange, UpdateCanonEntity, UpdateComment,
     UpdateDocument, UpdateMethodPack, UpdateTimelineEvent, UpdateWorldEntry,
 };
-use margin_domain::{
+use asten_domain::{
     CanonEntity, Comment, CommentId, CompileArtifact, Diagnostic, Document, DocumentId, DocumentOp,
     DocumentSnapshot, EntityId, Fact, MethodPack, MethodPackId, Project, ProjectId, SnapshotId,
     Suppression, TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId, WorldEntry,
@@ -143,10 +143,7 @@ async fn update_world_entry(
 }
 
 #[tauri::command]
-async fn world_pulse(
-    state: State<'_, AppState>,
-    project_id: Uuid,
-) -> Result<WorldPulse, String> {
+async fn world_pulse(state: State<'_, AppState>, project_id: Uuid) -> Result<WorldPulse, String> {
     state
         .0
         .world_pulse(ProjectId(project_id))
@@ -339,7 +336,11 @@ async fn create_suppression(
 
 #[tauri::command]
 async fn list_packs(state: State<'_, AppState>) -> Result<Vec<MethodPack>, String> {
-    state.0.list_packs().await.map_err(|error| error.to_string())
+    state
+        .0
+        .list_packs()
+        .await
+        .map_err(|error| error.to_string())
 }
 
 #[tauri::command]
@@ -426,7 +427,7 @@ pub fn run() {
             std::fs::create_dir_all(&data_directory)?;
             let database_path = data_directory.join("asten.db");
             let repository = tauri::async_runtime::block_on(
-                margin_storage::SqliteRepository::open(database_path),
+                asten_storage::SqliteRepository::open(database_path),
             )?;
             app.manage(AppState(Application::new(Arc::new(repository))));
             Ok(())

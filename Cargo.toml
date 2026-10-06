@@ -2,11 +2,11 @@
 resolver = "2"
 members = [
   "apps/desktop/src-tauri",
-  "crates/margin-application",
-  "crates/margin-diagnostics",
-  "crates/margin-domain",
-  "crates/margin-storage",
-  "services/margin-api",
+  "crates/asten-application",
+  "crates/asten-diagnostics",
+  "crates/asten-domain",
+  "crates/asten-storage",
+  "services/asten-api",
 ]
 
 [workspace.package]

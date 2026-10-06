@@ -168,7 +168,9 @@ pub fn parse_story_time(value: &str) -> Option<String> {
 
 #[must_use]
 pub fn story_times_out_of_order(earlier: &str, later: &str) -> bool {
-    comparable_time(earlier).zip(comparable_time(later)).is_some_and(|(left, right)| left > right)
+    comparable_time(earlier)
+        .zip(comparable_time(later))
+        .is_some_and(|(left, right)| left > right)
 }
 
 fn comparable_time(value: &str) -> Option<String> {

@@ -1,6 +1,4 @@
-use margin_domain::{
-    DocumentKind, markdown_to_prosemirror, plaintext_to_prosemirror,
-};
+use asten_domain::{DocumentKind, markdown_to_prosemirror, plaintext_to_prosemirror};
 use serde::{Deserialize, Serialize};
 
 use crate::{ApplicationError, Result};
@@ -22,7 +20,7 @@ pub struct ImportRequest {
     pub body: String,
     #[serde(default)]
     pub encoding: Option<String>,
-    pub parent_id: Option<margin_domain::DocumentId>,
+    pub parent_id: Option<asten_domain::DocumentId>,
     pub kind: Option<DocumentKind>,
 }
 
@@ -39,9 +37,9 @@ pub fn imported_title(filename: &str) -> String {
 pub fn imported_document_json(request: &ImportRequest) -> Result<serde_json::Value> {
     let text = decode_body(request)?;
     match request.format {
-        ImportFormat::Markdown | ImportFormat::Fountain | ImportFormat::Html => {
-            Ok(markdown_to_prosemirror(&strip_html_if_needed(&text, &request.format)))
-        }
+        ImportFormat::Markdown | ImportFormat::Fountain | ImportFormat::Html => Ok(
+            markdown_to_prosemirror(&strip_html_if_needed(&text, &request.format)),
+        ),
         ImportFormat::Plain => Ok(plaintext_to_prosemirror(&text)),
         ImportFormat::Docx => Ok(plaintext_to_prosemirror(&extract_docx_text(&text)?)),
     }

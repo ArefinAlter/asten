@@ -1,12 +1,12 @@
 import type { FormEvent } from "react";
-import type { DocumentKind, MarginDocument } from "@asten/contracts";
+import type { DocumentKind, AstenDocument } from "@asten/contracts";
 
 interface Props {
-  documents: MarginDocument[];
+  documents: AstenDocument[];
   selectedId?: string;
-  onSelect: (document: MarginDocument) => void;
+  onSelect: (document: AstenDocument) => void;
   onCreate: (input: { title: string; kind: DocumentKind; parent_id?: string | null }) => void;
-  onToggleCompile: (document: MarginDocument) => void;
+  onToggleCompile: (document: AstenDocument) => void;
   creating?: boolean;
 }
 
@@ -80,12 +80,12 @@ function BinderNode({
   onSelect,
   onToggleCompile,
 }: {
-  document: MarginDocument;
-  documents: MarginDocument[];
+  document: AstenDocument;
+  documents: AstenDocument[];
   depth: number;
   selectedId?: string;
-  onSelect: (document: MarginDocument) => void;
-  onToggleCompile: (document: MarginDocument) => void;
+  onSelect: (document: AstenDocument) => void;
+  onToggleCompile: (document: AstenDocument) => void;
 }) {
   const children = documents.filter((child) => child.parent_id === document.id);
   return (

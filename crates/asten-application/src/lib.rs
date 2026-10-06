@@ -1,16 +1,17 @@
 use std::sync::Arc;
 
+use asten_diagnostics::{AnalysisContext, DiagnosticEngine};
+use asten_domain::{
+    CanonEntity, Comment, CommentId, CompileArtifact, Diagnostic, Document, DocumentId,
+    DocumentKind, DocumentOp, DocumentSnapshot, EntityId, Fact, FactId, FactModality, FactStatus,
+    IdeaPrompt, MethodPack, MethodPackId, Project, ProjectId, ProjectKind, SnapshotId,
+    SourceAnchor, Suppression, TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId,
+    WorldEntry, WorldEntryId, WorldKind, WorldPulse, WorldStatus, compute_world_pulse,
+    default_world_hue, empty_prosemirror_doc, ensure_block_ids, entity_key_from_title,
+    normalize_key,
+};
 use async_trait::async_trait;
 use chrono::Utc;
-use margin_diagnostics::{AnalysisContext, DiagnosticEngine};
-use margin_domain::{
-    CanonEntity, Comment, CommentId, CompileArtifact, Diagnostic, Document, DocumentId, DocumentKind,
-    DocumentOp, DocumentSnapshot, EntityId, Fact, FactId, FactModality, FactStatus, IdeaPrompt,
-    MethodPack, MethodPackId, Project, ProjectId, ProjectKind, SnapshotId, SourceAnchor, Suppression,
-    TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId, WorldEntry, WorldEntryId,
-    WorldKind, WorldPulse, WorldStatus, compute_world_pulse, default_world_hue, empty_prosemirror_doc,
-    ensure_block_ids, entity_key_from_title, normalize_key,
-};
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
@@ -214,9 +215,7 @@ impl Application {
         self.repository
             .find_document(id)
             .await?
-            .ok_or(ApplicationError::NotFound {
-                entity: "document",
-            })
+            .ok_or(ApplicationError::NotFound { entity: "document" })
     }
 
     pub async fn create_document(&self, input: CreateDocument) -> Result<Document> {
@@ -227,13 +226,12 @@ impl Application {
                 "document title cannot be empty".into(),
             ));
         }
-        let content_json = if input.content_json.is_null()
-            || input.content_json == serde_json::json!({})
-        {
-            empty_prosemirror_doc()
-        } else {
-            ensure_block_ids(input.content_json)
-        };
+        let content_json =
+            if input.content_json.is_null() || input.content_json == serde_json::json!({}) {
+                empty_prosemirror_doc()
+            } else {
+                ensure_block_ids(input.content_json)
+            };
         let now = Utc::now();
         let document = Document {
             id: DocumentId::new(),
@@ -253,11 +251,7 @@ impl Application {
         Ok(document)
     }
 
-    pub async fn update_document(
-        &self,
-        id: DocumentId,
-        input: UpdateDocument,
-    ) -> Result<Document> {
+    pub async fn update_document(&self, id: DocumentId, input: UpdateDocument) -> Result<Document> {
         let mut document = self.get_document(id).await?;
         if let Some(title) = input.title {
             let title = title.trim();
@@ -312,7 +306,7 @@ impl Application {
         }
         let now = Utc::now();
         let fact = Fact {
-            id: margin_domain::FactId::new(),
+            id: asten_domain::FactId::new(),
             project_id: input.project_id,
             entity_key,
             predicate,
@@ -337,15 +331,17 @@ impl Application {
         let events = self.repository.list_events(project_id).await?;
         let suppressions = self.repository.list_suppressions(project_id).await?;
         let packs = self.repository.list_packs().await?;
-        Ok(DiagnosticEngine::with_builtin_rules().analyze(&AnalysisContext {
-            project: &project,
-            documents: &documents,
-            facts: &facts,
-            entities: &entities,
-            events: &events,
-            suppressions: &suppressions,
-            packs: &packs,
-        }))
+        Ok(
+            DiagnosticEngine::with_builtin_rules().analyze(&AnalysisContext {
+                project: &project,
+                documents: &documents,
+                facts: &facts,
+                entities: &entities,
+                events: &events,
+                suppressions: &suppressions,
+                packs: &packs,
+            }),
+        )
     }
 
     pub async fn list_world_entries(&self, project_id: ProjectId) -> Result<Vec<WorldEntry>> {
@@ -390,9 +386,7 @@ impl Application {
             summary: summary.to_owned(),
             prompt: input.prompt,
             status: input.status.unwrap_or_default(),
-            board_x: input
-                .board_x
-                .unwrap_or(8.0 + ((existing * 13) % 68) as f64),
+            board_x: input.board_x.unwrap_or(8.0 + ((existing * 13) % 68) as f64),
             board_y: input
                 .board_y
                 .unwrap_or(10.0 + ((existing * 17) % 56) as f64),
@@ -541,7 +535,7 @@ impl Application {
         let seq = self.repository.next_op_seq(document.id).await?;
         self.repository
             .insert_op(&DocumentOp {
-                id: margin_domain::DocumentOpId::new(),
+                id: asten_domain::DocumentOpId::new(),
                 document_id: document.id,
                 seq,
                 kind: kind.to_owned(),

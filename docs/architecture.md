@@ -17,17 +17,17 @@ React UI ── HTTP ──► Axum API ──────┐
     │                               │
     └── Tauri invoke ─► Desktop ────┤
                                     ▼
-                         margin-application
+                         asten-application
                            │              │
                            ▼              ▼
-                    margin-domain   Repository trait
+                    asten-domain   Repository trait
                                           ▲
                                           │
-                                  margin-storage
+                                  asten-storage
                                       SQLite
 ```
 
-`margin-diagnostics` consumes domain snapshots and exposes a rule registry. It
+`asten-diagnostics` consumes domain snapshots and exposes a rule registry. It
 will later use incremental query infrastructure, but the transport and storage
 layers do not need to know which rules are installed.
 

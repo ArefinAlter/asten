@@ -1,15 +1,15 @@
 use std::path::Path;
 
-use async_trait::async_trait;
-use chrono::{DateTime, Utc};
-use margin_application::{ApplicationError, Repository, Result};
-use margin_domain::{
+use asten_application::{ApplicationError, Repository, Result};
+use asten_domain::{
     CanonEntity, Comment, CommentId, Document, DocumentId, DocumentKind, DocumentOp, DocumentOpId,
     DocumentSnapshot, EntityId, EntityKind, Fact, FactId, FactModality, FactStatus, IdeaPrompt,
-    MethodPack, MethodPackId, Project, ProjectId, ProjectKind, SnapshotId, SourceAnchor, Suppression,
-    SuppressionId, TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId, TrackedKind,
-    WorldEntry, WorldEntryId, WorldKind, WorldStatus,
+    MethodPack, MethodPackId, Project, ProjectId, ProjectKind, SnapshotId, SourceAnchor,
+    Suppression, SuppressionId, TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId,
+    TrackedKind, WorldEntry, WorldEntryId, WorldKind, WorldStatus,
 };
+use async_trait::async_trait;
+use chrono::{DateTime, Utc};
 use sqlx::{
     Row, SqlitePool,
     sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions},
@@ -165,9 +165,7 @@ impl Repository for SqliteRepository {
         .await
         .map_err(storage_error)?;
         if result.rows_affected() == 0 {
-            return Err(ApplicationError::NotFound {
-                entity: "document",
-            });
+            return Err(ApplicationError::NotFound { entity: "document" });
         }
         Ok(())
     }
@@ -206,7 +204,11 @@ impl Repository for SqliteRepository {
         .bind(fact_status(&fact.status))
         .bind(&fact.valid_from)
         .bind(&fact.valid_to)
-        .bind(fact.source.as_ref().map(|source| source.document_id.to_string()))
+        .bind(
+            fact.source
+                .as_ref()
+                .map(|source| source.document_id.to_string()),
+        )
         .bind(fact.source.as_ref().map(|source| i64::from(source.start)))
         .bind(fact.source.as_ref().map(|source| i64::from(source.end)))
         .bind(fact.created_at.to_rfc3339())
@@ -503,16 +505,15 @@ impl Repository for SqliteRepository {
     }
 
     async fn update_comment(&self, comment: &Comment) -> Result<()> {
-        let result = sqlx::query(
-            "UPDATE comments SET body = ?, resolved = ?, updated_at = ? WHERE id = ?",
-        )
-        .bind(&comment.body)
-        .bind(if comment.resolved { 1 } else { 0 })
-        .bind(comment.updated_at.to_rfc3339())
-        .bind(comment.id.to_string())
-        .execute(&self.pool)
-        .await
-        .map_err(storage_error)?;
+        let result =
+            sqlx::query("UPDATE comments SET body = ?, resolved = ?, updated_at = ? WHERE id = ?")
+                .bind(&comment.body)
+                .bind(if comment.resolved { 1 } else { 0 })
+                .bind(comment.updated_at.to_rfc3339())
+                .bind(comment.id.to_string())
+                .execute(&self.pool)
+                .await
+                .map_err(storage_error)?;
         if result.rows_affected() == 0 {
             return Err(ApplicationError::NotFound { entity: "comment" });
         }
@@ -520,11 +521,13 @@ impl Repository for SqliteRepository {
     }
 
     async fn next_op_seq(&self, document_id: DocumentId) -> Result<i64> {
-        let row = sqlx::query("SELECT COALESCE(MAX(seq), 0) AS seq FROM document_ops WHERE document_id = ?")
-            .bind(document_id.to_string())
-            .fetch_one(&self.pool)
-            .await
-            .map_err(storage_error)?;
+        let row = sqlx::query(
+            "SELECT COALESCE(MAX(seq), 0) AS seq FROM document_ops WHERE document_id = ?",
+        )
+        .bind(document_id.to_string())
+        .fetch_one(&self.pool)
+        .await
+        .map_err(storage_error)?;
         let seq: i64 = row.try_get("seq").map_err(storage_error)?;
         Ok(seq + 1)
     }
@@ -758,10 +761,7 @@ fn document_from_row(row: sqlx::sqlite::SqliteRow) -> Result<Document> {
         content_json: serde_json::from_str(&content).map_err(storage_error)?,
         position: row.try_get("position").map_err(storage_error)?,
         revision: row.try_get("revision").map_err(storage_error)?,
-        exclude_from_compile: row
-            .try_get::<i64, _>("exclude_from_compile")
-            .unwrap_or(0)
-            != 0,
+        exclude_from_compile: row.try_get::<i64, _>("exclude_from_compile").unwrap_or(0) != 0,
         created_at: parse_time(row.try_get("created_at").map_err(storage_error)?)?,
         updated_at: parse_time(row.try_get("updated_at").map_err(storage_error)?)?,
     })

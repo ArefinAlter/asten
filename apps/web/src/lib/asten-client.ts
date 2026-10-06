@@ -15,8 +15,8 @@ import type {
   DocumentSnapshot,
   Fact,
   ImportRequest,
-  MarginDiagnostic,
-  MarginDocument,
+  AstenDiagnostic,
+  AstenDocument,
   MethodPack,
   Project,
   ProjectId,
@@ -32,19 +32,19 @@ import type {
   WorldPulse,
 } from "@asten/contracts";
 
-export interface MarginClient {
+export interface AstenClient {
   listProjects(): Promise<Project[]>;
   createProject(input: CreateProject): Promise<Project>;
-  listDocuments(projectId: ProjectId): Promise<MarginDocument[]>;
-  createDocument(input: CreateDocument): Promise<MarginDocument>;
+  listDocuments(projectId: ProjectId): Promise<AstenDocument[]>;
+  createDocument(input: CreateDocument): Promise<AstenDocument>;
   updateDocument(
     projectId: ProjectId,
     documentId: string,
     input: UpdateDocument,
-  ): Promise<MarginDocument>;
+  ): Promise<AstenDocument>;
   listFacts(projectId: ProjectId): Promise<Fact[]>;
   createFact(input: CreateFact): Promise<Fact>;
-  listDiagnostics(projectId: ProjectId): Promise<MarginDiagnostic[]>;
+  listDiagnostics(projectId: ProjectId): Promise<AstenDiagnostic[]>;
   listWorldEntries(projectId: ProjectId): Promise<WorldEntry[]>;
   createWorldEntry(input: CreateWorldEntry): Promise<WorldEntry>;
   updateWorldEntry(
@@ -91,7 +91,7 @@ export interface MarginClient {
   restoreSnapshot(
     projectId: ProjectId,
     snapshotId: string,
-  ): Promise<MarginDocument>;
+  ): Promise<AstenDocument>;
   listSuppressions(projectId: ProjectId): Promise<Suppression[]>;
   createSuppression(
     projectId: ProjectId,
@@ -125,10 +125,10 @@ export interface MarginClient {
   importDocument(
     projectId: ProjectId,
     request: ImportRequest,
-  ): Promise<MarginDocument>;
+  ): Promise<AstenDocument>;
 }
 
-export function createMarginClient(): MarginClient {
+export function createAstenClient(): AstenClient {
   return isTauri() ? new TauriClient() : new HttpClient();
 }
 
@@ -136,7 +136,7 @@ function isTauri(): boolean {
   return "__TAURI_INTERNALS__" in window;
 }
 
-class HttpClient implements MarginClient {
+class HttpClient implements AstenClient {
   private readonly baseUrl: string;
 
   constructor(baseUrl = "/api/v1") {
@@ -154,11 +154,11 @@ class HttpClient implements MarginClient {
     });
   }
 
-  listDocuments(projectId: ProjectId): Promise<MarginDocument[]> {
+  listDocuments(projectId: ProjectId): Promise<AstenDocument[]> {
     return this.request(`/projects/${projectId}/documents`);
   }
 
-  createDocument(input: CreateDocument): Promise<MarginDocument> {
+  createDocument(input: CreateDocument): Promise<AstenDocument> {
     return this.request(`/projects/${input.project_id}/documents`, {
       method: "POST",
       body: JSON.stringify(input),
@@ -169,7 +169,7 @@ class HttpClient implements MarginClient {
     projectId: ProjectId,
     documentId: string,
     input: UpdateDocument,
-  ): Promise<MarginDocument> {
+  ): Promise<AstenDocument> {
     return this.request(`/projects/${projectId}/documents/${documentId}`, {
       method: "PUT",
       body: JSON.stringify(input),
@@ -187,7 +187,7 @@ class HttpClient implements MarginClient {
     });
   }
 
-  listDiagnostics(projectId: ProjectId): Promise<MarginDiagnostic[]> {
+  listDiagnostics(projectId: ProjectId): Promise<AstenDiagnostic[]> {
     return this.request(`/projects/${projectId}/diagnostics`);
   }
 
@@ -316,7 +316,7 @@ class HttpClient implements MarginClient {
   restoreSnapshot(
     projectId: ProjectId,
     snapshotId: string,
-  ): Promise<MarginDocument> {
+  ): Promise<AstenDocument> {
     return this.request(
       `/projects/${projectId}/snapshots/${snapshotId}/restore`,
       { method: "POST", body: "{}" },
@@ -397,7 +397,7 @@ class HttpClient implements MarginClient {
   importDocument(
     projectId: ProjectId,
     request: ImportRequest,
-  ): Promise<MarginDocument> {
+  ): Promise<AstenDocument> {
     return this.request(`/projects/${projectId}/import`, {
       method: "POST",
       body: JSON.stringify(request),
@@ -422,7 +422,7 @@ class HttpClient implements MarginClient {
   }
 }
 
-class TauriClient implements MarginClient {
+class TauriClient implements AstenClient {
   private async invoke<T>(command: string, args?: Record<string, unknown>) {
     const { invoke } = await import("@tauri-apps/api/core");
     return invoke<T>(command, args);
@@ -434,17 +434,17 @@ class TauriClient implements MarginClient {
   createProject(input: CreateProject): Promise<Project> {
     return this.invoke("create_project", { input });
   }
-  listDocuments(projectId: ProjectId): Promise<MarginDocument[]> {
+  listDocuments(projectId: ProjectId): Promise<AstenDocument[]> {
     return this.invoke("list_documents", { projectId });
   }
-  createDocument(input: CreateDocument): Promise<MarginDocument> {
+  createDocument(input: CreateDocument): Promise<AstenDocument> {
     return this.invoke("create_document", { input });
   }
   updateDocument(
     _projectId: ProjectId,
     documentId: string,
     input: UpdateDocument,
-  ): Promise<MarginDocument> {
+  ): Promise<AstenDocument> {
     return this.invoke("update_document", { documentId, input });
   }
   listFacts(projectId: ProjectId): Promise<Fact[]> {
@@ -453,7 +453,7 @@ class TauriClient implements MarginClient {
   createFact(input: CreateFact): Promise<Fact> {
     return this.invoke("create_fact", { input });
   }
-  listDiagnostics(projectId: ProjectId): Promise<MarginDiagnostic[]> {
+  listDiagnostics(projectId: ProjectId): Promise<AstenDiagnostic[]> {
     return this.invoke("list_diagnostics", { projectId });
   }
   listWorldEntries(projectId: ProjectId): Promise<WorldEntry[]> {
@@ -536,7 +536,7 @@ class TauriClient implements MarginClient {
   restoreSnapshot(
     _projectId: ProjectId,
     snapshotId: string,
-  ): Promise<MarginDocument> {
+  ): Promise<AstenDocument> {
     return this.invoke("restore_snapshot", { snapshotId });
   }
   listSuppressions(projectId: ProjectId): Promise<Suppression[]> {
@@ -595,7 +595,7 @@ class TauriClient implements MarginClient {
   importDocument(
     projectId: ProjectId,
     request: ImportRequest,
-  ): Promise<MarginDocument> {
+  ): Promise<AstenDocument> {
     return this.invoke("import_document", { projectId, request });
   }
 }

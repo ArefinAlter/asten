@@ -1,19 +1,19 @@
-# Margin: Complete Product, Research, and Engineering Handoff
+# Asten: Complete Product, Research, and Engineering Handoff
 
 > **Document status:** Foundational handoff  
 > **Last updated:** 2026-09-21  
 > **Current product stage:** Architectural scaffold / pre-MVP  
 > **Primary audience:** Product leadership, design, research, engineering, editorial advisors, and future AI/ML teams  
-> **Repository:** `e:\margin`  
+> **Repository:** `B:\asten`  
 > **Tagline:** **Let AI be your editor, not your writer.**
 
 ---
 
 ## 1. Purpose of This Document
 
-This is the authoritative handoff for Margin. It records:
+This is the authoritative handoff for Asten. It records:
 
-- the product vision and the problem Margin is intended to solve;
+- the product vision and the problem Asten is intended to solve;
 - the philosophical and research foundations behind the product;
 - the product modules and expected workflows;
 - the proposed canon, consistency, and editorial engine;
@@ -34,14 +34,14 @@ should be able to understand the product and resume work without access to the
 original planning conversation.
 
 This is not a claim that every listed module should be built simultaneously.
-Margin's long-term vision is intentionally broad, but the implementation must
+Asten's long-term vision is intentionally broad, but the implementation must
 remain phased, evidence-driven, and centered on the canon engine.
 
 ---
 
 ## 2. Executive Summary
 
-Margin is a local-first desktop and web writing environment for novels,
+Asten is a local-first desktop and web writing environment for novels,
 screenplays, narrative non-fiction, research-heavy books, and other complex
 long-form work.
 
@@ -62,12 +62,12 @@ manuscript, world bible, timeline, maps, character files, source notes, and
 editorial checks do not share a consistent model of the work. Contradictions
 are discovered manually, often late in revision.
 
-Margin's central idea is to treat a writing project more like an integrated
+Asten's central idea is to treat a writing project more like an integrated
 development environment:
 
 1. The manuscript, wiki, research, timeline, graph, maps, and visual planning
    artifacts belong to one project.
-2. Margin builds a structured, provenance-aware model of what the project says
+2. Asten builds a structured, provenance-aware model of what the project says
    is true.
 3. A compiler-like engine evaluates the model and reports contradictions,
    impossible timelines, knowledge leaks, travel impossibilities, unresolved
@@ -107,7 +107,7 @@ protect the author's intended experience; they do not determine artistic merit.
 
 ### 3.2 Product promise
 
-Margin should eventually let an author:
+Asten should eventually let an author:
 
 - draft and revise a major manuscript in one environment;
 - organize chapters, scenes, notes, research, and visual material;
@@ -122,9 +122,9 @@ Margin should eventually let an author:
 - work offline and retain durable ownership of project data;
 - optionally use local or user-selected AI as an editorial assistant.
 
-### 3.3 What Margin must not become
+### 3.3 What Asten must not become
 
-Margin must not become:
+Asten must not become:
 
 - a prose-generation wrapper whose primary value is writing on the user's
   behalf;
@@ -143,7 +143,7 @@ Margin must not become:
 
 ### 4.1 The author is the authority
 
-Margin may propose, explain, compare, and warn. The author decides what is
+Asten may propose, explain, compare, and warn. The author decides what is
 canon and whether a diagnostic represents an error, an intentional mystery, an
 unreliable account, a draft inconsistency, or an exception.
 
@@ -201,7 +201,7 @@ No method is the universal project default.
 
 ### 4.4 Separate truth from craft advice
 
-Margin should distinguish at least:
+Asten should distinguish at least:
 
 - **Canon errors:** incompatible facts, impossible time, impossible presence,
   broken identity, violated user-defined world rules.
@@ -215,7 +215,7 @@ Craft hints must be opt-in or explicitly selected with a method/editorial pack.
 
 ### 4.5 Provenance is mandatory
 
-No structured claim is useful unless Margin can answer:
+No structured claim is useful unless Asten can answer:
 
 - where did this claim come from?
 - who or what asserted it?
@@ -238,7 +238,7 @@ offered, but they must not become the only route to the user's manuscript.
 
 ### 4.7 Incremental by default
 
-Margin should react like an IDE. Editing one paragraph must not reprocess an
+Asten should react like an IDE. Editing one paragraph must not reprocess an
 entire series. Parsing, mention resolution, fact extraction, rule evaluation,
 indexing, and diagnostics must be designed around stable identities and
 incremental recomputation.
@@ -254,7 +254,7 @@ calendars must be considered before editor architecture is locked.
 
 ## 5. Intended Users and Process Archetypes
 
-Margin should not define authors by one universal process. Research to date
+Asten should not define authors by one universal process. Research to date
 suggests at least these overlapping archetypes.
 
 ### 5.1 Architect / plotter
@@ -387,15 +387,15 @@ Needs:
 
 ## 6. Primary Product Use Cases
 
-Margin should eventually support these end-to-end use cases.
+Asten should eventually support these end-to-end use cases.
 
 ### 6.1 Start with prose
 
 1. Create a novel project.
 2. Begin writing without defining a wiki.
-3. Margin identifies recurring names and proposes entities.
+3. Asten identifies recurring names and proposes entities.
 4. The author confirms that aliases refer to the same person.
-5. Margin proposes facts with source citations.
+5. Asten proposes facts with source citations.
 6. The author accepts, edits, defers, or rejects them.
 7. Later passages are checked against confirmed canon.
 
@@ -405,14 +405,14 @@ Margin should eventually support these end-to-end use cases.
 2. Define characters, places, factions, routes, rules, and historical events.
 3. Build an outline tied to those entities.
 4. Draft scenes from outline cards.
-5. Margin checks the prose against the explicit model.
+5. Asten checks the prose against the explicit model.
 
 ### 6.3 Diagnose a continuity problem
 
 1. An author changes a character's eye color or history.
 2. The affected paragraph is parsed incrementally.
 3. A new fact conflicts with an overlapping canon fact.
-4. Margin emits a diagnostic with both source spans.
+4. Asten emits a diagnostic with both source spans.
 5. The author updates canon, edits prose, records an in-story change, marks an
    unreliable assertion, or suppresses the issue.
 6. Dependent diagnostics update without a full-project rebuild.
@@ -424,14 +424,14 @@ Margin should eventually support these end-to-end use cases.
 3. Relative constraints such as "three days after the siege" are entered or
    extracted.
 4. The temporal network detects an impossible cycle.
-5. Margin shows the smallest useful explanation chain.
+5. Asten shows the smallest useful explanation chain.
 
 ### 6.5 Validate travel
 
 1. Locations and routes are placed on a real or invented map.
 2. Travel modes define speed ranges and route restrictions.
 3. Consecutive character appearances are compared.
-4. Margin reports travel that cannot fit the elapsed story time.
+4. Asten reports travel that cannot fit the elapsed story time.
 5. The author changes time, route, transportation, location, or canon.
 
 ### 6.6 Track character knowledge
@@ -439,7 +439,7 @@ Margin should eventually support these end-to-end use cases.
 1. Facts can be world-true, narrator-asserted, or believed by an entity.
 2. Scenes record presence, communication, observation, and disclosure.
 3. A character refers to information before a plausible acquisition event.
-4. Margin raises a knowledge warning with the missing path.
+4. Asten raises a knowledge warning with the missing path.
 5. The author adds a disclosure, marks off-page knowledge, or confirms an
    intentional reveal.
 
@@ -623,7 +623,7 @@ Requirements:
 
 ### 7.7 Maps and spatial model
 
-Margin should distinguish:
+Asten should distinguish:
 
 - real geographic maps with coordinate reference systems;
 - invented geographic worlds with scale and projection;
@@ -734,7 +734,7 @@ Requirements:
 
 ### 7.13 Search and command system
 
-Margin should have:
+Asten should have:
 
 - command palette;
 - quick open;
@@ -848,7 +848,7 @@ novelist should not be confronted with every advanced module at once.
 
 ### 8.3 Progressive disclosure
 
-Margin should reveal complexity in layers:
+Asten should reveal complexity in layers:
 
 1. writing and basic organization;
 2. lightweight metadata and links;
@@ -867,7 +867,7 @@ and retain context.
 
 Any automated result must show:
 
-- what Margin observed;
+- what Asten observed;
 - which source spans and canon statements are involved;
 - what rule or model produced the result;
 - confidence and status where relevant;
@@ -1007,7 +1007,7 @@ represent at least:
 - planned but not canon;
 - deprecated or retconned.
 
-The exact vocabulary should be extensible. The key requirement is that Margin
+The exact vocabulary should be extensible. The key requirement is that Asten
 must not compare every sentence as though it were an omniscient factual
 statement.
 
@@ -1047,7 +1047,7 @@ Full OWL-style open-world semantics are not a natural default for fiction
 editing. Absence can be editorially meaningful, but absence is not always
 false.
 
-Margin should support rule-specific policies:
+Asten should support rule-specific policies:
 
 - known true;
 - known false;
@@ -1252,7 +1252,7 @@ Only through explicit packs:
 - point-of-view pattern observations;
 - pacing and paragraph variation.
 
-Margin must phrase these as observations or selected-method guidance, not
+Asten must phrase these as observations or selected-method guidance, not
 universal rules.
 
 ---
@@ -1495,7 +1495,7 @@ The scaffold is not an MVP. It does not yet include:
 ### 16.3 Repository map
 
 ```text
-margin/
+asten/
 ├── .github/workflows/ci.yml
 ├── apps/
 │   ├── desktop/
@@ -1510,26 +1510,26 @@ margin/
 │   │       └── tauri.conf.json
 │   └── web/
 │       ├── src/App.tsx
-│       ├── src/lib/margin-client.ts
+│       ├── src/lib/asten-client.ts
 │       ├── src/main.tsx
-│       ├── src/margin.css
+│       ├── src/asten.css
 │       ├── Dockerfile
 │       ├── nginx.conf
 │       ├── package.json
 │       └── vite.config.ts
 ├── assets/icon.svg
 ├── crates/
-│   ├── margin-domain/
-│   ├── margin-application/
-│   ├── margin-storage/
+│   ├── asten-domain/
+│   ├── asten-application/
+│   ├── asten-storage/
 │   │   ├── migrations/0001_initial.sql
 │   │   └── tests/repository.rs
-│   └── margin-diagnostics/
+│   └── asten-diagnostics/
 ├── docs/
 │   ├── architecture.md
 │   └── PROJECT_HANDOFF.md
 ├── packages/contracts/
-├── services/margin-api/
+├── services/asten-api/
 ├── books/                         ignored research material
 ├── Cargo.toml
 ├── Cargo.lock
@@ -1559,16 +1559,16 @@ React UI ── HTTP ──► Axum API ───────┐
     │                                │
     └── Tauri invoke ─► Desktop ─────┤
                                      ▼
-                           margin-application
+                           asten-application
                              │             │
                              ▼             ▼
-                       margin-domain   Repository trait
+                       asten-domain   Repository trait
                                              ▲
                                              │
-                                      margin-storage
+                                      asten-storage
                                           SQLite
 
-margin-diagnostics ── consumes domain snapshots; owns no UI or storage adapter
+asten-diagnostics ── consumes domain snapshots; owns no UI or storage adapter
 ```
 
 Rules:
@@ -1583,7 +1583,7 @@ Rules:
 
 ### 17.2 Rust crates
 
-#### `margin-domain`
+#### `asten-domain`
 
 Currently defines:
 
@@ -1600,7 +1600,7 @@ Currently defines:
 
 IDs use UUID version 7 to retain uniqueness with useful creation ordering.
 
-#### `margin-application`
+#### `asten-application`
 
 Currently defines:
 
@@ -1614,7 +1614,7 @@ Currently defines:
 Validation currently covers non-empty project and document names and verifies
 project existence before document operations.
 
-#### `margin-storage`
+#### `asten-storage`
 
 Currently provides:
 
@@ -1626,7 +1626,7 @@ Currently provides:
 - mapping between SQLite rows and domain types;
 - integration test for project/document persistence.
 
-#### `margin-diagnostics`
+#### `asten-diagnostics`
 
 Currently provides:
 
@@ -1639,7 +1639,7 @@ Currently provides:
 This is a minimal extension boundary. It is not yet incremental and should not
 be mistaken for the final engine architecture.
 
-#### `margin-api`
+#### `asten-api`
 
 Currently provides:
 
@@ -1655,7 +1655,7 @@ Currently provides:
 The frontend:
 
 - uses React and TanStack Query;
-- defines a `MarginClient` interface;
+- defines a `AstenClient` interface;
 - selects `TauriClient` when Tauri internals are present;
 - otherwise uses `HttpClient`;
 - lists and creates projects;
@@ -1907,7 +1907,7 @@ Potential requirements:
 
 Candidate CRDTs:
 
-- Loro, especially because rich text and movable trees align with Margin;
+- Loro, especially because rich text and movable trees align with Asten;
 - Yrs/Yjs, with mature ProseMirror integration;
 - Automerge.
 
@@ -1953,7 +1953,7 @@ name
 version
 author
 license
-supported Margin API version
+supported Asten API version
 entity schemas
 scene fields
 templates
@@ -1966,7 +1966,7 @@ permissions
 
 ### 22.4 Pack governance
 
-Margin must distinguish:
+Asten must distinguish:
 
 - official packs;
 - verified third-party packs;
@@ -2093,7 +2093,7 @@ AI features require project-specific evaluation sets:
 
 ### 24.3 Backups
 
-Margin should provide:
+Asten should provide:
 
 - automatic local snapshots;
 - retention policy visible to users;
@@ -2287,7 +2287,7 @@ Do not commit copyrighted book text. Tests should use:
 ### 28.2 Install
 
 ```powershell
-cd e:\margin
+cd B:\asten
 pnpm install
 ```
 
@@ -2574,7 +2574,7 @@ Tag findings by:
 
 ### 32.5 Research knowledge base
 
-The separate ingestion project at `e:\margin-research-ingest` can inventory and
+The separate ingestion project at `B:\asten-research-ingest` can inventory and
 convert lawfully acquired PDF, EPUB, Markdown, and text into a local,
 citation-preserving corpus.
 
@@ -2859,7 +2859,7 @@ Strengths:
 - compile flexibility;
 - trusted offline workflow.
 
-Gap Margin targets:
+Gap Asten targets:
 
 - structured connected canon;
 - live consistency diagnostics;
@@ -2874,7 +2874,7 @@ Strengths:
 - worldbuilding templates;
 - timelines and maps.
 
-Gap Margin targets:
+Gap Asten targets:
 
 - deeper manuscript editing;
 - local-first trust;
@@ -2891,7 +2891,7 @@ Strengths:
 - user trust;
 - graph.
 
-Gap Margin targets:
+Gap Asten targets:
 
 - purpose-built manuscript semantics;
 - structured story time and canon;
@@ -2904,7 +2904,7 @@ Strengths:
 - visual planning;
 - approachable cards and timelines.
 
-Gap Margin targets:
+Gap Asten targets:
 
 - rich knowledge graph;
 - manuscript-aware consistency engine;
@@ -2917,7 +2917,7 @@ Strengths:
 - prose-level reports;
 - editorial feedback.
 
-Gap Margin targets:
+Gap Asten targets:
 
 - project/world model;
 - cross-document canon;
@@ -2930,7 +2930,7 @@ Strengths:
 - ideation and prose generation;
 - accessible AI interaction.
 
-Margin differentiation:
+Asten differentiation:
 
 - authorial ownership;
 - evidence-backed editorial intelligence;
@@ -2976,7 +2976,7 @@ Exit criteria:
 - test authors understand and trust the proposed-fact flow;
 - false-positive policy is documented.
 
-### Phase 1: Margin Draft MVP
+### Phase 1: Asten Draft MVP
 
 Target:
 
@@ -3180,7 +3180,7 @@ Mitigations:
 
 Risk:
 
-Margin alienates writers and encodes cultural bias.
+Asten alienates writers and encodes cultural bias.
 
 Mitigations:
 
@@ -3239,7 +3239,7 @@ Mitigations:
 
 ## 38. Decisions Already Made
 
-- Product name: **Margin**.
+- Product name: **Asten**.
 - Positioning: **Let AI be your editor, not your writer.**
 - Local-first desktop capability is mandatory.
 - Web and desktop should share a frontend and application layer.
@@ -3389,5 +3389,5 @@ If that loop is trustworthy, the graph, timeline, map, screenplay, citations,
 plugins, and AI can become increasingly powerful views and contributors to the
 same model.
 
-If that loop is not trustworthy, adding more modules will not create the Margin
+If that loop is not trustworthy, adding more modules will not create the Asten
 described in this handoff.

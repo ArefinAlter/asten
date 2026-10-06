@@ -24,7 +24,7 @@ jobs:
       - run: pnpm check
       - run: pnpm lint
       - run: pnpm test
-      - run: pnpm --filter @margin/web build
+      - run: pnpm --filter @asten/web build
 
   rust:
     runs-on: ubuntu-latest
@@ -35,8 +35,8 @@ jobs:
           components: clippy,rustfmt
       - uses: Swatinem/rust-cache@v2
       - run: cargo fmt --all -- --check
-      - run: cargo clippy -p margin-domain -p margin-application -p margin-storage -p margin-diagnostics -p margin-api --all-targets -- -D warnings
-      - run: cargo test -p margin-domain -p margin-application -p margin-storage -p margin-diagnostics -p margin-api
+      - run: cargo clippy -p asten-domain -p asten-application -p asten-storage -p asten-diagnostics -p asten-api --all-targets -- -D warnings
+      - run: cargo test -p asten-domain -p asten-application -p asten-storage -p asten-diagnostics -p asten-api
 
   desktop:
     runs-on: windows-latest
@@ -52,5 +52,5 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @margin/web build
-      - run: cargo check -p margin-desktop
+      - run: pnpm --filter @asten/web build
+      - run: cargo check -p asten-desktop

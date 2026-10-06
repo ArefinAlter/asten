@@ -1,7 +1,8 @@
-use base64::{Engine as _, engine::general_purpose::STANDARD};
-use margin_domain::{
-    CompileArtifact, Document, document_plain_text, prosemirror_to_fountain, prosemirror_to_markdown,
+use asten_domain::{
+    CompileArtifact, Document, document_plain_text, prosemirror_to_fountain,
+    prosemirror_to_markdown,
 };
+use base64::{Engine as _, engine::general_purpose::STANDARD};
 use serde::{Deserialize, Serialize};
 
 use crate::{ApplicationError, Result};
@@ -21,7 +22,7 @@ pub struct CompileRequest {
     #[serde(default)]
     pub format: CompileFormat,
     #[serde(default)]
-    pub document_ids: Vec<margin_domain::DocumentId>,
+    pub document_ids: Vec<asten_domain::DocumentId>,
 }
 
 impl Default for CompileFormat {
@@ -41,9 +42,9 @@ pub fn compile_documents(
         .filter(|document| {
             matches!(
                 document.kind,
-                margin_domain::DocumentKind::Manuscript
-                    | margin_domain::DocumentKind::Chapter
-                    | margin_domain::DocumentKind::Scene
+                asten_domain::DocumentKind::Manuscript
+                    | asten_domain::DocumentKind::Chapter
+                    | asten_domain::DocumentKind::Scene
             )
         })
         .collect();
@@ -115,7 +116,10 @@ fn to_plain(title: &str, documents: &[&Document]) -> String {
 fn to_fountain(title: &str, documents: &[&Document]) -> String {
     let mut body = format!("Title: {title}\nCredit: Written by\n\n");
     for document in documents {
-        body.push_str(&prosemirror_to_fountain(&document.title, &document.content_json));
+        body.push_str(&prosemirror_to_fountain(
+            &document.title,
+            &document.content_json,
+        ));
         body.push('\n');
     }
     body
@@ -180,7 +184,8 @@ fn to_docx(title: &str, documents: &[&Document]) -> Result<Vec<u8>> {
     let mut cursor = Cursor::new(Vec::new());
     {
         let mut zip = ZipWriter::new(&mut cursor);
-        let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+        let options =
+            SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
         zip.start_file("[Content_Types].xml", options)
             .map_err(|error| ApplicationError::Storage(error.to_string()))?;
         zip.write_all(content_types.as_bytes())
@@ -235,5 +240,9 @@ fn slugify(value: &str) -> String {
         })
         .collect();
     let slug = slug.trim_matches('-');
-    if slug.is_empty() { "manuscript".into() } else { slug.into() }
+    if slug.is_empty() {
+        "manuscript".into()
+    } else {
+        slug.into()
+    }
 }

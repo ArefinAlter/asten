@@ -1,5 +1,5 @@
 [package]
-name = "margin-storage"
+name = "asten-storage"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -7,8 +7,8 @@ rust-version.workspace = true
 [dependencies]
 async-trait.workspace = true
 chrono.workspace = true
-margin-application = { path = "../margin-application" }
-margin-domain = { path = "../margin-domain" }
+asten-application = { path = "../asten-application" }
+asten-domain = { path = "../asten-domain" }
 serde_json.workspace = true
 sqlx.workspace = true
 uuid.workspace = true

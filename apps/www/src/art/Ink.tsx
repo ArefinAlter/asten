@@ -47,7 +47,7 @@ export function BrushUnderline({ className }: InkProps) {
   );
 }
 
-export function MarginRuleArt({ className }: InkProps) {
+export function RuleArt({ className }: InkProps) {
   return (
     <svg
       className={className}

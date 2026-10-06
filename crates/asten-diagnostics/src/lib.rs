@@ -1,4 +1,4 @@
-use margin_domain::{
+use asten_domain::{
     CanonEntity, Diagnostic, DiagnosticId, Document, DocumentKind, Fact, FactModality, FactStatus,
     MethodPack, Project, Severity, SourceAnchor, SourceRange, Suppression, TimelineEvent,
     document_plain_text, normalize_key, normalize_value, story_times_out_of_order,
@@ -25,11 +25,7 @@ pub struct AnalysisContext<'a> {
 
 impl<'a> AnalysisContext<'a> {
     #[must_use]
-    pub fn core(
-        project: &'a Project,
-        documents: &'a [Document],
-        facts: &'a [Fact],
-    ) -> Self {
+    pub fn core(project: &'a Project, documents: &'a [Document], facts: &'a [Fact]) -> Self {
         Self {
             project,
             documents,
@@ -205,7 +201,7 @@ fn analysis_fact(
     end: u32,
 ) -> Fact {
     Fact {
-        id: margin_domain::FactId::new(),
+        id: asten_domain::FactId::new(),
         project_id: project.id,
         entity_key: normalize_key(entity),
         predicate: normalize_key(predicate),
@@ -238,13 +234,12 @@ fn emit_fact_conflicts(facts: &[Fact], documents: &[Document], output: &mut Vec<
             {
                 continue;
             }
-            let severity = if left.status == FactStatus::Confirmed
-                && right.status == FactStatus::Confirmed
-            {
-                Severity::Error
-            } else {
-                Severity::Warning
-            };
+            let severity =
+                if left.status == FactStatus::Confirmed && right.status == FactStatus::Confirmed {
+                    Severity::Error
+                } else {
+                    Severity::Warning
+                };
             if let Some(source) = range_for_facts(left, right, documents) {
                 output.push(conflict_diagnostic(
                     severity,
@@ -337,7 +332,10 @@ fn is_comparable(fact: &Fact) -> bool {
 }
 
 fn is_color_predicate(predicate: &str) -> bool {
-    matches!(predicate, "hair_color" | "eye_color" | "haircolour" | "eyecolour")
+    matches!(
+        predicate,
+        "hair_color" | "eye_color" | "haircolour" | "eyecolour"
+    )
 }
 
 fn rule_allowed(context: &AnalysisContext<'_>, code: &str) -> bool {
@@ -351,11 +349,7 @@ fn rule_allowed(context: &AnalysisContext<'_>, code: &str) -> bool {
 }
 
 fn is_suppressed(context: &AnalysisContext<'_>, diagnostic: &Diagnostic) -> bool {
-    let entity = diagnostic
-        .message
-        .split(" · ")
-        .next()
-        .map(normalize_key);
+    let entity = diagnostic.message.split(" · ").next().map(normalize_key);
     context.suppressions.iter().any(|suppression| {
         suppression.hides(
             &diagnostic.code,
@@ -468,7 +462,12 @@ impl Rule for ClockContradiction {
         let mut dated: Vec<&TimelineEvent> = context
             .events
             .iter()
-            .filter(|event| event.story_time.as_ref().is_some_and(|value| !value.trim().is_empty()))
+            .filter(|event| {
+                event
+                    .story_time
+                    .as_ref()
+                    .is_some_and(|value| !value.trim().is_empty())
+            })
             .filter(|event| event.reading_order.is_some())
             .collect();
         dated.sort_by_key(|event| event.reading_order);
@@ -522,14 +521,14 @@ impl Rule for DictionHints {
         if !context.pack_enabled("diction") {
             return;
         }
-        let Some(pack) = context
-            .packs
-            .iter()
-            .find(|pack| pack.pack_key == "diction")
-        else {
+        let Some(pack) = context.packs.iter().find(|pack| pack.pack_key == "diction") else {
             return;
         };
-        let Some(hints) = pack.manifest.get("hints").and_then(|value| value.as_array()) else {
+        let Some(hints) = pack
+            .manifest
+            .get("hints")
+            .and_then(|value| value.as_array())
+        else {
             return;
         };
         for document in context.documents {
@@ -562,7 +561,9 @@ impl Rule for DictionHints {
                         start: found as u32,
                         end: (found + word.len()) as u32,
                     },
-                    details: Some("Craft hint from an enabled method pack. Not a canon error.".into()),
+                    details: Some(
+                        "Craft hint from an enabled method pack. Not a canon error.".into(),
+                    ),
                 });
             }
         }
@@ -628,11 +629,11 @@ fn surrounding_window(text: &str, start: usize, len: usize, radius: usize) -> St
 #[cfg(test)]
 mod tests {
     use super::{AnalysisContext, DiagnosticEngine};
-    use chrono::Utc;
-    use margin_domain::{
+    use asten_domain::{
         Document, DocumentId, DocumentKind, Fact, FactId, FactModality, FactStatus, Project,
         ProjectId, ProjectKind, Severity,
     };
+    use chrono::Utc;
     use serde_json::json;
 
     fn project() -> Project {
@@ -693,14 +694,20 @@ mod tests {
         let scene = document(&project, DocumentKind::Scene, json!({ "text": "Later." }));
         let engine = DiagnosticEngine::with_builtin_rules();
         let facts = vec![
-            fact(&project, "auburn", FactStatus::Confirmed, FactModality::Established),
-            fact(&project, "black", FactStatus::Confirmed, FactModality::Established),
+            fact(
+                &project,
+                "auburn",
+                FactStatus::Confirmed,
+                FactModality::Established,
+            ),
+            fact(
+                &project,
+                "black",
+                FactStatus::Confirmed,
+                FactModality::Established,
+            ),
         ];
-        let diagnostics = engine.analyze(&AnalysisContext::core(
-            &project,
-            &[scene],
-            &facts,
-        ));
+        let diagnostics = engine.analyze(&AnalysisContext::core(&project, &[scene], &facts));
         assert!(
             diagnostics
                 .iter()
@@ -714,14 +721,20 @@ mod tests {
         let scene = document(&project, DocumentKind::Scene, json!({ "text": "Later." }));
         let engine = DiagnosticEngine::with_builtin_rules();
         let facts = vec![
-            fact(&project, "auburn", FactStatus::Confirmed, FactModality::Established),
-            fact(&project, "black", FactStatus::Confirmed, FactModality::Contested),
+            fact(
+                &project,
+                "auburn",
+                FactStatus::Confirmed,
+                FactModality::Established,
+            ),
+            fact(
+                &project,
+                "black",
+                FactStatus::Confirmed,
+                FactModality::Contested,
+            ),
         ];
-        let diagnostics = engine.analyze(&AnalysisContext::core(
-            &project,
-            &[scene],
-            &facts,
-        ));
+        let diagnostics = engine.analyze(&AnalysisContext::core(&project, &[scene], &facts));
         assert!(diagnostics.is_empty());
     }
 
@@ -740,11 +753,7 @@ mod tests {
             FactStatus::Confirmed,
             FactModality::Established,
         )];
-        let diagnostics = engine.analyze(&AnalysisContext::core(
-            &project,
-            &[scene],
-            &facts,
-        ));
+        let diagnostics = engine.analyze(&AnalysisContext::core(&project, &[scene], &facts));
         assert!(
             diagnostics
                 .iter()
@@ -766,11 +775,7 @@ mod tests {
             json!({ "text": "[[mira.hair_color=black]]" }),
         );
         let engine = DiagnosticEngine::with_builtin_rules();
-        let diagnostics = engine.analyze(&AnalysisContext::core(
-            &project,
-            &[wiki, scene],
-            &[],
-        ));
+        let diagnostics = engine.analyze(&AnalysisContext::core(&project, &[wiki, scene], &[]));
         assert!(diagnostics.iter().any(|item| item.code == "CANON-E013"));
     }
 }

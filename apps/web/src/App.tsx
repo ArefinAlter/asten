@@ -6,7 +6,7 @@ import type {
   CreateProject,
   DocumentKind,
   ImportFormat,
-  MarginDocument,
+  AstenDocument,
   ProjectId,
   ProjectKind,
 } from "@asten/contracts";
@@ -14,16 +14,16 @@ import { Binder } from "./binder/Binder";
 import { Cast } from "./cast/Cast";
 import { CompileDock } from "./compile/CompileDock";
 import { ManuscriptEditor } from "./editor/ManuscriptEditor";
-import { createMarginClient } from "./lib/margin-client";
+import { createAstenClient } from "./lib/asten-client";
 import { emptyDoc } from "./lib/pm";
 import { Packs } from "./packs/Packs";
 import { Timeline } from "./timeline/Timeline";
 import { WorldInspector } from "./world/WorldInspector";
 import { WorldWorkspace } from "./world/WorldWorkspace";
 import type { WorldLens } from "./world/useWorld";
-import "./margin.css";
+import "./asten.css";
 
-const client = createMarginClient();
+const client = createAstenClient();
 type View =
   | "overview"
   | "write"
@@ -289,7 +289,7 @@ function App() {
     event.currentTarget.reset();
   }
 
-  function selectDocument(document: MarginDocument) {
+  function selectDocument(document: AstenDocument) {
     setSelectedDocumentId(document.id);
     setView("write");
   }

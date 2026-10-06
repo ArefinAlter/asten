@@ -12,18 +12,16 @@ services:
   api:
     build:
       context: .
-      dockerfile: services/margin-api/Dockerfile
+      dockerfile: services/asten-api/Dockerfile
     environment:
       ASTEN_BIND: 0.0.0.0:4317
       ASTEN_DATABASE_PATH: /app/data/asten.db
-      MARGIN_BIND: 0.0.0.0:4317
-      MARGIN_DATABASE_PATH: /app/data/asten.db
-      RUST_LOG: margin_api=info,tower_http=info
+      RUST_LOG: asten_api=info,tower_http=info
     ports:
       - "4317:4317"
     volumes:
-      - margin-data:/app/data
+      - asten-data:/app/data
     restart: unless-stopped
 
 volumes:
-  margin-data:
+  asten-data:

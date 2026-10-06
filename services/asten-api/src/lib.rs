@@ -2,19 +2,20 @@ mod extra;
 
 use std::{sync::Arc, time::Duration};
 
+use asten_application::{
+    Application, ApplicationError, CreateDocument, CreateFact, CreateProject, CreateWorldEntry,
+    UpdateDocument, UpdateWorldEntry,
+};
+use asten_domain::{
+    Diagnostic, Document, DocumentId, Fact, Project, ProjectId, WorldEntry, WorldEntryId,
+    WorldPulse,
+};
 use axum::{
     Json, Router,
     extract::{DefaultBodyLimit, Path, State},
     http::{HeaderName, Method, StatusCode},
     response::{IntoResponse, Response},
     routing::get,
-};
-use margin_application::{
-    Application, ApplicationError, CreateDocument, CreateFact, CreateProject, CreateWorldEntry,
-    UpdateDocument, UpdateWorldEntry,
-};
-use margin_domain::{
-    Diagnostic, Document, DocumentId, Fact, Project, ProjectId, WorldEntry, WorldEntryId, WorldPulse,
 };
 use serde::Serialize;
 use tower_http::{
@@ -58,10 +59,7 @@ pub fn router(application: Application) -> Router {
                     "/projects/{project_id}/facts",
                     get(list_facts).post(create_fact),
                 )
-                .route(
-                    "/projects/{project_id}/diagnostics",
-                    get(list_diagnostics),
-                )
+                .route("/projects/{project_id}/diagnostics", get(list_diagnostics))
                 .route(
                     "/projects/{project_id}/world-entries",
                     get(list_world_entries).post(create_world_entry),
@@ -70,10 +68,7 @@ pub fn router(application: Application) -> Router {
                     "/projects/{project_id}/world-entries/{entry_id}",
                     axum::routing::put(update_world_entry),
                 )
-                .route(
-                    "/projects/{project_id}/world-pulse",
-                    get(world_pulse),
-                )
+                .route("/projects/{project_id}/world-pulse", get(world_pulse))
                 .merge(extra::router()),
         )
         .with_state(ApiState { application })
@@ -224,10 +219,7 @@ async fn world_pulse(
     Path(project_id): Path<Uuid>,
 ) -> Result<Json<WorldPulse>, ApiError> {
     Ok(Json(
-        state
-            .application
-            .world_pulse(ProjectId(project_id))
-            .await?,
+        state.application.world_pulse(ProjectId(project_id)).await?,
     ))
 }
 
@@ -274,6 +266,6 @@ struct ErrorBody {
 }
 
 pub async fn application_for_database(path: &str) -> anyhow::Result<Application> {
-    let repository = margin_storage::SqliteRepository::open(path).await?;
+    let repository = asten_storage::SqliteRepository::open(path).await?;
     Ok(Application::new(Arc::new(repository)))
 }

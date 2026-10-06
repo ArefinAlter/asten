@@ -1,16 +1,16 @@
 use std::sync::Arc;
 
-use margin_application::{
+use asten_application::{
     Application, CreateDocument, CreateFact, CreateProject, CreateWorldEntry, UpdateWorldEntry,
 };
-use margin_domain::{DocumentKind, ProjectKind, Severity, WorldKind, WorldStatus};
-use margin_storage::SqliteRepository;
+use asten_domain::{DocumentKind, ProjectKind, Severity, WorldKind, WorldStatus};
+use asten_storage::SqliteRepository;
 use serde_json::json;
 use uuid::Uuid;
 
 #[tokio::test]
 async fn persists_projects_and_documents() {
-    let path = std::env::temp_dir().join(format!("margin-test-{}.db", Uuid::now_v7()));
+    let path = std::env::temp_dir().join(format!("asten-test-{}.db", Uuid::now_v7()));
     let repository = SqliteRepository::open(&path).await.unwrap();
     let application = Application::new(Arc::new(repository));
 
@@ -69,9 +69,9 @@ async fn persists_projects_and_documents() {
         .unwrap();
     let diagnostics = application.analyze_project(project.id).await.unwrap();
     assert!(
-        diagnostics.iter().any(|item| {
-            item.code == "CANON-E013" && item.severity == Severity::Warning
-        }),
+        diagnostics
+            .iter()
+            .any(|item| { item.code == "CANON-E013" && item.severity == Severity::Warning }),
         "expected a lexical hair-color warning, got {diagnostics:?}"
     );
 
@@ -117,8 +117,8 @@ async fn persists_projects_and_documents() {
     let compiled = application
         .compile_project(
             project.id,
-            margin_application::CompileRequest {
-                format: margin_application::CompileFormat::Markdown,
+            asten_application::CompileRequest {
+                format: asten_application::CompileFormat::Markdown,
                 document_ids: Vec::new(),
             },
         )

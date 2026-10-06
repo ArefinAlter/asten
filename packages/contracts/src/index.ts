@@ -24,7 +24,7 @@ export interface CreateProject {
 export type DocumentKind =
   "manuscript" | "chapter" | "scene" | "wiki" | "note" | "source";
 
-export interface MarginDocument {
+export interface AstenDocument {
   id: DocumentId;
   project_id: ProjectId;
   parent_id: DocumentId | null;
@@ -98,7 +98,7 @@ export interface CreateFact {
   valid_to?: string | null;
 }
 
-export interface MarginDiagnostic {
+export interface AstenDiagnostic {
   id: DiagnosticId;
   code: string;
   severity: Severity;

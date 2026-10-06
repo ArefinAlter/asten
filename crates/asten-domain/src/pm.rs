@@ -33,9 +33,7 @@ fn assign_ids(value: &mut Value) {
                 .unwrap_or_default()
                 .to_owned();
             if !node_type.is_empty() && node_type != "text" {
-                let attrs = map
-                    .entry("attrs")
-                    .or_insert_with(|| json!({}));
+                let attrs = map.entry("attrs").or_insert_with(|| json!({}));
                 if let Some(attrs) = attrs.as_object_mut() {
                     let missing = attrs
                         .get("id")

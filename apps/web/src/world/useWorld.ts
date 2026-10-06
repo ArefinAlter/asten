@@ -4,9 +4,9 @@ import type {
   ProjectId,
   UpdateWorldEntry,
 } from "@asten/contracts";
-import { createMarginClient } from "../lib/margin-client";
+import { createAstenClient } from "../lib/asten-client";
 
-const client = createMarginClient();
+const client = createAstenClient();
 
 export function useWorld(projectId?: ProjectId) {
   const queryClient = useQueryClient();

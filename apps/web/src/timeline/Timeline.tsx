@@ -1,10 +1,10 @@
 import type { FormEvent } from "react";
-import type { CanonEntity, MarginDocument, TimelineEvent } from "@asten/contracts";
+import type { CanonEntity, AstenDocument, TimelineEvent } from "@asten/contracts";
 
 interface Props {
   events: TimelineEvent[];
   entities: CanonEntity[];
-  documents: MarginDocument[];
+  documents: AstenDocument[];
   onCreate: (input: {
     title: string;
     story_time?: string;
