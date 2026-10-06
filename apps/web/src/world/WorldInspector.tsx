@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { WorldStatus } from "@margin/contracts";
+import type { WorldStatus } from "@asten/contracts";
 import {
   icebergCaption,
   kindLabel,

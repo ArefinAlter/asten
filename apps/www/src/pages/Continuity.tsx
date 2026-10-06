@@ -41,7 +41,7 @@ export function Continuity() {
 
       <Reveal className="closer">
         <p>
-          Craft advice stays a method pack. Margin will not mark “show,
+          Craft advice stays a method pack. Asten will not mark “show,
           don’t tell” as a defect.
         </p>
         <Link to="/environment" className="quiet">

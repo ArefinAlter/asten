@@ -1,4 +1,4 @@
-@import "@margin/brand/tokens.css";
+@import "@asten/brand/tokens.css";
 
 * {
   box-sizing: border-box;
@@ -160,6 +160,18 @@ main {
   top: -40px;
   left: -8%;
   width: min(720px, 90vw);
+}
+
+.hero-pen {
+  width: min(280px, 70%);
+  margin-top: 18px;
+  color: var(--ochre);
+  opacity: 0.7;
+}
+
+.ibis-art {
+  width: 140px;
+  color: var(--bound);
 }
 
 .spread-art {

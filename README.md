@@ -1,9 +1,12 @@
-# Margin
+# Asten
 
-Margin is a local-first writing IDE. The current repository is an architectural
-scaffold: project and document persistence works. Confirmed facts and the first
-continuity rule (`CANON-E013` attribute contradiction) now run on demand. Broader
-editorial rules, method packs, and the manuscript editor remain extension points.
+Asten is a local-first writing environment. The name is another name for Thoth,
+the Egyptian god of writing. The thesis is unchanged: let AI be the editor, not
+the writer.
+
+The desk is a manuscript editor with a binder, comments, find, page view, and
+track changes. The compiler notices contradictions in world, character, and
+time. Word and Docs remain guests.
 
 ## Prerequisites
 
@@ -23,13 +26,17 @@ pnpm dev:api
 # Terminal 2: browser UI
 pnpm dev
 
-# Or run the same UI in the desktop shell
+# Marketing site
+pnpm www
+
+# Desktop shell
 pnpm dev:desktop
 ```
 
-The API listens on `127.0.0.1:4317`; Vite listens on `localhost:1420`.
-Desktop data is stored in the operating system's application-data directory.
-API development data defaults to `data/margin.db`.
+The API listens on `127.0.0.1:4317`; the desk listens on `localhost:1420`;
+the foyer listens on `localhost:4320`. Desktop data is stored in the operating
+system's application-data directory as `asten.db`. API development data defaults
+to `data/asten.db`.
 
 ## Workspace
 
@@ -37,19 +44,22 @@ API development data defaults to `data/margin.db`.
 apps/
   web/                    Shared React frontend
   desktop/src-tauri/      Tauri transport and native shell
+  www/                    Marketing foyer
+  addin-word/             Word task pane (local API)
+  addin-docs/             Docs add-on notes
 crates/
   margin-domain/          Transport-independent data types
   margin-application/     Use cases and repository boundary
   margin-storage/         SQLite adapter and migrations
-  margin-diagnostics/     Rule-engine extension boundary
+  margin-diagnostics/     Rule engine
 packages/
   contracts/              Shared TypeScript API contracts
+  brand/                  Ink and paper tokens
 services/
-  margin-api/             Axum HTTP transport and middleware
-docs/
-  architecture.md         Dependency rules and design decisions
-  PROJECT_HANDOFF.md      Complete product and engineering handoff
+  margin-api/             Axum HTTP transport
 ```
+
+Crate folder names still say `margin-*` in this tree; the product name is Asten.
 
 ## Quality checks
 
@@ -59,6 +69,3 @@ pnpm lint
 pnpm test
 pnpm format:check
 ```
-
-The `books/` research directory, databases, generated output, editor settings,
-and secrets are excluded from Git.

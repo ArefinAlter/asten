@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { BrushWash, IcebergMark, WaxSeal, Wordmark } from "../art/Ink";
+import { BrushWash, IbisMark, IcebergMark, ReedPen, WaxSeal, Wordmark } from "../art/Ink";
 import { DiagnosticDemo } from "../components/DiagnosticDemo";
 import { Reveal } from "../components/Reveal";
 
@@ -13,9 +13,10 @@ export function Home() {
           <Wordmark large />
         </h1>
         <p className="lede">
-          The environment that notices. It underlines a contradiction in
+          Named for Thoth in another tongue. Asten notices a contradiction in
           world, character, or time — and leaves the sentence yours.
         </p>
+        <ReedPen className="hero-pen" />
         <div className="actions">
           <Link to="/download" className="cta">
             Open the library
@@ -35,7 +36,7 @@ export function Home() {
           <p className="eyebrow">Not a generator</p>
           <h2>AI as the editor, not the writer.</h2>
           <p>
-            Margin keeps the manuscript on this machine. It can point at a
+            Asten keeps the manuscript on this machine. It can point at a
             span. It does not pick up the pen. World tools stay optional. A
             gardener starts a scene. An architect may pin a harbor first.
             Neither path is the gate.
@@ -47,6 +48,30 @@ export function Home() {
         </div>
       </Reveal>
 
+      <Reveal className="cards">
+        <article>
+          <h2>The desk</h2>
+          <p>
+            A binder, a page, comments, find, counts, a letter-sized view, and
+            track changes. Paginate when you ask how long the book feels.
+          </p>
+        </article>
+        <article>
+          <h2>The compiler</h2>
+          <p>
+            Confirmed facts, two clocks, a settled death. Problems point at
+            evidence. You can suppress a rule.
+          </p>
+        </article>
+        <article>
+          <h2>The guests</h2>
+          <p>
+            Compile to Markdown, Fountain, HTML, and Word. Import the draft
+            home. Add-ins come after the file path works.
+          </p>
+        </article>
+      </Reveal>
+
       <Reveal className="seals-row">
         <WaxSeal label="Asked why" />
         <WaxSeal label="A place" />
@@ -54,16 +79,19 @@ export function Home() {
         <WaxSeal label="Wrote anyway" />
       </Reveal>
 
-      <Reveal className="closer">
-        <h2>Take it to Word. Bring it back.</h2>
-        <p>
-          Margin is the desk. Word and Docs are guests. Page view, track
-          changes, and compile live here. The agency template can wait in
-          another window.
-        </p>
-        <Link to="/interop" className="quiet">
-          How the fence works
-        </Link>
+      <Reveal className="split">
+        <div>
+          <p className="eyebrow">The name</p>
+          <h2>Asten, another name for Thoth.</h2>
+          <p>
+            The ibis-headed scribe. Writing, the moon, the weighing of words.
+            We kept paper, ink, and ochre. We did not build a temple theme.
+          </p>
+          <Link to="/name" className="quiet">
+            Why the name
+          </Link>
+        </div>
+        <IbisMark className="ibis-art" />
       </Reveal>
     </main>
   );

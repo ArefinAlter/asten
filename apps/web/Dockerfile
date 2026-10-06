@@ -6,7 +6,7 @@ COPY apps/web ./apps/web
 COPY apps/desktop/package.json ./apps/desktop/package.json
 COPY packages/contracts ./packages/contracts
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @margin/web build
+RUN pnpm --filter @asten/web build
 
 FROM nginx:1.29-alpine
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf

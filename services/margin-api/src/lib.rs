@@ -1,3 +1,5 @@
+mod extra;
+
 use std::{sync::Arc, time::Duration};
 
 use axum::{
@@ -71,7 +73,8 @@ pub fn router(application: Application) -> Router {
                 .route(
                     "/projects/{project_id}/world-pulse",
                     get(world_pulse),
-                ),
+                )
+                .merge(extra::router()),
         )
         .with_state(ApiState { application })
         .layer(DefaultBodyLimit::max(10 * 1024 * 1024))
@@ -90,7 +93,7 @@ pub fn router(application: Application) -> Router {
 async fn health() -> Json<HealthResponse> {
     Json(HealthResponse {
         status: "ok",
-        service: "margin-api",
+        service: "asten-api",
     })
 }
 

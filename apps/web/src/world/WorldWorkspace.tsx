@@ -1,5 +1,5 @@
 import { type FormEvent, type PointerEvent, useMemo, useRef, useState } from "react";
-import type { IdeaPrompt, WorldEntry, WorldKind } from "@margin/contracts";
+import type { IdeaPrompt, WorldEntry, WorldKind } from "@asten/contracts";
 import {
   DISCOVERY_LABELS,
   WORLD_KINDS,

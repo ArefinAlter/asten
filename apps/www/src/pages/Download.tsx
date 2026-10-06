@@ -4,12 +4,12 @@ export function Download() {
       <p className="eyebrow">The library</p>
       <h1>Open it on this machine.</h1>
       <p className="lede">
-        The desktop build will sit here. Until then the environment runs
-        locally from the Margin repository — API on one port, the desk on
-        another. Nothing cute. No account.
+        The desktop build will sit here. Until then Asten runs locally from
+        the repository — API on one port, the desk on another. Nothing cute.
+        No account.
       </p>
       <ol className="steps">
-        <li>Clone the Margin repository.</li>
+        <li>Clone the Asten repository.</li>
         <li>
           <code>pnpm install</code>
         </li>

@@ -162,7 +162,60 @@ export function Wordmark({ large = false }: { large?: boolean }) {
   return (
     <span className={`wordmark${large ? " large" : ""}`}>
       <span className="spine" aria-hidden="true" />
-      Margin
+      Asten
     </span>
+  );
+}
+
+export function ReedPen({ className }: InkProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 280 48"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        className="ink-draw"
+        pathLength="1"
+        d="M8 30c36-18 72-22 118-8 28 8 54 6 86-8 18-8 40-10 60-2"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+      />
+      <path
+        d="M248 12l18 14-28 8 10-22z"
+        fill="currentColor"
+        opacity="0.7"
+      />
+    </svg>
+  );
+}
+
+export function IbisMark({ className }: InkProps) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 120 90"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        className="ink-draw"
+        pathLength="1"
+        d="M22 58c8-22 28-38 48-34 14 2 22 14 18 26-6 18-28 22-40 12-4 10 2 22 16 26"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+      />
+      <path
+        className="ink-draw delay"
+        pathLength="1"
+        d="M68 28c18-10 34-8 46 6"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }

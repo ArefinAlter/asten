@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Asten for Word</title>
+    <style>
+      body {
+        font: 15px/1.5 Georgia, serif;
+        color: #26231f;
+        background: #f6f4ef;
+        margin: 16px;
+      }
+      button {
+        border: 1px solid #7a5c3e;
+        background: #7a5c3e;
+        color: #f6f4ef;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      pre {
+        white-space: pre-wrap;
+        font: 12px/1.4 ui-monospace, monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <p>Asten stays on this machine. Word is a guest.</p>
+    <label>
+      Project id
+      <input id="project" />
+    </label>
+    <button type="button" id="check">Check selection</button>
+    <pre id="out"></pre>
+    <script>
+      const out = document.getElementById("out");
+      document.getElementById("check").onclick = async () => {
+        const project = document.getElementById("project").value.trim();
+        if (!project) {
+          out.textContent = "A project id is required.";
+          return;
+        }
+        const response = await fetch(
+          "http://127.0.0.1:4317/api/v1/projects/" + project + "/diagnostics",
+        );
+        out.textContent = await response.text();
+      };
+    </script>
+  </body>
+</html>

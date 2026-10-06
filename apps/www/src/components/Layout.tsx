@@ -4,16 +4,22 @@ import { Wordmark } from "../art/Ink";
 const LINKS = [
   ["/", "Notice"],
   ["/environment", "Desk"],
-  ["/continuity", "Continuity"],
+  ["/continuity", "Canon"],
+  ["/cast", "Cast"],
+  ["/time", "Time"],
+  ["/world", "World"],
+  ["/engine", "Engine"],
+  ["/packs", "Packs"],
   ["/interop", "Guests"],
   ["/local", "Local"],
+  ["/name", "Name"],
 ] as const;
 
 export function Layout() {
   return (
     <div className="site">
       <header className="top">
-        <NavLink to="/" className="brand" aria-label="Margin home">
+        <NavLink to="/" className="brand" aria-label="Asten home">
           <Wordmark />
         </NavLink>
         <nav>

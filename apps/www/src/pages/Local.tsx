@@ -17,7 +17,7 @@ export function LocalPage() {
         </article>
         <article>
           <h2>Export is not a favor</h2>
-          <p>If Margin vanished tomorrow, the manuscript still opens elsewhere.</p>
+          <p>If Asten vanished tomorrow, the manuscript still opens elsewhere.</p>
         </article>
         <article>
           <h2>Provenance</h2>

@@ -6,7 +6,7 @@ export function Interop() {
       <p className="eyebrow">Guests</p>
       <h1>Word and Docs remain in the house.</h1>
       <p className="lede">
-        Margin does not replace them. It sends a clean manuscript out and
+        Asten does not replace them. It sends a clean manuscript out and
         takes prose back. Add-ins come after the file path works.
       </p>
 
@@ -25,7 +25,7 @@ export function Interop() {
         <article>
           <h2>Add-ins</h2>
           <p>
-            A Word add-in and a Docs add-on that send a selection to Margin
+            A Word add-in and a Docs add-on that send a selection to Asten
             and show a problem. Canon does not move to Microsoft or Google.
           </p>
         </article>

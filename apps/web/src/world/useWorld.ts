@@ -3,7 +3,7 @@ import type {
   CreateWorldEntry,
   ProjectId,
   UpdateWorldEntry,
-} from "@margin/contracts";
+} from "@asten/contracts";
 import { createMarginClient } from "../lib/margin-client";
 
 const client = createMarginClient();

@@ -1,9 +1,12 @@
 use margin_domain::{
-    Diagnostic, DiagnosticId, Document, DocumentKind, Fact, FactModality, FactStatus, Project,
-    Severity, SourceAnchor, SourceRange, document_plain_text, normalize_key, normalize_value,
+    CanonEntity, Diagnostic, DiagnosticId, Document, DocumentKind, Fact, FactModality, FactStatus,
+    MethodPack, Project, Severity, SourceAnchor, SourceRange, Suppression, TimelineEvent,
+    document_plain_text, normalize_key, normalize_value, story_times_out_of_order,
 };
 
 pub const ATTRIBUTE_CONTRADICTION: &str = "CANON-E013";
+pub const LIFECYCLE_AFTER_DEATH: &str = "CANON-E101";
+pub const CLOCK_ORDER: &str = "CANON-E201";
 
 const COLOR_WORDS: &[&str] = &[
     "amber", "auburn", "black", "blond", "blonde", "blue", "brown", "ginger", "gray", "green",
@@ -14,6 +17,38 @@ pub struct AnalysisContext<'a> {
     pub project: &'a Project,
     pub documents: &'a [Document],
     pub facts: &'a [Fact],
+    pub entities: &'a [CanonEntity],
+    pub events: &'a [TimelineEvent],
+    pub suppressions: &'a [Suppression],
+    pub packs: &'a [MethodPack],
+}
+
+impl<'a> AnalysisContext<'a> {
+    #[must_use]
+    pub fn core(
+        project: &'a Project,
+        documents: &'a [Document],
+        facts: &'a [Fact],
+    ) -> Self {
+        Self {
+            project,
+            documents,
+            facts,
+            entities: &[],
+            events: &[],
+            suppressions: &[],
+            packs: &[],
+        }
+    }
+
+    #[must_use]
+    pub fn pack_enabled(&self, key: &str) -> bool {
+        self.packs
+            .iter()
+            .find(|pack| pack.pack_key == key)
+            .map(|pack| pack.enabled)
+            .unwrap_or(key == "scribe")
+    }
 }
 
 pub trait Rule: Send + Sync {
@@ -36,6 +71,9 @@ impl DiagnosticEngine {
     pub fn with_builtin_rules() -> Self {
         let mut engine = Self::new();
         engine.register(AttributeContradiction);
+        engine.register(LifecycleContradiction);
+        engine.register(ClockContradiction);
+        engine.register(DictionHints);
         engine
     }
 
@@ -47,8 +85,12 @@ impl DiagnosticEngine {
     pub fn analyze(&self, context: &AnalysisContext<'_>) -> Vec<Diagnostic> {
         let mut diagnostics = Vec::new();
         for rule in &self.rules {
+            if !rule_allowed(context, rule.code()) {
+                continue;
+            }
             rule.evaluate(context, &mut diagnostics);
         }
+        diagnostics.retain(|item| !is_suppressed(context, item));
         diagnostics
     }
 
@@ -298,6 +340,235 @@ fn is_color_predicate(predicate: &str) -> bool {
     matches!(predicate, "hair_color" | "eye_color" | "haircolour" | "eyecolour")
 }
 
+fn rule_allowed(context: &AnalysisContext<'_>, code: &str) -> bool {
+    match code {
+        ATTRIBUTE_CONTRADICTION => true,
+        LIFECYCLE_AFTER_DEATH => context.pack_enabled("lifecycle"),
+        CLOCK_ORDER => context.pack_enabled("clocks"),
+        "CRAFT-H001" | "CRAFT-H002" => context.pack_enabled("diction"),
+        _ => true,
+    }
+}
+
+fn is_suppressed(context: &AnalysisContext<'_>, diagnostic: &Diagnostic) -> bool {
+    let entity = diagnostic
+        .message
+        .split(" · ")
+        .next()
+        .map(normalize_key);
+    context.suppressions.iter().any(|suppression| {
+        suppression.hides(
+            &diagnostic.code,
+            diagnostic.source.document_id,
+            entity.as_deref(),
+        )
+    })
+}
+
+pub struct LifecycleContradiction;
+
+impl Rule for LifecycleContradiction {
+    fn code(&self) -> &'static str {
+        LIFECYCLE_AFTER_DEATH
+    }
+
+    fn evaluate(&self, context: &AnalysisContext<'_>, output: &mut Vec<Diagnostic>) {
+        for fact in context.facts {
+            if fact.status != FactStatus::Confirmed
+                || fact.modality == FactModality::Contested
+                || !is_death_fact(fact)
+            {
+                continue;
+            }
+            let death_order = context
+                .events
+                .iter()
+                .filter(|event| event_matches_entity(event, &fact.entity_key, context))
+                .filter_map(|event| event.reading_order)
+                .min();
+            let Some(death_order) = death_order else {
+                continue;
+            };
+            for event in context.events {
+                let Some(order) = event.reading_order else {
+                    continue;
+                };
+                if order <= death_order || !event_matches_entity(event, &fact.entity_key, context) {
+                    continue;
+                }
+                if looks_like_flashback(&event.notes) {
+                    continue;
+                }
+                let source = event
+                    .document_id
+                    .or_else(|| context.documents.first().map(|document| document.id));
+                let Some(document_id) = source else {
+                    continue;
+                };
+                output.push(Diagnostic {
+                    id: DiagnosticId::new(),
+                    code: LIFECYCLE_AFTER_DEATH.to_owned(),
+                    severity: Severity::Error,
+                    message: format!(
+                        "{} acts after a settled death ({})",
+                        fact.entity_key, event.title
+                    ),
+                    source: SourceRange {
+                        document_id,
+                        start: 0,
+                        end: 0,
+                    },
+                    details: Some(
+                        "A later reading-order beat still belongs to someone you marked dead. \
+                         Mark the beat a flashback, move the death, or suppress the rule."
+                            .into(),
+                    ),
+                });
+            }
+        }
+    }
+}
+
+fn is_death_fact(fact: &Fact) -> bool {
+    matches!(fact.predicate.as_str(), "lifecycle" | "status" | "alive")
+        && matches!(
+            normalize_value(&fact.value).as_str(),
+            "dead" | "deceased" | "died" | "false" | "no"
+        )
+}
+
+fn event_matches_entity(
+    event: &TimelineEvent,
+    entity_key: &str,
+    context: &AnalysisContext<'_>,
+) -> bool {
+    if let Some(entity_id) = event.entity_id {
+        return context
+            .entities
+            .iter()
+            .any(|entity| entity.id == entity_id && normalize_key(&entity.name) == entity_key);
+    }
+    normalize_key(&event.title).contains(entity_key)
+        || normalize_key(&event.notes).contains(entity_key)
+}
+
+fn looks_like_flashback(notes: &str) -> bool {
+    let lower = notes.to_ascii_lowercase();
+    lower.contains("flashback") || lower.contains("memory") || lower.contains("earlier")
+}
+
+pub struct ClockContradiction;
+
+impl Rule for ClockContradiction {
+    fn code(&self) -> &'static str {
+        CLOCK_ORDER
+    }
+
+    fn evaluate(&self, context: &AnalysisContext<'_>, output: &mut Vec<Diagnostic>) {
+        let mut dated: Vec<&TimelineEvent> = context
+            .events
+            .iter()
+            .filter(|event| event.story_time.as_ref().is_some_and(|value| !value.trim().is_empty()))
+            .filter(|event| event.reading_order.is_some())
+            .collect();
+        dated.sort_by_key(|event| event.reading_order);
+        for pair in dated.windows(2) {
+            let earlier = pair[0];
+            let later = pair[1];
+            let (Some(left), Some(right)) = (&earlier.story_time, &later.story_time) else {
+                continue;
+            };
+            if !story_times_out_of_order(left, right) {
+                continue;
+            }
+            let document_id = later
+                .document_id
+                .or(earlier.document_id)
+                .or_else(|| context.documents.first().map(|document| document.id));
+            let Some(document_id) = document_id else {
+                continue;
+            };
+            output.push(Diagnostic {
+                id: DiagnosticId::new(),
+                code: CLOCK_ORDER.to_owned(),
+                severity: Severity::Error,
+                message: format!(
+                    "reading order places “{}” before “{}”, but story time runs the other way",
+                    earlier.title, later.title
+                ),
+                source: SourceRange {
+                    document_id,
+                    start: 0,
+                    end: 0,
+                },
+                details: Some(
+                    "Story time and reading order are different clocks. Reorder the binder, \
+                     retcon a date, or mark one beat a flashback."
+                        .into(),
+                ),
+            });
+        }
+    }
+}
+
+pub struct DictionHints;
+
+impl Rule for DictionHints {
+    fn code(&self) -> &'static str {
+        "CRAFT-H001"
+    }
+
+    fn evaluate(&self, context: &AnalysisContext<'_>, output: &mut Vec<Diagnostic>) {
+        if !context.pack_enabled("diction") {
+            return;
+        }
+        let Some(pack) = context
+            .packs
+            .iter()
+            .find(|pack| pack.pack_key == "diction")
+        else {
+            return;
+        };
+        let Some(hints) = pack.manifest.get("hints").and_then(|value| value.as_array()) else {
+            return;
+        };
+        for document in context.documents {
+            if document.kind == DocumentKind::Wiki {
+                continue;
+            }
+            let text = document_plain_text(&document.content_json);
+            for hint in hints {
+                let Some(word) = hint.get("word").and_then(|value| value.as_str()) else {
+                    continue;
+                };
+                let Some(found) = find_word(&text, word) else {
+                    continue;
+                };
+                output.push(Diagnostic {
+                    id: DiagnosticId::new(),
+                    code: hint
+                        .get("code")
+                        .and_then(|value| value.as_str())
+                        .unwrap_or("CRAFT-H001")
+                        .to_owned(),
+                    severity: Severity::Hint,
+                    message: hint
+                        .get("message")
+                        .and_then(|value| value.as_str())
+                        .unwrap_or("Optional diction note.")
+                        .to_owned(),
+                    source: SourceRange {
+                        document_id: document.id,
+                        start: found as u32,
+                        end: (found + word.len()) as u32,
+                    },
+                    details: Some("Craft hint from an enabled method pack. Not a canon error.".into()),
+                });
+            }
+        }
+    }
+}
+
 fn intervals_overlap(left: &Fact, right: &Fact) -> bool {
     !range_before(left.valid_to.as_deref(), right.valid_from.as_deref())
         && !range_before(right.valid_to.as_deref(), left.valid_from.as_deref())
@@ -387,6 +658,7 @@ mod tests {
             content_json: content,
             position: 0,
             revision: 1,
+            exclude_from_compile: false,
             created_at: now,
             updated_at: now,
         }
@@ -424,11 +696,11 @@ mod tests {
             fact(&project, "auburn", FactStatus::Confirmed, FactModality::Established),
             fact(&project, "black", FactStatus::Confirmed, FactModality::Established),
         ];
-        let diagnostics = engine.analyze(&AnalysisContext {
-            project: &project,
-            documents: &[scene],
-            facts: &facts,
-        });
+        let diagnostics = engine.analyze(&AnalysisContext::core(
+            &project,
+            &[scene],
+            &facts,
+        ));
         assert!(
             diagnostics
                 .iter()
@@ -445,11 +717,11 @@ mod tests {
             fact(&project, "auburn", FactStatus::Confirmed, FactModality::Established),
             fact(&project, "black", FactStatus::Confirmed, FactModality::Contested),
         ];
-        let diagnostics = engine.analyze(&AnalysisContext {
-            project: &project,
-            documents: &[scene],
-            facts: &facts,
-        });
+        let diagnostics = engine.analyze(&AnalysisContext::core(
+            &project,
+            &[scene],
+            &facts,
+        ));
         assert!(diagnostics.is_empty());
     }
 
@@ -468,11 +740,11 @@ mod tests {
             FactStatus::Confirmed,
             FactModality::Established,
         )];
-        let diagnostics = engine.analyze(&AnalysisContext {
-            project: &project,
-            documents: &[scene],
-            facts: &facts,
-        });
+        let diagnostics = engine.analyze(&AnalysisContext::core(
+            &project,
+            &[scene],
+            &facts,
+        ));
         assert!(
             diagnostics
                 .iter()
@@ -494,11 +766,11 @@ mod tests {
             json!({ "text": "[[mira.hair_color=black]]" }),
         );
         let engine = DiagnosticEngine::with_builtin_rules();
-        let diagnostics = engine.analyze(&AnalysisContext {
-            project: &project,
-            documents: &[wiki, scene],
-            facts: &[],
-        });
+        let diagnostics = engine.analyze(&AnalysisContext::core(
+            &project,
+            &[wiki, scene],
+            &[],
+        ));
         assert!(diagnostics.iter().any(|item| item.code == "CANON-E013"));
     }
 }

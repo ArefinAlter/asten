@@ -1,18 +1,18 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Margin",
+  "productName": "Asten",
   "version": "0.1.0",
-  "identifier": "com.margin.app",
+  "identifier": "com.asten.app",
   "build": {
-    "beforeDevCommand": "pnpm --dir ../../.. --filter @margin/web dev",
+    "beforeDevCommand": "pnpm --dir ../../.. --filter @asten/web dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "pnpm --dir ../../.. --filter @margin/web build",
+    "beforeBuildCommand": "pnpm --dir ../../.. --filter @asten/web build",
     "frontendDist": "../../web/dist"
   },
   "app": {
     "windows": [
       {
-        "title": "Margin",
+        "title": "Asten",
         "width": 1440,
         "height": 900,
         "minWidth": 960,

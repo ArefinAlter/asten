@@ -1,13 +1,13 @@
 {
-  "name": "margin",
+  "name": "asten",
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@11.7.0",
   "scripts": {
-    "dev": "pnpm --filter @margin/web dev",
-    "www": "pnpm --filter @margin/www dev",
+    "dev": "pnpm --filter @asten/web dev",
+    "www": "pnpm --filter @asten/www dev",
     "dev:api": "cargo run -p margin-api",
-    "dev:desktop": "pnpm --filter @margin/desktop dev",
+    "dev:desktop": "pnpm --filter @asten/desktop dev",
     "build": "pnpm -r build && cargo build --workspace",
     "check": "pnpm -r check && cargo check --workspace",
     "lint": "pnpm -r lint && cargo clippy --workspace --all-targets -- -D warnings",

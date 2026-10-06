@@ -39,8 +39,8 @@ export function Environment() {
         <article>
           <h2>Compile</h2>
           <p>
-            The binder becomes a manuscript. .docx, PDF, Fountain. Take it
-            with you. Bring the draft home.
+            The binder becomes a manuscript. .docx, HTML, Fountain. Take it
+            with you. Print to PDF from the page. Bring the draft home.
           </p>
         </article>
       </Reveal>

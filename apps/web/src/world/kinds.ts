@@ -1,4 +1,4 @@
-import type { IdeaPrompt, WorldKind, WorldStatus } from "@margin/contracts";
+import type { IdeaPrompt, WorldKind, WorldStatus } from "@asten/contracts";
 
 export const WORLD_KINDS: WorldKind[] = [
   "place",

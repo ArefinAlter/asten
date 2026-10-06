@@ -114,7 +114,17 @@ async fn persists_projects_and_documents() {
             .any(|fact| fact.entity_key == "dusk_harbor" && fact.predicate == "place"),
         "settling a place should mint a confirmed fact, got {facts:?}"
     );
-
+    let compiled = application
+        .compile_project(
+            project.id,
+            margin_application::CompileRequest {
+                format: margin_application::CompileFormat::Markdown,
+                document_ids: Vec::new(),
+            },
+        )
+        .await
+        .unwrap();
+    assert!(compiled.body.contains("Harbor"));
     drop(application);
     let _ = std::fs::remove_file(&path);
     let _ = std::fs::remove_file(path.with_extension("db-shm"));

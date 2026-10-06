@@ -2,6 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+#[macro_export]
 macro_rules! entity_id {
     ($name:ident) => {
         #[derive(
@@ -36,6 +37,12 @@ entity_id!(DocumentId);
 entity_id!(DiagnosticId);
 entity_id!(FactId);
 entity_id!(WorldEntryId);
+
+mod engine;
+mod pm;
+
+pub use engine::*;
+pub use pm::*;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -77,6 +84,8 @@ pub struct Document {
     pub content_json: serde_json::Value,
     pub position: i64,
     pub revision: i64,
+    #[serde(default)]
+    pub exclude_from_compile: bool,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
@@ -449,6 +458,7 @@ mod tests {
             content_json: serde_json::json!({"text": "She heard the harbor."}),
             position: 0,
             revision: 1,
+            exclude_from_compile: false,
             created_at: now,
             updated_at: now,
         }];

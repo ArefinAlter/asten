@@ -13,8 +13,9 @@ async fn main() -> anyhow::Result<()> {
         )
         .init();
 
-    let database_path =
-        env::var("MARGIN_DATABASE_PATH").unwrap_or_else(|_| "data/margin.db".into());
+    let database_path = env::var("ASTEN_DATABASE_PATH")
+        .or_else(|_| env::var("MARGIN_DATABASE_PATH"))
+        .unwrap_or_else(|_| "data/asten.db".into());
     if let Some(parent) = std::path::Path::new(&database_path).parent() {
         tokio::fs::create_dir_all(parent)
             .await
@@ -22,12 +23,13 @@ async fn main() -> anyhow::Result<()> {
     }
     let application = margin_api::application_for_database(&database_path).await?;
     let app = margin_api::router(application);
-    let address: SocketAddr = env::var("MARGIN_BIND")
+    let address: SocketAddr = env::var("ASTEN_BIND")
+        .or_else(|_| env::var("MARGIN_BIND"))
         .unwrap_or_else(|_| "127.0.0.1:4317".into())
         .parse()
-        .context("MARGIN_BIND must be a valid socket address")?;
+        .context("ASTEN_BIND must be a valid socket address")?;
     let listener = tokio::net::TcpListener::bind(address).await?;
-    info!(%address, %database_path, "Margin API listening");
+    info!(%address, %database_path, "Asten API listening");
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await?;

@@ -1,5 +1,5 @@
 {
-  "name": "@margin/www",
+  "name": "@asten/www",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@margin/brand": "workspace:*",
+    "@asten/brand": "workspace:*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.9.0"

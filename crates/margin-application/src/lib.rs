@@ -4,13 +4,27 @@ use async_trait::async_trait;
 use chrono::Utc;
 use margin_diagnostics::{AnalysisContext, DiagnosticEngine};
 use margin_domain::{
-    Diagnostic, Document, DocumentId, DocumentKind, Fact, FactId, FactModality, FactStatus,
-    IdeaPrompt, Project, ProjectId, ProjectKind, SourceAnchor, WorldEntry, WorldEntryId, WorldKind,
-    WorldPulse, WorldStatus, compute_world_pulse, default_world_hue, entity_key_from_title,
-    normalize_key,
+    CanonEntity, Comment, CommentId, CompileArtifact, Diagnostic, Document, DocumentId, DocumentKind,
+    DocumentOp, DocumentSnapshot, EntityId, Fact, FactId, FactModality, FactStatus, IdeaPrompt,
+    MethodPack, MethodPackId, Project, ProjectId, ProjectKind, SnapshotId, SourceAnchor, Suppression,
+    TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId, WorldEntry, WorldEntryId,
+    WorldKind, WorldPulse, WorldStatus, compute_world_pulse, default_world_hue, empty_prosemirror_doc,
+    ensure_block_ids, entity_key_from_title, normalize_key,
 };
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
+
+mod compile;
+mod engine_app;
+mod import;
+
+pub use compile::{CompileFormat, CompileRequest, compile_documents};
+pub use engine_app::{
+    CreateCanonEntity, CreateComment, CreateSnapshot, CreateSuppression, CreateTimelineEvent,
+    CreateTrackedChange, ResolveTrackedChange, UpdateCanonEntity, UpdateComment, UpdateMethodPack,
+    UpdateTimelineEvent,
+};
+pub use import::{ImportFormat, ImportRequest, imported_document_json, imported_title};
 
 #[derive(Debug, Error)]
 pub enum ApplicationError {
@@ -48,6 +62,11 @@ pub struct CreateDocument {
 pub struct UpdateDocument {
     pub title: Option<String>,
     pub content_json: Option<serde_json::Value>,
+    pub parent_id: Option<Option<DocumentId>>,
+    pub position: Option<i64>,
+    pub exclude_from_compile: Option<bool>,
+    #[serde(default)]
+    pub actor: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -112,6 +131,33 @@ pub trait Repository: Send + Sync {
     async fn find_world_entry(&self, id: WorldEntryId) -> Result<Option<WorldEntry>>;
     async fn insert_world_entry(&self, entry: &WorldEntry) -> Result<()>;
     async fn update_world_entry(&self, entry: &WorldEntry) -> Result<()>;
+    async fn list_entities(&self, project_id: ProjectId) -> Result<Vec<CanonEntity>>;
+    async fn find_entity(&self, id: EntityId) -> Result<Option<CanonEntity>>;
+    async fn insert_entity(&self, entity: &CanonEntity) -> Result<()>;
+    async fn update_entity(&self, entity: &CanonEntity) -> Result<()>;
+    async fn list_events(&self, project_id: ProjectId) -> Result<Vec<TimelineEvent>>;
+    async fn find_event(&self, id: TimelineEventId) -> Result<Option<TimelineEvent>>;
+    async fn insert_event(&self, event: &TimelineEvent) -> Result<()>;
+    async fn update_event(&self, event: &TimelineEvent) -> Result<()>;
+    async fn list_comments(&self, document_id: DocumentId) -> Result<Vec<Comment>>;
+    async fn find_comment(&self, id: CommentId) -> Result<Option<Comment>>;
+    async fn insert_comment(&self, comment: &Comment) -> Result<()>;
+    async fn update_comment(&self, comment: &Comment) -> Result<()>;
+    async fn next_op_seq(&self, document_id: DocumentId) -> Result<i64>;
+    async fn insert_op(&self, op: &DocumentOp) -> Result<()>;
+    async fn list_ops(&self, document_id: DocumentId) -> Result<Vec<DocumentOp>>;
+    async fn insert_snapshot(&self, snapshot: &DocumentSnapshot) -> Result<()>;
+    async fn list_snapshots(&self, document_id: DocumentId) -> Result<Vec<DocumentSnapshot>>;
+    async fn find_snapshot(&self, id: SnapshotId) -> Result<Option<DocumentSnapshot>>;
+    async fn list_suppressions(&self, project_id: ProjectId) -> Result<Vec<Suppression>>;
+    async fn insert_suppression(&self, suppression: &Suppression) -> Result<()>;
+    async fn list_packs(&self) -> Result<Vec<MethodPack>>;
+    async fn update_pack(&self, pack: &MethodPack) -> Result<()>;
+    async fn find_pack(&self, id: MethodPackId) -> Result<Option<MethodPack>>;
+    async fn list_tracked_changes(&self, document_id: DocumentId) -> Result<Vec<TrackedChange>>;
+    async fn insert_tracked_change(&self, change: &TrackedChange) -> Result<()>;
+    async fn update_tracked_change(&self, change: &TrackedChange) -> Result<()>;
+    async fn find_tracked_change(&self, id: TrackedChangeId) -> Result<Option<TrackedChange>>;
 }
 
 #[derive(Clone)]
@@ -181,6 +227,13 @@ impl Application {
                 "document title cannot be empty".into(),
             ));
         }
+        let content_json = if input.content_json.is_null()
+            || input.content_json == serde_json::json!({})
+        {
+            empty_prosemirror_doc()
+        } else {
+            ensure_block_ids(input.content_json)
+        };
         let now = Utc::now();
         let document = Document {
             id: DocumentId::new(),
@@ -188,13 +241,15 @@ impl Application {
             parent_id: input.parent_id,
             kind: input.kind,
             title: title.to_owned(),
-            content_json: input.content_json,
+            content_json,
             position: input.position,
             revision: 1,
+            exclude_from_compile: false,
             created_at: now,
             updated_at: now,
         };
         self.repository.insert_document(&document).await?;
+        self.record_op(&document, "create", "author").await?;
         Ok(document)
     }
 
@@ -214,11 +269,26 @@ impl Application {
             document.title = title.to_owned();
         }
         if let Some(content_json) = input.content_json {
-            document.content_json = content_json;
+            document.content_json = ensure_block_ids(content_json);
+        }
+        if let Some(parent_id) = input.parent_id {
+            document.parent_id = parent_id;
+        }
+        if let Some(position) = input.position {
+            document.position = position;
+        }
+        if let Some(exclude_from_compile) = input.exclude_from_compile {
+            document.exclude_from_compile = exclude_from_compile;
         }
         document.revision += 1;
         document.updated_at = Utc::now();
         self.repository.update_document(&document).await?;
+        self.record_op(
+            &document,
+            "edit",
+            input.actor.as_deref().unwrap_or("author"),
+        )
+        .await?;
         Ok(document)
     }
 
@@ -263,10 +333,18 @@ impl Application {
         let project = self.get_project(project_id).await?;
         let documents = self.repository.list_documents(project_id).await?;
         let facts = self.repository.list_facts(project_id).await?;
+        let entities = self.repository.list_entities(project_id).await?;
+        let events = self.repository.list_events(project_id).await?;
+        let suppressions = self.repository.list_suppressions(project_id).await?;
+        let packs = self.repository.list_packs().await?;
         Ok(DiagnosticEngine::with_builtin_rules().analyze(&AnalysisContext {
             project: &project,
             documents: &documents,
             facts: &facts,
+            entities: &entities,
+            events: &events,
+            suppressions: &suppressions,
+            packs: &packs,
         }))
     }
 
@@ -425,6 +503,54 @@ impl Application {
                 source: None,
                 created_at: now,
                 updated_at: now,
+            })
+            .await
+    }
+
+    pub async fn compile_project(
+        &self,
+        project_id: ProjectId,
+        request: CompileRequest,
+    ) -> Result<CompileArtifact> {
+        let project = self.get_project(project_id).await?;
+        let mut documents = self.repository.list_documents(project_id).await?;
+        if !request.document_ids.is_empty() {
+            documents.retain(|document| request.document_ids.contains(&document.id));
+        }
+        compile_documents(&project.name, &documents, &request.format)
+    }
+
+    pub async fn import_document(
+        &self,
+        project_id: ProjectId,
+        request: ImportRequest,
+    ) -> Result<Document> {
+        let content_json = imported_document_json(&request)?;
+        self.create_document(CreateDocument {
+            project_id,
+            parent_id: request.parent_id,
+            kind: request.kind.unwrap_or(DocumentKind::Manuscript),
+            title: imported_title(&request.filename),
+            content_json,
+            position: 0,
+        })
+        .await
+    }
+
+    async fn record_op(&self, document: &Document, kind: &str, actor: &str) -> Result<()> {
+        let seq = self.repository.next_op_seq(document.id).await?;
+        self.repository
+            .insert_op(&DocumentOp {
+                id: margin_domain::DocumentOpId::new(),
+                document_id: document.id,
+                seq,
+                kind: kind.to_owned(),
+                op_json: serde_json::json!({
+                    "revision": document.revision,
+                    "title": document.title,
+                }),
+                actor: actor.to_owned(),
+                created_at: Utc::now(),
             })
             .await
     }
