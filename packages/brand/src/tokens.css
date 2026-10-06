@@ -1,18 +1,143 @@
+/*
+ * Asten brand tokens. The scribe's pigments. See docs/BRAND.md.
+ *
+ * Day (papyrus) is the default. Night (lapis) follows the system preference
+ * unless the page sets data-theme="day" or data-theme="night" on <html>.
+ */
+
 :root {
-  --ink: #26231f;
-  --paper: #f6f4ef;
-  --leaf: #fffdf8;
-  --rule: #dedbd3;
-  --ochre: #7a5c3e;
-  --ochre-deep: #5c432c;
-  --bound: #58483b;
-  --mute: #6f6a61;
-  --dust: #83796b;
-  --error: #a62e2e;
-  --warn: #8a5a12;
-  --moss: #3d4a32;
-  --serif: Georgia, "Times New Roman", serif;
-  --sans: Inter, ui-sans-serif, system-ui, sans-serif;
-  --radius: 4px;
+  color-scheme: light;
+
+  /* Surfaces */
+  --papyrus: #f5eedf;
+  --papyrus-raised: #fbf7ee;
+  --papyrus-sunk: #ece2cc;
+  --rule: #d9caa9;
+  --rule-strong: #bfab82;
+
+  /* Ink */
+  --ink: #1e1a15;
+  --ink-2: #4a4136;
+  --ink-3: #6e6253;
+
+  /* Voices */
+  --rubric: #b0351f;
+  --rubric-deep: #8c2814;
+  --rubric-wash: rgb(176 53 31 / 10%);
+  --lapis: #1f3f77;
+  --lapis-wash: rgb(31 63 119 / 9%);
+  --malachite: #2e6b4e;
+  --malachite-wash: rgb(46 107 78 / 11%);
+  --gold: #b98419;
+
+  /* Night registers (used in both themes for "ceiling" sections) */
+  --night: #0f1a2e;
+  --night-raised: #16264a;
+  --night-ink: #f1e7d2;
+  --night-ink-2: #c9bda5;
+  --star: #e3b341;
+
+  /* Pigments for illustration */
+  --art-line: #1e1a15;
+  --art-stroke: #1e1a15;
+  --art-red: #b0351f;
+  --art-blue: #2b62b0;
+  --art-lapis: #1f3f77;
+  --art-green: #2e6b4e;
+  --art-turq: #3d9a94;
+  --art-ochre: #c98a2e;
+  --art-gold: #d9a631;
+  --art-flesh: #a9532e;
+  --art-natron: #fffcf5;
+  --art-papyrus: #efe3c6;
+  --art-sand: #dcc597;
+  --art-shadow: #c9b58c;
+  --art-ground: #ece2cc;
+
+  /* Type */
+  --font-display: "Fraunces Variable", "Fraunces", Georgia, "Times New Roman", serif;
+  --font-text: "Literata Variable", "Literata", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  --font-glyph: "Noto Sans Egyptian Hieroglyphs", serif;
+
+  /* Shape and rhythm */
+  --radius-s: 4px;
+  --radius: 8px;
+  --radius-l: 16px;
   --measure: 40rem;
+  --ease-ink: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-rise: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-settle: cubic-bezier(0.34, 1.36, 0.64, 1);
+
+  /* Legacy aliases kept for older surfaces */
+  --paper: var(--papyrus);
+  --leaf: var(--papyrus-raised);
+  --ochre: var(--rubric);
+  --ochre-deep: var(--rubric-deep);
+  --bound: var(--ink-2);
+  --mute: var(--ink-3);
+  --dust: var(--ink-3);
+  --moss: var(--malachite);
+  --error: var(--rubric);
+  --warn: #8a5a12;
+  --serif: var(--font-text);
+  --sans: var(--font-text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="day"]) {
+    color-scheme: dark;
+    --papyrus: #0f1a2e;
+    --papyrus-raised: #15233d;
+    --papyrus-sunk: #0b1424;
+    --rule: #2a3a5a;
+    --rule-strong: #3e5179;
+    --ink: #f1e7d2;
+    --ink-2: #cbbfa6;
+    --ink-3: #9e937f;
+    --rubric: #e8694c;
+    --rubric-deep: #f08a70;
+    --rubric-wash: rgb(232 105 76 / 14%);
+    --lapis: #9bbdf2;
+    --lapis-wash: rgb(155 189 242 / 12%);
+    --malachite: #6cc59a;
+    --malachite-wash: rgb(108 197 154 / 13%);
+    --gold: #e3b341;
+    --night: #08101f;
+    --night-raised: #101c35;
+    --art-stroke: #e9dfc8;
+    --art-natron: #f3ead6;
+    --art-papyrus: #e4d6b4;
+    --art-sand: #c9b383;
+    --art-shadow: #b9a57a;
+    --art-ground: #e4d6b4;
+  }
+}
+
+:root[data-theme="night"] {
+  color-scheme: dark;
+  --papyrus: #0f1a2e;
+  --papyrus-raised: #15233d;
+  --papyrus-sunk: #0b1424;
+  --rule: #2a3a5a;
+  --rule-strong: #3e5179;
+  --ink: #f1e7d2;
+  --ink-2: #cbbfa6;
+  --ink-3: #9e937f;
+  --rubric: #e8694c;
+  --rubric-deep: #f08a70;
+  --rubric-wash: rgb(232 105 76 / 14%);
+  --lapis: #9bbdf2;
+  --lapis-wash: rgb(155 189 242 / 12%);
+  --malachite: #6cc59a;
+  --malachite-wash: rgb(108 197 154 / 13%);
+  --gold: #e3b341;
+  --night: #08101f;
+  --night-raised: #101c35;
+  --art-stroke: #e9dfc8;
+  --art-natron: #f3ead6;
+  --art-papyrus: #e4d6b4;
+  --art-sand: #c9b383;
+  --art-shadow: #b9a57a;
+  --art-ground: #e4d6b4;
 }
