@@ -57,4 +57,4 @@ Research ingest is a separate Python tool (`asten-ingest`) in the other repo. It
 
 ## CI
 
-On `fb373b8`, desktop passed. Rust failed clippy in `asten-diagnostics` and `asten-application`. Frontend failed Prettier in `@asten/contracts` and `@asten/web`. The fix for those checks is in the tree with this note.
+Three jobs. Frontend checks TypeScript on Linux. Rust checks the library crates. Desktop checks the Tauri shell on Windows. The Linux job does not compile the shell, because that needs GTK.

@@ -20,10 +20,12 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm format:check
-      - run: pnpm check
-      - run: pnpm lint
-      - run: pnpm test
+      # Root scripts also cargo-check the Tauri shell. That crate needs GTK,
+      # so the desktop job checks it on Windows instead.
+      - run: pnpm -r format:check
+      - run: pnpm -r check
+      - run: pnpm -r lint
+      - run: pnpm -r test
       - run: pnpm --filter @asten/web build
 
   rust:
