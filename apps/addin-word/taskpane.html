@@ -3,12 +3,21 @@
   <head>
     <meta charset="utf-8" />
     <title>Asten for Word</title>
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     <style>
       body {
-        font: 15px/1.5 Georgia, serif;
+        margin: 16px;
         color: #26231f;
         background: #f6f4ef;
-        margin: 16px;
+        font: 15px/1.5 Georgia, "Times New Roman", serif;
+      }
+      p, label, button, select { font: inherit; }
+      .quiet { color: #6f6a61; font: 13px/1.4 ui-sans-serif, system-ui, sans-serif; }
+      label { display: block; margin: 12px 0; }
+      select, button {
+        display: block;
+        width: 100%;
+        margin-top: 6px;
       }
       button {
         border: 1px solid #7a5c3e;
@@ -17,33 +26,147 @@
         padding: 8px 12px;
         cursor: pointer;
       }
+      button.quiet-button {
+        background: transparent;
+        color: #26231f;
+        margin-top: 8px;
+      }
       pre {
         white-space: pre-wrap;
-        font: 12px/1.4 ui-monospace, monospace;
+        font: 12px/1.45 ui-monospace, monospace;
       }
+      li { margin: 8px 0; }
     </style>
   </head>
   <body>
-    <p>Asten stays on this machine. Word is a guest.</p>
+    <p>Asten is a Verne product. Word is a guest. Canon stays on this machine.</p>
+    <p class="quiet" id="status">Looking for the local API…</p>
     <label>
-      Project id
-      <input id="project" />
+      Project
+      <select id="project"></select>
     </label>
-    <button type="button" id="check">Check selection</button>
+    <button type="button" id="refresh">Refresh diagnostics</button>
+    <button type="button" class="quiet-button" id="file">File the selection</button>
+    <ul id="problems"></ul>
     <pre id="out"></pre>
     <script>
+      const API = "http://127.0.0.1:4317";
+      const status = document.getElementById("status");
+      const project = document.getElementById("project");
+      const problems = document.getElementById("problems");
       const out = document.getElementById("out");
-      document.getElementById("check").onclick = async () => {
-        const project = document.getElementById("project").value.trim();
-        if (!project) {
-          out.textContent = "A project id is required.";
+
+      function say(message) {
+        status.textContent = message;
+      }
+
+      async function loadProjects() {
+        const response = await fetch(API + "/api/v1/projects");
+        if (!response.ok) throw new Error("The local API refused the project list.");
+        const items = await response.json();
+        project.replaceChildren();
+        for (const item of items) {
+          const option = document.createElement("option");
+          option.value = item.id;
+          option.textContent = item.name;
+          project.append(option);
+        }
+        if (!items.length) say("The API is up. There is no project yet.");
+        else say("Connected to Asten on this machine.");
+      }
+
+      async function loadDiagnostics() {
+        if (!project.value) {
+          say("Choose a project.");
           return;
         }
         const response = await fetch(
-          "http://127.0.0.1:4317/api/v1/projects/" + project + "/diagnostics",
+          API + "/api/v1/projects/" + project.value + "/diagnostics",
         );
-        out.textContent = await response.text();
+        const items = await response.json();
+        problems.replaceChildren();
+        if (!Array.isArray(items) || !items.length) {
+          say("No diagnostics.");
+          return;
+        }
+        for (const item of items) {
+          const line = document.createElement("li");
+          line.textContent = item.code + " — " + item.message;
+          problems.append(line);
+        }
+        say(items.length + " diagnostics.");
+      }
+
+      function selectedText() {
+        if (!window.Office || !Office.context || !Office.context.document) {
+          return Promise.resolve("");
+        }
+        return new Promise((resolve, reject) => {
+          Office.context.document.getSelectedDataAsync(
+            Office.CoercionType.Text,
+            (result) => {
+              if (result.status === Office.AsyncResultStatus.Succeeded) {
+                resolve(String(result.value || ""));
+              } else {
+                reject(new Error(result.error.message));
+              }
+            },
+          );
+        });
+      }
+
+      async function fileSelection() {
+        const text = (await selectedText()).trim();
+        if (!text) {
+          say("Select prose in Word first.");
+          return;
+        }
+        if (!project.value) {
+          say("Choose a project.");
+          return;
+        }
+        const response = await fetch(
+          API + "/api/v1/projects/" + project.value + "/import",
+          {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              filename: "From Word",
+              format: "plain",
+              body: text,
+              kind: "scene",
+            }),
+          },
+        );
+        const body = await response.text();
+        out.textContent = body;
+        if (!response.ok) {
+          say("Asten did not file the selection.");
+          return;
+        }
+        say("Filed into the local project.");
+        await loadDiagnostics();
+      }
+
+      document.getElementById("refresh").onclick = () => {
+        loadDiagnostics().catch((error) => {
+          say(error.message);
+        });
       };
+      document.getElementById("file").onclick = () => {
+        fileSelection().catch((error) => {
+          say(error.message);
+        });
+      };
+
+      function boot() {
+        loadProjects().catch((error) => {
+          say(error.message + " Start the API on 127.0.0.1:4317.");
+        });
+      }
+
+      if (window.Office) Office.onReady(boot);
+      else boot();
     </script>
   </body>
 </html>

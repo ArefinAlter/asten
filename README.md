@@ -4,9 +4,9 @@ Asten is a local-first writing environment. The name is another name for Thoth,
 the Egyptian god of writing. The thesis is unchanged: let AI be the editor, not
 the writer.
 
-The desk is a manuscript editor with a binder, comments, find, page view, and
-track changes. The compiler notices contradictions in world, character, and
-time. Word and Docs remain guests.
+Asten is a Verne product. The desk is a manuscript editor with a binder,
+comments, find, page view, and track changes. The compiler notices
+contradictions in world, character, and time. Word and Docs remain guests.
 
 ## Prerequisites
 
@@ -44,9 +44,9 @@ to `data/asten.db`.
 apps/
   web/                    Shared React frontend
   desktop/src-tauri/      Tauri transport and native shell
-  www/                    Marketing foyer
+  www/                    Public foyer, legal record, and crawl files
   addin-word/             Word task pane (local API)
-  addin-docs/             Docs add-on notes
+  addin-docs/             Docs sidebar (local API)
 crates/
   asten-domain/          Transport-independent data types
   asten-application/     Use cases and repository boundary

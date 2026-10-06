@@ -2,13 +2,20 @@
 <OfficeApp
   xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
   xsi:type="TaskPaneApp">
-  <Id>8f2c1c2e-4b7a-4e4a-9c0f-asten0000001</Id>
-  <Version>0.1.0</Version>
-  <ProviderName>Asten</ProviderName>
+  <Id>8f2c1c2e-4b7a-4e4a-9c0f-a57e00000001</Id>
+  <Version>0.2.0</Version>
+  <ProviderName>Verne</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Asten"/>
-  <Description DefaultValue="Send a selection to the local Asten compiler. Canon stays on this machine."/>
+  <Description DefaultValue="A Verne product. File a selection to the local Asten compiler. Canon stays on this machine."/>
+  <IconUrl DefaultValue="https://localhost:3000/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://localhost:3000/icon-64.png"/>
+  <SupportUrl DefaultValue="https://github.com/ArefinAlter/asten"/>
+  <AppDomains>
+    <AppDomain>https://localhost:3000</AppDomain>
+  </AppDomains>
   <Hosts>
     <Host Name="Document"/>
   </Hosts>

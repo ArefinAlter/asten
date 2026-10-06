@@ -11,8 +11,10 @@ import { Interop } from "./pages/Interop";
 import { LocalPage } from "./pages/Local";
 import { Name } from "./pages/Name";
 import { Packs } from "./pages/Packs";
+import { Record } from "./pages/Record";
 import { Time } from "./pages/Time";
 import { World } from "./pages/World";
+import { pages } from "./seo/catalog";
 
 export default function App() {
   return (
@@ -32,6 +34,15 @@ export default function App() {
           <Route path="local" element={<LocalPage />} />
           <Route path="name" element={<Name />} />
           <Route path="download" element={<Download />} />
+          {pages
+            .filter((page) => page.kind !== "story")
+            .map((page) => (
+              <Route
+                key={page.path}
+                path={page.path.slice(1)}
+                element={<Record />}
+              />
+            ))}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

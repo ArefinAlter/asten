@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export function Download() {
   return (
     <main className="page">
@@ -18,6 +20,11 @@ export function Download() {
         </li>
         <li>Write a scene. Pin a scrap. Neither is the gate.</li>
       </ol>
+      <p>
+        Asten is a Verne product. Read the <Link to="/license">license</Link>{" "}
+        and the <Link to="/privacy">privacy policy</Link> before you treat a
+        diagnostic as a verdict.
+      </p>
     </main>
   );
 }

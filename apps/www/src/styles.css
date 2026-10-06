@@ -1,5 +1,9 @@
 @import "@asten/brand/tokens.css";
 
+:root {
+  --sans: ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -411,6 +415,83 @@ main p {
   margin: 0;
   color: #d9d0c4;
   font-size: 13px;
+}
+
+.footer-brand {
+  display: flex;
+  flex: 1 1 280px;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px 36px;
+}
+
+.verne-credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  color: #f4efe6;
+}
+
+.verne-credit .built {
+  color: #d9d0c4;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.verne-credit img {
+  display: block;
+  height: 34px;
+  width: auto;
+}
+
+.verne-credit .ltd {
+  font-size: 15px;
+  letter-spacing: 0.01em;
+}
+
+.footer-links {
+  display: flex;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.footer-links a {
+  color: #e6d3b0;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.record h2,
+.record h3 {
+  margin-top: 2.2rem;
+}
+
+.record .question {
+  border-top: 1px solid var(--rule);
+  padding-top: 4px;
+}
+
+.record a {
+  color: var(--ochre);
+  border-bottom: 1px solid var(--ochre);
+}
+
+.colophon {
+  margin-top: 48px;
+  color: var(--dust);
+  font-size: 14px;
+}
+
+.crawl {
+  max-width: var(--measure);
+}
+
+html.js .crawl {
+  display: none;
 }
 
 .reveal {

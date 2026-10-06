@@ -3,7 +3,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
 import Underline from "@tiptap/extension-underline";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AstenDocument } from "@asten/contracts";
 import { Deletion, Insertion, SceneBreak } from "./marks";
 import { countWords, toEditorDoc } from "../lib/pm";
@@ -26,6 +26,7 @@ export function ManuscriptEditor({
   saving,
 }: Props) {
   const [matches, setMatches] = useState(0);
+  const findCursor = useRef(0);
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -70,7 +71,37 @@ export function ManuscriptEditor({
       index = found + needle.length;
     }
     setMatches(count);
+    findCursor.current = -1;
   }, [editor, findQuery, document.revision]);
+
+  function stepFind(direction: 1 | -1) {
+    if (!editor) return;
+    const needle = findQuery.trim().toLowerCase();
+    if (!needle) return;
+    const found: { from: number; to: number }[] = [];
+    editor.state.doc.descendants((node, pos) => {
+      if (!node.isText || !node.text) return;
+      const text = node.text.toLowerCase();
+      let start = 0;
+      while (start < text.length) {
+        const at = text.indexOf(needle, start);
+        if (at < 0) break;
+        found.push({ from: pos + at, to: pos + at + needle.length });
+        start = at + needle.length;
+      }
+    });
+    if (!found.length) return;
+    const next =
+      findCursor.current < 0
+        ? direction === 1
+          ? 0
+          : found.length - 1
+        : (findCursor.current + direction + found.length) % found.length;
+    findCursor.current = next;
+    const range = found[next];
+    if (!range) return;
+    editor.chain().focus().setTextSelection(range).scrollIntoView().run();
+  }
 
   if (!editor) return <p className="status">Opening the page…</p>;
 
@@ -148,6 +179,16 @@ export function ManuscriptEditor({
         >
           {saving ? "Saving…" : "Save"}
         </button>
+        {findQuery.trim() && (
+          <>
+            <button type="button" onClick={() => stepFind(-1)}>
+              Previous
+            </button>
+            <button type="button" onClick={() => stepFind(1)}>
+              Next
+            </button>
+          </>
+        )}
         <span className="toolbar-stats">
           {words} words · {chars} characters
           {findQuery.trim() ? ` · ${matches} found` : ""}

@@ -7,7 +7,8 @@ export function Interop() {
       <h1>Word and Docs remain in the house.</h1>
       <p className="lede">
         Asten does not replace them. It sends a clean manuscript out and
-        takes prose back. Add-ins come after the file path works.
+        takes prose back. The Word task pane and the Docs sidebar call the
+        local API. Canon does not move to Microsoft, Google, or Verne.
       </p>
 
       <Reveal className="cards">

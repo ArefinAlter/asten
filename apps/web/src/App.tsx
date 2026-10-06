@@ -676,7 +676,7 @@ function App() {
       <footer className="statusbar">
         <span>Local first</span>
         <span>{diagnostics.data?.length ?? 0} diagnostics</span>
-        <span>Asten 0.1.0</span>
+        <span>A Verne product</span>
       </footer>
     </div>
   );

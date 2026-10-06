@@ -8,13 +8,14 @@ export function Home() {
     <main>
       <section className="hero">
         <BrushWash className="hero-wash" />
-        <p className="eyebrow">A writing environment</p>
+        <p className="eyebrow">A Verne product</p>
         <h1>
           <Wordmark large />
         </h1>
         <p className="lede">
-          Named for Thoth in another tongue. Asten notices a contradiction in
-          world, character, or time — and leaves the sentence yours.
+          Named for Thoth in another tongue. Asten, published by Verne,
+          notices a contradiction in world, character, or time — and leaves
+          the sentence yours.
         </p>
         <ReedPen className="hero-pen" />
         <div className="actions">
@@ -67,7 +68,8 @@ export function Home() {
           <h2>The guests</h2>
           <p>
             Compile to Markdown, Fountain, HTML, and Word. Import the draft
-            home. Add-ins come after the file path works.
+            home. Word and Docs can file a selection to the machine. Canon
+            does not leave it.
           </p>
         </article>
       </Reveal>

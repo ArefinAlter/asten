@@ -13,6 +13,12 @@ export function Name() {
         Paper, ink, ochre, Georgia on the page. A reed-pen stroke. An ibis
         line, not a costume. The sentence stays yours.
       </p>
+      <h2>Who publishes it</h2>
+      <p>
+        Asten is a Verne product. Verne makes the environment and this
+        website. The manuscript stays the author’s. The legal notice names
+        the repository, and it does not invent a postal address.
+      </p>
       <h2>What we refused</h2>
       <p>
         Purple SaaS. A mythological skin. A doctrine named after a craft

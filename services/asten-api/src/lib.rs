@@ -12,8 +12,10 @@ use asten_domain::{
 };
 use axum::{
     Json, Router,
+    body::Body,
     extract::{DefaultBodyLimit, Path, State},
-    http::{HeaderName, Method, StatusCode},
+    http::{HeaderName, HeaderValue, Method, Request, StatusCode},
+    middleware::{self, Next},
     response::{IntoResponse, Response},
     routing::get,
 };
@@ -79,10 +81,20 @@ pub fn router(application: Application) -> Router {
         ))
         .layer(CompressionLayer::new())
         .layer(cors)
+        .layer(middleware::from_fn(allow_private_network))
         .layer(PropagateRequestIdLayer::new(request_id.clone()))
         .layer(SetRequestIdLayer::new(request_id, MakeRequestUuid))
         .layer(TraceLayer::new_for_http())
         .layer(CatchPanicLayer::new())
+}
+
+async fn allow_private_network(request: Request<Body>, next: Next) -> Response {
+    let mut response = next.run(request).await;
+    response.headers_mut().insert(
+        HeaderName::from_static("access-control-allow-private-network"),
+        HeaderValue::from_static("true"),
+    );
+    response
 }
 
 async fn health() -> Json<HealthResponse> {
