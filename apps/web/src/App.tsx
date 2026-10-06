@@ -25,13 +25,7 @@ import "./asten.css";
 
 const client = createAstenClient();
 type View =
-  | "overview"
-  | "write"
-  | "world"
-  | "cast"
-  | "time"
-  | "compile"
-  | "packs";
+  "overview" | "write" | "world" | "cast" | "time" | "compile" | "packs";
 
 function App() {
   const [selectedProjectId, setSelectedProjectId] = useState<ProjectId>();
@@ -86,7 +80,8 @@ function App() {
   });
   const snapshots = useQuery({
     queryKey: ["snapshots", selectedProjectId, selectedDocumentId],
-    queryFn: () => client.listSnapshots(selectedProjectId!, selectedDocumentId!),
+    queryFn: () =>
+      client.listSnapshots(selectedProjectId!, selectedDocumentId!),
     enabled: Boolean(selectedProjectId && selectedDocumentId),
   });
 
@@ -157,7 +152,8 @@ function App() {
   const createEntity = useMutation({
     mutationFn: (input: {
       name: string;
-      kind: "character" | "place" | "event" | "item" | "rule" | "source" | "other";
+      kind:
+        "character" | "place" | "event" | "item" | "rule" | "source" | "other";
       notes: string;
     }) =>
       client.createEntity({
@@ -202,8 +198,7 @@ function App() {
     },
   });
   const restoreSnapshot = useMutation({
-    mutationFn: (id: string) =>
-      client.restoreSnapshot(selectedProjectId!, id),
+    mutationFn: (id: string) => client.restoreSnapshot(selectedProjectId!, id),
     onSuccess: async (document) => {
       setSelectedDocumentId(document.id);
       await queryClient.invalidateQueries({ queryKey: ["documents"] });
@@ -258,7 +253,8 @@ function App() {
     (project) => project.id === selectedProjectId,
   );
   const selectedDocument = useMemo(
-    () => documents.data?.find((document) => document.id === selectedDocumentId),
+    () =>
+      documents.data?.find((document) => document.id === selectedDocumentId),
     [documents.data, selectedDocumentId],
   );
 
@@ -370,7 +366,9 @@ function App() {
         <button
           type="button"
           title="Map"
-          className={view === "world" && worldLens === "atlas" ? "selected" : ""}
+          className={
+            view === "world" && worldLens === "atlas" ? "selected" : ""
+          }
           disabled={!selectedProject}
           onClick={() => {
             setWorldLens("atlas");

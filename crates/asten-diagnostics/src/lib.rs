@@ -149,8 +149,7 @@ fn wiki_attribute_facts(project: &Project, document: &Document) -> Vec<Fact> {
                 predicate,
                 value,
                 FactStatus::Confirmed,
-                0,
-                value.len() as u32,
+                (0, value.len() as u32),
             ))
         })
         .collect()
@@ -177,8 +176,7 @@ fn inline_assertion_facts(project: &Project, document: &Document) -> Vec<Fact> {
                     predicate,
                     value,
                     FactStatus::Proposed,
-                    start as u32,
-                    (end + 2) as u32,
+                    (start as u32, (end + 2) as u32),
                 ));
             }
         }
@@ -197,8 +195,7 @@ fn analysis_fact(
     predicate: &str,
     value: &str,
     status: FactStatus,
-    start: u32,
-    end: u32,
+    span: (u32, u32),
 ) -> Fact {
     Fact {
         id: asten_domain::FactId::new(),
@@ -212,8 +209,8 @@ fn analysis_fact(
         valid_to: None,
         source: Some(SourceAnchor {
             document_id: document.id,
-            start,
-            end,
+            start: span.0,
+            end: span.1,
         }),
         created_at: project.created_at,
         updated_at: project.updated_at,
@@ -248,10 +245,11 @@ fn emit_fact_conflicts(facts: &[Fact], documents: &[Document], output: &mut Vec<
                     &left.value,
                     &right.value,
                     source,
-                    Some(format!(
+                    Some(
                         "Confirmed or asserted values disagree over overlapping story time. \
                          Update canon, revise the passage, record a change event, or suppress later."
-                    )),
+                            .to_owned(),
+                    ),
                 ));
             }
         }

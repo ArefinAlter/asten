@@ -79,7 +79,11 @@ export const DISCOVERY_LABELS: Record<string, string> = {
   scene_anyway: "Wrote anyway",
 };
 
-export function icebergCaption(scenes: number, underwater: number, sparks: number) {
+export function icebergCaption(
+  scenes: number,
+  underwater: number,
+  sparks: number,
+) {
   if (scenes === 0 && underwater === 0 && sparks === 0) {
     return "The wall is empty. That is allowed.";
   }

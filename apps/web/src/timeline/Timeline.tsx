@@ -1,5 +1,9 @@
 import type { FormEvent } from "react";
-import type { CanonEntity, AstenDocument, TimelineEvent } from "@asten/contracts";
+import type {
+  CanonEntity,
+  AstenDocument,
+  TimelineEvent,
+} from "@asten/contracts";
 
 interface Props {
   events: TimelineEvent[];
@@ -55,7 +59,8 @@ export function Timeline({
           <li key={item.id}>
             <strong>{item.title}</strong>
             <span>
-              Read {item.reading_order ?? "—"} · Story {item.story_time ?? "unsaid"}
+              Read {item.reading_order ?? "—"} · Story{" "}
+              {item.story_time ?? "unsaid"}
             </span>
             {item.notes ? <span>{item.notes}</span> : null}
           </li>

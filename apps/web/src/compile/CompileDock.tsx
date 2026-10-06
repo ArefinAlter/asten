@@ -16,7 +16,12 @@ const FORMATS: { id: CompileFormat; label: string }[] = [
   { id: "docx", label: "Word (.docx)" },
 ];
 
-export function CompileDock({ compiling, artifact, onCompile, onImportFile }: Props) {
+export function CompileDock({
+  compiling,
+  artifact,
+  onCompile,
+  onImportFile,
+}: Props) {
   const [format, setFormat] = useState<CompileFormat>("markdown");
 
   function download() {
@@ -54,7 +59,11 @@ export function CompileDock({ compiling, artifact, onCompile, onImportFile }: Pr
           </button>
         ))}
       </div>
-      <button type="button" disabled={compiling} onClick={() => onCompile(format)}>
+      <button
+        type="button"
+        disabled={compiling}
+        onClick={() => onCompile(format)}
+      >
         {compiling ? "Compiling…" : `Compile ${format}`}
       </button>
       {artifact && (

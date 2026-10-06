@@ -54,7 +54,8 @@ export function Cast({ entities, facts, onCreate, creating }: Props) {
               {facts
                 .filter(
                   (fact) =>
-                    fact.entity_key === entity.name.toLowerCase().replace(/\s+/g, "_"),
+                    fact.entity_key ===
+                    entity.name.toLowerCase().replace(/\s+/g, "_"),
                 )
                 .map((fact) => `${fact.predicate}=${fact.value}`)
                 .join(" · ") || "No confirmed facts."}

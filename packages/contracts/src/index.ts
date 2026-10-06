@@ -57,10 +57,7 @@ export interface UpdateDocument {
 }
 
 export type FactModality =
-  | "established"
-  | "inferred"
-  | "contested"
-  | "author_override";
+  "established" | "inferred" | "contested" | "author_override";
 
 export type FactStatus = "proposed" | "confirmed" | "deprecated";
 
@@ -185,13 +182,7 @@ export interface WorldPulse {
 }
 
 export type EntityKind =
-  | "character"
-  | "place"
-  | "event"
-  | "item"
-  | "rule"
-  | "source"
-  | "other";
+  "character" | "place" | "event" | "item" | "rule" | "source" | "other";
 
 export interface CanonEntity {
   id: string;

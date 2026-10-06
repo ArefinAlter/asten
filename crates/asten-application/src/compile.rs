@@ -7,9 +7,10 @@ use serde::{Deserialize, Serialize};
 
 use crate::{ApplicationError, Result};
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum CompileFormat {
+    #[default]
     Markdown,
     Plain,
     Fountain,
@@ -23,12 +24,6 @@ pub struct CompileRequest {
     pub format: CompileFormat,
     #[serde(default)]
     pub document_ids: Vec<asten_domain::DocumentId>,
-}
-
-impl Default for CompileFormat {
-    fn default() -> Self {
-        Self::Markdown
-    }
 }
 
 pub fn compile_documents(

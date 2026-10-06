@@ -68,8 +68,7 @@
   align-self: end;
   border: 1px solid #8a9aa8;
   border-bottom: 0;
-  background:
-    linear-gradient(180deg, #d7e7f2 0%, #9bb8c9 55%, #3f5a68 100%);
+  background: linear-gradient(180deg, #d7e7f2 0%, #9bb8c9 55%, #3f5a68 100%);
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 20%);
 }
@@ -449,7 +448,10 @@
   border: 1px solid #d2c6ae;
   border-radius: 4px;
   background: #fffdf8;
-  font: 16px/1.45 Georgia, "Times New Roman", serif;
+  font:
+    16px/1.45 Georgia,
+    "Times New Roman",
+    serif;
 }
 
 .capture-line {

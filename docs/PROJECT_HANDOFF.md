@@ -1,8 +1,8 @@
 # Asten: Complete Product, Research, and Engineering Handoff
 
-> **Document status:** Foundational handoff  
+> **Document status:** Planning archive. The current stage is [HANDOFF.md](HANDOFF.md).  
 > **Last updated:** 2026-09-21  
-> **Current product stage:** Architectural scaffold / pre-MVP  
+> **Stage recorded here:** Architectural scaffold / pre-MVP, as of that date  
 > **Primary audience:** Product leadership, design, research, engineering, editorial advisors, and future AI/ML teams  
 > **Repository:** `B:\asten`  
 > **Tagline:** **Let AI be your editor, not your writer.**

@@ -531,7 +531,9 @@ class TauriClient implements AstenClient {
     documentId: string,
     label?: string,
   ): Promise<DocumentSnapshot> {
-    return this.invoke("create_snapshot", { input: { document_id: documentId, label } });
+    return this.invoke("create_snapshot", {
+      input: { document_id: documentId, label },
+    });
   }
   restoreSnapshot(
     _projectId: ProjectId,

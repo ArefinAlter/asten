@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import type { WorldStatus } from "@asten/contracts";
-import {
-  icebergCaption,
-  kindLabel,
-  promptLabel,
-  statusLabel,
-} from "./kinds";
+import { icebergCaption, kindLabel, promptLabel, statusLabel } from "./kinds";
 import { useWorld } from "./useWorld";
 
 const STATUSES: WorldStatus[] = ["spark", "sketched", "settled"];
@@ -77,9 +72,7 @@ export function WorldInspector({ projectId, selectedId }: WorldInspectorProps) {
           update.mutate({ id: entry.id, title, summary });
         }}
       >
-        {entry.prompt && (
-          <p className="eyebrow">{promptLabel(entry.prompt)}</p>
-        )}
+        {entry.prompt && <p className="eyebrow">{promptLabel(entry.prompt)}</p>}
         <label>
           Name
           <input

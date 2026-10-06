@@ -304,7 +304,10 @@ button:disabled {
 
 .write-editor textarea {
   min-height: 240px;
-  font: 16px/1.6 Georgia, "Times New Roman", serif;
+  font:
+    16px/1.6 Georgia,
+    "Times New Roman",
+    serif;
 }
 
 .find-input {
@@ -361,7 +364,10 @@ button:disabled {
 
 .ProseMirror {
   min-height: 12rem;
-  font: 18px/1.7 Georgia, "Times New Roman", serif;
+  font:
+    18px/1.7 Georgia,
+    "Times New Roman",
+    serif;
   outline: none;
 }
 

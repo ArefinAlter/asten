@@ -5,7 +5,11 @@ interface Props {
   documents: AstenDocument[];
   selectedId?: string;
   onSelect: (document: AstenDocument) => void;
-  onCreate: (input: { title: string; kind: DocumentKind; parent_id?: string | null }) => void;
+  onCreate: (input: {
+    title: string;
+    kind: DocumentKind;
+    parent_id?: string | null;
+  }) => void;
   onToggleCompile: (document: AstenDocument) => void;
   creating?: boolean;
 }

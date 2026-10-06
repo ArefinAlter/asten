@@ -1,4 +1,10 @@
-import { type FormEvent, type PointerEvent, useMemo, useRef, useState } from "react";
+import {
+  type FormEvent,
+  type PointerEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import type { IdeaPrompt, WorldEntry, WorldKind } from "@asten/contracts";
 import {
   DISCOVERY_LABELS,
@@ -38,9 +44,9 @@ export function WorldWorkspace({
   const [kind, setKind] = useState<WorldKind>("fragment");
   const [prompt, setPrompt] = useState<IdeaPrompt>("why");
   const [draft, setDraft] = useState("");
-  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>(
-    {},
-  );
+  const [positions, setPositions] = useState<
+    Record<string, { x: number; y: number }>
+  >({});
   const boardRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{
     id: string;
@@ -90,7 +96,10 @@ export function WorldWorkspace({
     );
   }
 
-  function startDrag(event: PointerEvent<HTMLButtonElement>, entry: WorldEntry) {
+  function startDrag(
+    event: PointerEvent<HTMLButtonElement>,
+    entry: WorldEntry,
+  ) {
     const live = positions[entry.id];
     dragRef.current = {
       id: entry.id,
@@ -115,16 +124,8 @@ export function WorldWorkspace({
       return;
     }
     drag.moved = true;
-    const x = clamp(
-      drag.origX + (dx / board.clientWidth) * 100,
-      0,
-      86,
-    );
-    const y = clamp(
-      drag.origY + (dy / board.clientHeight) * 100,
-      0,
-      78,
-    );
+    const x = clamp(drag.origX + (dx / board.clientWidth) * 100, 0, 86);
+    const y = clamp(drag.origY + (dy / board.clientHeight) * 100, 0, 78);
     setPositions((current) => ({ ...current, [drag.id]: { x, y } }));
   }
 
@@ -147,8 +148,16 @@ export function WorldWorkspace({
 
   function dropOnMap(event: PointerEvent<HTMLDivElement>) {
     const rect = event.currentTarget.getBoundingClientRect();
-    const map_x = clamp(((event.clientX - rect.left) / rect.width) * 100, 4, 96);
-    const map_y = clamp(((event.clientY - rect.top) / rect.height) * 100, 6, 94);
+    const map_x = clamp(
+      ((event.clientX - rect.left) / rect.width) * 100,
+      4,
+      96,
+    );
+    const map_y = clamp(
+      ((event.clientY - rect.top) / rect.height) * 100,
+      6,
+      94,
+    );
     if (selected) {
       update.mutate({ id: selected.id, map_x, map_y });
       return;
@@ -174,8 +183,14 @@ export function WorldWorkspace({
           <p className="eyebrow">World · optional</p>
           <h1>{projectName}</h1>
         </div>
-        <div className="iceberg" title="How much of the world stays off the page">
-          <div className="iceberg-mark" style={{ height: `${Math.max(18, iceberg)}%` }} />
+        <div
+          className="iceberg"
+          title="How much of the world stays off the page"
+        >
+          <div
+            className="iceberg-mark"
+            style={{ height: `${Math.max(18, iceberg)}%` }}
+          />
           <div>
             <strong>{iceberg}%</strong>
             <span>underwater</span>
@@ -232,7 +247,9 @@ export function WorldWorkspace({
           )}
           {!entries.isPending && cards.length === 0 && (
             <div className="wall-empty">
-              <p>Baur kept napkins on a magnetic wall until they wanted an order.</p>
+              <p>
+                Baur kept napkins on a magnetic wall until they wanted an order.
+              </p>
               <div className="invites">
                 <button
                   type="button"
@@ -281,7 +298,9 @@ export function WorldWorkspace({
                 onPointerUp={() => endDrag(entry)}
               >
                 <span className="card-kind">
-                  {entry.prompt ? promptLabel(entry.prompt) : kindLabel(entry.kind)}
+                  {entry.prompt
+                    ? promptLabel(entry.prompt)
+                    : kindLabel(entry.kind)}
                 </span>
                 <strong>{entry.title}</strong>
                 {entry.summary && <p>{entry.summary}</p>}
@@ -300,7 +319,11 @@ export function WorldWorkspace({
             role="application"
             aria-label="Rough map. Click to drop a place."
           >
-            <svg viewBox="0 0 800 520" className="atlas-drawing" aria-hidden="true">
+            <svg
+              viewBox="0 0 800 520"
+              className="atlas-drawing"
+              aria-hidden="true"
+            >
               <path
                 d="M20 80 C 140 40, 220 130, 340 90 S 520 40, 680 110 790 240 760 360 620 500 400 470 40 430 30 280 Z"
                 fill="none"
@@ -365,7 +388,10 @@ export function WorldWorkspace({
       {lens === "dossier" && (
         <div className="dossier">
           {cards.length === 0 && (
-            <p>No dossier yet. The wall and the manuscript can stay ahead of this list.</p>
+            <p>
+              No dossier yet. The wall and the manuscript can stay ahead of this
+              list.
+            </p>
           )}
           {grouped.map((group) => (
             <section key={group.kind}>
@@ -434,7 +460,11 @@ export function WorldWorkspace({
             </button>
           </div>
         </label>
-        <button type="button" className="quiet skip-write" onClick={onWriteScene}>
+        <button
+          type="button"
+          className="quiet skip-write"
+          onClick={onWriteScene}
+        >
           Skip and write
         </button>
         {create.error && <p className="error">{create.error.message}</p>}
