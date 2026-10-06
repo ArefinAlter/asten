@@ -5,6 +5,7 @@
   "packageManager": "pnpm@11.7.0",
   "scripts": {
     "dev": "pnpm --filter @margin/web dev",
+    "www": "pnpm --filter @margin/www dev",
     "dev:api": "cargo run -p margin-api",
     "dev:desktop": "pnpm --filter @margin/desktop dev",
     "build": "pnpm -r build && cargo build --workspace",

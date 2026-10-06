@@ -54,6 +54,15 @@ button:disabled {
   background: #fff;
 }
 
+.app-shell.world-mode {
+  grid-template:
+    "title title title title" 38px
+    "activity side work inspect" minmax(0, 1fr)
+    "activity side problems inspect" 88px
+    "status status status status" 24px
+    / 48px 220px minmax(420px, 1fr) 230px;
+}
+
 .titlebar {
   grid-area: title;
   display: grid;
@@ -89,6 +98,11 @@ button:disabled {
 .activitybar button {
   width: 34px;
   height: 34px;
+  font-size: 15px;
+}
+
+.activitybar button.selected {
+  background: #e7e3da;
 }
 
 .sidebar,
@@ -261,6 +275,73 @@ button:disabled {
 
 .error {
   color: #a62e2e;
+}
+
+.stacked-form,
+.write-editor label,
+.editor-placeholder label {
+  display: grid;
+  gap: 6px;
+  margin: 10px;
+  font-size: 12px;
+}
+
+.stacked-form {
+  padding: 0 0 12px;
+}
+
+.stacked-form input,
+.editor-placeholder input,
+.editor-placeholder select,
+.editor-placeholder textarea,
+.write-editor textarea {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #cbc6bb;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.write-editor textarea {
+  min-height: 240px;
+  font: 16px/1.6 Georgia, "Times New Roman", serif;
+}
+
+.fact-list,
+.problem-list {
+  margin: 0;
+  padding: 0 10px 10px;
+  list-style: none;
+  overflow: auto;
+}
+
+.fact-list li,
+.problem-list li {
+  display: grid;
+  gap: 2px;
+  padding: 6px 0;
+  border-bottom: 1px solid #ece8df;
+  font-size: 12px;
+}
+
+.problem-list li.error {
+  color: #a62e2e;
+}
+
+.problem-list li.warning {
+  color: #8a5a12;
+}
+
+.problem-list code {
+  font-size: 11px;
+}
+
+.linkish {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
 }
 
 .statusbar {

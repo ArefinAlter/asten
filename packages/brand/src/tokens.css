@@ -1,0 +1,18 @@
+:root {
+  --ink: #26231f;
+  --paper: #f6f4ef;
+  --leaf: #fffdf8;
+  --rule: #dedbd3;
+  --ochre: #7a5c3e;
+  --ochre-deep: #5c432c;
+  --bound: #58483b;
+  --mute: #6f6a61;
+  --dust: #83796b;
+  --error: #a62e2e;
+  --warn: #8a5a12;
+  --moss: #3d4a32;
+  --serif: Georgia, "Times New Roman", serif;
+  --sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --radius: 4px;
+  --measure: 40rem;
+}

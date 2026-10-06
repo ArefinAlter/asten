@@ -6,3 +6,7 @@ rust-version.workspace = true
 
 [dependencies]
 margin-domain = { path = "../margin-domain" }
+
+[dev-dependencies]
+chrono.workspace = true
+serde_json.workspace = true

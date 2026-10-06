@@ -1,8 +1,9 @@
 # Margin
 
 Margin is a local-first writing IDE. The current repository is an architectural
-scaffold: project and document persistence works, while research-dependent
-editorial rules, knowledge schemas, and writing methods remain extension points.
+scaffold: project and document persistence works. Confirmed facts and the first
+continuity rule (`CANON-E013` attribute contradiction) now run on demand. Broader
+editorial rules, method packs, and the manuscript editor remain extension points.
 
 ## Prerequisites
 

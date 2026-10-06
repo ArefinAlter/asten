@@ -7,8 +7,13 @@ use axum::{
     response::{IntoResponse, Response},
     routing::get,
 };
-use margin_application::{Application, ApplicationError, CreateDocument, CreateProject};
-use margin_domain::{Document, Project, ProjectId};
+use margin_application::{
+    Application, ApplicationError, CreateDocument, CreateFact, CreateProject, CreateWorldEntry,
+    UpdateDocument, UpdateWorldEntry,
+};
+use margin_domain::{
+    Diagnostic, Document, DocumentId, Fact, Project, ProjectId, WorldEntry, WorldEntryId, WorldPulse,
+};
 use serde::Serialize;
 use tower_http::{
     catch_panic::CatchPanicLayer,
@@ -42,6 +47,30 @@ pub fn router(application: Application) -> Router {
                 .route(
                     "/projects/{project_id}/documents",
                     get(list_documents).post(create_document),
+                )
+                .route(
+                    "/projects/{project_id}/documents/{document_id}",
+                    axum::routing::put(update_document),
+                )
+                .route(
+                    "/projects/{project_id}/facts",
+                    get(list_facts).post(create_fact),
+                )
+                .route(
+                    "/projects/{project_id}/diagnostics",
+                    get(list_diagnostics),
+                )
+                .route(
+                    "/projects/{project_id}/world-entries",
+                    get(list_world_entries).post(create_world_entry),
+                )
+                .route(
+                    "/projects/{project_id}/world-entries/{entry_id}",
+                    axum::routing::put(update_world_entry),
+                )
+                .route(
+                    "/projects/{project_id}/world-pulse",
+                    get(world_pulse),
                 ),
         )
         .with_state(ApiState { application })
@@ -106,6 +135,97 @@ async fn create_document(
     input.project_id = ProjectId(project_id);
     let document = state.application.create_document(input).await?;
     Ok((StatusCode::CREATED, Json(document)))
+}
+
+async fn update_document(
+    State(state): State<ApiState>,
+    Path((_, document_id)): Path<(Uuid, Uuid)>,
+    Json(input): Json<UpdateDocument>,
+) -> Result<Json<Document>, ApiError> {
+    Ok(Json(
+        state
+            .application
+            .update_document(DocumentId(document_id), input)
+            .await?,
+    ))
+}
+
+async fn list_facts(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+) -> Result<Json<Vec<Fact>>, ApiError> {
+    Ok(Json(
+        state.application.list_facts(ProjectId(project_id)).await?,
+    ))
+}
+
+async fn create_fact(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+    Json(mut input): Json<CreateFact>,
+) -> Result<(StatusCode, Json<Fact>), ApiError> {
+    input.project_id = ProjectId(project_id);
+    let fact = state.application.create_fact(input).await?;
+    Ok((StatusCode::CREATED, Json(fact)))
+}
+
+async fn list_diagnostics(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+) -> Result<Json<Vec<Diagnostic>>, ApiError> {
+    Ok(Json(
+        state
+            .application
+            .analyze_project(ProjectId(project_id))
+            .await?,
+    ))
+}
+
+async fn list_world_entries(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+) -> Result<Json<Vec<WorldEntry>>, ApiError> {
+    Ok(Json(
+        state
+            .application
+            .list_world_entries(ProjectId(project_id))
+            .await?,
+    ))
+}
+
+async fn create_world_entry(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+    Json(mut input): Json<CreateWorldEntry>,
+) -> Result<(StatusCode, Json<WorldEntry>), ApiError> {
+    input.project_id = ProjectId(project_id);
+    let entry = state.application.create_world_entry(input).await?;
+    Ok((StatusCode::CREATED, Json(entry)))
+}
+
+async fn update_world_entry(
+    State(state): State<ApiState>,
+    Path((_, entry_id)): Path<(Uuid, Uuid)>,
+    Json(input): Json<UpdateWorldEntry>,
+) -> Result<Json<WorldEntry>, ApiError> {
+    Ok(Json(
+        state
+            .application
+            .update_world_entry(WorldEntryId(entry_id), input)
+            .await?,
+    ))
+}
+
+async fn world_pulse(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+) -> Result<Json<WorldPulse>, ApiError> {
+    Ok(Json(
+        state
+            .application
+            .world_pulse(ProjectId(project_id))
+            .await?,
+    ))
 }
 
 #[derive(Serialize)]
