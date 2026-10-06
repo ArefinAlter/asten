@@ -1,0 +1,1636 @@
+import { legalIndex } from "./legal-index";
+import type { LegalDoc } from "./types";
+
+export const legalUpdated = "2026-10-06";
+
+export const legalDocs: LegalDoc[] = [
+  // ---------------------------------------------------------------------------
+  // 1. Privacy
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/privacy"]!,
+    summary: [
+      "Your manuscript stays in a SQLite file on your computer. Verne never receives it, and Asten has no account, no sync, and no telemetry.",
+      "This website sets no cookies and runs no analytics or ads. Vercel, the host, processes ordinary request data to deliver pages and keep the site safe.",
+      "If you email Verne, your address and message are used to reply, then deleted within 24 months unless the conversation continues.",
+      "Verne does not sell personal information, does not run a mailing list, and will tell you in the interface before any feature sends data anywhere.",
+    ],
+    sections: [
+      {
+        id: "who-is-responsible",
+        heading: "Who is responsible",
+        blocks: [
+          {
+            kind: "p",
+            text: "This policy explains how personal information is handled when you use Asten, visit this website, or write to Verne. Asten and this website are published by Verne Systems, trading as Verne (“Verne”), registered in Bangladesh under company registration C-201411-1, at 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209, Bangladesh.",
+          },
+          {
+            kind: "p",
+            text: "For this website and for emails you send, Verne is the controller: the organization that decides why and how that information is used. For your manuscript, Verne is neither a controller nor a processor, because your manuscript never reaches Verne.",
+          },
+          {
+            kind: "p",
+            text: "Verne has not appointed an EU or UK representative. You can reach Verne about anything in this policy at [info@vernesystems.com](mailto:info@vernesystems.com). Company details are published at [vernesystems.com/legal/company](https://vernesystems.com/legal/company).",
+          },
+        ],
+      },
+      {
+        id: "the-desk",
+        heading: "Your manuscript and the desk",
+        blocks: [
+          {
+            kind: "p",
+            text: "The desk keeps your projects, scenes, notes, facts, comments, snapshots, tracked changes, and diagnostics in a SQLite database on the computer where Asten runs. In the desktop app, that file is `asten.db` in your operating system’s application-data folder. If you run the local API yourself, it uses `data/asten.db` unless you point `ASTEN_DATABASE_PATH` somewhere else.",
+          },
+          {
+            kind: "p",
+            text: "Asten has no account, no sync, and no telemetry. It does not upload your manuscript, your world notes, or your diagnostics to Verne or to anyone else. Verne never receives your manuscript, so Verne cannot read it, share it, or train anything on it.",
+          },
+          {
+            kind: "p",
+            text: "If you copy the database, export a file, or take your work into Word or Google Docs, that copy goes where you send it and is governed by the terms of that place.",
+          },
+          {
+            kind: "callout",
+            tone: "note",
+            title: "Deleting or exporting your work",
+            text: "Because Verne holds no copy, Verne cannot delete or export your manuscript for you. Delete a project in the desk, or delete the database file. Export it from the desk whenever you like. Both are entirely under your control.",
+          },
+        ],
+      },
+      {
+        id: "the-website",
+        heading: "This website",
+        blocks: [
+          {
+            kind: "p",
+            text: "This website describes Asten. It has no sign-in and stores no projects.",
+          },
+          {
+            kind: "list",
+            items: [
+              "**No cookies.** The site sets none. See the [cookie notice](/cookies).",
+              "**No analytics and no ads.** There are no tracking scripts, pixels, or advertising partners.",
+              "**Self-hosted fonts.** Typefaces are served from this site, so loading a page sends no request to a font service.",
+              "**One optional preference.** If you use the light/dark toggle, your browser saves the choice in a `localStorage` key named `asten-theme`. It stays in your browser and is never sent to Verne or anyone else.",
+            ],
+          },
+          { kind: "h3", text: "Hosting by Vercel" },
+          {
+            kind: "p",
+            text: "The site is hosted by Vercel Inc. When your browser asks for a page, Vercel’s servers process ordinary request data: your IP address, your browser’s user agent, the time, the path requested, and the referring page if your browser sends one. Vercel uses this to deliver pages and to protect the site against abuse, such as attacks and floods of automated traffic.",
+          },
+          {
+            kind: "p",
+            text: "Vercel handles that data under its own terms and privacy policy, including its own retention periods. Verne adds no tracking on top of it and does not use it to profile visitors.",
+          },
+        ],
+      },
+      {
+        id: "email",
+        heading: "When you email Verne",
+        blocks: [
+          {
+            kind: "p",
+            text: "If you write to [info@vernesystems.com](mailto:info@vernesystems.com), Verne receives your email address, your name if you include it, your message and any attachments, and the technical details that travel with every email, such as the date and the sending server.",
+          },
+          {
+            kind: "p",
+            text: "Verne uses this to read and answer your message. If you ask for early access, Verne also uses it to send you an invitation and the information you need to run Asten. Verne does not add you to a mailing list, does not send you marketing you did not ask for, and never sells or rents your address.",
+          },
+          {
+            kind: "p",
+            text: "Verne keeps your correspondence for as long as it needs to handle your request, then deletes it within 24 months of your last message, unless the conversation continues. Messages are stored with Verne’s business email provider, which handles them on Verne’s behalf; see [subprocessors](/subprocessors).",
+          },
+          {
+            kind: "p",
+            text: "Please do not email your manuscript. If you need to show Verne a problem, a short passage is almost always enough.",
+          },
+        ],
+      },
+      {
+        id: "add-ins",
+        heading: "The Word and Google Docs add-ins",
+        blocks: [
+          {
+            kind: "p",
+            text: "The Word task pane and the Google Docs sidebar are optional, and you install them yourself by sideloading. Both talk only to the Asten local API at `127.0.0.1:4317` on your own computer. A passage you file is written into your local project. It is not sent to Verne.",
+          },
+          {
+            kind: "p",
+            text: "The Word task pane loads Office.js from Microsoft, because Word requires that library. That request is between your computer and Microsoft, under Microsoft’s terms.",
+          },
+          {
+            kind: "p",
+            text: "The Docs sidebar runs in Google Apps Script, inside Google’s own service, next to a document Google already holds for you. Asten makes no extra copy of that document on any Verne server. Google’s terms govern Docs and Apps Script.",
+          },
+        ],
+      },
+      {
+        id: "legal-bases",
+        heading: "Legal bases under the GDPR and UK GDPR",
+        blocks: [
+          {
+            kind: "p",
+            text: "If the EU General Data Protection Regulation or the UK GDPR applies to you, these are the legal bases Verne relies on:",
+          },
+          {
+            kind: "table",
+            head: ["Activity", "Information", "Legal basis"],
+            rows: [
+              [
+                "Delivering this website and keeping it secure",
+                "Request data processed by Vercel: IP address, user agent, time, path, referrer",
+                "Legitimate interests in running a working, secure website",
+              ],
+              [
+                "Replying to your email",
+                "Your address, your message, and anything you include",
+                "Your consent; steps you ask Verne to take before an agreement, such as an early-access request; or Verne’s legitimate interest in answering correspondence",
+              ],
+              [
+                "Remembering your theme",
+                "The `asten-theme` value in your browser",
+                "None needed: it never leaves your browser, so Verne does not process it",
+              ],
+            ],
+          },
+          {
+            kind: "p",
+            text: "Where Verne relies on legitimate interests, it has weighed them against your rights, and you can object at any time. Where Verne relies on consent, you can withdraw it at any time by writing to Verne. Withdrawing does not affect anything that happened before.",
+          },
+        ],
+      },
+      {
+        id: "international-transfers",
+        heading: "International transfers",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne is based in Bangladesh. If you email Verne from another country, your message travels to Verne in Bangladesh and is stored by Verne’s business email provider, which may process it in other countries too.",
+          },
+          {
+            kind: "p",
+            text: "Vercel runs a global network, so request data from your visit may be processed in a country other than yours. Vercel’s own terms describe how it protects data it transfers between countries.",
+          },
+          {
+            kind: "p",
+            text: "Bangladesh and some of those countries may not have data protection laws equivalent to those where you live. Verne keeps what it receives to what this policy describes and handles it as described here.",
+          },
+        ],
+      },
+      {
+        id: "your-rights",
+        heading: "Your rights",
+        blocks: [
+          {
+            kind: "p",
+            text: "Depending on where you live, you may have the right to:",
+          },
+          {
+            kind: "list",
+            items: [
+              "access the personal information Verne holds about you;",
+              "have it corrected if it is wrong;",
+              "have it deleted;",
+              "object to processing based on legitimate interests;",
+              "restrict processing while a question about it is resolved;",
+              "receive it in a portable format;",
+              "withdraw consent, where processing is based on consent; and",
+              "complain to a data protection supervisory authority, for example in the country where you live or work.",
+            ],
+          },
+          {
+            kind: "p",
+            text: "To use any of these rights, write to [info@vernesystems.com](mailto:info@vernesystems.com). Verne may ask you to confirm the request is yours, for example by replying from the address you originally wrote from. Verne will respond within the time the applicable law allows.",
+          },
+          {
+            kind: "p",
+            text: "In practice, the personal information Verne holds is email correspondence. There is no manuscript on Verne’s side to access, export, or delete; that stays with you. For questions about request data from a visit to this site, write to Verne and Verne will help as far as it can, or contact Vercel directly.",
+          },
+          { kind: "h3", text: "United States privacy rights" },
+          {
+            kind: "p",
+            text: "If you live in a US state with a consumer privacy law, such as California, you may have the right to know, access, correct, and delete personal information, and to opt out of its sale or sharing. Verne does not sell personal information. Verne does not share it for cross-context behavioral advertising. Verne does not collect sensitive personal information. Verne will not treat you differently for exercising your rights. You, or an agent you authorize, can send requests to [info@vernesystems.com](mailto:info@vernesystems.com).",
+          },
+        ],
+      },
+      {
+        id: "children",
+        heading: "Children",
+        blocks: [
+          {
+            kind: "p",
+            text: "Asten and this website are not directed at children under 16, and Verne does not knowingly collect personal information from them. If you believe a child has written to Verne, let Verne know and the correspondence will be deleted.",
+          },
+        ],
+      },
+      {
+        id: "security",
+        heading: "Security",
+        blocks: [
+          {
+            kind: "p",
+            text: "Your manuscript lives on your computer, so its safety is mostly in your hands. Protect your device and your backups the way you would any private file. The Asten local API binds to the loopback address, `127.0.0.1`, by default, so other computers on your network cannot reach it unless you change that setting.",
+          },
+          {
+            kind: "p",
+            text: "This website is served over HTTPS, and its Content Security Policy allows scripts, styles, and fonts only from the site itself. No system is perfectly secure. If you find a weakness, please report it as described on the [security page](/security).",
+          },
+        ],
+      },
+      {
+        id: "changes",
+        heading: "Changes to this policy",
+        blocks: [
+          {
+            kind: "p",
+            text: "The “last updated” date on this page shows when this policy last changed. If Verne changes how personal information is handled, this page will be updated before the change takes effect.",
+          },
+          {
+            kind: "p",
+            text: "Apart from the Office.js request the Word task pane must make, Asten sends nothing off your computer today. If a future feature would send any data anywhere, for example to an AI provider you choose, the product will say so in the interface before that feature sends anything. Updating this page alone will never be treated as enough. See the [AI policy](/ai-policy).",
+          },
+        ],
+      },
+      {
+        id: "contact",
+        heading: "Contact",
+        blocks: [
+          {
+            kind: "p",
+            text: "Questions, requests, and complaints about privacy: [info@vernesystems.com](mailto:info@vernesystems.com). By post: Verne Systems, trading as Verne, 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209, Bangladesh. The [legal notice](/notice) has full company details.",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 2. Terms
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/terms"]!,
+    summary: [
+      "You may use this website and run the Asten builds Verne gives you for your own writing.",
+      "You own everything you write. Verne claims no rights in it, and Asten never trains on it.",
+      "Asten is early-access software, provided as is. Features can change, and a diagnostic is a notice, not a verdict.",
+      "These terms are governed by the laws of Bangladesh, but the consumer protections where you live still apply.",
+    ],
+    sections: [
+      {
+        id: "about-these-terms",
+        heading: "About these terms",
+        blocks: [
+          {
+            kind: "p",
+            text: "These terms apply to this website and to any Asten build that Verne Systems, trading as Verne (“Verne”), gives you. By using the site or running a build, you agree to them. If you do not agree, please do not use the site or the builds.",
+          },
+          {
+            kind: "p",
+            text: "Three other pages form part of these terms: the [license](/license), which says what you may do with an Asten build; the [acceptable use policy](/acceptable-use), which says what you may not do; and the [privacy policy](/privacy), which explains how personal information is handled.",
+          },
+          {
+            kind: "p",
+            text: "If you use Asten for an organization, you confirm that you are allowed to accept these terms on its behalf.",
+          },
+        ],
+      },
+      {
+        id: "what-asten-is",
+        heading: "What Asten is",
+        blocks: [
+          {
+            kind: "p",
+            text: "Asten is a local-first writing environment. The desk stores your project in a SQLite file on your computer, and a rule engine marks contradictions in your story’s canon, such as Mira’s hair turning black after chapter 2 settled it as auburn. Asten does not write prose, and it does not run an AI model.",
+          },
+          {
+            kind: "p",
+            text: "This website describes Asten. It is not an offer to host your work, and describing a planned feature is not a promise to build it. The [roadmap](/roadmap) says what is planned; only what ships is real.",
+          },
+        ],
+      },
+      {
+        id: "early-access",
+        heading: "Early access",
+        blocks: [
+          {
+            kind: "p",
+            text: "Asten is in early development. Builds are available by request, and Verne decides who receives them.",
+          },
+          {
+            kind: "list",
+            items: [
+              "Builds are provided as is and as available.",
+              "Features may be added, changed, or removed, and an early-access build may stop working after a set date.",
+              "There is no service level, uptime promise, or support commitment.",
+              "Keep your own backups. Asten keeps snapshots and a history, but a copy on another disk is still the best protection a manuscript can have.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "your-writing",
+        heading: "Your writing",
+        blocks: [
+          {
+            kind: "p",
+            text: "You own what you write in Asten: manuscripts, notes, facts, comments, and exports. Verne claims no rights in any of it. These terms give Verne no license to your work, and none is needed, because your work never reaches Verne.",
+          },
+          {
+            kind: "p",
+            text: "Asten never trains any model on your writing, and Verne will never use it to train one. See the [AI policy](/ai-policy).",
+          },
+          {
+            kind: "p",
+            text: "You are responsible for having the right to hold and use what you import. Importing a file does not change who owns it.",
+          },
+        ],
+      },
+      {
+        id: "diagnostics",
+        heading: "Diagnostics are notices, not verdicts",
+        blocks: [
+          {
+            kind: "p",
+            text: "A diagnostic, such as a mark that Captain Oren gives an order after his settled death in chapter 9, points at a passage and names the rule and the fact it disagrees with. It is a notice for you to weigh. Asten checks only the facts you have confirmed, so it can miss things, and it can flag things you meant on purpose.",
+          },
+          {
+            kind: "p",
+            text: "You decide what to change. You can suppress any rule. You remain the author of your work and the person responsible for what you publish.",
+          },
+        ],
+      },
+      {
+        id: "acceptable-use",
+        heading: "Acceptable use",
+        blocks: [
+          {
+            kind: "p",
+            text: "Use the site and Asten lawfully and in line with the [acceptable use policy](/acceptable-use). In short: work with texts you have a right to hold, leave other people’s computers alone, and do not attack or overload this website.",
+          },
+        ],
+      },
+      {
+        id: "intellectual-property",
+        heading: "Verne’s intellectual property",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne owns the Asten software, the names “Asten” and “Verne”, the Palette mark, the text of this website, and its original artwork. These terms do not transfer any of that to you.",
+          },
+          {
+            kind: "p",
+            text: "The [license](/license) gives you permission to run builds. The [trademark page](/trademark) explains how you may refer to the names and use the logo. The [credits](/credits) list the third-party fonts and software, which keep their own licenses.",
+          },
+        ],
+      },
+      {
+        id: "feedback",
+        heading: "Feedback",
+        blocks: [
+          {
+            kind: "p",
+            text: "If you send Verne ideas, suggestions, or bug reports, Verne may use them to improve Asten without owing you anything, and without any obligation to use them. Please do not send material you need kept confidential as feedback, and please do not send a manuscript.",
+          },
+        ],
+      },
+      {
+        id: "third-party-services",
+        heading: "Third-party services",
+        blocks: [
+          {
+            kind: "p",
+            text: "Some parts of Asten work alongside services Verne does not control: Microsoft Word and Office.js for the Word task pane, Google Docs and Apps Script for the Docs sidebar, and Vercel, which hosts this website. Your use of those services is governed by their own terms and privacy policies, and Verne is not responsible for them.",
+          },
+        ],
+      },
+      {
+        id: "disclaimers",
+        heading: "Disclaimers",
+        blocks: [
+          {
+            kind: "p",
+            text: "To the extent the law allows, this website and Asten are provided “as is” and “as available”, without warranties of any kind, express or implied, including warranties of merchantability, fitness for a particular purpose, accuracy, non-infringement, and uninterrupted or error-free operation.",
+          },
+          {
+            kind: "p",
+            text: "In particular, Verne does not promise that Asten will find every contradiction, that every diagnostic is correct, or that a build will never lose data.",
+          },
+        ],
+      },
+      {
+        id: "limitation-of-liability",
+        heading: "Limitation of liability",
+        blocks: [
+          {
+            kind: "p",
+            text: "To the extent permitted by law, Verne is not liable for any indirect, incidental, special, or consequential loss arising from your use of this website or Asten, including the loss of a draft that existed only on your computer.",
+          },
+          {
+            kind: "p",
+            text: "To the extent permitted by law, Verne’s total liability for all claims relating to this website or Asten is limited to USD 100.",
+          },
+          {
+            kind: "p",
+            text: "Nothing in these terms limits or excludes any liability that cannot be limited or excluded by law. If you use Asten as a consumer, nothing in these terms affects the protections you have under the consumer laws of the place where you live.",
+          },
+        ],
+      },
+      {
+        id: "governing-law",
+        heading: "Governing law",
+        blocks: [
+          {
+            kind: "p",
+            text: "These terms are governed by the laws of Bangladesh, and the courts of Dhaka have jurisdiction over any dispute about them.",
+          },
+          {
+            kind: "p",
+            text: "If you are a consumer, the mandatory consumer laws of the country where you live still apply to you, and this choice of law does not take those protections away.",
+          },
+          {
+            kind: "p",
+            text: "Before anything formal, please write to Verne. Most problems are easier to solve in an email.",
+          },
+        ],
+      },
+      {
+        id: "changes",
+        heading: "Changes to these terms",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne may update these terms as Asten develops. The “last updated” date on this page shows the current version. Changes apply from that date and do not reach back to earlier use. If you keep using the site or a build after a change, the updated terms apply; if you do not accept them, stop using the site and the builds.",
+          },
+        ],
+      },
+      {
+        id: "general",
+        heading: "General",
+        blocks: [
+          {
+            kind: "p",
+            text: "If a court finds part of these terms unenforceable, the rest still applies. If Verne does not enforce a term straight away, it has not given up the right to enforce it later. You may not transfer your rights under these terms to someone else without Verne’s written agreement.",
+          },
+        ],
+      },
+      {
+        id: "contact",
+        heading: "Contact",
+        blocks: [
+          {
+            kind: "p",
+            text: "Questions about these terms: [info@vernesystems.com](mailto:info@vernesystems.com). The [legal notice](/notice) has Verne’s registered address and company details.",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 3. Cookies
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/cookies"]!,
+    summary: [
+      "This website sets no cookies and uses no analytics, advertising, or tracking technology.",
+      "If you switch between the light and dark themes, your browser remembers the choice in one local setting. It never leaves your browser.",
+      "There is no consent banner, because nothing here needs your consent.",
+    ],
+    sections: [
+      {
+        id: "no-cookies",
+        heading: "No cookies",
+        blocks: [
+          {
+            kind: "p",
+            text: "This website does not set any cookies, its own or anyone else’s. It loads no analytics, advertising, social media, or tracking scripts, and its fonts are served from the site itself rather than from a font service.",
+          },
+          {
+            kind: "p",
+            text: "The Asten desk does not use cookies either. There is no sign-in. Your project is a SQLite file on your computer, which is not a cookie and is not sent to Verne.",
+          },
+        ],
+      },
+      {
+        id: "theme-preference",
+        heading: "The one thing stored: your theme",
+        blocks: [
+          {
+            kind: "p",
+            text: "The site has a light/dark toggle. If you use it, your browser saves the choice in `localStorage`, a small storage area that belongs to your browser. Unlike a cookie, it is not sent to the server with your requests.",
+          },
+          {
+            kind: "table",
+            head: ["Name", "Purpose", "Where it is stored", "How long", "Sent to anyone?"],
+            rows: [
+              [
+                "`asten-theme`",
+                "Remembers whether you chose the light or the dark theme",
+                "Your browser’s `localStorage` for this site",
+                "Until you clear it",
+                "No. It never leaves your browser.",
+              ],
+            ],
+          },
+          {
+            kind: "p",
+            text: "If you never use the toggle, nothing is stored. The value holds a theme name and nothing that identifies you.",
+          },
+        ],
+      },
+      {
+        id: "hosting",
+        heading: "Hosting infrastructure",
+        blocks: [
+          {
+            kind: "p",
+            text: "The site is hosted by Vercel. Like any host, Vercel may rely on strictly necessary infrastructure mechanisms to deliver pages and protect the site against abuse. For example, if the site is under attack, Vercel may briefly show a browser check that stores a short-lived security token, used only to tell visitors apart from automated traffic.",
+          },
+          {
+            kind: "p",
+            text: "These mechanisms are not used for analytics, advertising, or tracking you across sites. The [privacy policy](/privacy#the-website) explains what request data Vercel processes.",
+          },
+        ],
+      },
+      {
+        id: "no-consent-banner",
+        heading: "Why there is no consent banner",
+        blocks: [
+          {
+            kind: "p",
+            text: "Consent banners exist to ask permission for cookies and trackers that are not strictly necessary. This site sets none, and any security mechanism used by the host is strictly necessary. The theme setting is stored only because you asked for it by pressing the toggle, and it never leaves your browser. There is nothing to consent to, so there is no banner to dismiss.",
+          },
+        ],
+      },
+      {
+        id: "clearing-it",
+        heading: "How to clear it",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "Clear site data for this website in your browser’s privacy or site settings. This removes `asten-theme` and anything else stored for the site.",
+              "Or open your browser’s developer tools, find Local Storage for this site, and delete the `asten-theme` entry.",
+              "Private or incognito windows discard it when you close them.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "changes",
+        heading: "Changes",
+        blocks: [
+          {
+            kind: "p",
+            text: "If this site ever needs a cookie or another stored value, this page will name it, say who sets it and how long it lasts, and be updated before it is used. Questions: [info@vernesystems.com](mailto:info@vernesystems.com).",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 4. License
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/license"]!,
+    summary: [
+      "You may run the Asten builds Verne gives you, for your own writing, on computers you control.",
+      "Your manuscripts are yours. This license runs one way and gives Verne no rights in them.",
+      "Asten is not open source. Do not host it as a service, rebrand it, or pass it on.",
+      "If the license ends, your files stay yours and stay readable.",
+    ],
+    sections: [
+      {
+        id: "what-you-may-do",
+        heading: "What you may do",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne Systems, trading as Verne (“Verne”), grants you a personal, non-exclusive, non-transferable, revocable permission to install and run the Asten builds Verne gives you, for your own writing and research, on computers you own or control.",
+          },
+          {
+            kind: "p",
+            text: "That covers every part of a build: the desk, the desktop app, the local API, and the Word and Google Docs add-ins. You may keep backup copies of a build for your own use.",
+          },
+        ],
+      },
+      {
+        id: "your-work",
+        heading: "Your work is not licensed to Verne",
+        blocks: [
+          {
+            kind: "p",
+            text: "Your manuscripts, notes, facts, comments, snapshots, exports, and the local database are yours. This license runs one way, from Verne to you. You grant Verne nothing in your writing, and Asten never trains on it.",
+          },
+          {
+            kind: "p",
+            text: "You may keep, copy, export, publish, and sell what you write with Asten, without credit or payment to Verne.",
+          },
+        ],
+      },
+      {
+        id: "restrictions",
+        heading: "What you may not do",
+        blocks: [
+          {
+            kind: "p",
+            text: "Unless Verne agrees in writing, or the law gives you the right regardless of this license, you may not:",
+          },
+          {
+            kind: "list",
+            items: [
+              "offer Asten, or any part of it, as a hosted or online service to other people;",
+              "share, sell, rent, lend, sublicense, or redistribute a build, or the access you were given to one;",
+              "remove the Asten or Verne names, rebrand Asten, or ship it as part of another product;",
+              "reverse engineer, decompile, or disassemble a build, except to the extent applicable law expressly permits it;",
+              "remove or change copyright, trademark, license, or other notices, including those of third parties; or",
+              "use Asten in breach of the [acceptable use policy](/acceptable-use).",
+            ],
+          },
+        ],
+      },
+      {
+        id: "early-access-builds",
+        heading: "Early-access builds",
+        blocks: [
+          {
+            kind: "p",
+            text: "Asten is in early development. A build may stop running after a set date, may change between versions, and may be replaced or withdrawn. Verne has no obligation to provide updates, support, or any particular feature.",
+          },
+          {
+            kind: "p",
+            text: "Your project file does not expire with a build. Before a build expires, keep the database, or export your work, and you will lose nothing.",
+          },
+        ],
+      },
+      {
+        id: "source-code",
+        heading: "Source code",
+        blocks: [
+          {
+            kind: "p",
+            text: "Asten is not open source. Its source code is private, and neither this page nor receiving a build gives you any rights in it. Nothing here grants rights in Verne’s names or logos; for those, see the [trademark page](/trademark).",
+          },
+        ],
+      },
+      {
+        id: "third-party-components",
+        heading: "Third-party components",
+        blocks: [
+          {
+            kind: "p",
+            text: "Asten and this website include components made by others, such as fonts and open-source libraries. Each keeps its own license, and nothing in this license limits the rights those licenses give you. The [credits](/credits) list them.",
+          },
+        ],
+      },
+      {
+        id: "termination",
+        heading: "When the license ends",
+        blocks: [
+          {
+            kind: "p",
+            text: "This license lasts until you stop using Asten or Verne ends it. Verne may end it if you break this license or the [terms of use](/terms), or when an early-access program ends. When it ends, stop running the builds and delete them.",
+          },
+          {
+            kind: "p",
+            text: "Your files remain yours and remain readable. The project is a standard SQLite database, and Asten exports to open formats: Markdown, plain text, Fountain, HTML, and .docx. No subscription or server is needed to read your own work.",
+          },
+          {
+            kind: "p",
+            text: "The sections on your work and on restrictions continue to apply after the license ends.",
+          },
+        ],
+      },
+      {
+        id: "relationship-to-terms",
+        heading: "How this fits with the terms",
+        blocks: [
+          {
+            kind: "p",
+            text: "This license is part of the [terms of use](/terms). The disclaimers, the limitation of liability, and the governing law set out there apply to builds as well. Questions: [info@vernesystems.com](mailto:info@vernesystems.com).",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 5. Acceptable use
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/acceptable-use"]!,
+    summary: [
+      "Use Asten with texts you have the right to hold and use.",
+      "Do not use Asten’s local API to reach a computer you do not control, and do not attack or overload this website.",
+      "Do not impersonate Verne or send false notices.",
+    ],
+    sections: [
+      {
+        id: "scope",
+        heading: "Who this applies to",
+        blocks: [
+          {
+            kind: "p",
+            text: "This policy applies to anyone who uses this website or an Asten build. It is part of the [terms of use](/terms) and the [license](/license), and breaking it can end your permission to use Asten.",
+          },
+        ],
+      },
+      {
+        id: "your-texts",
+        heading: "Your texts",
+        blocks: [
+          {
+            kind: "p",
+            text: "Import, file, index, and compile only works you have the right to hold and use: your own writing, works you have permission to use, and material the law where you are lets you use, such as public-domain texts.",
+          },
+          {
+            kind: "p",
+            text: "Asten does not check this for you. Calling a file a research note or a source does not change who owns it.",
+          },
+        ],
+      },
+      {
+        id: "other-computers",
+        heading: "Other people’s computers",
+        blocks: [
+          {
+            kind: "p",
+            text: "The Asten local API listens on `127.0.0.1:4317`, the loopback address, so that only programs on your own computer can reach it. Do not:",
+          },
+          {
+            kind: "list",
+            items: [
+              "scan for, connect to, read, or change an Asten project or local API on a computer you do not control, without its owner’s permission;",
+              "trick anyone into exposing their local API, or into installing a modified build or add-in; or",
+              "use an Asten add-in to read or file text from a document you are not allowed to access.",
+            ],
+          },
+          {
+            kind: "p",
+            text: "If you change the address your own local API listens on, you are responsible for who can reach it.",
+          },
+        ],
+      },
+      {
+        id: "this-website",
+        heading: "This website",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "Do not probe, scan, or test the site for vulnerabilities, except for good-faith research under the [security policy](/security).",
+              "Do not overload the site with automated requests or try to disrupt it.",
+              "Do not try to get around its security measures or reach anything not meant to be public.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "honesty",
+        heading: "Names and notices",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "Do not impersonate Verne, or claim to speak for Verne or Asten.",
+              "Do not suggest that Verne endorses you or your work; see the [trademark page](/trademark).",
+              "Do not send false or misleading copyright, trademark, or security notices.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "research-tools",
+        heading: "Research tools",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne also builds separate research tools. They are not part of Asten, and they are not a license to scrape websites, get around paywalls or access controls, or copy or redistribute copyrighted books. If you use them, follow the law and each source’s own terms.",
+          },
+        ],
+      },
+      {
+        id: "enforcement",
+        heading: "If this policy is broken",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne may refuse or end your access to builds, block abusive traffic to this website, or report unlawful activity to the authorities. Verne cannot reach into your computer, and it cannot switch off a database on your disk.",
+          },
+          {
+            kind: "p",
+            text: "To report misuse, write to [info@vernesystems.com](mailto:info@vernesystems.com).",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 6. AI policy
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/ai-policy"]!,
+    summary: [
+      "Asten does not run any AI model today, local or cloud. Its checks are deterministic rules over facts you confirm.",
+      "If AI features arrive, they will only propose. They will never write your prose or change your canon without you.",
+      "Your manuscript will never be used to train a model, by Verne or by any provider Verne chooses.",
+      "Asten will tell you in the interface before this policy changes.",
+    ],
+    sections: [
+      {
+        id: "today",
+        heading: "Asten today",
+        blocks: [
+          {
+            kind: "p",
+            text: "Asten does not run any AI model, on your computer or in the cloud. When Asten marks that Mira’s hair is black in chapter 14 after chapter 2 settled it as auburn, that mark comes from a deterministic rule comparing facts you confirmed. The same project gives the same result every time.",
+          },
+          {
+            kind: "p",
+            text: "Asten does not generate prose, and it never will. The tagline is a design rule: **let AI be your editor, not your writer.** Your words are black ink; Asten only ever writes in red.",
+          },
+        ],
+      },
+      {
+        id: "principles",
+        heading: "Principles for any future AI feature",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne plans optional assisted features, such as proposing facts from your prose for you to confirm. These are plans, not promises, and none has a date; see the [roadmap](/roadmap). If any AI feature ships, it will follow these principles:",
+          },
+          {
+            kind: "list",
+            items: [
+              "**Editor, not writer.** AI in Asten will never write, rewrite, or continue your prose.",
+              "**Proposals only.** AI output arrives as a proposal in red ink: a suggested fact, a possible contradiction, a question. Nothing takes effect until you accept it.",
+              "**Never silent canon.** An AI proposal never becomes a confirmed fact on its own. Only you can confirm it.",
+              "**Local first.** Deterministic rules come first, then models that run on your computer. Nothing leaves your computer unless you decide it should.",
+              "**Your provider, your key, your consent.** Asten will send text to a cloud AI provider only if you choose that provider, use your own account and key, and explicitly turn the feature on. Whenever a provider is in use, the interface will say which one.",
+              "**A complete switch-off.** You will be able to turn every AI feature off in one place. Off means no model runs and nothing is sent.",
+              "**No training on manuscripts, ever.** Your manuscript will never be used to train or improve a model, by Verne or by any provider Verne chooses.",
+              "**You can see what was sent.** Where practical, Asten will offer an audit view of each request: what text left your computer, when, and to which provider.",
+            ],
+          },
+          {
+            kind: "callout",
+            tone: "note",
+            title: "If you bring your own provider",
+            text: "When you connect a provider with your own account, that provider’s terms govern what it does with the text you send. Read them before you turn the feature on.",
+          },
+        ],
+      },
+      {
+        id: "how-verne-builds-asten",
+        heading: "How Verne builds Asten",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne may use AI tools in its own work, such as writing code or drafting text. That is outside this policy, with one firm exception: your manuscripts are never part of it. Verne never receives your manuscript, so it cannot be fed into any tool Verne uses.",
+          },
+        ],
+      },
+      {
+        id: "changes",
+        heading: "How this policy changes",
+        blocks: [
+          {
+            kind: "p",
+            text: "If this policy changes, Asten will tell you in the interface first, and this page will show the new date. Turning on any AI feature will always be your choice.",
+          },
+          {
+            kind: "p",
+            text: "For the thinking behind this policy, see [Asten and AI](/ai) and [AI as editor, not writer](/journal/ai-editor-not-writer). Questions: [info@vernesystems.com](mailto:info@vernesystems.com).",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 7. Accessibility
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/accessibility"]!,
+    summary: [
+      "Verne aims for this website to meet WCAG 2.2 at level AA.",
+      "Pages use real headings, work with a keyboard, show focus clearly, and respect reduced-motion settings.",
+      "There has been no independent audit yet. If something blocks you, email Verne; the aim is to reply within 10 business days.",
+    ],
+    sections: [
+      {
+        id: "our-aim",
+        heading: "The aim",
+        blocks: [
+          {
+            kind: "p",
+            text: "Anyone should be able to read about Asten. For this website, Verne’s target is the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA. This statement covers the website and describes the goals for the desk.",
+          },
+        ],
+      },
+      {
+        id: "measures",
+        heading: "What has been done",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "**Structure.** Each page has one main heading and real subheadings in order, so you can move through a page by heading. Pages declare English as their language.",
+              "**Keyboard.** Navigation, links, the theme toggle, and the interactive demos can be used with a keyboard alone.",
+              "**Visible focus.** Whatever has keyboard focus is clearly outlined.",
+              "**Reduced motion.** When your system asks for reduced motion, animations stop or are kept to a minimum.",
+              "**Contrast.** Text and controls are designed to meet AA contrast in both the light and the dark theme.",
+              "**Text alternatives.** Meaningful images have text alternatives. Purely decorative artwork is hidden from assistive technology.",
+              "**Not color alone.** Color never carries meaning by itself. Asten’s red-ink marks always come with words or a code.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "known-limitations",
+        heading: "Known limitations",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "**Decorative animation.** Some pages animate Egyptian motifs when reduced motion is not requested. The animations carry no information, but some visitors may find them distracting; turning on reduced motion in your system settings stops them.",
+              "**Demos are illustrations.** The interactive demos show how Asten behaves, in simplified form. They may not convey everything to a screen reader as well as plain text does. The same ideas are explained in prose on [How it works](/how-it-works) and the [feature pages](/features).",
+              "**No independent audit.** The site has been checked by Verne, not by an independent auditor, so this statement is a self-assessment.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "the-desk",
+        heading: "The desk",
+        blocks: [
+          {
+            kind: "p",
+            text: "The desk is a separate application in early development. Verne’s goals for it are full keyboard operation, a sensible focus order, standard controls that work with screen readers, readable contrast in both themes, and diagnostics that use words and codes, never color alone. Verne does not yet claim a conformance level for the desk.",
+          },
+        ],
+      },
+      {
+        id: "feedback",
+        heading: "Tell Verne about a problem",
+        blocks: [
+          {
+            kind: "p",
+            text: "If something on this website or in Asten gets in your way, write to [info@vernesystems.com](mailto:info@vernesystems.com) with “Accessibility” in the subject. Please include:",
+          },
+          {
+            kind: "list",
+            items: [
+              "the page address, or the part of Asten you were using;",
+              "what you were trying to do, and what happened instead; and",
+              "if you are comfortable sharing it, your browser, device, and any assistive technology you use.",
+            ],
+          },
+          {
+            kind: "p",
+            text: "Verne aims to reply within 10 business days.",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 8. Copyright
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/copyright"]!,
+    summary: [
+      "You own your writing. Asten and Verne claim no copyright in it.",
+      "Verne owns the text and the original artwork on this website.",
+      "If you believe something on this site infringes your copyright, email Verne with the details listed below.",
+    ],
+    sections: [
+      {
+        id: "your-writing",
+        heading: "Your writing",
+        blocks: [
+          {
+            kind: "p",
+            text: "Copyright in your manuscripts, notes, and exports stays with you, or with whoever already owned it. A diagnostic that points at your sentence, a fact you confirm, or a passage you file through an add-in gives Verne no claim on your work. Verne never receives it.",
+          },
+        ],
+      },
+      {
+        id: "verne-content",
+        heading: "Verne’s content",
+        blocks: [
+          {
+            kind: "p",
+            text: "The text, design, illustrations, and logos on this website, and the Asten software, belong to Verne Systems, trading as Verne, except where the [credits](/credits) say otherwise. All rights are reserved.",
+          },
+          {
+            kind: "p",
+            text: "You may quote short passages with a link back, as the law on quotation and fair use allows. For logos and press assets, see the [brand page](/brand) and the [trademark page](/trademark).",
+          },
+        ],
+      },
+      {
+        id: "egyptian-artwork",
+        heading: "The Egyptian artwork",
+        blocks: [
+          {
+            kind: "p",
+            text: "The Egyptian motifs on this site, such as the scales, the ibis, the moon, and the scribe’s palette, are original drawings made by Verne. They are inspired by Egyptian art of the Old, Middle, and New Kingdoms, which is public-domain heritage.",
+          },
+          {
+            kind: "p",
+            text: "Verne’s copyright covers its own drawings, not the ancient works or the motifs themselves. Anyone is free to draw on the same heritage.",
+          },
+        ],
+      },
+      {
+        id: "notices",
+        heading: "Reporting infringement",
+        blocks: [
+          {
+            kind: "p",
+            text: "This website hosts no uploads from visitors, so a notice will usually concern Verne’s own text or artwork. Asten keeps manuscripts only on its users’ computers, which Verne cannot see or change.",
+          },
+          {
+            kind: "p",
+            text: "If you believe material on this site infringes your copyright, email [info@vernesystems.com](mailto:info@vernesystems.com) with “Copyright notice” in the subject, and include:",
+          },
+          {
+            kind: "list",
+            ordered: true,
+            items: [
+              "the URL of the page, and a description of the material;",
+              "the copyrighted work you say is infringed, or a representative list if there are several;",
+              "your name, postal address, and email address, and, if you act for someone else, whom you represent;",
+              "a statement that you believe in good faith that the use is not authorized by the copyright owner, its agent, or the law;",
+              "a statement that the information in your notice is accurate and, under penalty of perjury, that you are the owner or are authorized to act for the owner; and",
+              "your physical or electronic signature. Typing your full name is enough.",
+            ],
+          },
+          {
+            kind: "p",
+            text: "Verne will review each notice and, where it is valid, remove or change the material and tell you what was done.",
+          },
+        ],
+      },
+      {
+        id: "counter-notices",
+        heading: "Counter-notices",
+        blocks: [
+          {
+            kind: "p",
+            text: "If material was removed after a notice and you believe that was a mistake, for example because you wrote the quoted text or hold a license to it, email [info@vernesystems.com](mailto:info@vernesystems.com) with “Counter-notice” in the subject. Include the URL, why you believe the removal was a mistake, your contact details, a statement made in good faith, and your signature. Verne will review it and may restore the material.",
+          },
+        ],
+      },
+      {
+        id: "repeat-infringers",
+        heading: "Repeat infringers",
+        blocks: [
+          {
+            kind: "p",
+            text: "Repeat-infringer policies apply to services that host user content. This website hosts none, and Asten keeps manuscripts on your own computer, so there are no accounts to suspend. If that ever changes, this page will explain how repeat infringement is handled before it does.",
+          },
+          {
+            kind: "p",
+            text: "Please do not send false notices. Knowingly misrepresenting infringement can make you liable, and it breaks the [acceptable use policy](/acceptable-use).",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 9. Trademark
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/trademark"]!,
+    summary: [
+      "“Asten”, the Palette mark, and “Verne” are Verne’s trademarks.",
+      "You can refer to Asten accurately, use the press assets from the brand page unaltered, and say your work was written with Asten.",
+      "Do not imply that Verne endorses you, put the marks in your own product names or domains, or alter the logo.",
+    ],
+    sections: [
+      {
+        id: "marks",
+        heading: "Verne’s marks",
+        blocks: [
+          {
+            kind: "p",
+            text: "These are trademarks of Verne Systems, trading as Verne:",
+          },
+          {
+            kind: "list",
+            items: [
+              "the name **Asten**;",
+              "the **Palette mark**, Asten’s logo; and",
+              "the name **Verne** and Verne’s logo.",
+            ],
+          },
+          {
+            kind: "p",
+            text: "This page explains how you may use them without asking. It does not grant any license beyond what it describes.",
+          },
+        ],
+      },
+      {
+        id: "what-is-fine",
+        heading: "What is fine without asking",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "Referring to Asten by name in reviews, articles, tutorials, videos, and conversation, as long as what you say is accurate.",
+              "Saying that your book, script, or story was written with Asten.",
+              "Using the logos and screenshots from the [brand page](/brand), unaltered, in press coverage and articles about Asten.",
+              "Linking to this website using the name Asten.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "what-needs-permission",
+        heading: "What needs permission",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "Suggesting that Verne sponsors, endorses, or is connected with you, your product, or your work.",
+              "Using “Asten”, the Palette mark, or “Verne”, or anything confusingly similar, in the name of your product, company, app, add-in, domain name, or social media account.",
+              "Changing the logo: recoloring, stretching, cropping, animating, adding to it, or combining it with another mark.",
+              "Using the marks on merchandise, or in advertising for anything other than Asten.",
+              "Using the Egyptian artwork from this site as your own branding.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "writing-the-name",
+        heading: "Writing the name",
+        blocks: [
+          {
+            kind: "p",
+            text: "Write “Asten” with a capital A and the rest in lowercase. It is a name, not a verb: your novel was written with Asten; it was not “Astened”.",
+          },
+        ],
+      },
+      {
+        id: "requests",
+        heading: "Asking for permission",
+        blocks: [
+          {
+            kind: "p",
+            text: "For anything this page does not cover, write to [info@vernesystems.com](mailto:info@vernesystems.com) with “Trademark” in the subject. Say what you want to do and where. Permission is given only in writing.",
+          },
+          {
+            kind: "p",
+            text: "If you see the marks being misused, Verne would like to hear about it at the same address.",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 10. Security
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/security"]!,
+    summary: [
+      "Report security problems to info@vernesystems.com with “Security” in the subject.",
+      "Verne will acknowledge your report within 5 business days and asks for 90 days before public disclosure.",
+      "Good-faith research within this policy is welcome, and Verne will not pursue legal action over it.",
+      "There is no bug bounty at present.",
+    ],
+    sections: [
+      {
+        id: "how-to-report",
+        heading: "How to report",
+        blocks: [
+          {
+            kind: "p",
+            text: "Email [info@vernesystems.com](mailto:info@vernesystems.com) with “Security” in the subject line. Please include:",
+          },
+          {
+            kind: "list",
+            items: [
+              "a description of the problem and its likely impact;",
+              "the steps to reproduce it, with any proof-of-concept code or screenshots;",
+              "the affected URL, or the affected part of Asten with its version or build date and your operating system; and",
+              "whether, and how, you would like to be credited.",
+            ],
+          },
+          {
+            kind: "p",
+            text: "Please do not include anyone else’s personal data or manuscript. If you need to send something sensitive, say so in your first message, and Verne will reply with how to send it.",
+          },
+        ],
+      },
+      {
+        id: "in-scope",
+        heading: "In scope",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "This website.",
+              "Asten builds distributed by Verne, including the desk and the desktop app.",
+              "The Asten local API.",
+              "The Word task pane and the Google Docs sidebar.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "out-of-scope",
+        heading: "Out of scope",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "Social engineering, phishing, or physical attacks against Verne or its people.",
+              "Denial-of-service attacks, or any test that degrades the website for others.",
+              "Services run by third parties, such as Vercel, Microsoft, and Google. Please report those to them.",
+            ],
+          },
+        ],
+      },
+      {
+        id: "local-api",
+        heading: "About the local API",
+        blocks: [
+          {
+            kind: "p",
+            text: "The Asten local API binds to the loopback address, `127.0.0.1:4317`, by default, so only software on the same computer can reach it. It can be configured to listen elsewhere; if you do that, put it behind your own access controls. Problems with how the API behaves on loopback, including how it treats requests from web pages open in your browser, are in scope.",
+          },
+        ],
+      },
+      {
+        id: "safe-harbor",
+        heading: "Safe harbor",
+        blocks: [
+          {
+            kind: "p",
+            text: "If you research and report in good faith under this policy, Verne will treat your research as authorized, will not pursue or support legal action against you for it, and will work with you to understand and fix the problem. Good faith means you:",
+          },
+          {
+            kind: "list",
+            items: [
+              "test only against your own installation and data, or systems you are authorized to test;",
+              "avoid privacy violations, destruction of data, and interruption of service;",
+              "access only what you need to show the problem, and stop and report as soon as you have;",
+              "do not disclose the problem before Verne has had a reasonable chance to fix it; and",
+              "follow the law.",
+            ],
+          },
+          {
+            kind: "p",
+            text: "This safe harbor covers Verne’s own claims. It cannot bind third parties such as Vercel, Microsoft, or Google. If you are unsure whether something is allowed, ask first.",
+          },
+        ],
+      },
+      {
+        id: "disclosure",
+        heading: "What happens next",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne will acknowledge your report within 5 business days, keep you informed, and tell you when the problem is fixed.",
+          },
+          {
+            kind: "p",
+            text: "Please give Verne 90 days from your report before disclosing it publicly, so a fix can reach people first. If a fix needs longer, Verne will explain why and agree a date with you. If a fix ships sooner, Verne is happy to coordinate an earlier disclosure.",
+          },
+        ],
+      },
+      {
+        id: "rewards",
+        heading: "Rewards",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne does not run a bug bounty and does not currently pay for reports. Your help is appreciated all the same.",
+          },
+        ],
+      },
+      {
+        id: "security-txt",
+        heading: "Machine-readable contact",
+        blocks: [
+          {
+            kind: "p",
+            text: "The contact details in this policy are also published at `/.well-known/security.txt` on this site, in the standard security.txt format.",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 11. Subprocessors
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/subprocessors"]!,
+    summary: [
+      "No third party processes your manuscript for Verne, because Verne never receives it.",
+      "Vercel hosts this website. Verne’s business email provider carries the messages you send to Verne.",
+      "Microsoft and Google are involved only if you choose to use the Word or Google Docs add-ins.",
+      "Verne uses no analytics, advertising, payment, or customer-relationship vendors.",
+    ],
+    sections: [
+      {
+        id: "the-desk",
+        heading: "The desk",
+        blocks: [
+          {
+            kind: "p",
+            text: "None. Your manuscript is stored in SQLite on your computer and is never sent to Verne, so no vendor processes it on Verne’s behalf. Asten does not call any AI model or cloud service today. If a future build would send data to a third party, the interface will say so first, and this page will be updated.",
+          },
+        ],
+      },
+      {
+        id: "website-and-email",
+        heading: "Website and email",
+        blocks: [
+          {
+            kind: "table",
+            head: ["Name", "Purpose", "Data", "Location"],
+            rows: [
+              [
+                "Vercel Inc.",
+                "Hosting and edge delivery of this website, and protection against abuse",
+                "Request data: IP address, user agent, time, path, referrer",
+                "United States company with a global edge network",
+              ],
+              [
+                "Verne’s business email provider",
+                "Receiving, storing, and sending mail for info@vernesystems.com",
+                "Your email address, name, message, attachments, and email metadata",
+                "May be outside your country; see [international transfers](/privacy#international-transfers)",
+              ],
+            ],
+          },
+          {
+            kind: "p",
+            text: "Each works under its own terms and data protection commitments. The [privacy policy](/privacy) explains what is collected and why.",
+          },
+        ],
+      },
+      {
+        id: "only-if-you-choose",
+        heading: "Only if you choose them",
+        blocks: [
+          {
+            kind: "table",
+            head: ["Name", "Purpose", "Data", "Location"],
+            rows: [
+              [
+                "Microsoft",
+                "Supplies Office.js, which the Word task pane must load, and runs Word itself",
+                "Ordinary request data for Office.js; your Word document, under your own agreement with Microsoft",
+                "Microsoft’s infrastructure",
+              ],
+              [
+                "Google",
+                "Runs the Docs sidebar in Google Apps Script, and Google Docs itself",
+                "Your document and Apps Script usage, under your own agreement with Google",
+                "Google’s infrastructure",
+              ],
+            ],
+          },
+          {
+            kind: "p",
+            text: "These are not Verne’s subprocessors in the usual sense. You use them under your own agreements with Microsoft and Google, and Verne receives nothing through them. The add-ins send the passages you file only to the Asten local API on your computer.",
+          },
+        ],
+      },
+      {
+        id: "not-used",
+        heading: "What Verne does not use",
+        blocks: [
+          {
+            kind: "p",
+            text: "No analytics, advertising, payment, or customer-relationship (CRM) vendors. No font services, tag managers, or social media widgets. This website’s Content Security Policy allows scripts, styles, and fonts only from the site itself.",
+          },
+        ],
+      },
+      {
+        id: "changes",
+        heading: "Changes",
+        blocks: [
+          {
+            kind: "p",
+            text: "If Verne adds a service that processes personal information, this page will be updated before that service starts. Questions: [info@vernesystems.com](mailto:info@vernesystems.com).",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 12. Credits
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/credits"]!,
+    summary: [
+      "This website is set in Fraunces, Literata, IBM Plex Mono, and Noto Sans Egyptian Hieroglyphs, all under the SIL Open Font License 1.1.",
+      "It is built with React, React Router, Vite, and TypeScript. Its social images are rendered at build time with Satori and resvg-js.",
+      "The Egyptian illustrations are original drawings by Verne, inspired by public-domain heritage.",
+    ],
+    sections: [
+      {
+        id: "fonts",
+        heading: "Fonts",
+        blocks: [
+          {
+            kind: "table",
+            head: ["Font", "Designer and copyright", "License"],
+            rows: [
+              [
+                "Fraunces",
+                "Undercase Type. © 2020 The Fraunces Project Authors",
+                "SIL Open Font License 1.1",
+              ],
+              [
+                "Literata",
+                "TypeTogether for Google. © 2017 The Literata Project Authors",
+                "SIL Open Font License 1.1",
+              ],
+              [
+                "IBM Plex Mono",
+                "IBM. © 2017 IBM Corp.",
+                "SIL Open Font License 1.1",
+              ],
+              [
+                "Noto Sans Egyptian Hieroglyphs",
+                "Google. © 2022 The Noto Project Authors",
+                "SIL Open Font License 1.1",
+              ],
+            ],
+          },
+          {
+            kind: "p",
+            text: "The font files are served from this website, packaged by the Fontsource project. The SIL Open Font License allows fonts to be used, studied, modified, and redistributed freely, as long as they are not sold on their own. Its full text is at [openfontlicense.org](https://openfontlicense.org).",
+          },
+        ],
+      },
+      {
+        id: "software",
+        heading: "Software",
+        blocks: [
+          {
+            kind: "table",
+            head: ["Software", "Copyright", "License"],
+            rows: [
+              ["React and React DOM", "Meta Platforms, Inc. and affiliates", "MIT"],
+              [
+                "React Router",
+                "React Training LLC, Remix Software Inc., and Shopify Inc.",
+                "MIT",
+              ],
+              ["Vite", "VoidZero Inc. and Vite contributors", "MIT"],
+              ["TypeScript", "Microsoft Corporation", "Apache License 2.0"],
+              ["Satori", "Vercel", "Mozilla Public License 2.0"],
+              ["resvg-js", "The resvg-js contributors", "Mozilla Public License 2.0"],
+            ],
+          },
+          {
+            kind: "p",
+            text: "Satori and resvg-js run only at build time, to render the images shown when a page is shared. They are not sent to your browser.",
+          },
+          {
+            kind: "p",
+            text: "License texts: [MIT](https://opensource.org/license/mit), [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0), and [MPL 2.0](https://www.mozilla.org/MPL/2.0/). Each package also ships its own copy.",
+          },
+        ],
+      },
+      {
+        id: "in-asten",
+        heading: "In Asten builds",
+        blocks: [
+          {
+            kind: "p",
+            text: "The desk is built on open-source work too. The main components include SQLite (public domain), Tauri (MIT or Apache 2.0), Axum and Tokio (MIT), SQLx (MIT or Apache 2.0), Tiptap and ProseMirror (MIT), and React (MIT). This is not a complete list, and each component’s own license applies.",
+          },
+        ],
+      },
+      {
+        id: "artwork",
+        heading: "Artwork",
+        blocks: [
+          {
+            kind: "p",
+            text: "The illustrations on this site are original SVG drawings by Verne. They are inspired by Egyptian art of the Old, Middle, and New Kingdoms, which is public-domain heritage. See [copyright](/copyright) for how they may be used.",
+          },
+        ],
+      },
+      {
+        id: "hieroglyphs",
+        heading: "Hieroglyphs and the cartouche toy",
+        blocks: [
+          {
+            kind: "p",
+            text: "Where this site refers to a hieroglyph by code, the code follows Gardiner’s sign list, the standard catalog from Sir Alan Gardiner’s *Egyptian Grammar*. G26, for example, is the sacred ibis on a standard, the sign of Thoth.",
+          },
+          {
+            kind: "callout",
+            tone: "note",
+            title: "A game, not a translation",
+            text: "The cartouche name toy spells names with a popular, simplified “hieroglyphic alphabet” that matches letters to single signs. It is not real Middle Egyptian. Egyptian writing mixed sound signs with signs for words and meanings, so a scholar would write your name differently.",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ---------------------------------------------------------------------------
+  // 13. Legal notice
+  // ---------------------------------------------------------------------------
+  {
+    ...legalIndex["/notice"]!,
+    summary: [
+      "Asten and this website are published by Verne Systems, trading as Verne, registered in Dhaka, Bangladesh.",
+      "The quickest way to reach Verne is info@vernesystems.com.",
+    ],
+    sections: [
+      {
+        id: "publisher",
+        heading: "Publisher",
+        blocks: [
+          {
+            kind: "list",
+            items: [
+              "**Product:** Asten, a local-first writing environment",
+              "**Publisher:** Verne Systems, trading as Verne",
+              "**Registered address:** 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209, Bangladesh",
+              "**Company registration:** C-201411-1",
+              "**Email:** [info@vernesystems.com](mailto:info@vernesystems.com)",
+              "**Website:** [vernesystems.com](https://vernesystems.com)",
+              "**Company details:** [vernesystems.com/legal/company](https://vernesystems.com/legal/company)",
+              "**Asten website:** [asten-writing.vercel.app](https://asten-writing.vercel.app)",
+            ],
+          },
+        ],
+      },
+      {
+        id: "responsible-for-content",
+        heading: "Responsible for content",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne Systems, trading as Verne, at the address above, is responsible for the content of this website. If you spot something inaccurate or out of date on any page, write to [info@vernesystems.com](mailto:info@vernesystems.com) and Verne will look into it.",
+          },
+        ],
+      },
+      {
+        id: "footer-credit",
+        heading: "About “Verne Ltd.”",
+        blocks: [
+          {
+            kind: "p",
+            text: "The footer credit “Designed and built by Verne Ltd.” refers to Verne, the publisher named above, whose legal name is Verne Systems, trading as Verne.",
+          },
+        ],
+      },
+      {
+        id: "dispute-resolution",
+        heading: "Dispute resolution",
+        blocks: [
+          {
+            kind: "p",
+            text: "Verne is not obliged to take part, and does not take part, in dispute resolution proceedings before a consumer arbitration board.",
+          },
+          {
+            kind: "p",
+            text: "That does not mean a complaint goes nowhere. You can write to [info@vernesystems.com](mailto:info@vernesystems.com) at any time, and Verne will try to put things right directly.",
+          },
+        ],
+      },
+      {
+        id: "hosting",
+        heading: "Hosting",
+        blocks: [
+          {
+            kind: "p",
+            text: "This website is hosted by Vercel Inc. Asten itself runs on your own computer; your manuscript is not stored on Verne’s servers or on Vercel’s.",
+          },
+        ],
+      },
+      {
+        id: "other-pages",
+        heading: "Other legal pages",
+        blocks: [
+          {
+            kind: "p",
+            text: "For how personal information is handled, see the [privacy policy](/privacy). For the rules of use, see the [terms of use](/terms) and the [license](/license). This site links to third-party websites; their operators are responsible for their content.",
+          },
+        ],
+      },
+    ],
+  },
+];

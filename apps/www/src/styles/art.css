@@ -1,0 +1,197 @@
+/* Pigments. Every illustration takes its colour from these classes, so art follows the theme. */
+
+.art {
+  display: block;
+  overflow: visible;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.f-ink { fill: var(--art-line); }
+.f-red { fill: var(--art-red); }
+.f-blue { fill: var(--art-blue); }
+.f-lapis { fill: var(--art-lapis); }
+.f-green { fill: var(--art-green); }
+.f-turq { fill: var(--art-turq); }
+.f-ochre { fill: var(--art-ochre); }
+.f-gold { fill: var(--art-gold); }
+.f-flesh { fill: var(--art-flesh); }
+.f-natron { fill: var(--art-natron); }
+.f-papyrus { fill: var(--art-papyrus); }
+.f-sand { fill: var(--art-sand); }
+.f-shadow { fill: var(--art-shadow); }
+.f-page { fill: var(--papyrus); }
+.f-raised { fill: var(--papyrus-raised); }
+.f-sunk { fill: var(--papyrus-sunk); }
+.f-night { fill: var(--night); }
+.f-star { fill: var(--star); }
+.f-none { fill: none; }
+
+.o { stroke: var(--art-line); stroke-width: 2; }
+.o-thin { stroke: var(--art-line); stroke-width: 1.2; }
+.o-hair { stroke: var(--art-line); stroke-width: 0.8; }
+.o-bold { stroke: var(--art-line); stroke-width: 2.8; }
+
+.s-ink { stroke: var(--art-stroke); }
+.s-line { stroke: var(--art-line); }
+.s-red { stroke: var(--art-red); }
+.s-blue { stroke: var(--art-blue); }
+.s-lapis { stroke: var(--art-lapis); }
+.s-gold { stroke: var(--art-gold); }
+.s-ochre { stroke: var(--art-ochre); }
+.s-green { stroke: var(--art-green); }
+.s-natron { stroke: var(--art-natron); }
+.s-sand { stroke: var(--art-sand); }
+.s-rule { stroke: var(--rule-strong); }
+.s-star { stroke: var(--star); }
+
+.w1 { stroke-width: 1; }
+.w15 { stroke-width: 1.5; }
+.w2 { stroke-width: 2; }
+.w3 { stroke-width: 3; }
+.w4 { stroke-width: 4; }
+
+/* Drawing: strokes with pathLength="1" draw on when an ancestor is revealed. */
+.reveal-ready .draw [pathLength] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+
+.reveal-ready .is-in .draw [pathLength],
+.reveal-ready .draw.is-in [pathLength] {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1.3s var(--ease-ink) calc(var(--d, 0) * 90ms + 150ms);
+}
+
+/* Drawn on page load without waiting for script. */
+.draw-now [pathLength] {
+  stroke-dasharray: 1;
+  animation: draw 1.5s var(--ease-ink) both;
+  animation-delay: calc(var(--d, 0) * 120ms + 200ms);
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Ambient: twinkling stars */
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.82); }
+}
+
+.twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: twinkle 5.5s ease-in-out infinite;
+  animation-delay: calc(var(--t, 0) * -0.9s);
+}
+
+/* Ambient: the moon's glow */
+@keyframes moonglow {
+  0%, 100% { opacity: 0.18; transform: scale(1); }
+  50% { opacity: 0.32; transform: scale(1.08); }
+}
+
+.moon-glow {
+  opacity: 0.22;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: moonglow 7s ease-in-out infinite;
+}
+
+/* Thoth: the reed pen writes; the eye blinks */
+@keyframes write {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-3px, 2px) rotate(-2deg); }
+  40% { transform: translate(2px, 3px) rotate(1deg); }
+  60% { transform: translate(-1px, 1px) rotate(-1deg); }
+  80% { transform: translate(3px, 2px) rotate(2deg); }
+}
+
+.thoth .pen-hand {
+  transform-box: fill-box;
+  transform-origin: 30% 80%;
+  animation: write 3.2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+.thoth .eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 6s ease-in-out infinite;
+}
+
+/* The scales: the registered --tilt property is what animates, so the pans stay exactly plumb. */
+.scales .beam {
+  transform-box: view-box;
+  transform-origin: 160px 88px;
+  transform: rotate(var(--tilt));
+  transition: --tilt 1.2s var(--ease-settle);
+}
+
+.scales .pan {
+  transform-box: view-box;
+}
+
+.scales.is-marked .feather {
+  filter: drop-shadow(0 0 0 transparent);
+}
+
+/* Lotus friezes open on hover */
+.frieze .bud {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 500ms var(--ease-settle);
+  transition-delay: calc(var(--i, 0) * 25ms);
+}
+
+.frieze:hover .bud {
+  transform: scaleY(1.18);
+}
+
+/* Glyph icons draw on hover of their card */
+.glyph {
+  width: 40px;
+  height: 40px;
+  flex: none;
+}
+
+.glyph .g-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.glyph .g-fill {
+  fill: var(--glyph-fill, var(--rubric-wash));
+}
+
+.glyph .g-dot {
+  fill: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .twinkle,
+  .moon-glow,
+  .thoth .pen-hand,
+  .thoth .eye {
+    animation: none;
+  }
+
+  .reveal-ready .draw [pathLength],
+  .draw-now [pathLength] {
+    stroke-dashoffset: 0;
+    transition: none;
+    animation: none;
+  }
+}

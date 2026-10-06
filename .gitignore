@@ -24,3 +24,8 @@ coverage/
 *.db-shm
 *.db-wal
 /data/
+dist-server/
+
+# Vercel CLI link and pulled environment
+.vercel
+.env*.local

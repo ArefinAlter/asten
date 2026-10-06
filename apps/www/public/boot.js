@@ -1,4 +1,8 @@
-document.documentElement.classList.add("js");
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("crawl")?.remove();
-});
+(function () {
+  var root = document.documentElement;
+  root.classList.add("js");
+  try {
+    var theme = localStorage.getItem("asten-theme");
+    if (theme === "day" || theme === "night") root.setAttribute("data-theme", theme);
+  } catch (error) {}
+})();

@@ -1,69 +1,173 @@
-import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { Wordmark } from "../art/Ink";
-import { pages } from "../seo/catalog";
+import { Suspense, useEffect, useRef } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { loaderFor } from "../pages/loaders";
 import { Seo } from "../seo/Seo";
-
-const story = pages.filter((page) => page.kind === "story" && page.nav);
-const record = pages.filter((page) => page.kind !== "story" && page.nav);
+import { Footer } from "./Footer";
+import { Masthead } from "./Masthead";
 
 export function Layout() {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
+  const main = useRef<HTMLElement>(null);
+  const first = useRef(true);
+  // The arrival animation plays only after a client-side navigation, never on first load.
+  const initialPath = useRef(pathname);
+  const moved = useRef(false);
+  if (pathname !== initialPath.current) moved.current = true;
+
+  // On navigation: scroll to the top (or the anchor) and move focus into the page.
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    main.current?.focus({ preventScroll: true });
+    if (!hash) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    // The page may still be loading its chunk, so wait for the anchor to exist.
+    const id = decodeURIComponent(hash.slice(1));
+    let frames = 0;
+    let frame = 0;
+    const seek = () => {
+      const target = document.getElementById(id);
+      if (target) target.scrollIntoView();
+      else if (frames++ < 120) frame = window.requestAnimationFrame(seek);
+    };
+    seek();
+    return () => window.cancelAnimationFrame(frame);
+  }, [pathname, hash]);
+
+  useReveal();
+  usePrefetch();
+  useMagnetic();
+
   return (
-    <div className="site">
+    <>
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
       <Seo pathname={pathname} />
-      <header className="top">
-        <NavLink to="/" className="brand" aria-label="Asten home">
-          <Wordmark />
-        </NavLink>
-        <nav aria-label="Product">
-          {story.map((page) => (
-            <NavLink
-              key={page.path}
-              to={page.path}
-              end={page.path === "/"}
-              className={({ isActive }) => (isActive ? "on" : "")}
-            >
-              {page.nav}
-            </NavLink>
-          ))}
-          {record
-            .filter((page) => page.kind === "record")
-            .map((page) => (
-              <NavLink
-                key={page.path}
-                to={page.path}
-                className={({ isActive }) => (isActive ? "on" : "")}
-              >
-                {page.nav}
-              </NavLink>
-            ))}
-        </nav>
-        <NavLink to="/download" className="cta">
-          Open the library
-        </NavLink>
-      </header>
-      <Outlet />
-      <footer className="bound">
-        <div className="footer-brand">
-          <Wordmark />
-          <p>Asten is a Verne product.</p>
-          <p>Let AI be the editor, not the writer. The files stay on this machine.</p>
-        </div>
-        <p className="verne-credit">
-          <span className="built">Designed and built by</span>
-          <img src="/verne-mark.png" alt="" />
-          <span className="ltd">Verne Ltd.</span>
-        </p>
-        <nav className="footer-links" aria-label="Legal">
-          {record
-            .filter((page) => page.kind === "legal")
-            .map((page) => (
-              <NavLink key={page.path} to={page.path}>
-                {page.nav}
-              </NavLink>
-            ))}
-        </nav>
-      </footer>
-    </div>
+      <Masthead />
+      <main id="main" ref={main} tabIndex={-1} key={pathname} className={moved.current ? "page-enter" : undefined}>
+        <Suspense fallback={<div className="page-loading" aria-busy="true" />}>
+          <Outlet />
+        </Suspense>
+      </main>
+      <Footer />
+    </>
   );
+}
+
+const REVEAL = "[data-reveal]";
+
+/**
+ * Registers rise into place as they enter the viewport. Anything already on
+ * screen when the page hydrates is shown at once, so nothing flickers. Pages
+ * arrive lazily, so new sections are picked up whenever they enter the DOM,
+ * not only when the address changes.
+ */
+function useReveal() {
+  useEffect(() => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const supported = "IntersectionObserver" in window && "MutationObserver" in window;
+    if (reduced || !supported) {
+      const showAll = () => document.querySelectorAll(`${REVEAL}:not(.is-in)`).forEach((node) => node.classList.add("is-in"));
+      showAll();
+      if (!("MutationObserver" in window)) return;
+      const mutations = new MutationObserver(showAll);
+      mutations.observe(document.body, { childList: true, subtree: true });
+      return () => mutations.disconnect();
+    }
+
+    const intersections = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-in");
+            intersections.unobserve(entry.target);
+          }
+        }
+      },
+      { rootMargin: "0px 0px -8% 0px", threshold: 0.08 },
+    );
+    const watch = (scope: Element | Document) => {
+      if (scope instanceof Element && scope.matches(`${REVEAL}:not(.is-in)`)) intersections.observe(scope);
+      scope.querySelectorAll(`${REVEAL}:not(.is-in)`).forEach((node) => intersections.observe(node));
+    };
+
+    // First load: show what is already on screen, then hide the rest until reached.
+    const height = window.innerHeight;
+    document.querySelectorAll(REVEAL).forEach((node) => {
+      const box = node.getBoundingClientRect();
+      if (box.top < height * 0.92 && box.bottom > 0) node.classList.add("is-in");
+    });
+    document.documentElement.classList.add("reveal-ready");
+    watch(document);
+
+    // Later pages: watch sections as they are added.
+    const mutations = new MutationObserver((records) => {
+      for (const record of records) {
+        record.addedNodes.forEach((node) => {
+          if (node instanceof Element) watch(node);
+        });
+      }
+    });
+    mutations.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      mutations.disconnect();
+      intersections.disconnect();
+    };
+  }, []);
+}
+
+/** Fetch a page's code as soon as a link to it is hovered or focused. */
+function usePrefetch() {
+  useEffect(() => {
+    const done = new Set<string>();
+    function onIntent(event: Event) {
+      const link = (event.target as Element | null)?.closest?.("a[href^='/']");
+      const href = link?.getAttribute("href");
+      if (!href || href.startsWith("//")) return;
+      const path = href.split(/[?#]/)[0] ?? "/";
+      if (done.has(path) || /\.[a-z0-9]+$/i.test(path)) return;
+      done.add(path);
+      loaderFor(path)().catch(() => done.delete(path));
+    }
+    document.addEventListener("pointerover", onIntent, { passive: true });
+    document.addEventListener("focusin", onIntent);
+    document.addEventListener("touchstart", onIntent, { passive: true });
+    return () => {
+      document.removeEventListener("pointerover", onIntent);
+      document.removeEventListener("focusin", onIntent);
+      document.removeEventListener("touchstart", onIntent);
+    };
+  }, []);
+}
+
+/** Primary buttons lean a few pixels toward the pointer. */
+function useMagnetic() {
+  useEffect(() => {
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fine || reduced) return;
+    let active: HTMLElement | null = null;
+    function onMove(event: PointerEvent) {
+      const target = (event.target as Element | null)?.closest<HTMLElement>("[data-magnetic]") ?? null;
+      if (active && active !== target) {
+        active.style.removeProperty("--mx");
+        active.style.removeProperty("--my");
+      }
+      active = target;
+      if (!target) return;
+      const box = target.getBoundingClientRect();
+      const dx = (event.clientX - (box.left + box.width / 2)) / (box.width / 2);
+      const dy = (event.clientY - (box.top + box.height / 2)) / (box.height / 2);
+      target.style.setProperty("--mx", `${(dx * 4).toFixed(2)}px`);
+      target.style.setProperty("--my", `${(dy * 3).toFixed(2)}px`);
+    }
+    document.addEventListener("pointermove", onMove, { passive: true });
+    return () => document.removeEventListener("pointermove", onMove);
+  }, []);
 }

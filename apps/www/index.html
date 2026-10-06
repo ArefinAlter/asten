@@ -2,23 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f6f4ef" />
-    <meta name="color-scheme" content="light" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f5eedf" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1a2e" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="Asten Journal" href="/journal/rss.xml" />
     <script src="/boot.js"></script>
-    <!--seo-head-->
-    <title>Asten — a writing environment by Verne</title>
-    <meta
-      name="description"
-      content="Asten is a local-first writing environment by Verne. It notices contradictions in world, character, and time, and it does not write the manuscript."
-    />
-    <!--/seo-head-->
+    <!--app-head-->
   </head>
   <body>
-    <!--seo-body--><!--/seo-body-->
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div id="root"><!--app-html--></div>
+    <script type="module" src="/src/entry-client.tsx"></script>
   </body>
 </html>
