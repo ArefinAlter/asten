@@ -1,0 +1,28 @@
+# Upload only what the public website build needs: the www app, the brand
+# tokens, and the workspace manifests pnpm uses to verify the lockfile.
+/*
+!/package.json
+!/pnpm-lock.yaml
+!/pnpm-workspace.yaml
+!/vercel.json
+
+!/apps
+/apps/*
+!/apps/www
+!/apps/web
+/apps/web/*
+!/apps/web/package.json
+!/apps/desktop
+/apps/desktop/*
+!/apps/desktop/package.json
+
+!/packages
+/packages/*
+!/packages/brand
+!/packages/contracts
+/packages/contracts/*
+!/packages/contracts/package.json
+
+**/node_modules
+/apps/www/dist
+/apps/www/dist-server

@@ -34,7 +34,7 @@ Research ingest is a separate Python tool (`asten-ingest`) in the other repo. It
 - Compile and import: markdown, plain, fountain, HTML, docx. PDF is print-from-HTML.
 - Local API and a Tauri desktop shell. Run from source. No signed installer.
 - Word task pane and Docs sidebar. Sideload only. They call `127.0.0.1:4317`.
-- Public site: product pages, legal record, sitemap, robots, `llms.txt`, FAQ schema. Footer credit: Designed and built by Verne Ltd. Live origin in code is `https://asten.vercel.app`.
+- Public site (`apps/www`): 49 statically prerendered pages in the Egyptian brand (see `docs/BRAND.md`): product, nine features, five audience pages, AI stance, compare, roadmap, journal (5 articles, RSS), glossary, FAQ, guide, brand and press kit, and 13 legal pages. Interactive demos, original SVG art, day and night themes. Build writes sitemap, robots, `llms.txt`, `llms-full.txt`, JSON-LD, an OG card per page, icons, and `security.txt`. No cookies, no analytics. Footer credit: Designed and built by Verne Ltd. Live origin: `https://asten-writing.vercel.app` (Vercel project `asten-writing`, configured by the root `vercel.json`).
 
 ## Still to do
 
@@ -42,8 +42,8 @@ Research ingest is a separate Python tool (`asten-ingest`) in the other repo. It
 - Signed desktop installer. The download page says to run from source.
 - Publish the add-ins only if they go to the Office or Workspace stores. Today they are sideload guests. The Word pane must be served at `https://localhost:3000`.
 - Reindex the research collection `asten_chunks`. Search is empty until that runs.
-- Set `site.origin` in `apps/www/src/seo/catalog.ts` when a real domain replaces `asten.vercel.app`.
-- Legal pages name Verne and point at the GitHub repo. They do not invent a postal address, company number, or governing law. Add those only when Verne Ltd. supplies them.
+- Set `site.origin` in `apps/www/src/site.ts` when a real domain replaces `asten-writing.vercel.app`.
+- Legal pages use the entity Verne publishes at vernesystems.com/legal/company (Verne Systems, trading as Verne, Dhaka) and mirror Verne's website terms (Bangladesh law, Dhaka courts, USD 100 cap). The footer still says “Verne Ltd.”; confirm which name is right. Have counsel review before launch.
 - Align older “a Verne product” lines with “Verne Ltd.” where the legal identity should say the company name.
 
 ## Left out on purpose
