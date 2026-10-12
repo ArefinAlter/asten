@@ -80,7 +80,7 @@ export function AiStance() {
           />
           <div className="card-grid card-grid--3">
             {[
-              { title: "Deterministic", text: "Rules you can read and test: CANON-E013, CANON-E101, CANON-E201." },
+              { title: "Deterministic", text: "Rules you can read and test, from CANON-E013 to CANON-E602, and perception that is dictionaries and cues, not a model." },
               { title: "Offline", text: "Everything runs on your machine. Nothing is sent anywhere." },
               { title: "Explainable", text: "Every mark points to evidence: the settled fact and the page that disagrees." },
             ].map((item, i) => (

@@ -125,7 +125,7 @@ export function HowItWorks() {
               <Diagnostic code="CANON-E101" title="Oren acts after a settled death." lines={["Chapter 9: Oren · status · dead", "Chapter 14: “Oren pours the tea”", "Mark flashback · Move the death · Silence"]} />
             </div>
             <div data-reveal>
-              <Diagnostic code="CANON-E201" title="Story time runs backward." lines={["Ch. 11 “The harbor burns”: day 17", "Ch. 12 “Mira remembers”: day 4", "Reorder · Retcon a date · Silence"]} />
+              <Diagnostic code="CANON-E201" title="Story time runs backward inside a continuous run." lines={["Ch. 11 “The harbor burns”: day 17", "Ch. 12 “The morning after”: day 4", "Reorder · Retcon a date · Mark it a flashback"]} />
             </div>
           </div>
         </div>

@@ -402,7 +402,7 @@ export function Home() {
               <h3>Works today</h3>
               <ul>
                 <li>The desk: binder, comments, page view, track changes, snapshots</li>
-                <li>Canon with three continuity rules</li>
+                <li>Canon with seventeen continuity rules, read from the page and from what you settle</li>
                 <li>Cast, two clocks, optional world</li>
                 <li>Compile and import: Markdown, Fountain, HTML, .docx</li>
               </ul>
@@ -411,7 +411,7 @@ export function Home() {
               <h3>Not yet</h3>
               <ul>
                 <li>A public download or signed installer</li>
-                <li>Facts proposed automatically from prose</li>
+                <li>Trained perception models (today the reading is rule-based)</li>
                 <li>Any AI model, local or cloud</li>
                 <li>EPUB, FDX, and collaboration</li>
               </ul>

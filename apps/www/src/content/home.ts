@@ -52,7 +52,7 @@ export const homeFaqs: QA[] = [
   },
   {
     q: "Does Asten use AI?",
-    a: "Not today. Asten’s checks are deterministic rules over facts you confirm, and no model runs, local or remote. Planned AI features will only propose facts for you to confirm, will run locally first, and can be switched off entirely.",
+    a: "No model runs, local or remote. Asten reads names and plain attributes from the page with fixed rules and weighs them against facts you confirm. Planned perception models are small local classifiers that only propose, and any generative AI, if it ever comes, will be optional, local first, and switchable off entirely.",
   },
   {
     q: "Will my writing be used to train AI?",
@@ -64,7 +64,7 @@ export const homeFaqs: QA[] = [
   },
   {
     q: "What does Asten check today?",
-    a: "Three things: a character attribute that disagrees with your canon (CANON-E013), someone acting after a settled death (CANON-E101), and scenes whose story time runs backward against reading order (CANON-E201). Optional diction hints are off until you turn them on.",
+    a: "Seven families of rules, all deterministic: attributes that disagree with your canon or with the page itself (CANON-E013 to E015), lifecycle such as acting after a settled death (E101 to E103), the two clocks and dates that cannot all be true (E201 to E203), travel and place (E301, E302), who knows what and when (E401), relations and genealogy (E501 to E503), and rules you write yourself (E601, E602). Name hygiene and setup ledgers come along. Optional diction hints are off until you turn them on.",
   },
   {
     q: "How do I get Asten?",

@@ -101,9 +101,9 @@ export const audiences: Audience[] = [
       ],
     },
     honest: [
-      "The atlas is a rough map for pinning places. Travel-time checks are planned, not shipped.",
-      "World rules (“magic costs blood”) can be written down today; automatic rule checks are planned.",
-      "Custom calendars are planned. Today story time is a label you write.",
+      "The atlas is a rough map for pinning places. Travel-time checks work once you declare routes with a travel time.",
+      "World rules (“magic costs blood”) are written as plain patterns in the invariants panel and checked against the scene trace.",
+      "Story time can count days, use Gregorian dates, or use a fictional calendar whose months you define.",
     ],
     faqs: [
       { q: "Can Asten replace World Anvil or Campfire?", a: "Asten is a writing app with optional worldbuilding, not a dedicated worldbuilding platform. Its world tools are lighter, but they connect directly to your manuscript’s continuity checks and stay on your own computer." },
@@ -132,7 +132,7 @@ export const audiences: Audience[] = [
     ],
     helps: [
       { title: "Fountain in and out", text: "Import and compile the open plain-text screenplay format.", href: "/features/word-and-google-docs" },
-      { title: "Two clocks", text: "Screen order and story order, kept separate. CANON-E201 when they cross unexpectedly.", href: "/features/time" },
+      { title: "Two clocks", text: "Screen order and story order, kept separate. CANON-E201 only inside a run you declared continuous.", href: "/features/time" },
       { title: "Canon checks", text: "Scars, cars, and who knows what, settled once.", href: "/features/canon" },
       { title: "Local and private", text: "An unproduced script stays on your machine.", href: "/features/local-first" },
     ],
@@ -140,7 +140,7 @@ export const audiences: Audience[] = [
       title: "Three weeks earlier",
       lines: [
         "Your script opens on the fire, then cuts to “THREE WEEKS EARLIER.”",
-        "Asten marks the cut: CANON-E201. Story time steps backward. You meant it, so you silence it for that scene.",
+        "The cut steps backward in story time. It is outside the run you declared continuous, so Asten says nothing.",
         "In act three a scene you dated day 15 lands before day 14, and this time you didn’t mean it.",
         "You swap the scenes in the binder. Fountain compiles clean.",
       ],
@@ -148,7 +148,7 @@ export const audiences: Audience[] = [
     honest: [
       "Asten is not a full screenplay editor: no production revisions, page locking, or FDX yet.",
       "Fountain is supported for import and compile; FDX is planned.",
-      "Flashbacks are marked by CANON-E201 until you silence them; automatic flashback recognition is planned.",
+      "A flashback is never marked on its own. CANON-E201 appears only inside a run of scenes you declared continuous.",
     ],
     faqs: [
       { q: "Does Asten support Fountain?", a: "Yes. Asten imports and compiles Fountain, the plain-text screenplay format, alongside Markdown, plain text, HTML, and .docx." },
@@ -214,7 +214,7 @@ export const audiences: Audience[] = [
     h1: "For people who know exactly what AI is good at.",
     lede: "You use models every day. You also know where they hallucinate, flatten voice, and claim confidence they haven’t earned. Asten is built on that knowledge: deterministic checks today, AI only as a proposer later, and your words never in a training set.",
     answer:
-      "Asten is a local-first writing environment with a deterministic canon engine: Rust, SQLite, a loopback HTTP API on 127.0.0.1:4317, and stable diagnostic codes. No model runs today. Planned AI features will only propose facts for the author to confirm, prefer local models, support bring-your-own keys, and never train on manuscripts.",
+      "Asten is a local-first writing environment with a deterministic canon engine: Rust, SQLite, a loopback HTTP API on 127.0.0.1:4317, and stable diagnostic codes. No model runs today: perception is deterministic. Planned perception models are small local classifiers that only propose; any generative AI, if ever, is optional and never trains on manuscripts.",
     pains: [
       { title: "Voice flattening", text: "Every AI draft sounds like every other AI draft." },
       { title: "Confident nonsense", text: "A model “remembers” a plot point that never happened." },
@@ -222,7 +222,7 @@ export const audiences: Audience[] = [
     ],
     helps: [
       { title: "Deterministic first", text: "Rules you can read, test, and argue with. Same project, same marks.", href: "/features/compiler" },
-      { title: "Stable codes", text: "CANON-E013, E101, E201, CRAFT-H. Searchable, suppressible, documented.", href: "/glossary#diagnostic" },
+      { title: "Stable codes", text: "CANON-E013 to E602, NAME-W, PLOT-I, CRAFT-H. Searchable, suppressible, documented.", href: "/glossary#diagnostic" },
       { title: "Plain architecture", text: "Rust crates, SQLite, Axum on loopback, React, Tauri.", href: "/features/compiler" },
       { title: "A written AI policy", text: "Proposals only, local first, your key, full switch-off, no training.", href: "/ai-policy" },
     ],
@@ -238,7 +238,7 @@ export const audiences: Audience[] = [
     honest: [
       "No model ships today. The scenario above is planned work, described as a design commitment, not a feature.",
       "The source repository is private; Asten is not open source.",
-      "The local API binds to loopback by default. Don’t expose it to a network.",
+      "The local API binds to loopback by default and answers only to paired clients. Don’t expose it to a network without TLS and an owner passphrase.",
     ],
     faqs: [
       { q: "Does Asten run a local LLM?", a: "Not today. Asten’s checks are deterministic rules. Planned AI features will prefer local models, support bring-your-own provider keys with explicit consent, and can be switched off entirely." },

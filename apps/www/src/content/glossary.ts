@@ -55,7 +55,7 @@ export const glossary: GlossaryTerm[] = [
     term: "CANON-E013",
     short:
       "CANON-E013 is Asten’s attribute-contradiction rule: it marks two confirmed values for the same attribute, such as auburn and black for one character’s hair.",
-    long: "If Mira’s hair was settled as auburn in chapter 2 and a later confirmed fact says black, the mark shows both sides. The rule belongs to the Scribe pack and is always on.",
+    long: "If Mira’s hair was settled as auburn in chapter 2 and a later confirmed fact, or the page itself, says black at the same story time with no change in between, the mark shows both sides in a numbered chain. The rule belongs to the Scribe pack and is always on.",
     see: "/features/compiler",
     related: ["scribe-pack", "diagnostic", "confirmed-fact", "predicate"],
   },
@@ -64,7 +64,7 @@ export const glossary: GlossaryTerm[] = [
     term: "CANON-E101",
     short:
       "CANON-E101 is Asten’s life-after-death rule: it marks a character who acts after their death has been confirmed.",
-    long: "Captain Oren dies in chapter 9. If a later scene has him giving orders, Asten marks it. The rule belongs to the Lifecycle pack, which is on by default.",
+    long: "Captain Oren dies in chapter 9. If a later scene in story time has him giving orders, Asten marks it; a memory or a flashback is not marked. The rule belongs to the Lifecycle pack, which is on by default.",
     see: "/features/compiler",
     related: ["lifecycle-pack", "diagnostic", "confirmed-fact", "entity"],
   },
@@ -72,8 +72,8 @@ export const glossary: GlossaryTerm[] = [
     slug: "canon-e201",
     term: "CANON-E201",
     short:
-      "CANON-E201 is Asten’s clocks rule: it marks places where reading order contradicts the story time you have stated.",
-    long: "It belongs to the Clocks pack, which is on by default, and it stays silent until both clocks exist. If the mark lands on a flashback you meant, suppress it; the rule is there for the jumps you didn’t mean.",
+      "CANON-E201 is Asten’s clocks rule: it marks story time stepping backward inside a run of scenes you declared continuous.",
+    long: "It belongs to the Clocks pack, which is on by default, and it stays silent until scenes are dated and placed in a run. A flashback outside a run, or a scene marked as a memory, is never marked. Its siblings are CANON-E202, for dates that cannot all be true, and CANON-E203, for an effect seen before its cause.",
     see: "/features/time",
     related: ["story-time", "reading-order", "clocks-pack", "flashback"],
   },
@@ -91,7 +91,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Clocks pack",
     short:
       "The Clocks pack is the Asten method pack that compares reading order with story time; it holds CANON-E201 and is on by default.",
-    long: "It stays silent until a project has both clocks, so if you never set story time, you never hear from it.",
+    long: "It holds CANON-E201, E202, and E203, and stays silent until scenes are dated, so if you never set story time, you never hear from it.",
     see: "/features/packs",
     related: ["method-pack", "canon-e201", "story-time", "reading-order"],
   },
@@ -109,7 +109,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Confirmed fact",
     short:
       "A confirmed fact is a fact you have settled as canon; in Asten, only confirmed facts can produce hard contradictions.",
-    long: "Mira · hair color · auburn, confirmed in chapter 2, is one. Asten’s planned fact proposals would need your confirmation before they count.",
+    long: "Mira · hair color · auburn, confirmed in chapter 2, is one. Facts Asten reads from the page stay proposals until you confirm them.",
     see: "/features/canon",
     related: ["fact", "proposed-fact", "deprecated-fact", "canon"],
   },
@@ -127,7 +127,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Continuity error",
     short:
       "A continuity error is a detail in a story that contradicts something established earlier, like a character’s eye color changing between chapters.",
-    long: "Long manuscripts make them easy to commit and hard to catch, because the original detail is hundreds of pages back. Asten’s compiler marks the kinds it can check today: attribute contradictions, a life after a settled death, and clocks that disagree.",
+    long: "Long manuscripts make them easy to commit and hard to catch, because the original detail is hundreds of pages back. Asten’s compiler marks the kinds it can check today: attributes, lifecycle, the two clocks, travel, knowledge, relations, and rules you write yourself.",
     see: "/journal/continuity-in-a-long-novel",
     related: ["canon", "canon-e013", "canon-e101", "canon-e201"],
   },
@@ -217,7 +217,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Flashback",
     short:
       "A flashback is a scene that shows events from earlier in story time than the scenes around it.",
-    long: "Asten allows them and keeps story time and reading order as separate clocks. If `CANON-E201` marks a flashback you meant, suppress the mark and the page stays as you wrote it.",
+    long: "Asten allows them and keeps story time and reading order as separate clocks. It argues only inside a run of scenes you declared continuous, and a scene marked as a memory or flashback is never weighed against the world.",
     see: "/features/time",
     related: ["story-time", "reading-order", "canon-e201", "fabula-and-syuzhet"],
   },
@@ -262,7 +262,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Local API",
     short:
       "The local API is the HTTP interface Asten runs on your own computer, at 127.0.0.1:4317, which the Word and Google Docs add-ins use to reach your projects.",
-    long: "The address `127.0.0.1` means this machine, so the add-ins reach your projects without a cloud in between. For tinkerers: it’s an Axum server written in Rust.",
+    long: "The address `127.0.0.1` means this machine, so the add-ins reach your projects without a cloud in between. It answers only to clients paired with a six-digit code. For tinkerers: it’s an Axum server written in Rust, and the desktop shell embeds it.",
     see: "/for/ai-tinkerers",
     related: ["word-task-pane", "docs-sidebar", "local-first", "sqlite"],
   },
@@ -289,7 +289,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Method pack",
     short:
       "A method pack is a bundle of rules or hints added to Asten’s checks; packs mark your pages but never change your manuscript.",
-    long: "Today there are four: Scribe (the core canon compiler, always on), Lifecycle and Clocks (on by default), and Diction watch (off by default). No craft doctrine is a default.",
+    long: "Today there are eight: Scribe (the core canon compiler, always on), Lifecycle, Clocks, Relations, Knowledge, Atlas, and Invariants (on by default), and Diction watch (off by default). No craft doctrine is a default.",
     see: "/features/packs",
     related: ["scribe-pack", "lifecycle-pack", "clocks-pack", "diction-watch"],
   },
@@ -325,7 +325,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Proposed fact",
     short:
       "A proposed fact is a fact waiting for your decision; Asten records it, but it can’t produce a hard contradiction until you confirm it.",
-    long: "Asten extracts nothing from your prose today. Planned fact extraction would only ever create proposals like this, never silent canon.",
+    long: "Facts Asten reads from the page arrive as proposals like this, with the sentence they came from. Nothing becomes canon until you confirm it.",
     see: "/features/canon",
     related: ["confirmed-fact", "deprecated-fact", "fact"],
   },
@@ -469,7 +469,7 @@ export const glossary: GlossaryTerm[] = [
     term: "World wall, atlas, and dossier",
     short:
       "The world wall, atlas, and dossier are Asten’s three optional views of your world: a board of loose cards, a rough map for places, and an organized list.",
-    long: "Pin the harbor at Veld to the wall as a scrap, drop it on the atlas once you know where it sits, and find it in the dossier grouped by kind. The atlas is for orientation; it doesn’t check travel times.",
+    long: "Pin the harbor at Veld to the wall as a scrap, drop it on the atlas once you know where it sits, and find it in the dossier grouped by kind. Declare a route with a travel time and the atlas checks can notice a journey that does not fit.",
     see: "/features/world",
     related: ["spark-sketched-settled", "entity", "gardener"],
   },

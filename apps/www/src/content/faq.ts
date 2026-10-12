@@ -49,7 +49,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Does Asten use AI right now?",
-        a: "No AI model runs in Asten today, local or cloud. Asten’s checks are deterministic rules over facts you confirm, so the same manuscript and the same canon always produce the same marks. See [Asten and AI](/ai).",
+        a: "No AI model runs in Asten today, local or cloud. Asten reads names and plain attributes from the page with fixed rules, and its checks are deterministic over those readings and the facts you confirm, so the same manuscript and the same canon always produce the same marks. See [Asten and AI](/ai).",
       },
       {
         q: "Will Asten add AI features in the future?",
@@ -69,7 +69,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Does Asten understand my story?",
-        a: "No, and Asten doesn’t claim to. Asten compares facts you’ve confirmed, such as Mira · hair color · auburn, using fixed rules; it notices when they disagree, but it doesn’t read for meaning. Automatic extraction of facts from prose is planned, not shipped.",
+        a: "No, and Asten doesn’t claim to. Asten reads plain attributes from the page (hair, eyes, height, age, where someone is, alive or dead, who is married to whom) with fixed rules, compares them with facts you’ve confirmed such as Mira · hair color · auburn, and notices when they disagree. It doesn’t read for meaning, and it never writes.",
       },
     ],
   },
@@ -83,19 +83,19 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What continuity errors can Asten catch?",
-        a: "Asten ships three canon checks today. `CANON-E013` marks two confirmed values for the same attribute, such as auburn and black hair; `CANON-E101` marks a character acting after a confirmed death, such as Captain Oren after chapter 9; and `CANON-E201` marks reading order that contradicts the story time you’ve stated. Checks for travel, who knows what when, genealogy, world rules, and custom calendars are planned; see [the compiler](/features/compiler).",
+        a: "Asten ships seventeen canon rules in seven families. `CANON-E013` marks two values for one attribute, such as auburn and black hair, whether both are confirmed or one is on the page; `CANON-E101` marks a character acting after a confirmed death, such as Captain Oren after chapter 9; `CANON-E201` to `E203` cover story time stepping backward inside a continuous run, dates that cannot all be true, and an effect before its cause; `E301` and `E302` cover travel time and being in two places at once; `E401` knowledge a character cannot have yet; `E501` to `E503` genealogy and exclusive relations; `E601` rules you write yourself. See [the compiler](/features/compiler).",
       },
       {
         q: "Does Asten find contradictions in my prose automatically?",
-        a: "Not yet: Asten doesn’t extract facts from your prose today, and its checks start from facts you’ve confirmed and the timeline you’ve stated. Automatic fact proposals are planned, and they would arrive as proposals you confirm, never as silent canon.",
+        a: "Yes, for plain attributes. Asten reads names, aliases, hair and eye color, height, age, location, alive or dead, and relations from the page with fixed rules, no model, and weighs them against your canon as warnings. What it reads arrives as proposals you confirm or reject, never as silent canon. Deeper reading, such as a pronoun with no name in the sentence, is not weighed.",
       },
       {
         q: "How do I silence a warning in Asten?",
-        a: "Any rule in Asten can be suppressed, and the suppression is stored with your project, so the mark stays quiet. Diction watch is off unless you turn it on, the Lifecycle and Clocks packs are on by default, and the Scribe pack, Asten’s core canon compiler, is always on. Diagnostics only point at your text, so silencing one never changes a word.",
+        a: "Any mark in Asten can be suppressed with a reason, and the suppression is stored with your project and knows when its evidence changes. Diction watch is off unless you turn it on; Lifecycle, Clocks, Relations, Knowledge, Atlas, and Invariants are on by default; and the Scribe pack, Asten’s core canon compiler, is always on. A project’s strictness can also be set to quiet, standard, or thorough. Diagnostics only point at your text, so silencing one never changes a word.",
       },
       {
         q: "What if a contradiction in my story is intentional?",
-        a: "Asten gives you three ways to keep an intentional contradiction, such as an unreliable narrator, a lie, or a dream. Mark the fact as contested and Asten won’t raise contradictions from it; deprecate a fact you have abandoned; or suppress the single mark and keep your sentence. The canon is yours; Asten only records it.",
+        a: "Asten gives you several ways to keep an intentional contradiction. Anything inside quotation marks counts as something a character says, not as world truth; a scene can be marked a memory, dream, vision, or frame story and nothing in it is weighed against the world; a narrator can be marked unreliable; a fact can be marked contested or deprecated; or you can suppress the single mark with a reason and keep your sentence. The canon is yours; Asten only records it.",
       },
       {
         q: "Do I have to fill out a story bible before I start writing in Asten?",
@@ -107,7 +107,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Does Asten work with flashbacks?",
-        a: "Yes, Asten allows flashbacks: it keeps two clocks, story time and reading order, so a scene can happen early and be told late. `CANON-E201` stays silent until both clocks exist, then marks places where they run against each other; when the flashback is intended, suppress the mark and your page stays as written. See [time](/features/time).",
+        a: "Yes, Asten allows flashbacks: it keeps two clocks, story time and reading order, so a scene can happen early and be told late, and it argues only inside a run of scenes you declared continuous. A scene marked as a memory or flashback is never weighed against the world. `CANON-E201` appears only when a continuous run steps backward in story time. See [time](/features/time).",
       },
     ],
   },
@@ -175,11 +175,11 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Does Asten work with Microsoft Word or Google Docs?",
-        a: "Asten works with Word and Google Docs through a Word task pane and a Google Docs sidebar. Both list your local Asten projects, show diagnostics, and can file a selected passage into a local project, talking to Asten’s local API on your computer. They are sideload only and aren’t in the Microsoft or Google stores; see [Word and Google Docs](/features/word-and-google-docs).",
+        a: "Asten works with Word and Google Docs through a Word task pane and a Google Docs sidebar. Both pair once with a six-digit code from the desk, then list your local Asten projects, show the Scales, and can file a selected passage into a local project, talking to Asten’s local API on your computer. They are sideload only and aren’t in the Microsoft or Google stores; see [Word and Google Docs](/features/word-and-google-docs).",
       },
       {
         q: "What’s on the Asten roadmap?",
-        a: "Asten’s roadmap includes optional fact proposals from prose that you confirm; more checks for travel, character knowledge, genealogy, world rules, and custom calendars; a signed desktop installer; EPUB and FDX export; a graph, maps, boards, research, and citations; a runtime for plugins and packs; and, later, collaboration that keeps offline work. Everything on it is planned, with no promised dates. See [the roadmap](/roadmap).",
+        a: "Asten’s roadmap includes a signed desktop installer; small local perception models that propose, never generate; generated API contracts; EPUB and FDX export; a graph, maps, boards, research, and citations; a runtime for plugins and packs; and, later, collaboration that keeps offline work. Everything on it is planned, with no promised dates. See [the roadmap](/roadmap).",
       },
       {
         q: "How do I report a bug or security issue in Asten?",
