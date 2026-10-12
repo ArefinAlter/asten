@@ -1,0 +1,14 @@
+[package]
+name = "asten-logic"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "The exact analyses of the Asten canon engine: event calculus, typestate lifecycles, clocks, symbols, relations, knowledge flow, travel and LTLf invariants."
+
+[dependencies]
+asten-diagnostics = { path = "../asten-diagnostics" }
+asten-ir = { path = "../asten-ir" }
+asten-time = { path = "../asten-time" }
+serde.workspace = true
+serde_json.workspace = true
+unicode-segmentation.workspace = true

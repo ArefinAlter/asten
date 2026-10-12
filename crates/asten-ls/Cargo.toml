@@ -1,0 +1,12 @@
+[package]
+name = "asten-ls"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "The story language server protocol: the request and notification shapes shared by the desk, the Word pane, the Docs sidebar and the API."
+
+[dependencies]
+asten-diagnostics = { path = "../asten-diagnostics" }
+asten-ir = { path = "../asten-ir" }
+serde.workspace = true
+serde_json.workspace = true

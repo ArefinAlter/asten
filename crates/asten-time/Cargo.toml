@@ -1,0 +1,10 @@
+[package]
+name = "asten-time"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Story time for the Asten canon engine: ticks, calendars, label parsing, and the simple temporal network."
+
+[dependencies]
+asten-ir = { path = "../asten-ir" }
+serde.workspace = true

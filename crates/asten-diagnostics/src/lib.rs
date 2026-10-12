@@ -1,779 +1,809 @@
-use asten_domain::{
-    CanonEntity, Diagnostic, DiagnosticId, Document, DocumentKind, Fact, FactModality, FactStatus,
-    MethodPack, Project, Severity, SourceAnchor, SourceRange, Suppression, TimelineEvent,
-    document_plain_text, normalize_key, normalize_value, story_times_out_of_order,
+//! Diagnostics: the records the desk shows, the codes that never change, the
+//! severity table, explanations as minimal conflict sets, ranked culprits,
+//! abductive repairs, and suppressions that know when to come back.
+//! See `docs/ENGINE_DESIGN.md` §12.
+
+use std::collections::BTreeMap;
+
+use asten_ir::{
+    Anchor, BlockId, Context, DocId, EntityId, Provenance, Status, Strictness,
+    evidence_fingerprint, sha256_hex,
 };
+use serde::{Deserialize, Serialize};
 
-pub const ATTRIBUTE_CONTRADICTION: &str = "CANON-E013";
-pub const LIFECYCLE_AFTER_DEATH: &str = "CANON-E101";
-pub const CLOCK_ORDER: &str = "CANON-E201";
+pub mod catalog;
 
-const COLOR_WORDS: &[&str] = &[
-    "amber", "auburn", "black", "blond", "blonde", "blue", "brown", "ginger", "gray", "green",
-    "grey", "hazel", "pink", "red", "silver", "white",
-];
+pub use catalog::{Area, CodeInfo, catalog, info};
 
-pub struct AnalysisContext<'a> {
-    pub project: &'a Project,
-    pub documents: &'a [Document],
-    pub facts: &'a [Fact],
-    pub entities: &'a [CanonEntity],
-    pub events: &'a [TimelineEvent],
-    pub suppressions: &'a [Suppression],
-    pub packs: &'a [MethodPack],
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Severity {
+    Error,
+    Warning,
+    Information,
+    Hint,
 }
 
-impl<'a> AnalysisContext<'a> {
+/// Whether the conflict is forced by the constraints or merely possible.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Tier {
+    Must,
+    #[default]
+    May,
+}
+
+/// Which kinds of statements disagree. Drives severity (§12.2).
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Pairing {
+    SettledSettled,
+    SettledObserved,
+    ProposedProposed,
+}
+
+/// Where a mark lands. Block-relative when the statement has an anchor; the
+/// whole document otherwise.
+#[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+pub struct Location {
+    pub document: DocId,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub block: Option<BlockId>,
+    pub start: u32,
+    pub end: u32,
+    /// What the span says, for display.
+    #[serde(default)]
+    pub quote: String,
+    /// A human label for the place ("chapter 2").
+    #[serde(default)]
+    pub label: String,
+}
+
+impl Location {
     #[must_use]
-    pub fn core(project: &'a Project, documents: &'a [Document], facts: &'a [Fact]) -> Self {
+    pub fn from_anchor(anchor: &Anchor) -> Self {
         Self {
-            project,
-            documents,
-            facts,
-            entities: &[],
-            events: &[],
-            suppressions: &[],
-            packs: &[],
+            document: anchor.document.clone(),
+            block: Some(anchor.block.clone()),
+            start: anchor.start,
+            end: anchor.end,
+            quote: anchor.quote.clone(),
+            label: String::new(),
         }
     }
 
     #[must_use]
-    pub fn pack_enabled(&self, key: &str) -> bool {
-        self.packs
-            .iter()
-            .find(|pack| pack.pack_key == key)
-            .map(|pack| pack.enabled)
-            .unwrap_or(key == "scribe")
-    }
-}
-
-pub trait Rule: Send + Sync {
-    fn code(&self) -> &'static str;
-    fn evaluate(&self, context: &AnalysisContext<'_>, output: &mut Vec<Diagnostic>);
-}
-
-#[derive(Default)]
-pub struct DiagnosticEngine {
-    rules: Vec<Box<dyn Rule>>,
-}
-
-impl DiagnosticEngine {
-    #[must_use]
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    #[must_use]
-    pub fn with_builtin_rules() -> Self {
-        let mut engine = Self::new();
-        engine.register(AttributeContradiction);
-        engine.register(LifecycleContradiction);
-        engine.register(ClockContradiction);
-        engine.register(DictionHints);
-        engine
-    }
-
-    pub fn register(&mut self, rule: impl Rule + 'static) {
-        self.rules.push(Box::new(rule));
-    }
-
-    #[must_use]
-    pub fn analyze(&self, context: &AnalysisContext<'_>) -> Vec<Diagnostic> {
-        let mut diagnostics = Vec::new();
-        for rule in &self.rules {
-            if !rule_allowed(context, rule.code()) {
-                continue;
-            }
-            rule.evaluate(context, &mut diagnostics);
+    pub fn document(document: DocId, label: impl Into<String>) -> Self {
+        Self {
+            document,
+            label: label.into(),
+            ..Self::default()
         }
-        diagnostics.retain(|item| !is_suppressed(context, item));
-        diagnostics
     }
+}
 
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum StatementKind {
+    Fact,
+    Observation,
+    Event,
+    Scene,
+    Constraint,
+    Mention,
+    Invariant,
+    Rule,
+}
+
+/// One statement in a minimal conflict set.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Statement {
+    pub kind: StatementKind,
+    /// The id of the fact, observation, event, scene or constraint.
+    pub id: String,
+    /// Rendered for the explanation chain.
+    pub text: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub location: Option<Location>,
+    pub status: Status,
+    /// Prior probability that this statement is the one at fault (§10.6).
+    pub fault_prior: f32,
+    #[serde(default = "one")]
+    pub confidence: f32,
+}
+
+fn one() -> f32 {
+    1.0
+}
+
+impl Statement {
     #[must_use]
-    pub fn rule_codes(&self) -> Vec<&'static str> {
-        self.rules.iter().map(|rule| rule.code()).collect()
-    }
-}
-
-pub struct AttributeContradiction;
-
-impl Rule for AttributeContradiction {
-    fn code(&self) -> &'static str {
-        ATTRIBUTE_CONTRADICTION
-    }
-
-    fn evaluate(&self, context: &AnalysisContext<'_>, output: &mut Vec<Diagnostic>) {
-        let mut facts = context.facts.to_vec();
-        facts.extend(derived_facts(context));
-        emit_fact_conflicts(&facts, context.documents, output);
-        emit_lexical_conflicts(&facts, context.documents, output);
-    }
-}
-
-fn derived_facts(context: &AnalysisContext<'_>) -> Vec<Fact> {
-    let mut derived = Vec::new();
-    for document in context.documents {
-        derived.extend(wiki_attribute_facts(context.project, document));
-        derived.extend(inline_assertion_facts(context.project, document));
-    }
-    derived
-}
-
-fn wiki_attribute_facts(project: &Project, document: &Document) -> Vec<Fact> {
-    if document.kind != DocumentKind::Wiki {
-        return Vec::new();
-    }
-    let Some(entity) = document
-        .content_json
-        .get("entity")
-        .and_then(|value| value.as_str())
-    else {
-        return Vec::new();
-    };
-    let Some(attributes) = document
-        .content_json
-        .get("attributes")
-        .and_then(|value| value.as_object())
-    else {
-        return Vec::new();
-    };
-    attributes
-        .iter()
-        .filter_map(|(predicate, value)| {
-            let value = value.as_str()?;
-            Some(analysis_fact(
-                project,
-                document,
-                entity,
-                predicate,
-                value,
-                FactStatus::Confirmed,
-                (0, value.len() as u32),
-            ))
-        })
-        .collect()
-}
-
-fn inline_assertion_facts(project: &Project, document: &Document) -> Vec<Fact> {
-    let text = document_plain_text(&document.content_json);
-    let mut facts = Vec::new();
-    let bytes = text.as_bytes();
-    let mut index = 0;
-    while let Some(start_rel) = text[index..].find("[[") {
-        let start = index + start_rel;
-        let Some(end_rel) = text[start + 2..].find("]]") else {
-            break;
+    pub fn new(
+        kind: StatementKind,
+        id: impl Into<String>,
+        text: impl Into<String>,
+        status: Status,
+    ) -> Self {
+        let fault_prior = match status {
+            Status::Settled => 0.01,
+            Status::Proposed => 0.15,
+            Status::Deprecated | Status::Rejected => 0.5,
         };
-        let end = start + 2 + end_rel;
-        let inner = &text[start + 2..end];
-        if let Some((entity_pred, value)) = inner.split_once('=') {
-            if let Some((entity, predicate)) = entity_pred.split_once('.') {
-                facts.push(analysis_fact(
-                    project,
-                    document,
-                    entity,
-                    predicate,
-                    value,
-                    FactStatus::Proposed,
-                    (start as u32, (end + 2) as u32),
-                ));
-            }
-        }
-        index = end + 2;
-        if index >= bytes.len() {
-            break;
+        Self {
+            kind,
+            id: id.into(),
+            text: text.into(),
+            location: None,
+            status,
+            fault_prior,
+            confidence: 1.0,
         }
     }
-    facts
-}
 
-fn analysis_fact(
-    project: &Project,
-    document: &Document,
-    entity: &str,
-    predicate: &str,
-    value: &str,
-    status: FactStatus,
-    span: (u32, u32),
-) -> Fact {
-    Fact {
-        id: asten_domain::FactId::new(),
-        project_id: project.id,
-        entity_key: normalize_key(entity),
-        predicate: normalize_key(predicate),
-        value: value.trim().to_owned(),
-        modality: FactModality::Established,
-        status,
-        valid_from: None,
-        valid_to: None,
-        source: Some(SourceAnchor {
-            document_id: document.id,
-            start: span.0,
-            end: span.1,
-        }),
-        created_at: project.created_at,
-        updated_at: project.updated_at,
+    #[must_use]
+    pub fn at(mut self, location: Option<Location>) -> Self {
+        self.location = location;
+        self
+    }
+
+    #[must_use]
+    pub fn with_prior(mut self, prior: f32) -> Self {
+        self.fault_prior = prior.clamp(0.001, 0.999);
+        self
+    }
+
+    #[must_use]
+    pub fn with_confidence(mut self, confidence: f32) -> Self {
+        self.confidence = confidence.clamp(0.0, 1.0);
+        self
+    }
+
+    /// Prior from provenance, status and context.
+    #[must_use]
+    pub fn prior_from(
+        provenance: &Provenance,
+        status: Status,
+        context: &Context,
+        confidence: f32,
+    ) -> f32 {
+        provenance.fault_prior(status, context, confidence)
     }
 }
 
-fn emit_fact_conflicts(facts: &[Fact], documents: &[Document], output: &mut Vec<Diagnostic>) {
-    for (index, left) in facts.iter().enumerate() {
-        if !is_comparable(left) {
-            continue;
+/// A repair the author may apply. Repairs change canon, contexts or metadata,
+/// never prose (§10.7).
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case", tag = "kind")]
+pub enum RepairKind {
+    /// Record that a fluent changed between two times.
+    AddChangeEvent {
+        entity: EntityId,
+        predicate: String,
+        to_value: serde_json::Value,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        after_tick: Option<i64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        before_tick: Option<i64>,
+    },
+    /// Reclassify a passage's context (dream, memory, a character's claim).
+    MarkContext { document: DocId, context: Context },
+    /// Bound a fact's validity in story time.
+    SetValidity {
+        fact: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        from_tick: Option<i64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        to_tick: Option<i64>,
+    },
+    /// Move a scene in story time.
+    PlaceScene {
+        document: DocId,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        lo: Option<i64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        hi: Option<i64>,
+    },
+    /// Move an event in story time.
+    MoveEvent {
+        event: String,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        lo: Option<i64>,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        hi: Option<i64>,
+    },
+    /// Retire a settled fact.
+    DeprecateFact { fact: String },
+    /// Settle a proposed statement as canon.
+    SettleFact { fact: String },
+    /// Add an unknown name to the cast.
+    AddEntity { name: String, sort: asten_ir::Sort },
+    /// Link an alias to an existing entity.
+    AddAlias { entity: EntityId, alias: String },
+    /// Declare that a run of scenes is not continuous after all.
+    ClearContinuity { document: DocId },
+    /// Silence this mark with a reason. Always available, never auto-chosen.
+    Suppress,
+    /// Keep the sentence as written; nothing changes.
+    Keep,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Repair {
+    pub kind: RepairKind,
+    /// A verb the author owns: "Add an event", "Mark as a dream", "Keep my sentence".
+    pub label: String,
+    /// Tropical-semiring cost: lower is more likely to be what the author meant.
+    pub cost: f32,
+}
+
+impl Repair {
+    #[must_use]
+    pub fn new(kind: RepairKind, label: impl Into<String>, cost: f32) -> Self {
+        Self {
+            kind,
+            label: label.into(),
+            cost,
         }
-        for right in facts.iter().skip(index + 1) {
-            if !is_comparable(right)
-                || left.entity_key != right.entity_key
-                || left.predicate != right.predicate
-                || !intervals_overlap(left, right)
-                || normalize_value(&left.value) == normalize_value(&right.value)
+    }
+
+    #[must_use]
+    pub fn keep() -> Self {
+        Self::new(RepairKind::Keep, "Keep my sentence", 100.0)
+    }
+
+    #[must_use]
+    pub fn suppress() -> Self {
+        Self::new(RepairKind::Suppress, "Silence this mark", 99.0)
+    }
+}
+
+/// What an analysis emits: a conflict with its evidence and tier, before
+/// severity, calibration, suppressions and baselines are applied.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Violation {
+    pub code: String,
+    /// One line: what disagrees. "Mira's hair was settled as auburn."
+    pub title: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary: Option<Location>,
+    /// Other sides of the conflict with their roles.
+    #[serde(default)]
+    pub related: Vec<(Location, String)>,
+    /// The minimal conflict set, most authoritative statement first.
+    pub conflict: Vec<Statement>,
+    pub tier: Tier,
+    pub pairing: Pairing,
+    /// Product of the evidence confidences behind the conflict.
+    pub confidence: f32,
+    #[serde(default)]
+    pub repairs: Vec<Repair>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity: Option<EntityId>,
+    /// A longer note for the details view.
+    #[serde(default)]
+    pub details: String,
+    /// Codes that are notes rather than conflicts (names, the ledger) fix
+    /// their severity instead of deriving it from the pairing.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub severity_override: Option<Severity>,
+}
+
+impl Violation {
+    /// The stable evidence fingerprint: statement ids and anchor blocks.
+    #[must_use]
+    pub fn evidence_fingerprint(&self) -> String {
+        let mut parts: Vec<String> = self
+            .conflict
+            .iter()
+            .map(|statement| statement.id.clone())
+            .collect();
+        for statement in &self.conflict {
+            if let Some(block) = statement
+                .location
+                .as_ref()
+                .and_then(|location| location.block.as_ref())
             {
-                continue;
+                parts.push(format!("block:{}", block.0));
             }
-            let severity =
-                if left.status == FactStatus::Confirmed && right.status == FactStatus::Confirmed {
-                    Severity::Error
+        }
+        evidence_fingerprint(parts.iter().map(String::as_str))
+    }
+
+    /// Stable id: code plus evidence identities, never offsets.
+    #[must_use]
+    pub fn stable_id(&self) -> String {
+        sha256_hex(format!("{}|{}", self.code, self.evidence_fingerprint()).as_bytes())[..24]
+            .to_owned()
+    }
+}
+
+/// A ranked single-fault diagnosis.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Diagnosis {
+    pub statement_id: String,
+    pub probability: f32,
+}
+
+/// Rank which statement in a conflict set is most likely wrong, assuming one
+/// fault: `P(Δ = {c}) ∝ p_c ∏_{d≠c} (1 − p_d)`.
+#[must_use]
+pub fn diagnose(conflict: &[Statement]) -> Vec<Diagnosis> {
+    if conflict.is_empty() {
+        return Vec::new();
+    }
+    let weights: Vec<f64> = conflict
+        .iter()
+        .map(|candidate| {
+            conflict
+                .iter()
+                .map(|other| {
+                    let p = f64::from(other.fault_prior.clamp(0.001, 0.999));
+                    if std::ptr::eq(candidate, other) {
+                        p
+                    } else {
+                        1.0 - p
+                    }
+                })
+                .product::<f64>()
+        })
+        .collect();
+    let total: f64 = weights.iter().sum::<f64>().max(f64::MIN_POSITIVE);
+    let mut diagnoses: Vec<Diagnosis> = conflict
+        .iter()
+        .zip(weights)
+        .map(|(statement, weight)| Diagnosis {
+            statement_id: statement.id.clone(),
+            probability: (weight / total) as f32,
+        })
+        .collect();
+    diagnoses.sort_by(|a, b| {
+        b.probability
+            .partial_cmp(&a.probability)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    diagnoses
+}
+
+/// Severity from the pairing, the tier and the project strictness. `None`
+/// means the mark is not shown at this strictness.
+#[must_use]
+pub fn severity_for(pairing: Pairing, tier: Tier, strictness: Strictness) -> Option<Severity> {
+    match (pairing, tier) {
+        (Pairing::SettledSettled, Tier::Must) => Some(Severity::Error),
+        (Pairing::SettledSettled, Tier::May) => Some(Severity::Warning),
+        (Pairing::SettledObserved, Tier::Must) => match strictness {
+            Strictness::Quiet => None,
+            Strictness::Standard | Strictness::Thorough => Some(Severity::Warning),
+        },
+        (Pairing::SettledObserved, Tier::May) => match strictness {
+            Strictness::Quiet => None,
+            Strictness::Standard | Strictness::Thorough => Some(Severity::Information),
+        },
+        (Pairing::ProposedProposed, Tier::Must) => match strictness {
+            Strictness::Thorough => Some(Severity::Information),
+            _ => None,
+        },
+        (Pairing::ProposedProposed, Tier::May) => None,
+    }
+}
+
+/// Confidence threshold below which observed conflicts are not shown, per
+/// strictness. Calibrated thresholds replace these once models exist (§10.8).
+#[must_use]
+pub fn confidence_threshold(strictness: Strictness) -> f32 {
+    match strictness {
+        Strictness::Quiet => 1.0,
+        Strictness::Standard => 0.55,
+        Strictness::Thorough => 0.25,
+    }
+}
+
+/// The record the desk shows.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Diagnostic {
+    /// Stable across re-analysis: hash of code and evidence identities.
+    pub id: String,
+    pub code: String,
+    pub severity: Severity,
+    pub tier: Tier,
+    /// Calibrated probability that this is a real problem.
+    pub probability: f32,
+    pub title: String,
+    /// The explanation chain rendered as text.
+    pub message: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub primary: Option<Location>,
+    #[serde(default)]
+    pub related: Vec<(Location, String)>,
+    pub explanation: Vec<Statement>,
+    pub culprit: Vec<Diagnosis>,
+    pub repairs: Vec<Repair>,
+    pub provenance: DiagnosticProvenance,
+    #[serde(default)]
+    pub stale: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub suppressed_by: Option<String>,
+    #[serde(default)]
+    pub new_since_baseline: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub entity: Option<EntityId>,
+    #[serde(default)]
+    pub details: String,
+    pub evidence_fingerprint: String,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+pub struct DiagnosticProvenance {
+    pub rules: Vec<String>,
+    #[serde(default)]
+    pub packs: Vec<String>,
+    /// The project revision the diagnostic was computed at.
+    pub revision: String,
+    #[serde(default)]
+    pub engine_version: String,
+}
+
+/// Render the explanation chain in the voice of a careful editor.
+#[must_use]
+pub fn render_message(violation: &Violation, culprit: &[Diagnosis]) -> String {
+    let marks = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨'];
+    let mut lines = Vec::new();
+    for (index, statement) in violation.conflict.iter().enumerate() {
+        let mark = marks.get(index).copied().unwrap_or('•');
+        let place = statement
+            .location
+            .as_ref()
+            .map(|location| {
+                if location.label.is_empty() {
+                    String::new()
                 } else {
-                    Severity::Warning
-                };
-            if let Some(source) = range_for_facts(left, right, documents) {
-                output.push(conflict_diagnostic(
-                    severity,
-                    &left.entity_key,
-                    &left.predicate,
-                    &left.value,
-                    &right.value,
-                    source,
-                    Some(
-                        "Confirmed or asserted values disagree over overlapping story time. \
-                         Update canon, revise the passage, record a change event, or suppress later."
-                            .to_owned(),
-                    ),
+                    format!(" ({})", location.label)
+                }
+            })
+            .unwrap_or_default();
+        lines.push(format!("{mark} {}{place}", statement.text));
+    }
+    if let Some(best) = culprit.first() {
+        if violation.conflict.len() > 1 && best.probability > 0.5 {
+            if let Some(index) = violation
+                .conflict
+                .iter()
+                .position(|statement| statement.id == best.statement_id)
+            {
+                let mark = marks.get(index).copied().unwrap_or('•');
+                lines.push(format!(
+                    "Most likely slip: {mark} ({}%)",
+                    (best.probability * 100.0).round() as i32
                 ));
             }
         }
     }
-}
-
-fn emit_lexical_conflicts(facts: &[Fact], documents: &[Document], output: &mut Vec<Diagnostic>) {
-    for fact in facts {
-        if fact.status != FactStatus::Confirmed
-            || fact.modality == FactModality::Contested
-            || !is_color_predicate(&fact.predicate)
-        {
-            continue;
-        }
-        let canon = normalize_value(&fact.value);
-        for document in documents {
-            if document.kind == DocumentKind::Wiki {
-                continue;
-            }
-            let text = document_plain_text(&document.content_json);
-            let Some(mention) = find_word(&text, &fact.entity_key) else {
-                continue;
-            };
-            let window = surrounding_window(&text, mention, fact.entity_key.len(), 80);
-            for color in COLOR_WORDS {
-                let observed = normalize_value(color);
-                if observed == canon {
-                    continue;
-                }
-                if find_word(&window, color).is_none() {
-                    continue;
-                }
-                let start = mention as u32;
-                let end = start + fact.entity_key.len() as u32;
-                output.push(conflict_diagnostic(
-                    Severity::Warning,
-                    &fact.entity_key,
-                    &fact.predicate,
-                    &fact.value,
-                    color,
-                    SourceRange {
-                        document_id: document.id,
-                        start,
-                        end,
-                    },
-                    Some(format!(
-                        "The passage mentions {} near a color that is not the confirmed {}.",
-                        fact.entity_key, fact.value
-                    )),
-                ));
-                break;
-            }
-        }
+    if !violation.repairs.is_empty() {
+        let labels: Vec<&str> = violation
+            .repairs
+            .iter()
+            .map(|repair| repair.label.as_str())
+            .collect();
+        lines.push(format!("Fixes: {}", labels.join(" · ")));
     }
+    lines.join("\n")
 }
 
-fn conflict_diagnostic(
-    severity: Severity,
-    entity: &str,
-    predicate: &str,
-    left: &str,
-    right: &str,
-    source: SourceRange,
-    details: Option<String>,
-) -> Diagnostic {
-    Diagnostic {
-        id: DiagnosticId::new(),
-        code: ATTRIBUTE_CONTRADICTION.to_owned(),
+/// Turn a violation into a diagnostic at a strictness, or `None` when the
+/// strictness hides it.
+#[must_use]
+pub fn finish(violation: Violation, strictness: Strictness, revision: &str) -> Option<Diagnostic> {
+    let severity = match violation.severity_override {
+        Some(severity) => severity,
+        None => {
+            let severity = severity_for(violation.pairing, violation.tier, strictness)?;
+            if violation.pairing != Pairing::SettledSettled
+                && violation.confidence < confidence_threshold(strictness)
+            {
+                return None;
+            }
+            severity
+        }
+    };
+    let culprit = diagnose(&violation.conflict);
+    let mut repairs = violation.repairs.clone();
+    repairs.sort_by(|a, b| {
+        a.cost
+            .partial_cmp(&b.cost)
+            .unwrap_or(std::cmp::Ordering::Equal)
+    });
+    let probability = match violation.pairing {
+        Pairing::SettledSettled => 1.0,
+        _ => violation.confidence.clamp(0.0, 1.0),
+    };
+    let evidence = violation.evidence_fingerprint();
+    let id = violation.stable_id();
+    let message = render_message(&violation, &culprit);
+    Some(Diagnostic {
+        id,
+        code: violation.code.clone(),
         severity,
-        message: format!("{entity} · {predicate} · {left} conflicts with {right}"),
-        source,
-        details,
-    }
-}
-
-fn is_comparable(fact: &Fact) -> bool {
-    fact.status != FactStatus::Deprecated && fact.modality != FactModality::Contested
-}
-
-fn is_color_predicate(predicate: &str) -> bool {
-    matches!(
-        predicate,
-        "hair_color" | "eye_color" | "haircolour" | "eyecolour"
-    )
-}
-
-fn rule_allowed(context: &AnalysisContext<'_>, code: &str) -> bool {
-    match code {
-        ATTRIBUTE_CONTRADICTION => true,
-        LIFECYCLE_AFTER_DEATH => context.pack_enabled("lifecycle"),
-        CLOCK_ORDER => context.pack_enabled("clocks"),
-        "CRAFT-H001" | "CRAFT-H002" => context.pack_enabled("diction"),
-        _ => true,
-    }
-}
-
-fn is_suppressed(context: &AnalysisContext<'_>, diagnostic: &Diagnostic) -> bool {
-    let entity = diagnostic.message.split(" · ").next().map(normalize_key);
-    context.suppressions.iter().any(|suppression| {
-        suppression.hides(
-            &diagnostic.code,
-            diagnostic.source.document_id,
-            entity.as_deref(),
-        )
+        tier: violation.tier,
+        probability,
+        title: violation.title,
+        message,
+        primary: violation.primary,
+        related: violation.related,
+        explanation: violation.conflict,
+        culprit,
+        repairs,
+        provenance: DiagnosticProvenance {
+            rules: vec![violation.code],
+            packs: Vec::new(),
+            revision: revision.to_owned(),
+            engine_version: env!("CARGO_PKG_VERSION").to_owned(),
+        },
+        stale: false,
+        suppressed_by: None,
+        new_since_baseline: false,
+        entity: violation.entity,
+        details: violation.details,
+        evidence_fingerprint: evidence,
     })
 }
 
-pub struct LifecycleContradiction;
+// ───────────────────────── suppressions 2.0 ─────────────────────────
 
-impl Rule for LifecycleContradiction {
-    fn code(&self) -> &'static str {
-        LIFECYCLE_AFTER_DEATH
-    }
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case", tag = "kind")]
+pub enum SuppressionScope {
+    /// This one mark, bound to its evidence.
+    Occurrence { diagnostic_id: String },
+    /// This code for this entity.
+    Entity { entity: EntityId },
+    /// This code in this document.
+    Document { document: DocId },
+    /// This code everywhere in the project.
+    Project,
+}
 
-    fn evaluate(&self, context: &AnalysisContext<'_>, output: &mut Vec<Diagnostic>) {
-        for fact in context.facts {
-            if fact.status != FactStatus::Confirmed
-                || fact.modality == FactModality::Contested
-                || !is_death_fact(fact)
-            {
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct Suppression {
+    pub id: String,
+    pub code: String,
+    pub scope: SuppressionScope,
+    /// Fingerprint of the evidence when the author silenced it. When the
+    /// evidence changes the suppression goes stale and the mark returns.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_fingerprint: Option<String>,
+    #[serde(default)]
+    pub reason: String,
+}
+
+/// The result of applying suppressions to a set of diagnostics.
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct Suppressed {
+    pub diagnostics: Vec<Diagnostic>,
+    /// Suppressions whose evidence no longer exists as it did: the mark came back.
+    pub stale: Vec<String>,
+}
+
+/// Mark suppressed diagnostics and report stale suppressions. Suppressed marks
+/// stay in the list with `suppressed_by` set so the desk can show them on request.
+#[must_use]
+pub fn apply_suppressions(
+    diagnostics: Vec<Diagnostic>,
+    suppressions: &[Suppression],
+) -> Suppressed {
+    let mut stale = Vec::new();
+    let mut out = Vec::with_capacity(diagnostics.len());
+    let mut matched: BTreeMap<&str, bool> = BTreeMap::new();
+    for mut diagnostic in diagnostics {
+        for suppression in suppressions {
+            if suppression.code != diagnostic.code {
                 continue;
             }
-            let death_order = context
-                .events
-                .iter()
-                .filter(|event| event_matches_entity(event, &fact.entity_key, context))
-                .filter_map(|event| event.reading_order)
-                .min();
-            let Some(death_order) = death_order else {
-                continue;
+            let in_scope = match &suppression.scope {
+                SuppressionScope::Occurrence { diagnostic_id } => *diagnostic_id == diagnostic.id,
+                SuppressionScope::Entity { entity } => diagnostic.entity.as_ref() == Some(entity),
+                SuppressionScope::Document { document } => {
+                    diagnostic
+                        .primary
+                        .as_ref()
+                        .is_some_and(|location| &location.document == document)
+                        || diagnostic
+                            .related
+                            .iter()
+                            .any(|(location, _)| &location.document == document)
+                }
+                SuppressionScope::Project => true,
             };
-            for event in context.events {
-                let Some(order) = event.reading_order else {
-                    continue;
-                };
-                if order <= death_order || !event_matches_entity(event, &fact.entity_key, context) {
+            if !in_scope {
+                continue;
+            }
+            match &suppression.evidence_fingerprint {
+                Some(fingerprint) if *fingerprint != diagnostic.evidence_fingerprint => {
+                    // Same mark, changed evidence: the suppression is stale and the mark returns.
+                    if matches!(suppression.scope, SuppressionScope::Occurrence { .. }) {
+                        stale.push(suppression.id.clone());
+                    }
                     continue;
                 }
-                if looks_like_flashback(&event.notes) {
-                    continue;
+                _ => {
+                    diagnostic.suppressed_by = Some(suppression.id.clone());
+                    matched.insert(suppression.id.as_str(), true);
+                    break;
                 }
-                let source = event
-                    .document_id
-                    .or_else(|| context.documents.first().map(|document| document.id));
-                let Some(document_id) = source else {
-                    continue;
-                };
-                output.push(Diagnostic {
-                    id: DiagnosticId::new(),
-                    code: LIFECYCLE_AFTER_DEATH.to_owned(),
-                    severity: Severity::Error,
-                    message: format!(
-                        "{} acts after a settled death ({})",
-                        fact.entity_key, event.title
-                    ),
-                    source: SourceRange {
-                        document_id,
-                        start: 0,
-                        end: 0,
-                    },
-                    details: Some(
-                        "A later reading-order beat still belongs to someone you marked dead. \
-                         Mark the beat a flashback, move the death, or suppress the rule."
-                            .into(),
-                    ),
-                });
             }
         }
+        out.push(diagnostic);
+    }
+    stale.sort();
+    stale.dedup();
+    Suppressed {
+        diagnostics: out,
+        stale,
     }
 }
 
-fn is_death_fact(fact: &Fact) -> bool {
-    matches!(fact.predicate.as_str(), "lifecycle" | "status" | "alive")
-        && matches!(
-            normalize_value(&fact.value).as_str(),
-            "dead" | "deceased" | "died" | "false" | "no"
-        )
-}
-
-fn event_matches_entity(
-    event: &TimelineEvent,
-    entity_key: &str,
-    context: &AnalysisContext<'_>,
-) -> bool {
-    if let Some(entity_id) = event.entity_id {
-        return context
-            .entities
-            .iter()
-            .any(|entity| entity.id == entity_id && normalize_key(&entity.name) == entity_key);
+/// Mark diagnostics that did not exist in a baseline set of ids.
+pub fn apply_baseline(diagnostics: &mut [Diagnostic], baseline: &[String]) {
+    for diagnostic in diagnostics {
+        diagnostic.new_since_baseline = !baseline.contains(&diagnostic.id);
     }
-    normalize_key(&event.title).contains(entity_key)
-        || normalize_key(&event.notes).contains(entity_key)
 }
 
-fn looks_like_flashback(notes: &str) -> bool {
-    let lower = notes.to_ascii_lowercase();
-    lower.contains("flashback") || lower.contains("memory") || lower.contains("earlier")
+/// The difference between two diagnostic sets by stable id.
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+pub struct MarksDiff {
+    pub added: Vec<Diagnostic>,
+    pub removed: Vec<String>,
+    pub changed: Vec<Diagnostic>,
 }
 
-pub struct ClockContradiction;
-
-impl Rule for ClockContradiction {
-    fn code(&self) -> &'static str {
-        CLOCK_ORDER
-    }
-
-    fn evaluate(&self, context: &AnalysisContext<'_>, output: &mut Vec<Diagnostic>) {
-        let mut dated: Vec<&TimelineEvent> = context
-            .events
-            .iter()
-            .filter(|event| {
-                event
-                    .story_time
-                    .as_ref()
-                    .is_some_and(|value| !value.trim().is_empty())
-            })
-            .filter(|event| event.reading_order.is_some())
-            .collect();
-        dated.sort_by_key(|event| event.reading_order);
-        for pair in dated.windows(2) {
-            let earlier = pair[0];
-            let later = pair[1];
-            let (Some(left), Some(right)) = (&earlier.story_time, &later.story_time) else {
-                continue;
-            };
-            if !story_times_out_of_order(left, right) {
-                continue;
-            }
-            let document_id = later
-                .document_id
-                .or(earlier.document_id)
-                .or_else(|| context.documents.first().map(|document| document.id));
-            let Some(document_id) = document_id else {
-                continue;
-            };
-            output.push(Diagnostic {
-                id: DiagnosticId::new(),
-                code: CLOCK_ORDER.to_owned(),
-                severity: Severity::Error,
-                message: format!(
-                    "reading order places “{}” before “{}”, but story time runs the other way",
-                    earlier.title, later.title
-                ),
-                source: SourceRange {
-                    document_id,
-                    start: 0,
-                    end: 0,
-                },
-                details: Some(
-                    "Story time and reading order are different clocks. Reorder the binder, \
-                     retcon a date, or mark one beat a flashback."
-                        .into(),
-                ),
-            });
+#[must_use]
+pub fn diff_marks(previous: &[Diagnostic], next: &[Diagnostic]) -> MarksDiff {
+    let before: BTreeMap<&str, &Diagnostic> = previous
+        .iter()
+        .map(|diagnostic| (diagnostic.id.as_str(), diagnostic))
+        .collect();
+    let after: BTreeMap<&str, &Diagnostic> = next
+        .iter()
+        .map(|diagnostic| (diagnostic.id.as_str(), diagnostic))
+        .collect();
+    let mut diff = MarksDiff::default();
+    for (id, diagnostic) in &after {
+        match before.get(id) {
+            None => diff.added.push((*diagnostic).clone()),
+            Some(old) if *old != *diagnostic => diff.changed.push((*diagnostic).clone()),
+            Some(_) => {}
         }
     }
-}
-
-pub struct DictionHints;
-
-impl Rule for DictionHints {
-    fn code(&self) -> &'static str {
-        "CRAFT-H001"
-    }
-
-    fn evaluate(&self, context: &AnalysisContext<'_>, output: &mut Vec<Diagnostic>) {
-        if !context.pack_enabled("diction") {
-            return;
-        }
-        let Some(pack) = context.packs.iter().find(|pack| pack.pack_key == "diction") else {
-            return;
-        };
-        let Some(hints) = pack
-            .manifest
-            .get("hints")
-            .and_then(|value| value.as_array())
-        else {
-            return;
-        };
-        for document in context.documents {
-            if document.kind == DocumentKind::Wiki {
-                continue;
-            }
-            let text = document_plain_text(&document.content_json);
-            for hint in hints {
-                let Some(word) = hint.get("word").and_then(|value| value.as_str()) else {
-                    continue;
-                };
-                let Some(found) = find_word(&text, word) else {
-                    continue;
-                };
-                output.push(Diagnostic {
-                    id: DiagnosticId::new(),
-                    code: hint
-                        .get("code")
-                        .and_then(|value| value.as_str())
-                        .unwrap_or("CRAFT-H001")
-                        .to_owned(),
-                    severity: Severity::Hint,
-                    message: hint
-                        .get("message")
-                        .and_then(|value| value.as_str())
-                        .unwrap_or("Optional diction note.")
-                        .to_owned(),
-                    source: SourceRange {
-                        document_id: document.id,
-                        start: found as u32,
-                        end: (found + word.len()) as u32,
-                    },
-                    details: Some(
-                        "Craft hint from an enabled method pack. Not a canon error.".into(),
-                    ),
-                });
-            }
+    for id in before.keys() {
+        if !after.contains_key(id) {
+            diff.removed.push((*id).to_owned());
         }
     }
-}
-
-fn intervals_overlap(left: &Fact, right: &Fact) -> bool {
-    !range_before(left.valid_to.as_deref(), right.valid_from.as_deref())
-        && !range_before(right.valid_to.as_deref(), left.valid_from.as_deref())
-}
-
-fn range_before(end: Option<&str>, start: Option<&str>) -> bool {
-    match (end, start) {
-        (Some(end), Some(start)) => end < start,
-        _ => false,
-    }
-}
-
-fn range_for_facts(left: &Fact, right: &Fact, documents: &[Document]) -> Option<SourceRange> {
-    left.source
-        .clone()
-        .or(right.source.clone())
-        .map(SourceRange::from)
-        .or_else(|| {
-            documents.first().map(|document| SourceRange {
-                document_id: document.id,
-                start: 0,
-                end: 0,
-            })
-        })
-}
-
-fn find_word(haystack: &str, needle: &str) -> Option<usize> {
-    let hay = haystack.to_ascii_lowercase();
-    let needle = needle.to_ascii_lowercase();
-    if needle.is_empty() {
-        return None;
-    }
-    let mut offset = 0;
-    while let Some(found) = hay[offset..].find(&needle) {
-        let index = offset + found;
-        let before = index
-            .checked_sub(1)
-            .and_then(|pos| hay.as_bytes().get(pos))
-            .copied();
-        let after = hay.as_bytes().get(index + needle.len()).copied();
-        if before.is_none_or(|byte| !byte.is_ascii_alphanumeric())
-            && after.is_none_or(|byte| !byte.is_ascii_alphanumeric())
-        {
-            return Some(index);
-        }
-        offset = index + 1;
-    }
-    None
-}
-
-fn surrounding_window(text: &str, start: usize, len: usize, radius: usize) -> String {
-    let from = start.saturating_sub(radius);
-    let to = (start + len).saturating_add(radius).min(text.len());
-    text[from..to].to_owned()
+    diff
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{AnalysisContext, DiagnosticEngine};
-    use asten_domain::{
-        Document, DocumentId, DocumentKind, Fact, FactId, FactModality, FactStatus, Project,
-        ProjectId, ProjectKind, Severity,
-    };
-    use chrono::Utc;
-    use serde_json::json;
+    use super::*;
 
-    fn project() -> Project {
-        let now = Utc::now();
-        Project {
-            id: ProjectId::new(),
-            name: "Test".into(),
-            kind: ProjectKind::Novel,
-            description: None,
-            created_at: now,
-            updated_at: now,
-        }
-    }
-
-    fn document(project: &Project, kind: DocumentKind, content: serde_json::Value) -> Document {
-        let now = Utc::now();
-        Document {
-            id: DocumentId::new(),
-            project_id: project.id,
-            parent_id: None,
-            kind,
-            title: "Scene".into(),
-            content_json: content,
-            position: 0,
-            revision: 1,
-            exclude_from_compile: false,
-            created_at: now,
-            updated_at: now,
-        }
-    }
-
-    fn fact(project: &Project, value: &str, status: FactStatus, modality: FactModality) -> Fact {
-        let now = Utc::now();
-        Fact {
-            id: FactId::new(),
-            project_id: project.id,
-            entity_key: "mira".into(),
-            predicate: "hair_color".into(),
-            value: value.into(),
-            modality,
-            status,
-            valid_from: None,
-            valid_to: None,
-            source: None,
-            created_at: now,
-            updated_at: now,
+    fn violation() -> Violation {
+        Violation {
+            code: "CANON-E013".into(),
+            title: "Mira's hair was settled as auburn.".into(),
+            primary: Some(Location::document(DocId::new("ch19"), "chapter 19")),
+            related: vec![],
+            conflict: vec![
+                Statement::new(
+                    StatementKind::Fact,
+                    "fact-1",
+                    "Settled in chapter 2: Mira · hair · auburn",
+                    Status::Settled,
+                ),
+                Statement::new(
+                    StatementKind::Observation,
+                    "obs-1",
+                    "Chapter 19 says: \"black hair\"",
+                    Status::Proposed,
+                )
+                .with_prior(0.15),
+            ],
+            tier: Tier::Must,
+            pairing: Pairing::SettledObserved,
+            confidence: 0.9,
+            repairs: vec![
+                Repair::keep(),
+                Repair::new(
+                    RepairKind::DeprecateFact {
+                        fact: "fact-1".into(),
+                    },
+                    "Deprecate the fact",
+                    5.0,
+                ),
+            ],
+            entity: Some(EntityId::new("mira")),
+            details: String::new(),
+            severity_override: None,
         }
     }
 
     #[test]
-    fn empty_engine_has_no_rules() {
-        assert!(DiagnosticEngine::new().rule_codes().is_empty());
+    fn blame_lands_on_the_uncertain_side() {
+        let culprit = diagnose(&violation().conflict);
+        assert_eq!(culprit[0].statement_id, "obs-1");
+        assert!(culprit[0].probability > 0.9);
     }
 
     #[test]
-    fn confirmed_attribute_clash_is_an_error() {
-        let project = project();
-        let scene = document(&project, DocumentKind::Scene, json!({ "text": "Later." }));
-        let engine = DiagnosticEngine::with_builtin_rules();
-        let facts = vec![
-            fact(
-                &project,
-                "auburn",
-                FactStatus::Confirmed,
-                FactModality::Established,
-            ),
-            fact(
-                &project,
-                "black",
-                FactStatus::Confirmed,
-                FactModality::Established,
-            ),
-        ];
-        let diagnostics = engine.analyze(&AnalysisContext::core(&project, &[scene], &facts));
-        assert!(
-            diagnostics
-                .iter()
-                .any(|item| item.code == "CANON-E013" && item.severity == Severity::Error)
+    fn severity_follows_the_table() {
+        assert_eq!(
+            severity_for(Pairing::SettledSettled, Tier::Must, Strictness::Quiet),
+            Some(Severity::Error)
         );
-    }
-
-    #[test]
-    fn contested_facts_do_not_emit() {
-        let project = project();
-        let scene = document(&project, DocumentKind::Scene, json!({ "text": "Later." }));
-        let engine = DiagnosticEngine::with_builtin_rules();
-        let facts = vec![
-            fact(
-                &project,
-                "auburn",
-                FactStatus::Confirmed,
-                FactModality::Established,
-            ),
-            fact(
-                &project,
-                "black",
-                FactStatus::Confirmed,
-                FactModality::Contested,
-            ),
-        ];
-        let diagnostics = engine.analyze(&AnalysisContext::core(&project, &[scene], &facts));
-        assert!(diagnostics.is_empty());
-    }
-
-    #[test]
-    fn prose_color_clash_is_a_warning() {
-        let project = project();
-        let scene = document(
-            &project,
-            DocumentKind::Scene,
-            json!({ "text": "Mira pushed her black hair out of her eyes." }),
+        assert_eq!(
+            severity_for(Pairing::SettledObserved, Tier::Must, Strictness::Quiet),
+            None
         );
-        let engine = DiagnosticEngine::with_builtin_rules();
-        let facts = vec![fact(
-            &project,
-            "auburn",
-            FactStatus::Confirmed,
-            FactModality::Established,
-        )];
-        let diagnostics = engine.analyze(&AnalysisContext::core(&project, &[scene], &facts));
-        assert!(
-            diagnostics
-                .iter()
-                .any(|item| item.code == "CANON-E013" && item.severity == Severity::Warning)
+        assert_eq!(
+            severity_for(Pairing::SettledObserved, Tier::Must, Strictness::Standard),
+            Some(Severity::Warning)
+        );
+        assert_eq!(
+            severity_for(Pairing::ProposedProposed, Tier::Must, Strictness::Standard),
+            None
+        );
+        assert_eq!(
+            severity_for(Pairing::ProposedProposed, Tier::Must, Strictness::Thorough),
+            Some(Severity::Information)
         );
     }
 
     #[test]
-    fn wiki_and_inline_annotation_clash() {
-        let project = project();
-        let wiki = document(
-            &project,
-            DocumentKind::Wiki,
-            json!({ "entity": "Mira", "attributes": { "hair_color": "auburn" } }),
-        );
-        let scene = document(
-            &project,
-            DocumentKind::Scene,
-            json!({ "text": "[[mira.hair_color=black]]" }),
-        );
-        let engine = DiagnosticEngine::with_builtin_rules();
-        let diagnostics = engine.analyze(&AnalysisContext::core(&project, &[wiki, scene], &[]));
-        assert!(diagnostics.iter().any(|item| item.code == "CANON-E013"));
+    fn finished_diagnostics_have_stable_ids_and_sorted_repairs() {
+        let a = finish(violation(), Strictness::Standard, "r1").unwrap();
+        let mut moved = violation();
+        moved.primary = Some(Location::document(DocId::new("ch19"), "chapter 19, later"));
+        let b = finish(moved, Strictness::Standard, "r2").unwrap();
+        assert_eq!(a.id, b.id);
+        assert_eq!(a.repairs[0].label, "Deprecate the fact");
+        assert!(a.message.contains("Most likely slip: ②"));
+        assert!(finish(violation(), Strictness::Quiet, "r1").is_none());
+    }
+
+    #[test]
+    fn suppressions_go_stale_when_evidence_changes() {
+        let diagnostic = finish(violation(), Strictness::Standard, "r1").unwrap();
+        let suppression = Suppression {
+            id: "s1".into(),
+            code: "CANON-E013".into(),
+            scope: SuppressionScope::Occurrence {
+                diagnostic_id: diagnostic.id.clone(),
+            },
+            evidence_fingerprint: Some(diagnostic.evidence_fingerprint.clone()),
+            reason: "intentional".into(),
+        };
+        let result =
+            apply_suppressions(vec![diagnostic.clone()], std::slice::from_ref(&suppression));
+        assert_eq!(result.diagnostics[0].suppressed_by.as_deref(), Some("s1"));
+        assert!(result.stale.is_empty());
+
+        let mut changed = violation();
+        changed.conflict[1].id = "obs-2".into();
+        let mut changed = finish(changed, Strictness::Standard, "r2").unwrap();
+        // Force the same diagnostic id to simulate the same mark with new evidence.
+        changed.id = diagnostic.id.clone();
+        let result = apply_suppressions(vec![changed], &[suppression]);
+        assert!(result.diagnostics[0].suppressed_by.is_none());
+        assert_eq!(result.stale, vec!["s1".to_owned()]);
+    }
+
+    #[test]
+    fn diffs_marks_by_id() {
+        let a = finish(violation(), Strictness::Standard, "r1").unwrap();
+        let mut other = violation();
+        other.code = "CANON-E101".into();
+        let b = finish(other, Strictness::Standard, "r1").unwrap();
+        let diff = diff_marks(std::slice::from_ref(&a), std::slice::from_ref(&b));
+        assert_eq!(diff.added.len(), 1);
+        assert_eq!(diff.removed, vec![a.id]);
     }
 }

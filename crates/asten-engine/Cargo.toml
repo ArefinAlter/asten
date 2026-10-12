@@ -1,0 +1,17 @@
+[package]
+name = "asten-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "The incremental canon engine: per-block perception cached by fingerprint, IR assembly, analyses, diagnostics, and the queries behind the story language server."
+
+[dependencies]
+asten-blocks = { path = "../asten-blocks" }
+asten-diagnostics = { path = "../asten-diagnostics" }
+asten-ir = { path = "../asten-ir" }
+asten-logic = { path = "../asten-logic" }
+asten-ls = { path = "../asten-ls" }
+asten-perceive = { path = "../asten-perceive" }
+asten-time = { path = "../asten-time" }
+serde.workspace = true
+serde_json.workspace = true

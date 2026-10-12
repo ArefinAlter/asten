@@ -3,10 +3,9 @@ name = "asten-diagnostics"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+description = "Diagnostic codes, records, computed severities, explanations, repairs and evidence-bound suppressions for the Asten canon engine."
 
 [dependencies]
-asten-domain = { path = "../asten-domain" }
-
-[dev-dependencies]
-chrono.workspace = true
+asten-ir = { path = "../asten-ir" }
+serde.workspace = true
 serde_json.workspace = true
