@@ -365,6 +365,8 @@ function EntityDetail({
                       onJump({
                         document: fact.anchor.document,
                         block: fact.anchor.block,
+                        quote: "",
+                        label: "",
                         start: fact.anchor.start,
                         end: fact.anchor.end,
                       })
@@ -488,6 +490,8 @@ function EntityDetail({
                   onJump({
                     document: mention.document,
                     block: mention.block,
+                    quote: "",
+                    label: "",
                     start: mention.start,
                     end: mention.end,
                   })

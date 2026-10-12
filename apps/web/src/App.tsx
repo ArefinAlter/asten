@@ -16,6 +16,7 @@ import type {
   Location,
   ProjectId,
   ProjectKind,
+  JsonValue,
 } from "@asten/contracts";
 import { PairScreen } from "./auth/PairScreen";
 import { Binder } from "./binder/Binder";
@@ -280,7 +281,7 @@ function Desk() {
   const updateDocument = useMutation({
     mutationFn: (input: {
       documentId: string;
-      content_json?: unknown;
+      content_json?: JsonValue;
       exclude_from_compile?: boolean;
       title?: string;
       position?: number;
@@ -638,7 +639,9 @@ function Desk() {
             projectId={selectedProject.id}
             documents={documents.data ?? []}
             entities={entities.data ?? []}
-            onOpenDocument={(id) => jumpTo({ document: id, start: 0, end: 0 })}
+            onOpenDocument={(id) =>
+              jumpTo({ document: id, start: 0, end: 0, quote: "", label: "" })
+            }
           />
         ) : view === "history" ? (
           <History

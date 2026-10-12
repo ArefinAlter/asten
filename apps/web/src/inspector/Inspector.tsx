@@ -230,6 +230,8 @@ export function Inspector({
                                 onJump({
                                   document: where.document,
                                   block: where.block,
+                                  quote: "",
+                                  label: "",
                                   start: where.start,
                                   end: where.end,
                                 }),

@@ -8,6 +8,11 @@ use serde::{Deserialize, Serialize};
 use crate::{ApplicationError, Result};
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
 #[serde(rename_all = "snake_case")]
 pub enum CompileFormat {
     #[default]
@@ -19,10 +24,18 @@ pub enum CompileFormat {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CompileRequest {
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub format: CompileFormat,
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub document_ids: Vec<asten_domain::DocumentId>,
 }
 

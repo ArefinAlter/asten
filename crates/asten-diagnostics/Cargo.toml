@@ -6,6 +6,11 @@ rust-version.workspace = true
 description = "Diagnostic codes, records, computed severities, explanations, repairs and evidence-bound suppressions for the Asten canon engine."
 
 [dependencies]
+ts-rs = { workspace = true, optional = true }
 asten-ir = { path = "../asten-ir" }
 serde.workspace = true
 serde_json.workspace = true
+
+[features]
+# Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
+ts = ["dep:ts-rs", "asten-ir/ts"]

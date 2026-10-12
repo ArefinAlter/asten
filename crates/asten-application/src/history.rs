@@ -21,24 +21,49 @@ use crate::{Application, ApplicationError, Result};
 const SNAPSHOT_EVERY: i64 = 500;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateDraft {
     pub name: String,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateDraft {
     pub name: Option<String>,
     pub content_json: Option<serde_json::Value>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct MergeRequest {
     /// `"{node_id}:{field}"` → `"ours"` | `"theirs"`.
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub resolutions: BTreeMap<String, String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct MergePreview {
     pub draft_id: DraftId,
     pub merged_content: serde_json::Value,
@@ -51,6 +76,11 @@ pub struct MergePreview {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
 pub struct VerifyReport {
     pub document_id: DocumentId,
     pub events: usize,

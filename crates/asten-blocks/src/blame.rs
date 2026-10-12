@@ -10,6 +10,7 @@ use crate::materialize::{DocState, apply};
 use crate::patch::{TextOp, root_text_ops};
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
 pub struct BlameSpan {
     pub start: u32,
     pub end: u32,

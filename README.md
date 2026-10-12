@@ -82,7 +82,7 @@ crates/
   asten-application/      Use cases and the repository boundary
   asten-storage/          SQLite adapter and migrations
 packages/
-  contracts/              Shared TypeScript API contracts
+  contracts/              TypeScript API contracts, generated from Rust and drift-checked
   brand/                  Ink and paper tokens
 services/
   asten-api/              Axum HTTP transport and SSE
@@ -101,7 +101,13 @@ pnpm check          # tsc + cargo check
 pnpm lint           # oxlint + clippy -D warnings
 pnpm test           # vitest + cargo test
 pnpm format:check   # prettier + rustfmt
+pnpm contracts:gen  # regenerate packages/contracts/src/generated from the Rust types
 ```
+
+The TypeScript contracts are generated from the Rust types with `ts-rs`
+(`packages/contracts/src/generated`, committed). The handwritten contracts in
+`packages/contracts/src/index.ts` are checked against them by `src/drift.ts`,
+so a field that changes on one side fails the type-check until both agree.
 
 ## Licence note
 

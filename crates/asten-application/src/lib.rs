@@ -60,6 +60,12 @@ pub enum ApplicationError {
 pub type Result<T> = std::result::Result<T, ApplicationError>;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateProject {
     pub name: String,
     pub kind: ProjectKind,
@@ -67,21 +73,36 @@ pub struct CreateProject {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateDocument {
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub project_id: ProjectId,
     pub parent_id: Option<DocumentId>,
     pub kind: DocumentKind,
     pub title: String,
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub content_json: serde_json::Value,
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub position: i64,
     #[serde(default)]
     pub scene: Option<ScenePlacement>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateDocument {
     pub title: Option<String>,
     pub content_json: Option<serde_json::Value>,
@@ -98,15 +119,24 @@ pub struct UpdateDocument {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateFact {
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub project_id: ProjectId,
     pub entity_key: String,
     pub predicate: String,
     pub value: String,
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub modality: FactModality,
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub status: FactStatus,
     pub valid_from: Option<String>,
     pub valid_to: Option<String>,
@@ -123,6 +153,12 @@ pub struct CreateFact {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateFact {
     pub value: Option<String>,
     pub predicate: Option<String>,
@@ -137,12 +173,20 @@ pub struct UpdateFact {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateWorldEntry {
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub project_id: ProjectId,
     pub kind: WorldKind,
     pub title: String,
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub summary: String,
     pub prompt: Option<IdeaPrompt>,
     pub status: Option<WorldStatus>,
@@ -154,6 +198,12 @@ pub struct CreateWorldEntry {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateWorldEntry {
     pub kind: Option<WorldKind>,
     pub title: Option<String>,

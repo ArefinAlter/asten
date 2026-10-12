@@ -74,6 +74,8 @@ writing app.
 
 - One `Application` behind one HTTP transport. Per-project engine, broadcast
   stream, SSE with diagnostics deltas and heartbeats.
+- TypeScript contracts generated from the Rust types with `ts-rs` and checked
+  for drift against the handwritten desk contracts on every build.
 - Story language server routes: diagnostics, fact card, mentions, where
   settled, rename preview/apply, scene summary, cast search, proposals, apply
   repair, bisect, catalog, invariants, routes, baselines, settings.
@@ -134,7 +136,9 @@ writing app.
   source until a signed build exists.
 - Tier A perception models (M1–M5 in the design) and the training pipeline.
   Everything today is Tier B/C.
-- Generated TypeScript contracts from the Rust types; an OpenAPI document.
+- An OpenAPI document for the routes. The TypeScript types are now generated
+  from Rust (`pnpm contracts:gen`) and drift-checked in CI; the route list is
+  not yet described formally.
 - Docker: the compose file runs the API in pairing mode behind nginx with the
   stream unbuffered and unlogged. The images have not been built; the Docker
   daemon was not running in this session.

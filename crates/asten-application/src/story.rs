@@ -31,6 +31,12 @@ use serde::{Deserialize, Serialize};
 use crate::{Application, ApplicationError, Result};
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateSettings {
     pub strictness: Option<asten_ir::Strictness>,
     pub narrator_reliable: Option<bool>,
@@ -40,12 +46,20 @@ pub struct UpdateSettings {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateInvariant {
     pub label: String,
     pub pattern: InvariantPattern,
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub clock: TraceClock,
     #[serde(default = "yes")]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub enabled: bool,
 }
 
@@ -54,11 +68,23 @@ fn yes() -> bool {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateRoute {
     pub route: Route,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateBaseline {
     pub name: String,
 }

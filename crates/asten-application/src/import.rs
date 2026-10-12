@@ -4,6 +4,11 @@ use serde::{Deserialize, Serialize};
 use crate::{ApplicationError, Result};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
 #[serde(rename_all = "snake_case")]
 pub enum ImportFormat {
     Markdown,
@@ -14,6 +19,12 @@ pub enum ImportFormat {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct ImportRequest {
     pub filename: String,
     pub format: ImportFormat,

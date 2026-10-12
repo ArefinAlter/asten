@@ -88,8 +88,12 @@ issues a fresh desk token, and exposes exactly two Tauri commands:
 The React client therefore has one code path for both, and a feature that works
 in the browser works on the desktop by construction.
 
-The TypeScript contracts in `packages/contracts` are handwritten mirrors of the
-Rust types. Generating them from the Rust side is still the plan.
+The TypeScript contracts in `packages/contracts` come from the Rust types:
+every serde-derived type in the contract crates also derives `ts_rs::TS`
+behind the `ts` feature, `pnpm contracts:gen` exports them to
+`src/generated/<crate>/`, and `src/drift.ts` asserts that each handwritten
+type the desk uses is mutually assignable with its generated twin. CI
+regenerates and fails on a diff. An OpenAPI document is still to come.
 
 ## HTTP middleware
 
@@ -122,5 +126,5 @@ Rust types. Generating them from the Rust side is still the plan.
 - trained local perception models (Tier A) and the training pipeline;
 - a plugin runtime for third-party packs;
 - map and drawing renderers;
-- generated contracts and an OpenAPI document;
+- an OpenAPI document for the routes (the types are already generated);
 - product licensing and distribution terms.

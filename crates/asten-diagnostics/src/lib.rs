@@ -16,6 +16,11 @@ pub mod catalog;
 pub use catalog::{Area, CodeInfo, catalog, info};
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 #[serde(rename_all = "snake_case")]
 pub enum Severity {
     Error,
@@ -26,6 +31,11 @@ pub enum Severity {
 
 /// Whether the conflict is forced by the constraints or merely possible.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 #[serde(rename_all = "snake_case")]
 pub enum Tier {
     Must,
@@ -35,6 +45,11 @@ pub enum Tier {
 
 /// Which kinds of statements disagree. Drives severity (§12.2).
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 #[serde(rename_all = "snake_case")]
 pub enum Pairing {
     SettledSettled,
@@ -45,6 +60,11 @@ pub enum Pairing {
 /// Where a mark lands. Block-relative when the statement has an anchor; the
 /// whole document otherwise.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct Location {
     pub document: DocId,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -83,6 +103,11 @@ impl Location {
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 #[serde(rename_all = "snake_case")]
 pub enum StatementKind {
     Fact,
@@ -97,6 +122,11 @@ pub enum StatementKind {
 
 /// One statement in a minimal conflict set.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct Statement {
     pub kind: StatementKind,
     /// The id of the fact, observation, event, scene or constraint.
@@ -173,6 +203,11 @@ impl Statement {
 /// A repair the author may apply. Repairs change canon, contexts or metadata,
 /// never prose (§10.7).
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum RepairKind {
     /// Record that a fluent changed between two times.
@@ -228,6 +263,11 @@ pub enum RepairKind {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct Repair {
     pub kind: RepairKind,
     /// A verb the author owns: "Add an event", "Mark as a dream", "Keep my sentence".
@@ -260,6 +300,11 @@ impl Repair {
 /// What an analysis emits: a conflict with its evidence and tier, before
 /// severity, calibration, suppressions and baselines are applied.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct Violation {
     pub code: String,
     /// One line: what disagrees. "Mira's hair was settled as auburn."
@@ -319,6 +364,11 @@ impl Violation {
 
 /// A ranked single-fault diagnosis.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct Diagnosis {
     pub statement_id: String,
     pub probability: f32,
@@ -400,6 +450,11 @@ pub fn confidence_threshold(strictness: Strictness) -> f32 {
 
 /// The record the desk shows.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct Diagnostic {
     /// Stable across re-analysis: hash of code and evidence identities.
     pub id: String,
@@ -433,6 +488,11 @@ pub struct Diagnostic {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct DiagnosticProvenance {
     pub rules: Vec<String>,
     #[serde(default)]
@@ -550,6 +610,11 @@ pub fn finish(violation: Violation, strictness: Strictness, revision: &str) -> O
 // ───────────────────────── suppressions 2.0 ─────────────────────────
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum SuppressionScope {
     /// This one mark, bound to its evidence.
@@ -563,6 +628,11 @@ pub enum SuppressionScope {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct Suppression {
     pub id: String,
     pub code: String,
@@ -650,6 +720,11 @@ pub fn apply_baseline(diagnostics: &mut [Diagnostic], baseline: &[String]) {
 
 /// The difference between two diagnostic sets by stable id.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct MarksDiff {
     pub added: Vec<Diagnostic>,
     pub removed: Vec<String>,

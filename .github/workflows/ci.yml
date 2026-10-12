@@ -36,10 +36,18 @@ jobs:
         with:
           components: clippy,rustfmt
       - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - run: cargo fmt --all -- --check
       # Every crate except the Tauri shell, which needs GTK and is checked on Windows below.
       - run: cargo clippy --workspace --exclude asten-desktop --all-targets -- -D warnings
       - run: cargo test --workspace --exclude asten-desktop
+      # The TypeScript contracts are generated from the Rust types; the committed
+      # output must match, and src/drift.ts (checked by the frontend job) keeps
+      # the handwritten contracts in step with it.
+      - run: node scripts/contracts-gen.mjs
+      - run: git diff --exit-code -- packages/contracts/src/generated
 
   desktop:
     runs-on: windows-latest

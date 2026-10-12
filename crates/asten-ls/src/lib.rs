@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 
 /// `story/diagnostics`: the full set at a revision.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct DiagnosticsSnapshot {
     pub revision: String,
     pub diagnostics: Vec<Diagnostic>,
@@ -31,6 +32,7 @@ pub struct DiagnosticsSnapshot {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct Timings {
     pub perceive: u64,
     pub analyze: u64,
@@ -39,6 +41,7 @@ pub struct Timings {
 
 /// `story/diagnostics` as a diff since a revision.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct DiagnosticsDelta {
     pub from_revision: String,
     pub revision: String,
@@ -48,6 +51,7 @@ pub struct DiagnosticsDelta {
 
 /// A pending obligation from the setup/payoff ledger.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct Obligation {
     pub invariant: String,
     pub label: String,
@@ -57,6 +61,7 @@ pub struct Obligation {
 
 /// The support tier for a script seen in the project (§13.2).
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct LanguageTier {
     pub script: String,
     pub tier: String,
@@ -65,6 +70,7 @@ pub struct LanguageTier {
 
 /// `story/factCard`: hovering a name.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct FactCard {
     pub entity: EntityId,
     pub name: String,
@@ -82,6 +88,7 @@ pub struct FactCard {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct FactSummary {
     pub id: String,
     pub predicate: String,
@@ -96,6 +103,7 @@ pub struct FactSummary {
 
 /// `story/mentions`: every mention of an entity.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct MentionRef {
     pub document: DocId,
     pub document_title: String,
@@ -110,6 +118,7 @@ pub struct MentionRef {
 
 /// `story/whereSettled`: jump to where a fact was settled.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct WhereSettled {
     pub fact: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -128,6 +137,8 @@ pub struct WhereSettled {
 
 /// `story/rename` preview: every change the rename would make.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct RenamePreview {
     pub entity: EntityId,
     pub from: String,
@@ -136,6 +147,8 @@ pub struct RenamePreview {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct RenameChange {
     pub document: DocId,
     pub document_title: String,
@@ -147,15 +160,19 @@ pub struct RenameChange {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct RenameRequest {
     pub to: String,
     /// Apply the rename as patch events (true) or only preview (false).
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub apply: bool,
 }
 
 /// `story/sceneSummary`: the line above a scene.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct SceneSummary {
     pub document: DocId,
     pub title: String,
@@ -178,6 +195,7 @@ pub struct SceneSummary {
 
 /// `story/castSearch`.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct CastSearchHit {
     pub entity: EntityId,
     pub name: String,
@@ -188,11 +206,14 @@ pub struct CastSearchHit {
 
 /// `story/repairs` application request.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct ApplyRepairRequest {
     pub diagnostic_id: String,
     pub repair_index: usize,
     /// For `Suppress`: the author's reason.
     #[serde(default)]
+    #[cfg_attr(feature = "ts", ts(as = "Option<_>", optional))]
     pub reason: String,
     /// For `Suppress`: scope. Defaults to this occurrence.
     #[serde(default)]
@@ -200,6 +221,8 @@ pub struct ApplyRepairRequest {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct ApplyRepairResponse {
     pub applied: Repair,
     pub message: String,
@@ -207,6 +230,7 @@ pub struct ApplyRepairResponse {
 
 /// `story/bisect`: which edit introduced a mark.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct BisectResult {
     pub diagnostic_id: String,
     pub found: bool,
@@ -225,6 +249,7 @@ pub struct BisectResult {
 
 /// A baseline: the marks the author has accepted as known.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 pub struct Baseline {
     pub name: String,
     pub created_at: String,
@@ -234,6 +259,7 @@ pub struct Baseline {
 
 /// Server-sent events on the project stream.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum StreamEvent {
     /// A new revision is available; clients fetch or receive the delta.

@@ -14,6 +14,7 @@ const MAX_SCALARS: usize = 100_000;
 const MAX_EDITS: usize = 10_000;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
 pub struct RichTextPatch {
     pub version: u8,
     /// Fingerprint of the block before the patch.
@@ -26,6 +27,7 @@ pub struct RichTextPatch {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum RichTextEdit {
     /// Edit the inline text of the node at `path` (child indices from the block root).
@@ -37,6 +39,7 @@ pub enum RichTextEdit {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
 #[serde(tag = "kind", rename_all = "snake_case")]
 pub enum TextOp {
     Retain {

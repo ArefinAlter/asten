@@ -24,6 +24,7 @@ macro_rules! string_id {
     ($(#[$meta:meta])* $name:ident) => {
         $(#[$meta])*
         #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+        #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
         #[serde(transparent)]
         pub struct $name(pub String);
 
@@ -94,6 +95,7 @@ string_id!(
 
 /// Where a span of text was valid: the document revision and the block fingerprint.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct AnchorRevision {
     /// The document's event sequence number at which the offsets were valid.
     pub seq: i64,
@@ -105,6 +107,7 @@ pub struct AnchorRevision {
 /// block's plain text, matching Dynodoc's `RichTextPatch` units. User-facing
 /// code converts to grapheme clusters at the boundary.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Anchor {
     pub document: DocId,
     pub block: BlockId,
@@ -166,6 +169,7 @@ impl Anchor {
 
 /// What kind of thing an entity is. Packs may add sorts through `Other`.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case")]
 pub enum Sort {
     Character,
@@ -198,6 +202,7 @@ impl Sort {
 
 /// How many values a predicate may hold at one time, and whether it may change.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case")]
 pub enum Cardinality {
     /// One value at a time (hair color). Drives contradiction checks.
@@ -207,6 +212,7 @@ pub enum Cardinality {
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case")]
 pub enum Mutability {
     Mutable,
@@ -216,6 +222,7 @@ pub enum Mutability {
 
 /// The value domain of a predicate.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum ValueDomain {
     /// Values are concepts in a named lattice (colors, materials, lifecycle states).
@@ -236,6 +243,7 @@ pub enum ValueDomain {
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case")]
 pub enum Dimension {
     Length,
@@ -247,6 +255,7 @@ pub enum Dimension {
 
 /// Algebraic properties of relation predicates (`parent_of`, `married_to`).
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct RelationProps {
     #[serde(default)]
     pub symmetric: bool,
@@ -263,6 +272,7 @@ pub struct RelationProps {
 
 /// A predicate signature: `hair_color : Character → Color`.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct PredicateSig {
     pub id: PredicateId,
     pub label: String,
@@ -285,6 +295,7 @@ pub struct PredicateSig {
 /// A value in a predicate's domain. Strings never reach the analyses: concepts,
 /// intervals and entity ids do.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Value {
     Concept {
@@ -366,6 +377,7 @@ impl Value {
 /// The epistemic frame a statement lives in (§6.3). Contradictions are only
 /// computed inside one context after inheritance.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Context {
     /// World truth: what is actually so in the story world.
@@ -437,6 +449,7 @@ impl Context {
 // ───────────────────────── status and provenance ─────────────────────────
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case")]
 pub enum Status {
     /// Author-confirmed. Exact checks apply.
@@ -459,6 +472,7 @@ impl Status {
 /// Where a statement came from. Not decoration: explanation and blame are
 /// computed from it (§6.2).
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Provenance {
     /// An explicit author action in the desk, the wiki, or the cast.
@@ -545,6 +559,7 @@ impl Provenance {
 
 /// A name an entity goes by, possibly scoped in story time or to a speaker.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Alias {
     pub form: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -554,6 +569,7 @@ pub struct Alias {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Entity {
     pub id: EntityId,
     pub sort: Sort,
@@ -576,6 +592,7 @@ impl Entity {
 
 /// An anchored span that refers to an entity, with a link confidence.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Mention {
     pub anchor: Anchor,
     pub entity: EntityId,
@@ -590,6 +607,7 @@ pub struct Mention {
 
 /// A property that can hold or stop holding over story time.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Fluent {
     pub predicate: PredicateId,
     pub subject: EntityId,
@@ -616,6 +634,7 @@ impl Fluent {
 
 /// A fact: a fluent that holds in a context over a validity interval.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Fact {
     pub id: FactId,
     pub fluent: Fluent,
@@ -642,6 +661,7 @@ fn one() -> f32 {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct SettledAt {
     pub actor: String,
     pub at: String,
@@ -649,6 +669,7 @@ pub struct SettledAt {
 
 /// Where a statement sits in story time.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum TimeRef {
     /// Known exactly.
@@ -663,6 +684,7 @@ pub enum TimeRef {
 
 /// A statement in the prose that *reports* a fluent without causing it.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Observation {
     pub id: ObservationId,
     pub fluent: Fluent,
@@ -682,6 +704,7 @@ pub struct Observation {
 
 /// What kind of thing happened. Packs can add kinds through `Other`.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum EventKind {
     Born,
@@ -761,6 +784,7 @@ impl EventKind {
 
 /// Something that happens at a story time and can initiate or terminate fluents.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Event {
     pub id: EventId,
     pub kind: EventKind,
@@ -796,6 +820,7 @@ pub struct Event {
 
 /// A unit of narration with a reading position and a story-time placement.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Scene {
     pub document: DocId,
     pub title: String,
@@ -821,6 +846,7 @@ pub struct Scene {
 
 /// What a temporal constraint relates: a scene or an event, each a time point.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum TimePoint {
     Origin,
@@ -850,6 +876,7 @@ impl TimePoint {
 
 /// `lo ≤ to − from ≤ hi`, in ticks, with provenance (§9.6).
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct TemporalConstraint {
     pub from: TimePoint,
     pub to: TimePoint,
@@ -869,6 +896,7 @@ pub struct TemporalConstraint {
 
 /// Any perceptual output. Reasoning never reads raw text; it reads these.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Atom {
     Mention(Mention),
@@ -889,6 +917,7 @@ pub enum Atom {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Evidence {
     pub atom: Atom,
     pub confidence: f32,
@@ -900,6 +929,7 @@ pub struct Evidence {
 
 /// An atomic proposition over a scene's state, for author invariants (§9.10).
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Proposition {
     /// A fluent holds at the scene's time.
@@ -917,6 +947,7 @@ pub enum Proposition {
 
 /// A coarse pattern over event kinds so authors can say "dies" without arguments.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case")]
 pub enum EventKindPattern {
     Born,
@@ -956,6 +987,7 @@ impl EventKindPattern {
 
 /// The Dwyer, Avrunin and Corbett specification patterns authors see instead of LTLf.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case", tag = "pattern")]
 pub enum InvariantPattern {
     /// Once `after` holds, `never` never holds again. "Once Oren dies, he never speaks."
@@ -984,6 +1016,7 @@ pub enum InvariantPattern {
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case")]
 pub enum TraceClock {
     #[default]
@@ -992,6 +1025,7 @@ pub enum TraceClock {
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Invariant {
     pub id: String,
     pub label: String,
@@ -1006,6 +1040,7 @@ pub struct Invariant {
 
 /// A route between two places with a travel duration range, in ticks.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Route {
     pub from: EntityId,
     pub to: EntityId,
@@ -1025,6 +1060,7 @@ pub struct Route {
 
 /// Project-wide analysis settings.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct Settings {
     pub strictness: Strictness,
     /// Narration projects into world truth unless the author marks it unreliable.
@@ -1052,6 +1088,7 @@ impl Default for Settings {
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 #[serde(rename_all = "snake_case")]
 pub enum Strictness {
     /// Only settled-versus-settled conflicts.
@@ -1066,6 +1103,7 @@ pub enum Strictness {
 /// The full IR for one project revision. Built by the engine from the stored
 /// canon and the perception of every block; consumed by every analysis.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
 pub struct StoryIr {
     pub entities: Vec<Entity>,
     pub predicates: Vec<PredicateSig>,

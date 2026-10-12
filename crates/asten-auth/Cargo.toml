@@ -6,6 +6,7 @@ rust-version.workspace = true
 description = "Local authentication for the Asten API: pairing codes, hashed bearer tokens, an optional owner passphrase, and a rate limiter."
 
 [dependencies]
+ts-rs = { workspace = true, optional = true }
 argon2.workspace = true
 base64.workspace = true
 rand.workspace = true
@@ -13,3 +14,7 @@ serde.workspace = true
 sha2.workspace = true
 subtle.workspace = true
 thiserror.workspace = true
+
+[features]
+# Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
+ts = ["dep:ts-rs"]

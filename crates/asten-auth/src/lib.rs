@@ -28,6 +28,7 @@ use subtle::ConstantTimeEq;
 use thiserror::Error;
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "auth/"))]
 #[serde(rename_all = "snake_case")]
 pub enum AuthMode {
     /// No authentication. Development only.
@@ -52,6 +53,7 @@ impl AuthMode {
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "auth/"))]
 #[serde(rename_all = "snake_case")]
 pub enum TokenKind {
     /// The desk itself, issued at first run.
@@ -64,6 +66,7 @@ pub enum TokenKind {
 
 /// A stored token: only the hash is kept.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "auth/"))]
 pub struct TokenRecord {
     pub id: String,
     pub hash: String,

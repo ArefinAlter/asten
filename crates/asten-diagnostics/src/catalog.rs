@@ -6,6 +6,11 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 #[serde(rename_all = "snake_case")]
 pub enum Area {
     Attributes,
@@ -21,6 +26,11 @@ pub enum Area {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "diagnostics/")
+)]
 pub struct CodeInfo {
     pub code: &'static str,
     pub area: Area,

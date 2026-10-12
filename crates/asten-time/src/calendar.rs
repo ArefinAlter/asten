@@ -10,6 +10,7 @@ use asten_ir::{Tick, TimeBounds};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
 #[serde(rename_all = "snake_case")]
 pub enum TimeUnit {
     Minute,
@@ -31,6 +32,7 @@ impl TimeUnit {
 
 /// A month in a fictional calendar.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
 pub struct Month {
     pub name: String,
     pub days: u32,
@@ -38,6 +40,7 @@ pub struct Month {
 
 /// Every `every` years, `extra_days` are added to month `month` (zero-based).
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
 pub struct LeapRule {
     pub every: u32,
     pub extra_days: u32,
@@ -76,6 +79,7 @@ impl FictionalCalendar {
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
 pub struct FictionalCalendar {
     pub months: Vec<Month>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -92,6 +96,7 @@ pub struct FictionalCalendar {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Calendar {
     /// Days counted from an unnamed day 0. "Day 14" is tick 14 × ticks per day.
@@ -103,6 +108,7 @@ pub enum Calendar {
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
 pub struct Clock {
     #[serde(default)]
     pub unit: TimeUnit,
@@ -122,6 +128,7 @@ pub enum Granularity {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
 #[serde(rename_all = "snake_case")]
 pub enum Relation {
     After,

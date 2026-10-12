@@ -26,12 +26,22 @@ pub struct StreamTicket {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
 pub struct StreamTicketIssued {
     pub ticket: String,
     pub expires_at: DateTime<Utc>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
 pub struct AuthStatus {
     pub mode: AuthMode,
     pub owner_configured: bool,
@@ -41,6 +51,11 @@ pub struct AuthStatus {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
 pub struct PairingStart {
     pub id: PairingCodeId,
     /// Shown once in the desk; never stored in clear.
@@ -52,6 +67,11 @@ pub struct PairingStart {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
 pub struct PairingComplete {
     /// Given to the client once.
     pub token: String,
@@ -63,6 +83,11 @@ pub struct PairingComplete {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
 pub struct AuthenticatedClient {
     pub token_id: Option<AuthTokenId>,
     pub kind: TokenKind,

@@ -6,5 +6,10 @@ rust-version.workspace = true
 description = "Story time for the Asten canon engine: ticks, calendars, label parsing, and the simple temporal network."
 
 [dependencies]
+ts-rs = { workspace = true, optional = true }
 asten-ir = { path = "../asten-ir" }
 serde.workspace = true
+
+[features]
+# Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
+ts = ["dep:ts-rs", "asten-ir/ts"]

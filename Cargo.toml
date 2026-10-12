@@ -54,6 +54,7 @@ tokio-stream = { version = "0.1", features = ["sync"] }
 futures = "0.3"
 hex = "0.4"
 proptest = "1.5"
+ts-rs = { version = "12", features = ["serde-compat", "chrono-impl", "uuid-impl", "serde-json-impl", "no-serde-warnings"] }
 
 [profile.release]
 lto = "thin"

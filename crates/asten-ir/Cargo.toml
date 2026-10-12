@@ -6,6 +6,11 @@ rust-version.workspace = true
 description = "The Story IR: the language-independent representation the Asten canon engine reasons over."
 
 [dependencies]
+ts-rs = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
+
+[features]
+# Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
+ts = ["dep:ts-rs"]

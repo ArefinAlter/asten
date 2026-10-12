@@ -7,6 +7,26 @@ export type DocumentId = string;
 export type FactId = string;
 export type WorldEntryId = string;
 
+// Generated from the Rust types (`pnpm contracts:gen`); `drift.ts` checks that
+// every handwritten shape below agrees with its generated twin.
+import type { JsonValue } from "./generated/serde_json/JsonValue";
+import type { RichTextPatch } from "./generated/blocks/RichTextPatch";
+export type { JsonValue, RichTextPatch };
+export type * as generated from "./generated";
+
+/** The family a diagnostic code belongs to. */
+export type Area =
+  | "attributes"
+  | "lifecycles"
+  | "time"
+  | "space"
+  | "knowledge"
+  | "relations"
+  | "rules"
+  | "names"
+  | "ledger"
+  | "craft";
+
 // ───────────────────────── projects and documents ─────────────────────────
 
 export type ProjectKind = "novel" | "screenplay" | "non_fiction" | "other";
@@ -46,10 +66,10 @@ export interface ScenePlacement {
   tick?: number | null;
   tick_lo?: number | null;
   tick_hi?: number | null;
-  context?: Context;
+  context: Context;
   continuity_run?: string | null;
   language?: string | null;
-  introduces?: string[];
+  introduces: string[];
 }
 
 export interface AstenDocument {
@@ -58,7 +78,7 @@ export interface AstenDocument {
   parent_id: DocumentId | null;
   kind: DocumentKind;
   title: string;
-  content_json: unknown;
+  content_json: JsonValue;
   position: number;
   revision: number;
   exclude_from_compile: boolean;
@@ -70,21 +90,21 @@ export interface AstenDocument {
 }
 
 export interface CreateDocument {
-  project_id: ProjectId;
+  project_id?: ProjectId;
   parent_id?: DocumentId | null;
   kind: DocumentKind;
   title: string;
-  content_json?: unknown;
+  content_json?: JsonValue;
   position?: number;
   scene?: ScenePlacement | null;
 }
 
 export interface UpdateDocument {
   title?: string | null;
-  content_json?: unknown;
+  content_json?: JsonValue | null;
   parent_id?: DocumentId | null;
-  position?: number;
-  exclude_from_compile?: boolean;
+  position?: number | null;
+  exclude_from_compile?: boolean | null;
   scene?: ScenePlacement | null;
   actor?: string | null;
   expected_head_seq?: number | null;
@@ -103,14 +123,14 @@ export interface Anchor {
   start: number;
   end: number;
   revision?: AnchorRevision | null;
-  quote?: string;
-  context_before?: string;
-  context_after?: string;
-  stale?: boolean;
+  quote: string;
+  context_before: string;
+  context_after: string;
+  stale: boolean;
 }
 
 export type Provenance =
-  | { kind: "author"; action?: string }
+  | { kind: "author"; action: string }
   | { kind: "text"; anchor: Anchor }
   | { kind: "wiki"; document: string }
   | {
@@ -118,10 +138,10 @@ export type Provenance =
       id: string;
       version: string;
       anchor?: Anchor | null;
-      input_fingerprint?: string;
+      input_fingerprint: string;
     }
-  | { kind: "rule"; code: string; premises?: string[] }
-  | { kind: "import"; job?: string; anchor?: Anchor | null };
+  | { kind: "rule"; code: string; premises: string[] }
+  | { kind: "import"; job: string; anchor?: Anchor | null };
 
 export type FactModality =
   "established" | "inferred" | "contested" | "author_override";
@@ -156,7 +176,7 @@ export interface Fact {
 }
 
 export interface CreateFact {
-  project_id: ProjectId;
+  project_id?: ProjectId;
   entity_key: string;
   predicate: string;
   value: string;
@@ -164,19 +184,21 @@ export interface CreateFact {
   status?: FactStatus;
   valid_from?: string | null;
   valid_to?: string | null;
+  source?: SourceRange | null;
   context?: Context | null;
   anchor?: Anchor | null;
   confidence?: number | null;
+  provenance?: Provenance | null;
 }
 
 export interface UpdateFact {
-  value?: string;
-  predicate?: string;
-  status?: FactStatus;
-  modality?: FactModality;
+  value?: string | null;
+  predicate?: string | null;
+  status?: FactStatus | null;
+  modality?: FactModality | null;
   valid_from?: string | null;
   valid_to?: string | null;
-  context?: Context;
+  context?: Context | null;
   anchor?: Anchor | null;
   actor?: string | null;
 }
@@ -193,10 +215,10 @@ export type Sort =
   | "other";
 
 export type IrValue =
-  | { kind: "concept"; id: string; label?: string }
-  | { kind: "quantity"; lo: number; hi: number; label?: string }
+  | { kind: "concept"; id: string; label: string }
+  | { kind: "quantity"; lo: number; hi: number; label: string }
   | { kind: "entity"; id: string }
-  | { kind: "text"; norm: string; label?: string }
+  | { kind: "text"; norm: string; label: string }
   | { kind: "bool"; value: boolean };
 
 export interface Fluent {
@@ -241,7 +263,7 @@ export interface CanonEntity {
 }
 
 export interface CreateCanonEntity {
-  project_id: ProjectId;
+  project_id?: ProjectId;
   kind: EntityKind;
   name: string;
   aliases?: string[];
@@ -250,10 +272,10 @@ export interface CreateCanonEntity {
 }
 
 export interface UpdateCanonEntity {
-  kind?: EntityKind;
-  name?: string;
-  aliases?: string[];
-  notes?: string;
+  kind?: EntityKind | null;
+  name?: string | null;
+  aliases?: string[] | null;
+  notes?: string | null;
   introduced_at?: number | null;
 }
 
@@ -282,7 +304,7 @@ export interface TimelineEvent {
 }
 
 export interface CreateTimelineEvent {
-  project_id: ProjectId;
+  project_id?: ProjectId;
   title: string;
   entity_id?: string | null;
   document_id?: DocumentId | null;
@@ -297,20 +319,21 @@ export interface CreateTimelineEvent {
   tick?: number | null;
   tick_lo?: number | null;
   tick_hi?: number | null;
+  anchor?: Anchor | null;
 }
 
 export interface UpdateTimelineEvent {
-  title?: string;
+  title?: string | null;
   entity_id?: string | null;
   document_id?: DocumentId | null;
   story_time?: string | null;
   reading_order?: number | null;
   duration?: string | null;
-  notes?: string;
-  kind?: EventKind;
-  participants?: string[];
-  context?: Context;
-  status?: FactStatus;
+  notes?: string | null;
+  kind?: EventKind | null;
+  participants?: string[] | null;
+  context?: Context | null;
+  status?: FactStatus | null;
   tick?: number | null;
   tick_lo?: number | null;
   tick_hi?: number | null;
@@ -326,8 +349,8 @@ export interface Location {
   block?: string | null;
   start: number;
   end: number;
-  quote?: string;
-  label?: string;
+  quote: string;
+  label: string;
 }
 
 export type StatementKind =
@@ -355,7 +378,7 @@ export type RepairKind =
       kind: "add_change_event";
       entity: string;
       predicate: string;
-      to_value: unknown;
+      to_value: JsonValue;
       after_tick?: number | null;
       before_tick?: number | null;
     }
@@ -476,7 +499,7 @@ export type StreamEvent =
 
 export interface CodeInfo {
   code: string;
-  area: string;
+  area: Area;
   title: string;
   summary: string;
   pack: string;
@@ -609,7 +632,7 @@ export type EventPayload =
       node_type: string;
       parent_id?: string | null;
       pos: string;
-      fields: unknown;
+      fields: JsonValue;
     }
   | {
       type: "NodeMoved";
@@ -619,9 +642,9 @@ export type EventPayload =
     }
   | { type: "NodeDeleted"; node_id: string }
   | { type: "NodeRestored"; node_id: string }
-  | { type: "FieldEdited"; node_id: string; field: string; value: unknown }
-  | { type: "RichTextPatched"; node_id: string; patch: unknown }
-  | { type: "MetaEdited"; field: string; value: unknown };
+  | { type: "FieldEdited"; node_id: string; field: string; value: JsonValue }
+  | { type: "RichTextPatched"; node_id: string; patch: RichTextPatch }
+  | { type: "MetaEdited"; field: string; value: JsonValue };
 
 export interface EventRecord {
   id: string;
@@ -657,8 +680,8 @@ export interface Draft {
   document_id: DocumentId;
   name: string;
   base_seq: number;
-  base_state_json: unknown;
-  content_json: unknown;
+  base_state_json: JsonValue;
+  content_json: JsonValue;
   created_at: string;
   updated_at: string;
   merged_at?: string | null;
@@ -668,14 +691,14 @@ export interface MergeConflict {
   key: string;
   node_id: string;
   field: string;
-  base: unknown;
-  ours: unknown;
-  theirs: unknown;
+  base: JsonValue;
+  ours: JsonValue;
+  theirs: JsonValue;
 }
 
 export interface MergePreview {
   draft_id: string;
-  merged_content: unknown;
+  merged_content: JsonValue;
   conflicts: MergeConflict[];
   ops: number;
   new_marks: AstenDiagnostic[];
@@ -704,9 +727,9 @@ export type Calendar =
       kind: "fictional";
       months: { name: string; days: number }[];
       leap?: { every: number; extra_days: number; month: number } | null;
-      epoch_year?: number;
-      eras?: string[];
-      seasons?: string[];
+      epoch_year: number;
+      eras: string[];
+      seasons: string[];
     };
 
 export interface Clock {
@@ -725,11 +748,11 @@ export interface ProjectSettings {
 }
 
 export interface UpdateSettings {
-  strictness?: Strictness;
-  narrator_reliable?: boolean;
-  clock?: Clock;
+  strictness?: Strictness | null;
+  narrator_reliable?: boolean | null;
+  clock?: Clock | null;
   min_parent_age_days?: number | null;
-  resurrection_allowed?: Sort[];
+  resurrection_allowed?: Sort[] | null;
 }
 
 export type EventKindPattern =
@@ -793,9 +816,13 @@ export interface Route {
   to: string;
   min_ticks: number;
   max_ticks?: number | null;
-  mode?: string;
-  bidirectional?: boolean;
-  available?: TimeBounds;
+  mode: string;
+  bidirectional: boolean;
+  available: TimeBounds;
+}
+
+export interface CreateRoute {
+  route: Route;
 }
 
 export interface StoredRoute {
@@ -837,7 +864,7 @@ export interface DocumentSnapshot {
   document_id: DocumentId;
   revision: number;
   label: string | null;
-  content_json: unknown;
+  content_json: JsonValue;
   seq: number;
   chain_hash: string;
   merkle_root: string;
@@ -861,6 +888,7 @@ export interface Suppression {
 }
 
 export interface CreateSuppression {
+  project_id?: ProjectId;
   rule_code: string;
   document_id?: DocumentId | null;
   entity_key?: string | null;
@@ -877,7 +905,7 @@ export interface MethodPack {
   version: string;
   summary: string;
   enabled: boolean;
-  manifest: unknown;
+  manifest: JsonValue;
   created_at: string;
 }
 
@@ -916,7 +944,7 @@ export interface ImportRequest {
   body: string;
   encoding?: string | null;
   parent_id?: DocumentId | null;
-  kind?: DocumentKind;
+  kind?: DocumentKind | null;
 }
 
 export type WorldKind =
@@ -950,30 +978,30 @@ export interface WorldEntry {
 }
 
 export interface CreateWorldEntry {
-  project_id: ProjectId;
+  project_id?: ProjectId;
   kind: WorldKind;
   title: string;
   summary?: string;
   prompt?: IdeaPrompt | null;
-  status?: WorldStatus;
-  board_x?: number;
-  board_y?: number;
+  status?: WorldStatus | null;
+  board_x?: number | null;
+  board_y?: number | null;
   map_x?: number | null;
   map_y?: number | null;
-  hue?: string;
+  hue?: string | null;
 }
 
 export interface UpdateWorldEntry {
-  kind?: WorldKind;
-  title?: string;
-  summary?: string;
+  kind?: WorldKind | null;
+  title?: string | null;
+  summary?: string | null;
   prompt?: IdeaPrompt | null;
-  status?: WorldStatus;
-  board_x?: number;
-  board_y?: number;
+  status?: WorldStatus | null;
+  board_x?: number | null;
+  board_y?: number | null;
   map_x?: number | null;
   map_y?: number | null;
-  hue?: string;
+  hue?: string | null;
 }
 
 export interface WorldPulse {

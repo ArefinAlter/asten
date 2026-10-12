@@ -5,6 +5,7 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+ts-rs = { workspace = true, optional = true }
 asten-auth = { path = "../asten-auth" }
 asten-blocks = { path = "../asten-blocks" }
 asten-diagnostics = { path = "../asten-diagnostics" }
@@ -24,3 +25,7 @@ tokio = { workspace = true, features = ["sync", "rt"] }
 tracing.workspace = true
 uuid.workspace = true
 zip.workspace = true
+
+[features]
+# Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
+ts = ["dep:ts-rs", "asten-auth/ts", "asten-blocks/ts", "asten-diagnostics/ts", "asten-domain/ts", "asten-ir/ts", "asten-ls/ts", "asten-time/ts"]

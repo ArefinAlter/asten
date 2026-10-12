@@ -15,6 +15,7 @@ import type {
   AstenDiagnostic,
   AstenDocument,
   CanonEntity,
+  JsonValue,
   Location,
 } from "@asten/contracts";
 import {
@@ -62,7 +63,7 @@ interface Props {
    * Persist the content against the head sequence the editor last saw. Must
    * resolve with the saved document so the editor learns the new head.
    */
-  onSave: (content: unknown, headSeq: number) => Promise<AstenDocument>;
+  onSave: (content: JsonValue, headSeq: number) => Promise<AstenDocument>;
   onSelectMark: (id: string) => void;
   onSelectEntity: (key: string) => void;
   saving?: boolean;
@@ -208,7 +209,7 @@ export function ManuscriptEditor({
       setSaveState("saving");
       try {
         const saved = await onSaveRef.current(
-          editor.getJSON(),
+          editor.getJSON() as JsonValue,
           syncedSeq.current,
         );
         syncedSeq.current = saved.head_seq;
@@ -249,7 +250,7 @@ export function ManuscriptEditor({
       window.clearTimeout(retryTimer.current);
       if (editor && editVersion.current !== sentVersion.current) {
         void onSaveRef
-          .current(editor.getJSON(), syncedSeq.current)
+          .current(editor.getJSON() as JsonValue, syncedSeq.current)
           .catch(() => undefined);
       }
     };
