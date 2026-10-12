@@ -5,64 +5,178 @@
     <title>Asten for Word</title>
     <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
     <style>
+      :root {
+        --paper: #f4ecd8;
+        --ink: #141210;
+        --ink-soft: #5b544b;
+        --rubric: #a3261b;
+        --rule: #d9cdb0;
+      }
       body {
         margin: 16px;
-        color: #26231f;
-        background: #f6f4ef;
+        color: var(--ink);
+        background: var(--paper);
         font: 15px/1.5 Georgia, "Times New Roman", serif;
       }
-      p, label, button, select { font: inherit; }
-      .quiet { color: #6f6a61; font: 13px/1.4 ui-sans-serif, system-ui, sans-serif; }
+      p, label, button, select, input { font: inherit; }
+      .quiet { color: var(--ink-soft); font: 13px/1.4 ui-sans-serif, system-ui, sans-serif; }
+      .mono { font: 13px/1.4 ui-monospace, Consolas, monospace; letter-spacing: 0.04em; }
       label { display: block; margin: 12px 0; }
-      select, button {
-        display: block;
-        width: 100%;
-        margin-top: 6px;
-      }
+      select, input, button { display: block; width: 100%; margin-top: 6px; box-sizing: border-box; }
+      input, select { padding: 8px 10px; border: 1px solid var(--rule); background: #fffdf7; color: var(--ink); }
+      input.code { font: 22px/1.2 ui-monospace, Consolas, monospace; letter-spacing: 0.3em; text-align: center; }
       button {
-        border: 1px solid #7a5c3e;
-        background: #7a5c3e;
-        color: #f6f4ef;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: var(--paper);
         padding: 8px 12px;
         cursor: pointer;
       }
-      button.quiet-button {
-        background: transparent;
-        color: #26231f;
-        margin-top: 8px;
-      }
-      pre {
-        white-space: pre-wrap;
-        font: 12px/1.45 ui-monospace, monospace;
-      }
-      li { margin: 8px 0; }
+      button.quiet-button { background: transparent; color: var(--ink); margin-top: 8px; }
+      button.rubric { background: transparent; color: var(--rubric); border-color: transparent; text-align: left; width: auto; padding: 0; margin-top: 12px; font-size: 13px; }
+      button:disabled { opacity: 0.5; cursor: default; }
+      pre { white-space: pre-wrap; font: 12px/1.45 ui-monospace, monospace; }
+      ul { padding-left: 0; list-style: none; }
+      li { margin: 10px 0; padding-left: 10px; border-left: 2px solid var(--rule); }
+      li.error { border-left-color: var(--rubric); }
+      li .code { color: var(--rubric); }
+      li .msg { white-space: pre-wrap; }
+      [hidden] { display: none !important; }
+      hr { border: 0; border-top: 1px solid var(--rule); margin: 16px 0; }
     </style>
   </head>
   <body>
     <p>Asten is a Verne product. Word is a guest. Canon stays on this machine.</p>
-    <p class="quiet" id="status">Looking for the local API…</p>
-    <label>
-      Project
-      <select id="project"></select>
-    </label>
-    <button type="button" id="refresh">Refresh diagnostics</button>
-    <button type="button" class="quiet-button" id="file">File the selection</button>
-    <ul id="problems"></ul>
-    <pre id="out"></pre>
+    <p class="quiet" id="status">Looking for the local desk…</p>
+
+    <section id="pairing" hidden>
+      <p class="quiet">
+        The desk answers only to clients you have paired. Open the Asten desk → <em>Guests</em> → <em>Show a code</em>, or read the code the API printed when it started, and type it here once.
+      </p>
+      <label>
+        Pairing code
+        <input id="code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000 000" />
+      </label>
+      <label>
+        Where is the desk?
+        <input id="origin" class="mono" value="http://127.0.0.1:4317" />
+      </label>
+      <button type="button" id="pair">Pair this Word</button>
+    </section>
+
+    <section id="desk" hidden>
+      <label>
+        Project
+        <select id="project"></select>
+      </label>
+      <button type="button" id="refresh">Refresh the Scales</button>
+      <button type="button" class="quiet-button" id="file">File the selection as a scene</button>
+      <ul id="problems"></ul>
+      <pre id="out"></pre>
+      <hr />
+      <button type="button" class="rubric" id="forget">Forget this pairing</button>
+    </section>
+
     <script>
-      const API = "http://127.0.0.1:4317";
+      const TOKEN_KEY = "asten-token";
+      const ORIGIN_KEY = "asten-origin";
       const status = document.getElementById("status");
+      const pairing = document.getElementById("pairing");
+      const desk = document.getElementById("desk");
       const project = document.getElementById("project");
       const problems = document.getElementById("problems");
       const out = document.getElementById("out");
+      const codeInput = document.getElementById("code");
+      const originInput = document.getElementById("origin");
 
       function say(message) {
         status.textContent = message;
       }
+      function store(key, value) {
+        try {
+          if (value) localStorage.setItem(key, value);
+          else localStorage.removeItem(key);
+        } catch (_) {
+          /* storage may be blocked inside the task pane */
+        }
+      }
+      function load(key) {
+        try {
+          return localStorage.getItem(key);
+        } catch (_) {
+          return null;
+        }
+      }
+      function trimSlash(value) {
+        return value.endsWith("/") ? value.slice(0, -1) : value;
+      }
+      function api() {
+        return trimSlash(load(ORIGIN_KEY) || originInput.value || "http://127.0.0.1:4317");
+      }
+
+      class Unauthorized extends Error {}
+
+      async function call(path, init) {
+        const token = load(TOKEN_KEY);
+        const headers = Object.assign({ accept: "application/json" }, (init && init.headers) || {});
+        if (token) headers.authorization = "Bearer " + token;
+        const response = await fetch(api() + "/api/v1" + path, Object.assign({}, init, { headers }));
+        if (response.status === 401) throw new Unauthorized("This Word is not paired with the desk.");
+        return response;
+      }
+
+      function showPairing(message) {
+        pairing.hidden = false;
+        desk.hidden = true;
+        if (message) say(message);
+      }
+      function showDesk() {
+        pairing.hidden = true;
+        desk.hidden = false;
+      }
+
+      async function pair() {
+        const code = codeInput.value.replace(/[^0-9]/g, "");
+        if (code.length !== 6) {
+          say("The code has six digits.");
+          return;
+        }
+        store(ORIGIN_KEY, trimSlash(originInput.value.trim()));
+        const response = await fetch(api() + "/api/v1/auth/pair", {
+          method: "POST",
+          headers: { "content-type": "application/json", accept: "application/json" },
+          body: JSON.stringify({ code: code, label: "Word on this computer" }),
+        });
+        if (!response.ok) {
+          say(
+            response.status === 401
+              ? "That code was not accepted. Codes work once and expire after ten minutes."
+              : "The desk refused the pairing (" + response.status + ").",
+          );
+          return;
+        }
+        const paired = await response.json();
+        store(TOKEN_KEY, paired.token);
+        codeInput.value = "";
+        showDesk();
+        await loadProjects();
+      }
+
+      async function forget() {
+        try {
+          await call("/auth/logout", { method: "POST" });
+        } catch (_) {
+          /* the token may already be gone */
+        }
+        store(TOKEN_KEY, null);
+        problems.replaceChildren();
+        out.textContent = "";
+        showPairing("Pairing forgotten. The desk will no longer answer this pane.");
+      }
 
       async function loadProjects() {
-        const response = await fetch(API + "/api/v1/projects");
-        if (!response.ok) throw new Error("The local API refused the project list.");
+        const response = await call("/projects");
+        if (!response.ok) throw new Error("The desk refused the project list.");
         const items = await response.json();
         project.replaceChildren();
         for (const item of items) {
@@ -71,8 +185,8 @@
           option.textContent = item.name;
           project.append(option);
         }
-        if (!items.length) say("The API is up. There is no project yet.");
-        else say("Connected to Asten on this machine.");
+        showDesk();
+        say(items.length ? "Paired with the desk on this machine." : "Paired. There is no project yet; make one in the desk.");
       }
 
       async function loadDiagnostics() {
@@ -80,38 +194,38 @@
           say("Choose a project.");
           return;
         }
-        const response = await fetch(
-          API + "/api/v1/projects/" + project.value + "/diagnostics",
-        );
-        const items = await response.json();
+        const response = await call("/projects/" + project.value + "/story/diagnostics");
+        if (!response.ok) throw new Error("The desk could not weigh this project.");
+        const snapshot = await response.json();
+        const all = Array.isArray(snapshot) ? snapshot : snapshot.diagnostics || [];
+        const items = all.filter((mark) => !mark.suppressed_by);
         problems.replaceChildren();
-        if (!Array.isArray(items) || !items.length) {
-          say("No diagnostics.");
+        if (!items.length) {
+          say("The Scales are level. Nothing to weigh.");
           return;
         }
         for (const item of items) {
           const line = document.createElement("li");
-          line.textContent = item.code + " — " + item.message;
+          line.className = item.severity || "";
+          const code = document.createElement("span");
+          code.className = "code mono";
+          code.textContent = item.code + " ";
+          const msg = document.createElement("span");
+          msg.className = "msg";
+          msg.textContent = item.message;
+          line.append(code, msg);
           problems.append(line);
         }
-        say(items.length + " diagnostics.");
+        say(items.length + (items.length === 1 ? " mark." : " marks.") + " Repairs live in the desk.");
       }
 
       function selectedText() {
-        if (!window.Office || !Office.context || !Office.context.document) {
-          return Promise.resolve("");
-        }
+        if (!window.Office || !Office.context || !Office.context.document) return Promise.resolve("");
         return new Promise((resolve, reject) => {
-          Office.context.document.getSelectedDataAsync(
-            Office.CoercionType.Text,
-            (result) => {
-              if (result.status === Office.AsyncResultStatus.Succeeded) {
-                resolve(String(result.value || ""));
-              } else {
-                reject(new Error(result.error.message));
-              }
-            },
-          );
+          Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, (result) => {
+            if (result.status === Office.AsyncResultStatus.Succeeded) resolve(String(result.value || ""));
+            else reject(new Error(result.error.message));
+          });
         });
       }
 
@@ -125,21 +239,13 @@
           say("Choose a project.");
           return;
         }
-        const response = await fetch(
-          API + "/api/v1/projects/" + project.value + "/import",
-          {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              filename: "From Word",
-              format: "plain",
-              body: text,
-              kind: "scene",
-            }),
-          },
-        );
+        const response = await call("/projects/" + project.value + "/import", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ filename: "From Word", format: "plain", body: text, kind: "scene" }),
+        });
         const body = await response.text();
-        out.textContent = body;
+        out.textContent = response.ok ? "" : body;
         if (!response.ok) {
           say("Asten did not file the selection.");
           return;
@@ -148,25 +254,47 @@
         await loadDiagnostics();
       }
 
-      document.getElementById("refresh").onclick = () => {
-        loadDiagnostics().catch((error) => {
-          say(error.message);
-        });
-      };
-      document.getElementById("file").onclick = () => {
-        fileSelection().catch((error) => {
-          say(error.message);
-        });
-      };
-
-      function boot() {
-        loadProjects().catch((error) => {
-          say(error.message + " Start the API on 127.0.0.1:4317.");
-        });
+      function guard(task) {
+        return () =>
+          task().catch((error) => {
+            if (error instanceof Unauthorized) {
+              store(TOKEN_KEY, null);
+              showPairing(error.message);
+            } else {
+              say(error.message || String(error));
+            }
+          });
       }
 
-      if (window.Office) Office.onReady(boot);
-      else boot();
+      document.getElementById("pair").onclick = guard(pair);
+      document.getElementById("refresh").onclick = guard(loadDiagnostics);
+      document.getElementById("file").onclick = guard(fileSelection);
+      document.getElementById("forget").onclick = guard(forget);
+      codeInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") guard(pair)();
+      });
+
+      async function boot() {
+        originInput.value = load(ORIGIN_KEY) || originInput.value;
+        let up = false;
+        try {
+          up = (await fetch(api() + "/health")).ok;
+        } catch (_) {
+          up = false;
+        }
+        if (!up) {
+          showPairing("No desk is answering at " + api() + ". Open Asten, or start the API with pnpm dev:api, then pair.");
+          return;
+        }
+        if (!load(TOKEN_KEY)) {
+          showPairing("The desk is up. Pair this Word once.");
+          return;
+        }
+        await loadProjects();
+      }
+
+      if (window.Office) Office.onReady(() => guard(boot)());
+      else guard(boot)();
     </script>
   </body>
 </html>
