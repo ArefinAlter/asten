@@ -1,60 +1,166 @@
 # Asten — handoff
 
-6 October 2026. Asten is a Verne Ltd. product.
+12 October 2026. Asten is a Verne Ltd. product.
 
-Local-first writing desk. The manuscript stays in SQLite on the machine. Asten may notice a contradiction. It does not write the prose. No account. No sync.
+Local-first writing desk with a canon engine. The manuscript stays in SQLite on
+the machine. Asten may notice a contradiction and explain it. It does not write
+the prose. No account. No sync. No generative model.
 
 ## Repos
 
 - Product: https://github.com/ArefinAlter/asten
 - Research ingest: https://github.com/ArefinAlter/asten-research-ingest
 
-Local folders are still `B:\margin` and `B:\margin-research-ingest`. Windows has them open, so they were not renamed. GitHub already redirects the old `margin` names.
+Local folders are still `B:\margin` and `B:\margin-research-ingest`. GitHub
+redirects the old `margin` names.
 
-`docs/PROJECT_HANDOFF.md` is the September planning archive. This file is the current stage.
+`docs/PROJECT_HANDOFF.md` is the September planning archive.
+`docs/ENGINE_DESIGN.md` is the engine design the October work implements.
+`docs/BRAND.md` is the brand; §12 covers the desk. `docs/SECURITY.md` is the
+threat model and the auth modes. This file is the current stage.
 
 ## Run
 
 From `B:\margin`, after `pnpm install`:
 
-- `pnpm dev:api` — API on `127.0.0.1:4317`
-- `pnpm dev` — desk on `localhost:1420`
-- `pnpm www` — public site on `localhost:4320`
-- `pnpm dev:desktop` — Tauri shell
+- `pnpm dev:api` — API on `127.0.0.1:4317`. With no paired client it prints a
+  six-digit pairing code to stderr.
+- `pnpm dev` — desk on `localhost:1420`. Type the code once; the browser keeps
+  a token.
+- `pnpm dev:desktop` — Tauri shell. It embeds the API and pairs itself.
+- `pnpm www` — public site on `localhost:4320`.
 
-Desktop data is `asten.db` in the OS app-data directory. API dev data is `data/asten.db`. Env vars are `ASTEN_BIND` and `ASTEN_DATABASE_PATH`.
+Env vars: `ASTEN_BIND`, `ASTEN_DATABASE_PATH`, `ASTEN_AUTH`
+(`pairing` default, `owner`, `off` on loopback only), `ASTEN_ALLOWED_ORIGINS`,
+`ASTEN_SERVE_DESK`, `ASTEN_COOKIE_SECURE`. See `.env.example`.
 
-Research ingest is a separate Python tool (`asten-ingest`) in the other repo. It is not the writing app. Reindex after the rename: the Qdrant collection is `asten_chunks`.
+Desktop data is `asten.db` in the OS app-data directory. API dev data is
+`data/asten.db`.
+
+Research ingest is a separate Python tool in the other repo. It is not the
+writing app.
 
 ## Shipped
 
-- Binder, Tiptap editor, comments, find next/previous, letter page view, track-change marks, snapshots.
-- Cast, timeline, optional world (wall, atlas, dossier). A scene can start with no world.
-- Canon facts. Diagnostics: CANON-E013 attribute clash, CANON-E101 life after a settled death, CANON-E201 reading order against story time. Suppressions. Optional diction packs.
-- Compile and import: markdown, plain, fountain, HTML, docx. PDF is print-from-HTML.
-- Local API and a Tauri desktop shell. Run from source. No signed installer.
-- Word task pane and Docs sidebar. Sideload only. They call `127.0.0.1:4317`.
-- Public site (`apps/www`): 49 statically prerendered pages in the Egyptian brand (see `docs/BRAND.md`): product, nine features, five audience pages, AI stance, compare, roadmap, journal (5 articles, RSS), glossary, FAQ, guide, brand and press kit, and 13 legal pages. Interactive demos, original SVG art, day and night themes. Build writes sitemap, robots, `llms.txt`, `llms-full.txt`, JSON-LD, an OG card per page, icons, and `security.txt`. No cookies, no analytics. Footer credit: Designed and built by Verne Ltd. Live origin: `https://asten-writing.vercel.app` (Vercel project `asten-writing`, configured by the root `vercel.json`).
+### Engine (Rust, `crates/`)
+
+- `asten-ir`, `asten-time`, `asten-blocks`, `asten-diagnostics`, `asten-logic`,
+  `asten-perceive`, `asten-ls`, `asten-engine`, `asten-auth`. See
+  `docs/architecture.md` for what each owns.
+- Dynodoc block model: stable block ids, rich-text patches, hash-chained event
+  log per document, snapshots with Merkle roots, anchors that follow edits,
+  blame, three-way merge for drafts, verify.
+- Story IR with gradual canon (settled, proposed, deprecated, rejected) and
+  epistemic contexts (narration, dialogue, belief, memory, dream, vision, frame,
+  hypothetical). Lies and dreams do not count against the world.
+- Analyses and codes: `CANON-E013/E014/E015` attribute and quantity clashes,
+  `E101/E102/E103` lifecycle, `E201/E202/E203` two clocks and temporal
+  network, `E301/E302` routes, `E401` knowledge, `E501/E502/E503` relations,
+  `E601/E602` author invariants; `NAME-W001–W004` name hygiene;
+  `PLOT-I001/I002`. Severity by pairing (settled vs settled is an error,
+  prose vs settled a warning, prose vs prose information), confidence
+  thresholds, single-fault priors, explanation chains (①②③) and ranked
+  repairs the author owns. Suppressions carry an evidence fingerprint and go
+  stale when the evidence changes. Baselines for "new since".
+- Perception without models: Unicode folding, Aho-Corasick mentions with
+  suffix tolerance, cue-based attribute observations (hair, eyes, lifecycle,
+  material, location, age, height, relations), negation, dialogue attribution,
+  inline `[[entity.predicate=value]]`, name candidates across scripts.
+  Language tiers reported per project.
+- Performance: a 250k-word project re-perceives one block per edit, under two
+  seconds end to end in debug.
+
+### Application and API
+
+- One `Application` behind one HTTP transport. Per-project engine, broadcast
+  stream, SSE with diagnostics deltas and heartbeats.
+- Story language server routes: diagnostics, fact card, mentions, where
+  settled, rename preview/apply, scene summary, cast search, proposals, apply
+  repair, bisect, catalog, invariants, routes, baselines, settings.
+- History: event log, verify, document at a sequence, blame, drafts and merge
+  preview with semantic conflict marks.
+- Auth: pairing codes that grant a token kind (desk or guest), bearer tokens
+  hashed at rest, single-use stream tickets for SSE, optional owner
+  passphrase (argon2id, set once by the store), per-client and per-route rate
+  limiting with trusted-proxy support, CORS allowlist with strict wildcards,
+  same-origin-only session cookies, security headers. Guests cannot manage
+  pairing. Default mode is pairing. The API refuses `off` beyond loopback.
+- Reviewed 12 October: three independent review passes (API security, engine
+  correctness, desk and add-ins). Fixed: wildcard origin matching, query
+  tokens in logs, owner-setup race, pairing atomicity, limiter keying and
+  growth, Myers diff memory (bounded edit distance), fictional-calendar year
+  loops and zero-day months, duplicate block ids, fractional-key growth,
+  fuzzy reattach cost, number overflow, editor autosave caret jump and
+  lost-save states, Settings keystroke saves, `.docx` import size limit,
+  insecure-context UUIDs, 401 handling.
+- Compile and import unchanged: markdown, plain, fountain, HTML, docx.
+
+### Desktop
+
+- Tauri shell embeds the API on `127.0.0.1:4317` (ephemeral fallback), revokes
+  stale desk tokens, issues a fresh one, and exposes `desk_session` and
+  `start_pairing`. The webview uses the same HTTP client as the browser.
+
+### Desk (React, `apps/web`)
+
+- Brand §12: ink and papyrus tokens, Fraunces/Literata/Plex Mono, day and
+  night, cartouches, glyph rail.
+- Manuscript editor on Tiptap with stable block ids, inline underline marks
+  and margin cards, entity tokens with fact-card popovers, scene header with
+  story-time placement, track-change marks, page view, find, blame.
+- The Scales panel: filters, explanation chain, repairs, suppress with reason,
+  bisect, balanced empty state.
+- Binder, Overview, Cast (facts settle/reject/retire, aliases, mentions,
+  rename preview, merge), Canon (facts, proposals, invariants, routes,
+  baselines), Timeline (two registers), History (log, verify, peek, drafts,
+  merge preview), Guests (pairing codes, tokens, owner passphrase), Settings
+  (strictness, narrator, clock and calendar, parent age, language tiers),
+  Compile, Packs. Pair screen for browsers.
+- Hash routing `#/p/{project}/{view}/{doc}`.
+
+### Guests and site
+
+- Word task pane and Docs sidebar pair with a code, keep a bearer token, show
+  the Scales, file the selection, and can forget the pairing. Sideload only.
+- Public site (`apps/www`): unchanged from 6 October. Its features and roadmap
+  copy predate the engine work and should be refreshed to match "Shipped".
 
 ## Still to do
 
-- Close Cursor, stop Qdrant, and rename the two local folders.
 - Signed desktop installer. The download page says to run from source.
-- Publish the add-ins only if they go to the Office or Workspace stores. Today they are sideload guests. The Word pane must be served at `https://localhost:3000`.
-- Reindex the research collection `asten_chunks`. Search is empty until that runs.
-- Set `site.origin` in `apps/www/src/site.ts` when a real domain replaces `asten-writing.vercel.app`.
-- Legal pages use the entity Verne publishes at vernesystems.com/legal/company (Verne Systems, trading as Verne, Dhaka) and mirror Verne's website terms (Bangladesh law, Dhaka courts, USD 100 cap). The footer still says “Verne Ltd.”; confirm which name is right. Have counsel review before launch.
-- Align older “a Verne product” lines with “Verne Ltd.” where the legal identity should say the company name.
+- Refresh `apps/www` features, compare and roadmap pages against what shipped.
+  Do not push until reviewed.
+- Tier A perception models (M1–M5 in the design) and the training pipeline.
+  Everything today is Tier B/C.
+- Generated TypeScript contracts from the Rust types; an OpenAPI document.
+- Restyle `apps/web/src/world/*` on the brand tokens; it still uses the old hex
+  colours and the old client.
+- Docker: the compose file now runs the API in pairing mode behind nginx with
+  SSE buffering off. The images have not been built in this session.
+- Publish the add-ins only if they go to the Office or Workspace stores. The
+  Word pane must be served at `https://localhost:3000`.
+- Reindex the research collection `asten_chunks`.
+- Set `site.origin` in `apps/www/src/site.ts` when a real domain replaces
+  `asten-writing.vercel.app`.
+- Legal identity: footer says "Verne Ltd."; legal pages use the entity at
+  vernesystems.com/legal/company. Confirm which name is right. Counsel review
+  before launch.
+- Rotate the Vercel token that an earlier session printed, if not done.
 
 ## Left out on purpose
 
-- Adaptable writing-style workspace template. Not started. Still out of scope until asked.
-- InDesign, a pagination engine, and a PDF crate. Page view is a CSS letter sheet.
+- Any generative model, local or hosted. The engine is deterministic and
+  explainable; models, when added, are classifiers that feed the same logic.
+- Adaptable writing-style workspace template. Not started.
+- InDesign, a pagination engine, and a PDF crate. Page view is a CSS letter
+  sheet.
 - Full Word-style review. Track changes are insertion and deletion marks.
-- Find paints one match at a time. It does not highlight every hit.
-- A cloud model. If one is added, the privacy page and the UI say so first.
-- CSS `margin` properties were not renamed. The product name does not touch them.
+- Cloud sync, accounts, telemetry.
+- Pronoun resolution. Perception attributes an observation to a name in the
+  same sentence; "Her blue eyes" in a sentence without a name is not weighed.
 
 ## CI
 
-Three jobs. Frontend checks TypeScript on Linux. Rust checks the library crates. Desktop checks the Tauri shell on Windows. The Linux job does not compile the shell, because that needs GTK.
+Three jobs. Frontend formats, type-checks, lints, tests and builds the desk on
+Linux. Rust runs clippy and tests for the whole workspace except the Tauri
+shell. Desktop builds the desk and checks the shell on Windows.

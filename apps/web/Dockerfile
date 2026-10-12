@@ -4,7 +4,9 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web ./apps/web
 COPY apps/desktop/package.json ./apps/desktop/package.json
+COPY apps/www/package.json ./apps/www/package.json
 COPY packages/contracts ./packages/contracts
+COPY packages/brand ./packages/brand
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @asten/web build
 

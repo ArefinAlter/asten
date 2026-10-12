@@ -6,7 +6,7 @@ services:
     depends_on:
       - api
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     restart: unless-stopped
 
   api:
@@ -16,9 +16,20 @@ services:
     environment:
       ASTEN_BIND: 0.0.0.0:4317
       ASTEN_DATABASE_PATH: /app/data/asten.db
+      # The container binds beyond loopback, so authentication must be on.
+      # `pairing`: read the one-time code from `docker compose logs api`, then
+      # type it on the desk's pair screen at http://localhost:8080.
+      # `owner`: once a passphrase is set from a paired desk, a browser can
+      # unlock with it. Put TLS in front and set ASTEN_COOKIE_SECURE=true.
+      ASTEN_AUTH: pairing
+      ASTEN_COOKIE_SECURE: "false"
+      # nginx is the only thing that can reach this port, so its forwarded
+      # address is believed for rate limiting. Compose networks live in the
+      # private ranges below.
+      ASTEN_TRUSTED_PROXIES: 172.16.0.0/12,192.168.0.0/16,10.0.0.0/8
       RUST_LOG: asten_api=info,tower_http=info
     ports:
-      - "4317:4317"
+      - "127.0.0.1:4317:4317"
     volumes:
       - asten-data:/app/data
     restart: unless-stopped
