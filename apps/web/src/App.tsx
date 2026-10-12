@@ -1,44 +1,227 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { type FormEvent, useMemo, useState } from "react";
+import {
+  type FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import type {
+  AstenDocument,
   CompileArtifact,
   CompileFormat,
   CreateProject,
   DocumentKind,
   ImportFormat,
-  AstenDocument,
+  Location,
   ProjectId,
   ProjectKind,
 } from "@asten/contracts";
+import { PairScreen } from "./auth/PairScreen";
 import { Binder } from "./binder/Binder";
+import { Glyph, type GlyphKey } from "./brand/Glyphs";
+import { PaletteMark } from "./brand/Palette";
+import { ThemeToggle } from "./brand/ThemeToggle";
+import { Canon } from "./canon/Canon";
 import { Cast } from "./cast/Cast";
 import { CompileDock } from "./compile/CompileDock";
-import { ManuscriptEditor } from "./editor/ManuscriptEditor";
-import { createAstenClient } from "./lib/asten-client";
+import { ManuscriptEditor, type Jump } from "./editor/ManuscriptEditor";
+import { Guests } from "./guests/Guests";
+import { History } from "./history/History";
+import { Inspector } from "./inspector/Inspector";
+import { ApiError, createAstenClient } from "./lib/asten-client";
+import { useProjectStream, useStoredState } from "./lib/hooks";
 import { emptyDoc } from "./lib/pm";
+import { Overview } from "./overview/Overview";
 import { Packs } from "./packs/Packs";
+import { ScalesPanel } from "./scales/ScalesPanel";
+import { Settings } from "./settings/Settings";
 import { Timeline } from "./timeline/Timeline";
 import { WorldInspector } from "./world/WorldInspector";
 import { WorldWorkspace } from "./world/WorldWorkspace";
 import type { WorldLens } from "./world/useWorld";
-import "./asten.css";
 
 const client = createAstenClient();
-type View =
-  "overview" | "write" | "world" | "cast" | "time" | "compile" | "packs";
+
+export type View =
+  | "overview"
+  | "write"
+  | "cast"
+  | "canon"
+  | "time"
+  | "world"
+  | "history"
+  | "guests"
+  | "settings"
+  | "compile"
+  | "packs";
+
+const ACTIVITIES: {
+  view: View;
+  label: string;
+  glyph: GlyphKey;
+  needsProject: boolean;
+}[] = [
+  { view: "overview", label: "Overview", glyph: "house", needsProject: false },
+  { view: "write", label: "Write", glyph: "scroll", needsProject: true },
+  { view: "cast", label: "Cast", glyph: "seated", needsProject: true },
+  { view: "canon", label: "Canon", glyph: "feather", needsProject: true },
+  { view: "time", label: "Time", glyph: "moon", needsProject: true },
+  { view: "world", label: "World", glyph: "hills", needsProject: true },
+  { view: "history", label: "History", glyph: "pyramid", needsProject: true },
+  { view: "compile", label: "Compile", glyph: "kit", needsProject: true },
+  { view: "packs", label: "Packs", glyph: "papyrus", needsProject: false },
+  { view: "guests", label: "Guests", glyph: "door", needsProject: false },
+  { view: "settings", label: "Settings", glyph: "star", needsProject: true },
+];
+
+const VIEWS: ReadonlySet<string> = new Set(
+  ACTIVITIES.map((activity) => activity.view),
+);
+
+function readHash(): { project?: string; view?: View; document?: string } {
+  const match = /^#\/p\/([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?/.exec(
+    window.location.hash,
+  );
+  if (!match) return {};
+  const view = match[2] && VIEWS.has(match[2]) ? (match[2] as View) : undefined;
+  return {
+    project: decodeURIComponent(match[1]),
+    view,
+    document: match[3] ? decodeURIComponent(match[3]) : undefined,
+  };
+}
+
+function useAuthGate() {
+  const [tick, setTick] = useState(0);
+  const status = useQuery({
+    queryKey: ["auth-status", tick],
+    queryFn: () => client.authStatus(),
+    retry: 2,
+  });
+  const me = useQuery({
+    queryKey: ["auth-me", tick],
+    queryFn: () => client.me(),
+    enabled: Boolean(status.data?.requires_auth),
+    retry: false,
+  });
+  const authenticated = status.data
+    ? !status.data.requires_auth || me.isSuccess
+    : false;
+  const needsPairing =
+    Boolean(status.data?.requires_auth) &&
+    me.isError &&
+    me.error instanceof ApiError &&
+    me.error.status === 401;
+  // A revoked or expired token surfaces as a 401 on any request; the client
+  // forgets it and tells us, and we re-check so the pair screen comes back.
+  useEffect(() => {
+    const onUnauthorized = () => setTick((value) => value + 1);
+    window.addEventListener("asten:unauthorized", onUnauthorized);
+    return () =>
+      window.removeEventListener("asten:unauthorized", onUnauthorized);
+  }, []);
+  return {
+    status: status.data,
+    loading:
+      status.isPending || (Boolean(status.data?.requires_auth) && me.isPending),
+    authenticated,
+    needsPairing,
+    unreachable: status.isError,
+    refresh: () => setTick((value) => value + 1),
+  };
+}
 
 function App() {
-  const [selectedProjectId, setSelectedProjectId] = useState<ProjectId>();
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string>();
-  const [view, setView] = useState<View>("overview");
+  const gate = useAuthGate();
+  if (gate.unreachable) {
+    return (
+      <main className="pair-screen">
+        <section className="pair-card register">
+          <div className="pair-head">
+            <PaletteMark />
+            <h1>The desk cannot reach its API</h1>
+          </div>
+          <p className="lede">
+            Start the local API (<code>pnpm dev:api</code>) or open the desktop
+            app. Nothing of yours lives anywhere but this machine, so there is
+            no server to wait for.
+          </p>
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={gate.refresh}
+          >
+            Try again
+          </button>
+        </section>
+      </main>
+    );
+  }
+  if (gate.loading || !gate.status) {
+    return (
+      <main className="pair-screen">
+        <p className="status">Opening the desk…</p>
+      </main>
+    );
+  }
+  if (!gate.authenticated || gate.needsPairing) {
+    return <PairScreen status={gate.status} onPaired={gate.refresh} />;
+  }
+  return <Desk />;
+}
+
+function Desk() {
+  const initial = useMemo(() => readHash(), []);
+  const [selectedProjectId, setSelectedProjectId] = useState<
+    ProjectId | undefined
+  >(initial.project);
+  const [selectedDocumentId, setSelectedDocumentId] = useState<
+    string | undefined
+  >(initial.document);
+  const [view, setView] = useState<View>(initial.view ?? "overview");
   const [worldLens, setWorldLens] = useState<WorldLens>("wall");
   const [selectedWorldId, setSelectedWorldId] = useState<string>();
+  const [selectedEntityKey, setSelectedEntityKey] = useState<string>();
+  const [selectedMarkId, setSelectedMarkId] = useState<string>();
+  const [jump, setJump] = useState<Jump>();
   const [isCreating, setIsCreating] = useState(false);
-  const [pageView, setPageView] = useState(false);
+  const [pageView, setPageView] = useStoredState<"on" | "off">(
+    "asten-page-view",
+    "off",
+  );
   const [trackChanges, setTrackChanges] = useState(false);
+  const [showBlame, setShowBlame] = useState(false);
   const [findQuery, setFindQuery] = useState("");
   const [artifact, setArtifact] = useState<CompileArtifact>();
+  const [scalesCollapsed, setScalesCollapsed] = useStoredState<
+    "open" | "closed"
+  >("asten-scales", "open");
+  const [saveError, setSaveError] = useState<string>();
   const queryClient = useQueryClient();
+  const connected = useProjectStream(selectedProjectId);
+
+  // Keep the address in step with the desk, and the desk with the address
+  // (back, forward, a hand-edited hash).
+  useEffect(() => {
+    const parts = selectedProjectId
+      ? [`#/p/${selectedProjectId}`, view, selectedDocumentId ?? ""]
+      : ["#/"];
+    const next = parts.filter(Boolean).join("/");
+    if (window.location.hash !== next)
+      window.history.replaceState(null, "", next);
+  }, [selectedProjectId, view, selectedDocumentId]);
+  useEffect(() => {
+    const onHashChange = () => {
+      const target = readHash();
+      if (!target.project) return;
+      setSelectedProjectId(target.project as ProjectId);
+      if (target.view) setView(target.view);
+      setSelectedDocumentId(target.document);
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   const projects = useQuery({
     queryKey: ["projects"],
@@ -49,40 +232,20 @@ function App() {
     queryFn: () => client.listDocuments(selectedProjectId!),
     enabled: Boolean(selectedProjectId),
   });
-  const facts = useQuery({
-    queryKey: ["facts", selectedProjectId],
-    queryFn: () => client.listFacts(selectedProjectId!),
-    enabled: Boolean(selectedProjectId),
-  });
-  const diagnostics = useQuery({
-    queryKey: ["diagnostics", selectedProjectId],
-    queryFn: () => client.listDiagnostics(selectedProjectId!),
-    enabled: Boolean(selectedProjectId),
-  });
   const entities = useQuery({
     queryKey: ["entities", selectedProjectId],
     queryFn: () => client.listEntities(selectedProjectId!),
     enabled: Boolean(selectedProjectId),
   });
-  const events = useQuery({
-    queryKey: ["events", selectedProjectId],
-    queryFn: () => client.listEvents(selectedProjectId!),
+  const diagnostics = useQuery({
+    queryKey: ["diagnostics", selectedProjectId],
+    queryFn: () => client.diagnostics(selectedProjectId!),
     enabled: Boolean(selectedProjectId),
   });
-  const packs = useQuery({
-    queryKey: ["packs"],
-    queryFn: () => client.listPacks(),
-  });
-  const comments = useQuery({
-    queryKey: ["comments", selectedProjectId, selectedDocumentId],
-    queryFn: () => client.listComments(selectedProjectId!, selectedDocumentId!),
-    enabled: Boolean(selectedProjectId && selectedDocumentId),
-  });
-  const snapshots = useQuery({
-    queryKey: ["snapshots", selectedProjectId, selectedDocumentId],
-    queryFn: () =>
-      client.listSnapshots(selectedProjectId!, selectedDocumentId!),
-    enabled: Boolean(selectedProjectId && selectedDocumentId),
+  const blame = useQuery({
+    queryKey: ["blame", selectedProjectId, selectedDocumentId],
+    queryFn: () => client.blame(selectedProjectId!, selectedDocumentId!),
+    enabled: Boolean(selectedProjectId && selectedDocumentId && showBlame),
   });
 
   const createProject = useMutation({
@@ -90,6 +253,7 @@ function App() {
     onSuccess: async (project) => {
       setSelectedProjectId(project.id);
       setIsCreating(false);
+      setView("overview");
       await queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
@@ -105,6 +269,7 @@ function App() {
         title: input.title,
         parent_id: input.parent_id,
         content_json: emptyDoc(),
+        position: (documents.data?.length ?? 0) + 1,
       }),
     onSuccess: async (document) => {
       setSelectedDocumentId(document.id);
@@ -117,109 +282,36 @@ function App() {
       documentId: string;
       content_json?: unknown;
       exclude_from_compile?: boolean;
+      title?: string;
+      position?: number;
+      parent_id?: string | null;
+      expected_head_seq?: number;
     }) =>
       client.updateDocument(selectedProjectId!, input.documentId, {
         content_json: input.content_json,
         exclude_from_compile: input.exclude_from_compile,
+        title: input.title,
+        position: input.position,
+        parent_id: input.parent_id,
+        expected_head_seq: input.expected_head_seq,
         actor: "author",
       }),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["documents"] }),
-        queryClient.invalidateQueries({ queryKey: ["diagnostics"] }),
-      ]);
+      setSaveError(undefined);
+      await queryClient.invalidateQueries({
+        queryKey: ["documents", selectedProjectId],
+      });
     },
+    onError: (error) => setSaveError(error.message),
   });
-  const createFact = useMutation({
-    mutationFn: (input: {
-      entity_key: string;
-      predicate: string;
-      value: string;
-    }) =>
-      client.createFact({
-        project_id: selectedProjectId!,
-        ...input,
-        status: "confirmed",
-        modality: "established",
-      }),
+  const deleteDocument = useMutation({
+    mutationFn: (documentId: string) =>
+      client.deleteDocument(selectedProjectId!, documentId),
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["facts"] }),
-        queryClient.invalidateQueries({ queryKey: ["diagnostics"] }),
-      ]);
-    },
-  });
-  const createEntity = useMutation({
-    mutationFn: (input: {
-      name: string;
-      kind:
-        "character" | "place" | "event" | "item" | "rule" | "source" | "other";
-      notes: string;
-    }) =>
-      client.createEntity({
-        project_id: selectedProjectId!,
-        ...input,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["entities"] });
-      await queryClient.invalidateQueries({ queryKey: ["facts"] });
-    },
-  });
-  const createEvent = useMutation({
-    mutationFn: (input: {
-      title: string;
-      story_time?: string;
-      reading_order?: number;
-      notes?: string;
-      entity_id?: string | null;
-      document_id?: string | null;
-    }) =>
-      client.createEvent({
-        project_id: selectedProjectId!,
-        ...input,
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["events"] });
-      await queryClient.invalidateQueries({ queryKey: ["diagnostics"] });
-    },
-  });
-  const createComment = useMutation({
-    mutationFn: (body: string) =>
-      client.createComment(selectedProjectId!, selectedDocumentId!, { body }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["comments"] });
-    },
-  });
-  const createSnapshot = useMutation({
-    mutationFn: () =>
-      client.createSnapshot(selectedProjectId!, selectedDocumentId!, "Named"),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["snapshots"] });
-    },
-  });
-  const restoreSnapshot = useMutation({
-    mutationFn: (id: string) => client.restoreSnapshot(selectedProjectId!, id),
-    onSuccess: async (document) => {
-      setSelectedDocumentId(document.id);
-      await queryClient.invalidateQueries({ queryKey: ["documents"] });
-    },
-  });
-  const suppress = useMutation({
-    mutationFn: (input: { rule_code: string; document_id: string }) =>
-      client.createSuppression(selectedProjectId!, {
-        ...input,
-        reason: "Author suppressed",
-      }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["diagnostics"] });
-    },
-  });
-  const togglePack = useMutation({
-    mutationFn: (input: { id: string; enabled: boolean }) =>
-      client.updatePack(input.id, input.enabled),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["packs"] });
-      await queryClient.invalidateQueries({ queryKey: ["diagnostics"] });
+      setSelectedDocumentId(undefined);
+      await queryClient.invalidateQueries({
+        queryKey: ["documents", selectedProjectId],
+      });
     },
   });
   const compile = useMutation({
@@ -233,7 +325,7 @@ function App() {
       const buffer = await file.arrayBuffer();
       const body =
         format === "docx"
-          ? btoa(String.fromCharCode(...new Uint8Array(buffer)))
+          ? toBase64(new Uint8Array(buffer))
           : new TextDecoder().decode(buffer);
       return client.importDocument(selectedProjectId!, {
         filename: file.name,
@@ -257,6 +349,31 @@ function App() {
       documents.data?.find((document) => document.id === selectedDocumentId),
     [documents.data, selectedDocumentId],
   );
+  const marks = diagnostics.data?.diagnostics ?? [];
+  const openMarks = marks.filter((mark) => !mark.suppressed_by);
+
+  const jumpTo = useCallback(
+    (location: Location) => {
+      setSelectedDocumentId(location.document);
+      setView("write");
+      setJump({
+        block: location.block,
+        start: location.start,
+        end: location.end,
+        nonce: Date.now(),
+      });
+    },
+    [setSelectedDocumentId, setView],
+  );
+
+  function selectProject(id: ProjectId) {
+    setSelectedProjectId(id);
+    setSelectedDocumentId(undefined);
+    setSelectedWorldId(undefined);
+    setSelectedEntityKey(undefined);
+    setSelectedMarkId(undefined);
+    setView("overview");
+  }
 
   function submitProject(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -267,34 +384,57 @@ function App() {
     });
   }
 
-  function submitFact(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    createFact.mutate({
-      entity_key: String(form.get("entity_key") ?? ""),
-      predicate: String(form.get("predicate") ?? ""),
-      value: String(form.get("value") ?? ""),
-    });
-    event.currentTarget.reset();
-  }
-
-  function submitComment(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    createComment.mutate(String(form.get("body") ?? ""));
-    event.currentTarget.reset();
-  }
-
   function selectDocument(document: AstenDocument) {
     setSelectedDocumentId(document.id);
     setView("write");
   }
 
+  function openEntity(key: string) {
+    setSelectedEntityKey(key);
+    setView("cast");
+  }
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.key.toLowerCase() === "f" &&
+        view === "write"
+      ) {
+        event.preventDefault();
+        document.querySelector<HTMLInputElement>(".find-input")?.focus();
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key === "j") {
+        event.preventDefault();
+        setScalesCollapsed(scalesCollapsed === "open" ? "closed" : "open");
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [view, scalesCollapsed, setScalesCollapsed]);
+
+  const errorCount = openMarks.filter(
+    (mark) => mark.severity === "error",
+  ).length;
+  const warningCount = openMarks.filter(
+    (mark) => mark.severity === "warning",
+  ).length;
+
   return (
-    <div className={`app-shell${view === "world" ? " world-mode" : ""}`}>
+    <div
+      className={`app-shell view-${view}${scalesCollapsed === "closed" ? " scales-closed" : ""}`}
+    >
       <header className="titlebar">
-        <strong>Asten</strong>
-        <span>{selectedProject?.name ?? "Project library"}</span>
+        <span className="brand">
+          <PaletteMark />
+          <span className="wordmark">Asten</span>
+        </span>
+        <span className="title-crumb">
+          {selectedProject?.name ?? "Project library"}
+          {selectedDocument && view === "write" ? (
+            <span className="crumb-doc"> · {selectedDocument.title}</span>
+          ) : null}
+        </span>
         <div className="titlebar-actions">
           <input
             className="find-input"
@@ -302,11 +442,14 @@ function App() {
             value={findQuery}
             onChange={(event) => setFindQuery(event.target.value)}
             disabled={view !== "write"}
+            aria-label="Find in the page"
           />
           <button
             type="button"
-            className={pageView ? "active" : ""}
-            onClick={() => setPageView((value) => !value)}
+            className={pageView === "on" ? "active" : ""}
+            onClick={() => setPageView(pageView === "on" ? "off" : "on")}
+            title="Letter page view"
+            disabled={view !== "write"}
           >
             Page
           </button>
@@ -314,107 +457,49 @@ function App() {
             type="button"
             className={trackChanges ? "active" : ""}
             onClick={() => setTrackChanges((value) => !value)}
+            title="Track changes"
+            disabled={view !== "write"}
           >
             Track
           </button>
-          <button type="button" onClick={() => setView("compile")}>
-            Export
+          <button
+            type="button"
+            className={showBlame ? "active" : ""}
+            onClick={() => setShowBlame((value) => !value)}
+            title="Who wrote each line"
+            disabled={view !== "write"}
+          >
+            Blame
           </button>
+          <ThemeToggle />
         </div>
       </header>
 
-      <aside className="activitybar" aria-label="Workspace views">
-        <button
-          type="button"
-          title="Write"
-          className={view === "write" ? "selected" : ""}
-          disabled={!selectedProject}
-          onClick={() => setView("write")}
-        >
-          W
-        </button>
-        <button
-          type="button"
-          title="World wall"
-          className={view === "world" && worldLens === "wall" ? "selected" : ""}
-          disabled={!selectedProject}
-          onClick={() => {
-            setWorldLens("wall");
-            setView("world");
-          }}
-        >
-          ✦
-        </button>
-        <button
-          type="button"
-          title="Cast"
-          className={view === "cast" ? "selected" : ""}
-          disabled={!selectedProject}
-          onClick={() => setView("cast")}
-        >
-          C
-        </button>
-        <button
-          type="button"
-          title="Time"
-          className={view === "time" ? "selected" : ""}
-          disabled={!selectedProject}
-          onClick={() => setView("time")}
-        >
-          T
-        </button>
-        <button
-          type="button"
-          title="Map"
-          className={
-            view === "world" && worldLens === "atlas" ? "selected" : ""
-          }
-          disabled={!selectedProject}
-          onClick={() => {
-            setWorldLens("atlas");
-            setView("world");
-          }}
-        >
-          M
-        </button>
-        <button
-          type="button"
-          title="Dossier"
-          className={
-            view === "world" && worldLens === "dossier" ? "selected" : ""
-          }
-          disabled={!selectedProject}
-          onClick={() => {
-            setWorldLens("dossier");
-            setView("world");
-          }}
-        >
-          D
-        </button>
-        <button
-          type="button"
-          title="Compile"
-          className={view === "compile" ? "selected" : ""}
-          disabled={!selectedProject}
-          onClick={() => setView("compile")}
-        >
-          ⬇
-        </button>
-        <button
-          type="button"
-          title="Packs"
-          className={view === "packs" ? "selected" : ""}
-          disabled={!selectedProject}
-          onClick={() => setView("packs")}
-        >
-          ◇
-        </button>
-      </aside>
+      <nav className="activitybar" aria-label="Workspace views">
+        {ACTIVITIES.map((activity) => (
+          <button
+            key={activity.view}
+            type="button"
+            title={activity.label}
+            aria-label={activity.label}
+            className={view === activity.view ? "selected" : ""}
+            disabled={activity.needsProject && !selectedProject}
+            onClick={() => setView(activity.view)}
+          >
+            <Glyph name={activity.glyph} />
+            <span className="activity-label">{activity.label}</span>
+          </button>
+        ))}
+      </nav>
 
       <aside className="sidebar">
         <div className="pane-heading">
-          <span>Projects</span>
-          <button type="button" onClick={() => setIsCreating(true)}>
+          <span className="mono">Projects</span>
+          <button
+            type="button"
+            className="linkish"
+            onClick={() => setIsCreating(true)}
+          >
             New
           </button>
         </div>
@@ -425,12 +510,7 @@ function App() {
             <button
               className={project.id === selectedProjectId ? "selected" : ""}
               key={project.id}
-              onClick={() => {
-                setSelectedProjectId(project.id);
-                setSelectedDocumentId(undefined);
-                setSelectedWorldId(undefined);
-                setView("overview");
-              }}
+              onClick={() => selectProject(project.id)}
               type="button"
             >
               <span>{project.name}</span>
@@ -453,11 +533,19 @@ function App() {
                 <option value="other">Other</option>
               </select>
             </label>
-            <div>
-              <button type="submit" disabled={createProject.isPending}>
+            <div className="row">
+              <button
+                type="submit"
+                className="btn btn--small btn--primary"
+                disabled={createProject.isPending}
+              >
                 Create
               </button>
-              <button type="button" onClick={() => setIsCreating(false)}>
+              <button
+                type="button"
+                className="btn btn--small btn--ghost"
+                onClick={() => setIsCreating(false)}
+              >
                 Cancel
               </button>
             </div>
@@ -466,11 +554,12 @@ function App() {
         {selectedProject && (
           <>
             <div className="pane-heading">
-              <span>Binder</span>
+              <span className="mono">Binder</span>
             </div>
             <Binder
               documents={documents.data ?? []}
               selectedId={selectedDocumentId}
+              marks={openMarks}
               onSelect={selectDocument}
               onCreate={(input) => createDocument.mutate(input)}
               creating={createDocument.isPending}
@@ -480,6 +569,24 @@ function App() {
                   exclude_from_compile: !document.exclude_from_compile,
                 })
               }
+              onRename={(document, title) =>
+                updateDocument.mutate({ documentId: document.id, title })
+              }
+              onMove={(document, position, parent_id) =>
+                updateDocument.mutate({
+                  documentId: document.id,
+                  position,
+                  parent_id,
+                })
+              }
+              onDelete={(document) => {
+                if (
+                  window.confirm(
+                    `Delete “${document.title}”? Its history goes with it.`,
+                  )
+                )
+                  deleteDocument.mutate(document.id);
+              }}
             />
           </>
         )}
@@ -487,10 +594,20 @@ function App() {
 
       <main className={`workspace${view === "world" ? " world-open" : ""}`}>
         {!selectedProject ? (
-          <section className="empty-state">
-            <h1>Asten</h1>
-            <p>The environment that notices. Select a project or create one.</p>
-          </section>
+          view === "guests" ? (
+            <Guests />
+          ) : view === "packs" ? (
+            <Packs />
+          ) : (
+            <section className="empty-state">
+              <PaletteMark className="hero-mark" />
+              <h1>A writing desk with a memory.</h1>
+              <p>
+                Select a project or create one. Your words stay black. Asten
+                only ever writes in red.
+              </p>
+            </section>
+          )
         ) : view === "world" ? (
           <WorldWorkspace
             projectId={selectedProject.id}
@@ -503,18 +620,39 @@ function App() {
           />
         ) : view === "cast" ? (
           <Cast
+            projectId={selectedProject.id}
+            selectedKey={selectedEntityKey}
+            onSelectKey={setSelectedEntityKey}
+            documents={documents.data ?? []}
+            onJump={jumpTo}
+          />
+        ) : view === "canon" ? (
+          <Canon
+            projectId={selectedProject.id}
+            documents={documents.data ?? []}
             entities={entities.data ?? []}
-            facts={facts.data ?? []}
-            creating={createEntity.isPending}
-            onCreate={(input) => createEntity.mutate(input)}
+            snapshot={diagnostics.data}
           />
         ) : view === "time" ? (
           <Timeline
-            events={events.data ?? []}
-            entities={entities.data ?? []}
+            projectId={selectedProject.id}
             documents={documents.data ?? []}
-            creating={createEvent.isPending}
-            onCreate={(input) => createEvent.mutate(input)}
+            entities={entities.data ?? []}
+            onOpenDocument={(id) => jumpTo({ document: id, start: 0, end: 0 })}
+          />
+        ) : view === "history" ? (
+          <History
+            projectId={selectedProject.id}
+            documents={documents.data ?? []}
+            documentId={selectedDocumentId}
+            onSelectDocument={setSelectedDocumentId}
+          />
+        ) : view === "guests" ? (
+          <Guests />
+        ) : view === "settings" ? (
+          <Settings
+            projectId={selectedProject.id}
+            snapshot={diagnostics.data}
           />
         ) : view === "compile" ? (
           <CompileDock
@@ -522,46 +660,62 @@ function App() {
             artifact={artifact}
             onCompile={(format) => compile.mutate(format)}
             onImportFile={(file) => importDocument.mutate(file)}
+            error={compile.error?.message ?? importDocument.error?.message}
           />
         ) : view === "packs" ? (
-          <Packs
-            packs={packs.data ?? []}
-            onToggle={(id, enabled) => togglePack.mutate({ id, enabled })}
-          />
+          <Packs />
         ) : view === "write" ? (
           <section className="write-pane">
+            {saveError && (
+              <p className="error banner" role="alert">
+                {saveError}
+              </p>
+            )}
             {selectedDocument ? (
               <ManuscriptEditor
                 key={selectedDocument.id}
+                projectId={selectedProject.id}
                 document={selectedDocument}
-                pageView={pageView}
+                diagnostics={marks}
+                entities={entities.data ?? []}
+                pageView={pageView === "on"}
                 trackChanges={trackChanges}
                 findQuery={findQuery}
+                showBlame={showBlame}
+                blame={blame.data}
+                selectedMarkId={selectedMarkId}
+                jump={jump}
                 saving={updateDocument.isPending}
-                onSave={(content_json) =>
-                  updateDocument.mutate({
+                onSave={(content_json, headSeq) =>
+                  updateDocument.mutateAsync({
                     documentId: selectedDocument.id,
                     content_json,
+                    expected_head_seq: headSeq,
                   })
                 }
+                onSelectMark={setSelectedMarkId}
+                onSelectEntity={openEntity}
               />
             ) : (
-              <section className="editor-placeholder">
-                <p className="eyebrow">Binder</p>
+              <section className="editor-placeholder register">
+                <p className="eyebrow mono">Binder</p>
                 <h1>Start a scene</h1>
-                <p>Add a node in the binder. World tools are not the gate.</p>
+                <p>
+                  Add a scene in the binder, or import a manuscript under
+                  Compile. The world tools are not the gate.
+                </p>
               </section>
             )}
           </section>
         ) : (
-          <section className="editor-placeholder">
-            <p className="eyebrow">{selectedProject.kind}</p>
-            <h1>{selectedProject.name}</h1>
-            <p>
-              Write, pin a scrap, or name a character. None of those is required
-              first. Asten notices contradictions after you settle them.
-            </p>
-          </section>
+          <Overview
+            project={selectedProject}
+            documents={documents.data ?? []}
+            entities={entities.data ?? []}
+            snapshot={diagnostics.data}
+            onGo={setView}
+            onOpenDocument={(document) => selectDocument(document)}
+          />
         )}
       </main>
 
@@ -571,110 +725,64 @@ function App() {
             projectId={selectedProject.id}
             selectedId={selectedWorldId}
           />
+        ) : selectedProject ? (
+          <Inspector
+            projectId={selectedProject.id}
+            document={selectedDocument}
+            documents={documents.data ?? []}
+            entityKey={selectedEntityKey}
+            marks={marks}
+            selectedMarkId={selectedMarkId}
+            onJump={jumpTo}
+            onOpenEntity={openEntity}
+            onSelectMark={setSelectedMarkId}
+          />
         ) : (
-          <>
-            <div className="pane-heading">Canon facts</div>
-            {!selectedProject && (
-              <p className="status">Select a project to add facts.</p>
-            )}
-            {selectedProject && (
-              <>
-                <ul className="fact-list">
-                  {facts.data?.map((fact) => (
-                    <li key={fact.id}>
-                      <strong>
-                        {fact.entity_key}.{fact.predicate}
-                      </strong>
-                      <span>{fact.value}</span>
-                    </li>
-                  ))}
-                </ul>
-                <form className="stacked-form" onSubmit={submitFact}>
-                  <input name="entity_key" placeholder="mira" required />
-                  <input name="predicate" placeholder="hair_color" required />
-                  <input name="value" placeholder="auburn" required />
-                  <button type="submit" disabled={createFact.isPending}>
-                    Confirm fact
-                  </button>
-                </form>
-              </>
-            )}
-            {selectedDocument && (
-              <>
-                <div className="pane-heading">Comments</div>
-                <ul className="fact-list">
-                  {comments.data?.map((comment) => (
-                    <li key={comment.id}>{comment.body}</li>
-                  ))}
-                </ul>
-                <form className="stacked-form" onSubmit={submitComment}>
-                  <input name="body" placeholder="A note for later" required />
-                  <button type="submit" disabled={createComment.isPending}>
-                    Leave a comment
-                  </button>
-                </form>
-                <div className="pane-heading">Snapshots</div>
-                <button
-                  type="button"
-                  onClick={() => createSnapshot.mutate()}
-                  disabled={createSnapshot.isPending}
-                >
-                  Snapshot this revision
-                </button>
-                <ul className="fact-list">
-                  {snapshots.data?.map((snapshot) => (
-                    <li key={snapshot.id}>
-                      <span>
-                        r{snapshot.revision} {snapshot.label ?? ""}
-                      </span>
-                      <button
-                        type="button"
-                        className="linkish"
-                        onClick={() => restoreSnapshot.mutate(snapshot.id)}
-                      >
-                        Restore
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </>
+          <div className="inspector-empty">
+            <p className="hint">
+              The inspector shows what is settled about the name under your
+              cursor, the page's notes, and the mark you selected.
+            </p>
+          </div>
         )}
       </aside>
 
-      <section className="problems">
-        <div className="pane-heading">
-          <span>Problems</span>
-          <span>{diagnostics.data?.length ?? 0}</span>
-        </div>
-        {!diagnostics.data?.length && <p className="status">No diagnostics.</p>}
-        <ul className="problem-list">
-          {diagnostics.data?.map((item) => (
-            <li key={item.id} className={item.severity}>
-              <code>{item.code}</code>
-              <span>{item.message}</span>
-              <button
-                type="button"
-                className="linkish"
-                onClick={() =>
-                  suppress.mutate({
-                    rule_code: item.code,
-                    document_id: item.source.document_id,
-                  })
-                }
-              >
-                Suppress
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {selectedProject && (
+        <ScalesPanel
+          projectId={selectedProject.id}
+          snapshot={diagnostics.data}
+          loading={diagnostics.isPending}
+          documents={documents.data ?? []}
+          selectedMarkId={selectedMarkId}
+          onSelectMark={setSelectedMarkId}
+          onJump={jumpTo}
+          collapsed={scalesCollapsed === "closed"}
+          onToggleCollapsed={() =>
+            setScalesCollapsed(scalesCollapsed === "open" ? "closed" : "open")
+          }
+        />
+      )}
 
       <footer className="statusbar">
-        <span>Local first</span>
-        <span>{diagnostics.data?.length ?? 0} diagnostics</span>
-        <span>A Verne product</span>
+        <span
+          className={`live ${connected ? "on" : ""}`}
+          title={
+            connected
+              ? "Live: changes stream from the API"
+              : "Not connected to the change stream"
+          }
+        >
+          {connected ? "live" : "offline"}
+        </span>
+        <span>Local first · no account · no sync</span>
+        {selectedProject && diagnostics.data ? (
+          <span className="mono">
+            {errorCount} error{errorCount === 1 ? "" : "s"} · {warningCount}{" "}
+            warning{warningCount === 1 ? "" : "s"} · rev{" "}
+            {diagnostics.data.revision.slice(0, 8)}
+          </span>
+        ) : null}
+        <span>Designed and built by Verne Ltd.</span>
       </footer>
     </div>
   );
@@ -690,3 +798,16 @@ function importFormat(name: string): ImportFormat {
 }
 
 export default App;
+
+/** Base64 for a file of any size; spreading the bytes into one call overflows. */
+function toBase64(bytes: Uint8Array): string {
+  let binary = "";
+  const chunk = 0x8000;
+  for (let index = 0; index < bytes.length; index += chunk) {
+    binary += String.fromCharCode.apply(
+      null,
+      Array.from(bytes.subarray(index, index + chunk)),
+    );
+  }
+  return btoa(binary);
+}

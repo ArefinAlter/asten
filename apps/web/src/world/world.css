@@ -1,11 +1,17 @@
+/*
+ * The world: wall, atlas, dossier. Colours and type come from the brand
+ * tokens so the world sits on the same papyrus as the page, by day and by
+ * night. Cards keep their own ink so a pinned note stays legible on any desk.
+ */
+
 .world-stage {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
   background:
-    radial-gradient(circle at 18% 20%, rgb(255 248 230 / 55%), transparent 36%),
-    linear-gradient(180deg, #f4efe4 0%, #ebe4d4 100%);
+    radial-gradient(circle at 18% 20%, var(--papyrus-raised), transparent 36%),
+    linear-gradient(180deg, var(--papyrus) 0%, var(--papyrus-sunk) 100%);
 }
 
 .world-ribbon {
@@ -19,9 +25,9 @@
 
 .world-ribbon h1 {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 24px;
-  font-weight: 500;
+  font-weight: 560;
 }
 
 .world-toolbar {
@@ -35,10 +41,10 @@
 
 .world-lenses {
   display: flex;
-  border: 1px solid #d5ccb8;
+  border: 1px solid var(--rule);
   border-radius: 999px;
   overflow: hidden;
-  background: #fffaf0;
+  background: var(--papyrus-raised);
 }
 
 .world-lenses button {
@@ -46,14 +52,16 @@
   border: 0;
   border-radius: 0;
   background: transparent;
-  font-size: 12px;
-  letter-spacing: 0.04em;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--ink-2);
 }
 
 .world-lenses button.active {
-  background: #7a5c3e;
-  color: #fff8ee;
+  background: var(--ink);
+  color: var(--papyrus);
 }
 
 .iceberg {
@@ -66,23 +74,28 @@
 
 .iceberg-mark {
   align-self: end;
-  border: 1px solid #8a9aa8;
+  border: 1px solid var(--rule-strong);
   border-bottom: 0;
-  background: linear-gradient(180deg, #d7e7f2 0%, #9bb8c9 55%, #3f5a68 100%);
+  background: linear-gradient(
+    180deg,
+    var(--papyrus-raised) 0%,
+    var(--lapis-wash) 55%,
+    var(--lapis) 100%
+  );
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 20%);
 }
 
 .iceberg strong {
   display: block;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 20px;
+  font-weight: 560;
 }
 
 .iceberg span,
 .iceberg small {
   display: block;
-  color: #6d6456;
+  color: var(--ink-3);
   font-size: 11px;
   line-height: 1.35;
 }
@@ -95,10 +108,11 @@
 
 .seal {
   padding: 3px 10px;
-  border: 1px dashed #b08950;
+  border: 1px dashed var(--rule-strong);
   border-radius: 999px;
-  color: #7a5c3e;
-  background: rgb(255 248 230 / 70%);
+  color: var(--ink-2);
+  background: var(--papyrus-raised);
+  font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -106,7 +120,7 @@
 
 .seal.ghost {
   border-style: dotted;
-  color: #8a8174;
+  color: var(--ink-3);
 }
 
 .cork-wall {
@@ -115,17 +129,17 @@
   min-height: 200px;
   overflow: hidden;
   margin: 0 16px;
-  border: 1px solid #b89a6a;
-  border-radius: 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
   background:
-    radial-gradient(circle at 12% 18%, rgb(90 58 28 / 8%), transparent 28%),
+    radial-gradient(circle at 12% 18%, rgb(30 26 21 / 6%), transparent 28%),
     repeating-linear-gradient(
       135deg,
-      #c9a36d 0 2px,
-      #c0965d 2px 4px,
-      #d1ad79 4px 7px
+      var(--art-sand) 0 2px,
+      var(--art-shadow) 2px 4px,
+      var(--art-papyrus) 4px 7px
     );
-  box-shadow: inset 0 0 80px rgb(70 45 18 / 18%);
+  box-shadow: inset 0 0 80px rgb(30 26 21 / 14%);
 }
 
 .wall-empty {
@@ -136,12 +150,12 @@
   gap: 18px;
   padding: 24px;
   text-align: center;
-  color: #4d3a24;
+  color: var(--art-line);
 }
 
 .wall-empty p {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 20px;
   line-height: 1.45;
 }
@@ -156,18 +170,19 @@
 .invites button {
   min-width: 150px;
   padding: 14px 16px;
-  border-color: #e6d3a8;
-  background: #fff8e8;
-  box-shadow: 0 10px 20px rgb(60 40 10 / 12%);
-  font-family: Georgia, "Times New Roman", serif;
+  border-color: var(--art-shadow);
+  background: var(--art-natron);
+  color: var(--art-line);
+  box-shadow: 0 10px 20px rgb(30 26 21 / 14%);
+  font-family: var(--font-display);
   font-size: 16px;
 }
 
 .invites small {
   display: block;
   margin-bottom: 4px;
-  color: #8a7350;
-  font-family: Inter, sans-serif;
+  color: var(--art-flesh);
+  font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -187,18 +202,20 @@
   text-align: left;
   box-shadow:
     0 1px 0 rgb(255 255 255 / 40%) inset,
-    0 10px 18px rgb(40 28 10 / 18%);
+    0 10px 18px rgb(30 26 21 / 18%);
   cursor: grab;
 }
 
 .world-card.selected {
-  outline: 2px solid #7a5c3e;
+  outline: 2px solid var(--rubric);
+  outline-offset: 2px;
   z-index: 2;
 }
 
 .world-card .card-kind,
 .world-card em {
-  color: var(--ink, #4a3a22);
+  color: var(--ink);
+  font-family: var(--font-mono);
   font-size: 10px;
   font-style: normal;
   letter-spacing: 0.12em;
@@ -207,16 +224,16 @@
 }
 
 .world-card strong {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 560;
   line-height: 1.3;
-  color: var(--ink, #4a3a22);
+  color: var(--ink);
 }
 
 .world-card p {
   margin: 0;
-  color: var(--ink, #4a3a22);
+  color: var(--ink);
   font-size: 12px;
   line-height: 1.4;
   opacity: 0.86;
@@ -227,47 +244,50 @@
   top: 10px;
   right: 10px;
   padding: 2px 6px;
-  border: 1px solid rgb(122 92 62 / 40%);
-  color: #7a5c3e;
+  border: 1px solid var(--art-green);
+  color: var(--art-green);
   content: "Settled";
+  font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
+/* Card pigments: the scribe's palette on papyrus. Each card carries its own
+   ink so it reads the same on a day desk and a night desk. */
 .hue-ochre {
-  --ink: #5a3d14;
-  background: #f4dfb0;
+  --ink: #4a3410;
+  background: color-mix(in srgb, var(--art-ochre) 32%, var(--art-natron));
 }
 
 .hue-dusk {
-  --ink: #3d2a4a;
-  background: #e7d3ea;
+  --ink: #3a2a4a;
+  background: color-mix(in srgb, var(--art-lapis) 18%, var(--art-natron));
 }
 
 .hue-moss {
-  --ink: #24361c;
-  background: #d5e4c5;
+  --ink: #1f3a2b;
+  background: color-mix(in srgb, var(--art-green) 24%, var(--art-natron));
 }
 
 .hue-clay {
-  --ink: #5a2a18;
-  background: #f0cfc0;
+  --ink: #4a2414;
+  background: color-mix(in srgb, var(--art-flesh) 24%, var(--art-natron));
 }
 
 .hue-fog {
   --ink: #2a3340;
-  background: #e4e8ee;
+  background: color-mix(in srgb, var(--art-turq) 16%, var(--art-natron));
 }
 
 .hue-ink {
   --ink: #1c2740;
-  background: #dfe6ef;
+  background: color-mix(in srgb, var(--art-blue) 18%, var(--art-natron));
 }
 
 .hue-parchment {
-  --ink: #4a3a22;
-  background: #fff6e4;
+  --ink: #3b2f1c;
+  background: var(--art-papyrus);
 }
 
 .atlas-shell {
@@ -283,12 +303,17 @@
   position: relative;
   overflow: hidden;
   min-height: 360px;
-  border: 1px solid #c4b189;
-  border-radius: 6px;
-  color: #6d5a3c;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  color: var(--art-line);
   background:
-    radial-gradient(circle at 70% 30%, rgb(255 255 240 / 40%), transparent 32%),
-    linear-gradient(160deg, #f3e6c4, #e4d2a4 55%, #d9c08a);
+    radial-gradient(circle at 70% 30%, var(--art-natron), transparent 32%),
+    linear-gradient(
+      160deg,
+      var(--art-papyrus),
+      var(--art-sand) 55%,
+      var(--art-shadow)
+    );
   cursor: crosshair;
 }
 
@@ -299,7 +324,7 @@
 }
 
 .atlas-drawing polygon {
-  fill: #8b7350;
+  fill: var(--art-shadow);
   opacity: 0.8;
 }
 
@@ -309,8 +334,9 @@
   bottom: 12px;
   max-width: 240px;
   margin: 0;
-  color: #5c4a32;
-  font-family: Georgia, "Times New Roman", serif;
+  color: var(--art-line);
+  opacity: 0.8;
+  font-family: var(--font-display);
   font-size: 13px;
   font-style: italic;
   line-height: 1.4;
@@ -324,22 +350,27 @@
   padding: 0;
   border: 0;
   background: transparent;
+  color: var(--art-line);
   transform: translate(-50%, -100%);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 12px;
 }
 
 .map-pin span {
   width: 14px;
   height: 14px;
-  border: 2px solid #3d2b16;
+  border: 2px solid var(--art-line);
   border-radius: 50% 50% 50% 0;
-  background: currentColor;
+  background: var(--art-red);
   transform: rotate(-45deg);
 }
 
 .map-pin.selected {
   z-index: 2;
+}
+
+.map-pin.selected span {
+  background: var(--art-lapis);
 }
 
 .unplaced,
@@ -351,9 +382,9 @@
 .unplaced {
   overflow: auto;
   padding: 12px;
-  border: 1px solid #ddd4c2;
-  border-radius: 6px;
-  background: #fffaf1;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--papyrus-raised);
 }
 
 .unplaced button,
@@ -369,7 +400,8 @@
 
 .unplaced button.selected,
 .dossier button.selected {
-  background: #efe4cf;
+  background: var(--papyrus-sunk);
+  box-shadow: inset 2px 0 0 var(--rubric);
 }
 
 .dossier {
@@ -382,8 +414,10 @@
 
 .dossier h2 {
   margin: 18px 8px 6px;
-  color: #7a5c3e;
-  font-size: 12px;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
@@ -399,9 +433,9 @@
 
 .dossier li button {
   min-height: 92px;
-  border: 1px solid #e4d8c0;
-  border-radius: 4px;
-  background: #fffdf8;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-s);
+  background: var(--papyrus-raised);
 }
 
 .world-capture {
@@ -409,7 +443,8 @@
   flex: 0 0 auto;
   gap: 6px;
   padding: 8px 20px 10px;
-  background: #f7f1e4;
+  background: var(--papyrus-sunk);
+  border-top: 1px solid var(--rule);
 }
 
 .capture-kinds {
@@ -422,15 +457,15 @@
 .status-row button {
   padding: 5px 10px;
   border-radius: 999px;
-  background: #fffaf0;
+  background: var(--papyrus-raised);
   font-size: 12px;
 }
 
 .capture-kinds button.active,
 .status-row button.active {
-  background: #7a5c3e;
-  color: #fff8ee;
-  border-color: #7a5c3e;
+  background: var(--ink);
+  color: var(--papyrus);
+  border-color: var(--ink);
 }
 
 .world-capture label,
@@ -445,13 +480,10 @@
 .world-aside textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #d2c6ae;
-  border-radius: 4px;
-  background: #fffdf8;
-  font:
-    16px/1.45 Georgia,
-    "Times New Roman",
-    serif;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-s);
+  background: var(--papyrus-raised);
+  font: 16px/1.45 var(--font-text);
 }
 
 .capture-line {
@@ -462,17 +494,18 @@
 
 .capture-line button {
   padding: 0 16px;
-  background: #7a5c3e;
-  color: #fff8ee;
-  border-color: #7a5c3e;
+  background: var(--ink);
+  color: var(--papyrus);
+  border-color: var(--ink);
 }
 
 .skip-write {
   justify-self: start;
   border: 0;
   background: transparent;
-  color: #7a5c3e;
+  color: var(--ink-2);
   text-decoration: underline;
+  text-decoration-color: var(--rule-strong);
   font-size: 12px;
 }
 
@@ -492,7 +525,8 @@
 }
 
 .world-aside dt {
-  color: #7a7368;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
   font-size: 10px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -500,15 +534,19 @@
 
 .world-aside dd {
   margin: 2px 0 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display);
   font-size: 22px;
 }
 
 .world-aside .hint,
 .world-capture .error {
-  color: #6f675c;
+  color: var(--ink-3);
   font-size: 12px;
   line-height: 1.45;
+}
+
+.world-capture .error {
+  color: var(--rubric);
 }
 
 .status-row {
@@ -522,7 +560,7 @@
   flex-direction: column;
   overflow: hidden;
   min-height: 0;
-  background: #efe6d4;
+  background: var(--papyrus-sunk);
 }
 
 .workspace.world-open .world-stage {

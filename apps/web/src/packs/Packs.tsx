@@ -1,35 +1,64 @@
-import type { MethodPack } from "@asten/contracts";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createAstenClient } from "../lib/asten-client";
 
-interface Props {
-  packs: MethodPack[];
-  onToggle: (packId: string, enabled: boolean) => void;
-}
+/** Method packs: extensions, never a doctrine. */
+export function Packs() {
+  const client = createAstenClient();
+  const queryClient = useQueryClient();
+  const packs = useQuery({
+    queryKey: ["packs"],
+    queryFn: () => client.listPacks(),
+  });
+  const toggle = useMutation({
+    mutationFn: (input: { id: string; enabled: boolean }) =>
+      client.updatePack(input.id, input.enabled),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["packs"] });
+      await queryClient.invalidateQueries({ queryKey: ["diagnostics"] });
+    },
+  });
 
-export function Packs({ packs, onToggle }: Props) {
   return (
-    <section className="editor-placeholder">
-      <p className="eyebrow">Method packs</p>
-      <h1>Extensions, not a doctrine</h1>
-      <p>
-        Packs add rules and optional craft hints. They never replace the page.
-        Scribe stays on. Diction is a hint pack, off until you ask.
-      </p>
-      <ul className="fact-list">
-        {packs.map((pack) => (
-          <li key={pack.id}>
-            <strong>
-              {pack.name} · {pack.version}
-            </strong>
-            <span>{pack.summary}</span>
-            <button
-              type="button"
-              disabled={pack.pack_key === "scribe"}
-              onClick={() => onToggle(pack.id, !pack.enabled)}
-            >
-              {pack.enabled ? "On" : "Off"}
-            </button>
-          </li>
-        ))}
+    <section className="packs register">
+      <header>
+        <p className="eyebrow mono">Method packs</p>
+        <h1>Extensions, not a doctrine</h1>
+        <p className="lede">
+          Packs add rules and optional craft hints. They never replace the page.
+          Scribe stays on. Diction is a hint pack, off until you ask.
+        </p>
+      </header>
+      <ul className="pack-list">
+        {(packs.data ?? []).map((pack) => {
+          const rules = ((pack.manifest as { rules?: string[] } | null)
+            ?.rules ?? []) as string[];
+          return (
+            <li key={pack.id} className={`pack${pack.enabled ? " on" : ""}`}>
+              <div>
+                <strong>{pack.name}</strong>{" "}
+                <small className="mono">{pack.version}</small>
+                <p>{pack.summary}</p>
+                <p className="codes">
+                  {rules.map((code) => (
+                    <code key={code} className="chip chip--code">
+                      {code}
+                    </code>
+                  ))}
+                </p>
+              </div>
+              <button
+                type="button"
+                className={`btn btn--small${pack.enabled ? "" : " btn--ghost"}`}
+                disabled={pack.pack_key === "scribe" || toggle.isPending}
+                onClick={() =>
+                  toggle.mutate({ id: pack.id, enabled: !pack.enabled })
+                }
+              >
+                {pack.enabled ? "On" : "Off"}
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
