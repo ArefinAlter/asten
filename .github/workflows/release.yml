@@ -1,0 +1,55 @@
+name: Release
+
+# Builds the desktop installers when a version tag is pushed and attaches
+# them to a draft GitHub release. The installers are unsigned until a code
+# signing certificate is added as repository secrets (see docs/HANDOFF.md).
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            args: ""
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+      - run: pnpm install --frozen-lockfile
+      - name: Build the desk and the installers
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional Windows code signing. Leave unset for unsigned builds.
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        with:
+          projectPath: apps/desktop/src-tauri
+          tagName: ${{ github.ref_name }}
+          releaseName: "Asten ${{ github.ref_name }}"
+          releaseBody: |
+            Early-access desktop build. The installer is unsigned; Windows
+            will warn before it runs. Your manuscript stays on your machine.
+          releaseDraft: true
+          prerelease: true
+          args: ${{ matrix.args }}

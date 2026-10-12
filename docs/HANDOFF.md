@@ -122,21 +122,22 @@ writing app.
 
 - Word task pane and Docs sidebar pair with a code, keep a bearer token, show
   the Scales, file the selection, and can forget the pairing. Sideload only.
-- Public site (`apps/www`): unchanged from 6 October. Its features and roadmap
-  copy predate the engine work and should be refreshed to match "Shipped".
+- Public site (`apps/www`): features, FAQ, glossary, audience pages, roadmap
+  and reference refreshed on 12 October to match what shipped.
 
 ## Still to do
 
-- Signed desktop installer. The download page says to run from source.
-- Refresh `apps/www` features, compare and roadmap pages against what shipped.
-  Do not push until reviewed.
+- Signed desktop installer. `.github/workflows/release.yml` builds unsigned
+  NSIS and MSI installers on a `v*` tag and drafts a GitHub release. Signing
+  turns on when `WINDOWS_CERTIFICATE` and `WINDOWS_CERTIFICATE_PASSWORD`
+  exist as repository secrets. The download page still says to run from
+  source until a signed build exists.
 - Tier A perception models (M1–M5 in the design) and the training pipeline.
   Everything today is Tier B/C.
 - Generated TypeScript contracts from the Rust types; an OpenAPI document.
-- Restyle `apps/web/src/world/*` on the brand tokens; it still uses the old hex
-  colours and the old client.
-- Docker: the compose file now runs the API in pairing mode behind nginx with
-  SSE buffering off. The images have not been built in this session.
+- Docker: the compose file runs the API in pairing mode behind nginx with the
+  stream unbuffered and unlogged. The images have not been built; the Docker
+  daemon was not running in this session.
 - Publish the add-ins only if they go to the Office or Workspace stores. The
   Word pane must be served at `https://localhost:3000`.
 - Reindex the research collection `asten_chunks`.

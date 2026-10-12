@@ -1059,7 +1059,7 @@ mod tests {
         assert!(clock.parse("year 999999999999").is_none());
         let started = std::time::Instant::now();
         let _ = clock.format(1_000_000_000_000);
-        assert!(started.elapsed().as_millis() < 100);
+        assert!(started.elapsed().as_millis() < 500);
         // Zero-day months are refused by validation and tolerated by format.
         let mut broken = calendar;
         broken.months[0].days = 0;

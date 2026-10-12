@@ -25,6 +25,29 @@
     }
   },
   "bundle": {
-    "active": false
+    "active": true,
+    "targets": [
+      "nsis",
+      "msi"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "publisher": "Verne",
+    "shortDescription": "A writing desk that notices when the story contradicts itself.",
+    "longDescription": "Asten keeps your manuscript on this machine and weighs every page against the canon you settle. It never writes your prose.",
+    "category": "Productivity",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser"
+      },
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    }
   }
 }
