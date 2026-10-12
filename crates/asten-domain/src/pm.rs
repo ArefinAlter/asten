@@ -16,7 +16,29 @@ pub fn empty_prosemirror_doc() -> Value {
 #[must_use]
 pub fn ensure_block_ids(mut value: Value) -> Value {
     assign_ids(&mut value);
+    dedupe_top_level_ids(&mut value);
     value
+}
+
+/// The block model keys top-level nodes by id. A paste that carried ids along
+/// could otherwise make one block silently replace another; the first keeps
+/// its id and later twins are re-minted.
+fn dedupe_top_level_ids(value: &mut Value) {
+    let Some(content) = value.get_mut("content").and_then(Value::as_array_mut) else {
+        return;
+    };
+    let mut seen = std::collections::HashSet::new();
+    for node in content {
+        let Some(attrs) = node.get_mut("attrs").and_then(Value::as_object_mut) else {
+            continue;
+        };
+        let Some(id) = attrs.get("id").and_then(Value::as_str).map(str::to_owned) else {
+            continue;
+        };
+        if !seen.insert(id) {
+            attrs.insert("id".into(), json!(Uuid::now_v7().to_string()));
+        }
+    }
 }
 
 fn assign_ids(value: &mut Value) {

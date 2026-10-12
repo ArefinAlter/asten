@@ -1,473 +1,115 @@
-use std::sync::Arc;
+//! The desktop shell. It opens the writer's SQLite file in the OS app-data
+//! directory, hosts the same loopback API the browser desk and the Word and
+//! Docs guests use, and hands its own webview a desk token. One transport, no
+//! parity drift between desktop and web.
 
-use asten_application::{
-    Application, CompileRequest, CreateCanonEntity, CreateComment, CreateDocument, CreateFact,
-    CreateProject, CreateSnapshot, CreateSuppression, CreateTimelineEvent, CreateTrackedChange,
-    CreateWorldEntry, ImportRequest, ResolveTrackedChange, UpdateCanonEntity, UpdateComment,
-    UpdateDocument, UpdateMethodPack, UpdateTimelineEvent, UpdateWorldEntry,
-};
-use asten_domain::{
-    CanonEntity, Comment, CommentId, CompileArtifact, Diagnostic, Document, DocumentId, DocumentOp,
-    DocumentSnapshot, EntityId, Fact, MethodPack, MethodPackId, Project, ProjectId, SnapshotId,
-    Suppression, TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId, WorldEntry,
-    WorldEntryId, WorldPulse,
-};
+use std::{net::SocketAddr, sync::Arc};
+
+use asten_api::ApiConfig;
+use asten_application::{Application, AuthMode};
+use serde::Serialize;
 use tauri::{Manager, State};
-use uuid::Uuid;
 
-struct AppState(Application);
+/// What the webview needs to talk to the embedded API.
+#[derive(Clone, Debug, Serialize)]
+pub struct DeskSession {
+    pub origin: String,
+    pub token: String,
+    pub database_path: String,
+    pub version: String,
+}
 
-#[tauri::command]
-async fn list_projects(state: State<'_, AppState>) -> Result<Vec<Project>, String> {
-    state
-        .0
-        .list_projects()
-        .await
-        .map_err(|error| error.to_string())
+struct DesktopState {
+    application: Application,
+    session: DeskSession,
 }
 
 #[tauri::command]
-async fn create_project(
-    state: State<'_, AppState>,
-    input: CreateProject,
-) -> Result<Project, String> {
-    state
-        .0
-        .create_project(input)
-        .await
-        .map_err(|error| error.to_string())
+fn desk_session(state: State<'_, DesktopState>) -> DeskSession {
+    state.session.clone()
 }
 
-#[tauri::command]
-async fn list_documents(
-    state: State<'_, AppState>,
-    project_id: Uuid,
-) -> Result<Vec<Document>, String> {
-    state
-        .0
-        .list_documents(ProjectId(project_id))
-        .await
-        .map_err(|error| error.to_string())
+#[derive(Serialize)]
+struct PairingCodeView {
+    code: String,
+    label: String,
+    expires_at: String,
 }
 
+/// Mint a code a guest (Word, Docs, a browser) can type to pair with this desk.
 #[tauri::command]
-async fn create_document(
-    state: State<'_, AppState>,
-    input: CreateDocument,
-) -> Result<Document, String> {
-    state
-        .0
-        .create_document(input)
+async fn start_pairing(
+    state: State<'_, DesktopState>,
+    label: Option<String>,
+) -> Result<PairingCodeView, String> {
+    let start = state
+        .application
+        .start_pairing(
+            label.as_deref().unwrap_or("A guest"),
+            asten_domain::TokenKind::Guest,
+        )
         .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn update_document(
-    state: State<'_, AppState>,
-    document_id: Uuid,
-    input: UpdateDocument,
-) -> Result<Document, String> {
-    state
-        .0
-        .update_document(DocumentId(document_id), input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_facts(state: State<'_, AppState>, project_id: Uuid) -> Result<Vec<Fact>, String> {
-    state
-        .0
-        .list_facts(ProjectId(project_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn create_fact(state: State<'_, AppState>, input: CreateFact) -> Result<Fact, String> {
-    state
-        .0
-        .create_fact(input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_diagnostics(
-    state: State<'_, AppState>,
-    project_id: Uuid,
-) -> Result<Vec<Diagnostic>, String> {
-    state
-        .0
-        .analyze_project(ProjectId(project_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_world_entries(
-    state: State<'_, AppState>,
-    project_id: Uuid,
-) -> Result<Vec<WorldEntry>, String> {
-    state
-        .0
-        .list_world_entries(ProjectId(project_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn create_world_entry(
-    state: State<'_, AppState>,
-    input: CreateWorldEntry,
-) -> Result<WorldEntry, String> {
-    state
-        .0
-        .create_world_entry(input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn update_world_entry(
-    state: State<'_, AppState>,
-    entry_id: Uuid,
-    input: UpdateWorldEntry,
-) -> Result<WorldEntry, String> {
-    state
-        .0
-        .update_world_entry(WorldEntryId(entry_id), input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn world_pulse(state: State<'_, AppState>, project_id: Uuid) -> Result<WorldPulse, String> {
-    state
-        .0
-        .world_pulse(ProjectId(project_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_entities(
-    state: State<'_, AppState>,
-    project_id: Uuid,
-) -> Result<Vec<CanonEntity>, String> {
-    state
-        .0
-        .list_entities(ProjectId(project_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn create_entity(
-    state: State<'_, AppState>,
-    input: CreateCanonEntity,
-) -> Result<CanonEntity, String> {
-    state
-        .0
-        .create_entity(input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn update_entity(
-    state: State<'_, AppState>,
-    entity_id: Uuid,
-    input: UpdateCanonEntity,
-) -> Result<CanonEntity, String> {
-    state
-        .0
-        .update_entity(EntityId(entity_id), input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_events(
-    state: State<'_, AppState>,
-    project_id: Uuid,
-) -> Result<Vec<TimelineEvent>, String> {
-    state
-        .0
-        .list_events(ProjectId(project_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn create_event(
-    state: State<'_, AppState>,
-    input: CreateTimelineEvent,
-) -> Result<TimelineEvent, String> {
-    state
-        .0
-        .create_event(input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn update_event(
-    state: State<'_, AppState>,
-    event_id: Uuid,
-    input: UpdateTimelineEvent,
-) -> Result<TimelineEvent, String> {
-    state
-        .0
-        .update_event(TimelineEventId(event_id), input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_comments(
-    state: State<'_, AppState>,
-    document_id: Uuid,
-) -> Result<Vec<Comment>, String> {
-    state
-        .0
-        .list_comments(DocumentId(document_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn create_comment(
-    state: State<'_, AppState>,
-    input: CreateComment,
-) -> Result<Comment, String> {
-    state
-        .0
-        .create_comment(input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn update_comment(
-    state: State<'_, AppState>,
-    comment_id: Uuid,
-    input: UpdateComment,
-) -> Result<Comment, String> {
-    state
-        .0
-        .update_comment(CommentId(comment_id), input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_ops(
-    state: State<'_, AppState>,
-    document_id: Uuid,
-) -> Result<Vec<DocumentOp>, String> {
-    state
-        .0
-        .list_ops(DocumentId(document_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_snapshots(
-    state: State<'_, AppState>,
-    document_id: Uuid,
-) -> Result<Vec<DocumentSnapshot>, String> {
-    state
-        .0
-        .list_snapshots(DocumentId(document_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn create_snapshot(
-    state: State<'_, AppState>,
-    input: CreateSnapshot,
-) -> Result<DocumentSnapshot, String> {
-    state
-        .0
-        .create_snapshot(input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn restore_snapshot(
-    state: State<'_, AppState>,
-    snapshot_id: Uuid,
-) -> Result<Document, String> {
-    state
-        .0
-        .restore_snapshot(SnapshotId(snapshot_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_suppressions(
-    state: State<'_, AppState>,
-    project_id: Uuid,
-) -> Result<Vec<Suppression>, String> {
-    state
-        .0
-        .list_suppressions(ProjectId(project_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn create_suppression(
-    state: State<'_, AppState>,
-    input: CreateSuppression,
-) -> Result<Suppression, String> {
-    state
-        .0
-        .create_suppression(input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_packs(state: State<'_, AppState>) -> Result<Vec<MethodPack>, String> {
-    state
-        .0
-        .list_packs()
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn update_pack(
-    state: State<'_, AppState>,
-    pack_id: Uuid,
-    input: UpdateMethodPack,
-) -> Result<MethodPack, String> {
-    state
-        .0
-        .update_pack(MethodPackId(pack_id), input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn list_tracked_changes(
-    state: State<'_, AppState>,
-    document_id: Uuid,
-) -> Result<Vec<TrackedChange>, String> {
-    state
-        .0
-        .list_tracked_changes(DocumentId(document_id))
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn create_tracked_change(
-    state: State<'_, AppState>,
-    input: CreateTrackedChange,
-) -> Result<TrackedChange, String> {
-    state
-        .0
-        .create_tracked_change(input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn resolve_tracked_change(
-    state: State<'_, AppState>,
-    change_id: Uuid,
-    input: ResolveTrackedChange,
-) -> Result<TrackedChange, String> {
-    state
-        .0
-        .resolve_tracked_change(TrackedChangeId(change_id), input)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn compile_project(
-    state: State<'_, AppState>,
-    project_id: Uuid,
-    request: CompileRequest,
-) -> Result<CompileArtifact, String> {
-    state
-        .0
-        .compile_project(ProjectId(project_id), request)
-        .await
-        .map_err(|error| error.to_string())
-}
-
-#[tauri::command]
-async fn import_document(
-    state: State<'_, AppState>,
-    project_id: Uuid,
-    request: ImportRequest,
-) -> Result<Document, String> {
-    state
-        .0
-        .import_document(ProjectId(project_id), request)
-        .await
-        .map_err(|error| error.to_string())
+        .map_err(|error| error.to_string())?;
+    Ok(PairingCodeView {
+        code: start.code,
+        label: start.label,
+        expires_at: start.expires_at.to_rfc3339(),
+    })
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let _ = tracing_subscriber::fmt()
+        .with_env_filter("asten_desktop=info,asten_api=info")
+        .try_init();
     tauri::Builder::default()
         .setup(|app| {
             let data_directory = app.path().app_data_dir()?;
             std::fs::create_dir_all(&data_directory)?;
             let database_path = data_directory.join("asten.db");
-            let repository = tauri::async_runtime::block_on(
-                asten_storage::SqliteRepository::open(database_path),
-            )?;
-            app.manage(AppState(Application::new(Arc::new(repository))));
+            let (application, session) = tauri::async_runtime::block_on(async {
+                let repository = asten_storage::SqliteRepository::open(&database_path).await?;
+                let application = Application::with_auth(Arc::new(repository), AuthMode::Pairing);
+                // Each launch gets a fresh desk token; older desk tokens are revoked.
+                for token in application.list_tokens().await? {
+                    if token.kind == asten_domain::TokenKind::Desk && token.revoked_at.is_none() {
+                        let _ = application.revoke_token(token.id).await;
+                    }
+                }
+                let desk = application.issue_desk_token("Desktop desk").await?;
+                // Host the API on 4317 when free (guests expect it), else any port.
+                let preferred: SocketAddr = "127.0.0.1:4317".parse().expect("loopback address");
+                let listener = asten_api::bind_with_fallback(preferred).await?;
+                let origin = format!("http://{}", listener.local_addr()?);
+                let config = ApiConfig {
+                    auth_mode: AuthMode::Pairing,
+                    serve_desk: None,
+                    ..ApiConfig::default()
+                };
+                let serving = application.clone();
+                tauri::async_runtime::spawn(async move {
+                    if let Err(error) =
+                        asten_api::serve(listener, serving, config, std::future::pending()).await
+                    {
+                        tracing::error!(%error, "the embedded API stopped");
+                    }
+                });
+                let session = DeskSession {
+                    origin,
+                    token: desk.token,
+                    database_path: database_path.display().to_string(),
+                    version: env!("CARGO_PKG_VERSION").to_owned(),
+                };
+                Ok::<_, Box<dyn std::error::Error>>((application, session))
+            })?;
+            tracing::info!(origin = %session.origin, "embedded API ready");
+            app.manage(DesktopState {
+                application,
+                session,
+            });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![
-            list_projects,
-            create_project,
-            list_documents,
-            create_document,
-            update_document,
-            list_facts,
-            create_fact,
-            list_diagnostics,
-            list_world_entries,
-            create_world_entry,
-            update_world_entry,
-            world_pulse,
-            list_entities,
-            create_entity,
-            update_entity,
-            list_events,
-            create_event,
-            update_event,
-            list_comments,
-            create_comment,
-            update_comment,
-            list_ops,
-            list_snapshots,
-            create_snapshot,
-            restore_snapshot,
-            list_suppressions,
-            create_suppression,
-            list_packs,
-            update_pack,
-            list_tracked_changes,
-            create_tracked_change,
-            resolve_tracked_change,
-            compile_project,
-            import_document
-        ])
+        .invoke_handler(tauri::generate_handler![desk_session, start_pairing])
         .run(tauri::generate_context!())
         .expect("error while running Asten");
 }

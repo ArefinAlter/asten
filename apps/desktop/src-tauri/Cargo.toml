@@ -5,11 +5,15 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+asten-api = { path = "../../../services/asten-api" }
 asten-application = { path = "../../../crates/asten-application" }
 asten-domain = { path = "../../../crates/asten-domain" }
 asten-storage = { path = "../../../crates/asten-storage" }
+serde = { workspace = true }
 tauri.workspace = true
-uuid.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
 
 [build-dependencies]
 tauri-build.workspace = true

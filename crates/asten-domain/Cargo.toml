@@ -5,6 +5,8 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+asten-ir = { path = "../asten-ir" }
+asten-time = { path = "../asten-time" }
 chrono.workspace = true
 serde.workspace = true
 serde_json.workspace = true

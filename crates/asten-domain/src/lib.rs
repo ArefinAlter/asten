@@ -1,3 +1,7 @@
+//! Transport-independent data types for Asten. Nothing here knows about
+//! Tauri, Axum, SQLite or React.
+
+use asten_ir::{Anchor, Context, Provenance};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -34,7 +38,6 @@ macro_rules! entity_id {
 
 entity_id!(ProjectId);
 entity_id!(DocumentId);
-entity_id!(DiagnosticId);
 entity_id!(FactId);
 entity_id!(WorldEntryId);
 
@@ -74,7 +77,43 @@ pub enum DocumentKind {
     Source,
 }
 
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+impl DocumentKind {
+    /// Prose kinds take part in continuity checks and compile.
+    #[must_use]
+    pub fn is_prose(&self) -> bool {
+        matches!(
+            self,
+            DocumentKind::Manuscript | DocumentKind::Chapter | DocumentKind::Scene
+        )
+    }
+}
+
+/// Where a document sits in story time and what frame it is told in.
+#[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
+pub struct ScenePlacement {
+    /// The label the author typed: "day 14", "1890-03-02", "three days after the siege".
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub story_time: Option<String>,
+    /// A structured placement, when set by the author or a repair. Wins over the label.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tick: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tick_lo: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tick_hi: Option<i64>,
+    #[serde(default)]
+    pub context: Context,
+    /// Scenes sharing a run key were declared continuous.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub continuity_run: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub language: Option<String>,
+    /// The author marked this as the scene that introduces these entities (keys).
+    #[serde(default)]
+    pub introduces: Vec<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 pub struct Document {
     pub id: DocumentId,
     pub project_id: ProjectId,
@@ -86,34 +125,15 @@ pub struct Document {
     pub revision: i64,
     #[serde(default)]
     pub exclude_from_compile: bool,
+    #[serde(default)]
+    pub scene: ScenePlacement,
+    /// Head of the document's hash-chained event log.
+    #[serde(default)]
+    pub head_seq: i64,
+    #[serde(default)]
+    pub chain_hash: String,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-}
-
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Severity {
-    Error,
-    Warning,
-    Information,
-    Hint,
-}
-
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
-pub struct SourceRange {
-    pub document_id: DocumentId,
-    pub start: u32,
-    pub end: u32,
-}
-
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-pub struct Diagnostic {
-    pub id: DiagnosticId,
-    pub code: String,
-    pub severity: Severity,
-    pub message: String,
-    pub source: SourceRange,
-    pub details: Option<String>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
@@ -126,30 +146,36 @@ pub enum FactModality {
     AuthorOverride,
 }
 
-#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+/// `Confirmed` is the wire name for a settled fact.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum FactStatus {
     Proposed,
     #[default]
     Confirmed,
     Deprecated,
+    Rejected,
 }
 
+impl FactStatus {
+    #[must_use]
+    pub fn to_ir(self) -> asten_ir::Status {
+        match self {
+            FactStatus::Proposed => asten_ir::Status::Proposed,
+            FactStatus::Confirmed => asten_ir::Status::Settled,
+            FactStatus::Deprecated => asten_ir::Status::Deprecated,
+            FactStatus::Rejected => asten_ir::Status::Rejected,
+        }
+    }
+}
+
+/// Legacy whole-document offsets, kept for older rows. New facts carry a
+/// block-relative `anchor`.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SourceAnchor {
     pub document_id: DocumentId,
     pub start: u32,
     pub end: u32,
-}
-
-impl From<SourceAnchor> for SourceRange {
-    fn from(anchor: SourceAnchor) -> Self {
-        Self {
-            document_id: anchor.document_id,
-            start: anchor.start,
-            end: anchor.end,
-        }
-    }
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -163,9 +189,26 @@ pub struct Fact {
     pub status: FactStatus,
     pub valid_from: Option<String>,
     pub valid_to: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub source: Option<SourceAnchor>,
+    #[serde(default)]
+    pub context: Context,
+    #[serde(default = "one")]
+    pub confidence: f32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub anchor: Option<Anchor>,
+    #[serde(default)]
+    pub provenance: Provenance,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub settled_by: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub settled_at: Option<DateTime<Utc>>,
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
+}
+
+fn one() -> f32 {
+    1.0
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -227,6 +270,56 @@ pub struct WorldPulse {
     pub underwater: u32,
     pub iceberg: f32,
     pub discoveries: Vec<String>,
+}
+
+/// Project-wide engine settings.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub struct ProjectSettings {
+    pub project_id: ProjectId,
+    #[serde(default)]
+    pub strictness: asten_ir::Strictness,
+    #[serde(default = "yes")]
+    pub narrator_reliable: bool,
+    #[serde(default)]
+    pub clock: asten_time::Clock,
+    /// Minimum age of a parent at a child's birth, in days. None disables E503.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_parent_age_days: Option<i64>,
+    /// Sorts allowed to return from death by a world rule.
+    #[serde(default)]
+    pub resurrection_allowed: Vec<asten_ir::Sort>,
+    pub updated_at: DateTime<Utc>,
+}
+
+fn yes() -> bool {
+    true
+}
+
+impl ProjectSettings {
+    #[must_use]
+    pub fn for_project(project_id: ProjectId) -> Self {
+        Self {
+            project_id,
+            strictness: asten_ir::Strictness::Standard,
+            narrator_reliable: true,
+            clock: asten_time::Clock::default(),
+            min_parent_age_days: None,
+            resurrection_allowed: Vec::new(),
+            updated_at: Utc::now(),
+        }
+    }
+
+    #[must_use]
+    pub fn to_ir(&self) -> asten_ir::Settings {
+        let per_day = self.clock.ticks_per_day();
+        asten_ir::Settings {
+            strictness: self.strictness,
+            narrator_reliable: self.narrator_reliable,
+            ticks_per_day: per_day,
+            resurrection_allowed: self.resurrection_allowed.clone(),
+            min_parent_age_ticks: self.min_parent_age_days.map(|days| days * per_day),
+        }
+    }
 }
 
 #[must_use]
@@ -296,12 +389,7 @@ pub fn compute_world_pulse(entries: &[WorldEntry], documents: &[Document]) -> Wo
     }
     pulse.scenes = documents
         .iter()
-        .filter(|document| {
-            matches!(
-                document.kind,
-                DocumentKind::Scene | DocumentKind::Chapter | DocumentKind::Manuscript
-            )
-        })
+        .filter(|document| document.kind.is_prose())
         .count() as u32;
     let depth = pulse.underwater + pulse.scenes;
     pulse.iceberg = if depth == 0 {
@@ -332,12 +420,12 @@ pub fn compute_world_pulse(entries: &[WorldEntry], documents: &[Document]) -> Wo
 
 #[must_use]
 pub fn normalize_key(value: &str) -> String {
-    value.trim().to_ascii_lowercase()
+    value.trim().to_lowercase()
 }
 
 #[must_use]
 pub fn normalize_value(value: &str) -> String {
-    match value.trim().to_ascii_lowercase().as_str() {
+    match value.trim().to_lowercase().as_str() {
         "blonde" => "blond".to_owned(),
         "grey" => "gray".to_owned(),
         other => other.to_owned(),
@@ -408,8 +496,8 @@ mod tests {
     #[test]
     fn world_pulse_treats_notes_as_iceberg_and_scenes_as_the_tip() {
         use super::{
-            Document, DocumentId, DocumentKind, IdeaPrompt, ProjectId, WorldEntry, WorldEntryId,
-            WorldKind, WorldStatus, compute_world_pulse, entity_key_from_title,
+            Document, DocumentId, DocumentKind, IdeaPrompt, ProjectId, ScenePlacement, WorldEntry,
+            WorldEntryId, WorldKind, WorldStatus, compute_world_pulse, entity_key_from_title,
         };
         use chrono::Utc;
 
@@ -459,6 +547,9 @@ mod tests {
             position: 0,
             revision: 1,
             exclude_from_compile: false,
+            scene: ScenePlacement::default(),
+            head_seq: 0,
+            chain_hash: String::new(),
             created_at: now,
             updated_at: now,
         }];

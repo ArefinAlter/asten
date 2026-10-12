@@ -26,15 +26,20 @@ pub fn router() -> Router<ApiState> {
         )
         .route(
             "/projects/{project_id}/entities/{entity_id}",
-            axum::routing::put(update_entity),
+            axum::routing::put(update_entity).delete(delete_entity),
         )
+        .route(
+            "/projects/{project_id}/entities/{entity_id}/merge-into/{target_id}",
+            axum::routing::post(merge_entity),
+        )
+        .route("/projects/{project_id}/proposals", get(list_proposals))
         .route(
             "/projects/{project_id}/events",
             get(list_events).post(create_event),
         )
         .route(
             "/projects/{project_id}/events/{event_id}",
-            axum::routing::put(update_event),
+            axum::routing::put(update_event).delete(delete_event),
         )
         .route(
             "/projects/{project_id}/documents/{document_id}/comments",
@@ -59,6 +64,10 @@ pub fn router() -> Router<ApiState> {
         .route(
             "/projects/{project_id}/suppressions",
             get(list_suppressions).post(create_suppression),
+        )
+        .route(
+            "/projects/{project_id}/suppressions/{suppression_id}",
+            axum::routing::delete(delete_suppression),
         )
         .route("/packs", get(list_packs))
         .route("/packs/{pack_id}", axum::routing::put(update_pack))
@@ -113,6 +122,57 @@ async fn update_entity(
             .update_entity(EntityId(entity_id), input)
             .await?,
     ))
+}
+
+async fn delete_entity(
+    State(state): State<ApiState>,
+    Path((_, entity_id)): Path<(Uuid, Uuid)>,
+) -> Result<StatusCode, ApiError> {
+    state.application.delete_entity(EntityId(entity_id)).await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+async fn merge_entity(
+    State(state): State<ApiState>,
+    Path((_, entity_id, target_id)): Path<(Uuid, Uuid, Uuid)>,
+) -> Result<Json<CanonEntity>, ApiError> {
+    Ok(Json(
+        state
+            .application
+            .merge_entities(EntityId(target_id), EntityId(entity_id))
+            .await?,
+    ))
+}
+
+async fn list_proposals(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+) -> Result<Json<Vec<asten_domain::Fact>>, ApiError> {
+    Ok(Json(
+        state.application.proposals(ProjectId(project_id)).await?,
+    ))
+}
+
+async fn delete_event(
+    State(state): State<ApiState>,
+    Path((_, event_id)): Path<(Uuid, Uuid)>,
+) -> Result<StatusCode, ApiError> {
+    state
+        .application
+        .delete_event(TimelineEventId(event_id))
+        .await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+async fn delete_suppression(
+    State(state): State<ApiState>,
+    Path((_, suppression_id)): Path<(Uuid, Uuid)>,
+) -> Result<StatusCode, ApiError> {
+    state
+        .application
+        .delete_suppression(asten_domain::SuppressionId(suppression_id))
+        .await?;
+    Ok(StatusCode::NO_CONTENT)
 }
 
 async fn list_events(

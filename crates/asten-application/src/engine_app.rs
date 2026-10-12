@@ -1,11 +1,13 @@
+use asten_blocks::merkle_root;
+use asten_ir::{Anchor, Context, EventKind, Provenance};
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
 
 use crate::{ApplicationError, Result};
 use asten_domain::{
     CanonEntity, Comment, CommentId, DocumentId, DocumentSnapshot, EntityId, EntityKind,
-    MethodPack, MethodPackId, ProjectId, SnapshotId, Suppression, SuppressionId, TimelineEvent,
-    TimelineEventId, TrackedChange, TrackedChangeId, TrackedKind, entity_key_from_title,
+    FactStatus, MethodPack, MethodPackId, ProjectId, SnapshotId, Suppression, SuppressionId,
+    SuppressionScope, TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId, TrackedKind,
     normalize_key,
 };
 
@@ -19,6 +21,8 @@ pub struct CreateCanonEntity {
     pub aliases: Vec<String>,
     #[serde(default)]
     pub notes: String,
+    #[serde(default)]
+    pub introduced_at: Option<i64>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -27,6 +31,7 @@ pub struct UpdateCanonEntity {
     pub name: Option<String>,
     pub aliases: Option<Vec<String>>,
     pub notes: Option<String>,
+    pub introduced_at: Option<Option<i64>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -41,6 +46,22 @@ pub struct CreateTimelineEvent {
     pub duration: Option<String>,
     #[serde(default)]
     pub notes: String,
+    #[serde(default)]
+    pub kind: Option<EventKind>,
+    #[serde(default)]
+    pub participants: Vec<String>,
+    #[serde(default)]
+    pub context: Option<Context>,
+    #[serde(default)]
+    pub status: Option<FactStatus>,
+    #[serde(default)]
+    pub tick: Option<i64>,
+    #[serde(default)]
+    pub tick_lo: Option<i64>,
+    #[serde(default)]
+    pub tick_hi: Option<i64>,
+    #[serde(default)]
+    pub anchor: Option<Anchor>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -52,6 +73,13 @@ pub struct UpdateTimelineEvent {
     pub reading_order: Option<Option<i64>>,
     pub duration: Option<Option<String>>,
     pub notes: Option<String>,
+    pub kind: Option<EventKind>,
+    pub participants: Option<Vec<String>>,
+    pub context: Option<Context>,
+    pub status: Option<FactStatus>,
+    pub tick: Option<Option<i64>>,
+    pub tick_lo: Option<Option<i64>>,
+    pub tick_hi: Option<Option<i64>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -88,6 +116,12 @@ pub struct CreateSuppression {
     pub entity_key: Option<String>,
     #[serde(default)]
     pub reason: String,
+    #[serde(default)]
+    pub scope: Option<SuppressionScope>,
+    #[serde(default)]
+    pub diagnostic_id: Option<String>,
+    #[serde(default)]
+    pub evidence_fingerprint: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -117,6 +151,13 @@ impl crate::Application {
         self.repository.list_entities(project_id).await
     }
 
+    pub async fn get_entity(&self, id: EntityId) -> Result<CanonEntity> {
+        self.repository
+            .find_entity(id)
+            .await?
+            .ok_or(ApplicationError::NotFound { entity: "entity" })
+    }
+
     pub async fn create_entity(&self, input: CreateCanonEntity) -> Result<CanonEntity> {
         self.get_project(input.project_id).await?;
         let name = input.name.trim();
@@ -136,34 +177,12 @@ impl crate::Application {
                 .filter(|alias| !alias.is_empty())
                 .collect(),
             notes: input.notes.trim().to_owned(),
+            introduced_at: input.introduced_at,
             created_at: now,
             updated_at: now,
         };
         self.repository.insert_entity(&entity).await?;
-        if entity.kind == EntityKind::Character {
-            let key = entity_key_from_title(&entity.name);
-            if !key.is_empty() {
-                let facts = self.repository.list_facts(entity.project_id).await?;
-                if !facts
-                    .iter()
-                    .any(|fact| fact.entity_key == key && fact.predicate == "kind")
-                {
-                    let _ = self
-                        .create_fact(crate::CreateFact {
-                            project_id: entity.project_id,
-                            entity_key: key,
-                            predicate: "kind".into(),
-                            value: "character".into(),
-                            modality: Default::default(),
-                            status: Default::default(),
-                            valid_from: None,
-                            valid_to: None,
-                            source: None,
-                        })
-                        .await;
-                }
-            }
-        }
+        self.schedule_refresh(entity.project_id);
         Ok(entity)
     }
 
@@ -172,11 +191,8 @@ impl crate::Application {
         id: EntityId,
         input: UpdateCanonEntity,
     ) -> Result<CanonEntity> {
-        let mut entity = self
-            .repository
-            .find_entity(id)
-            .await?
-            .ok_or(ApplicationError::NotFound { entity: "entity" })?;
+        let mut entity = self.get_entity(id).await?;
+        let old_key = entity.key();
         if let Some(kind) = input.kind {
             entity.kind = kind;
         }
@@ -188,19 +204,117 @@ impl crate::Application {
             entity.name = name.to_owned();
         }
         if let Some(aliases) = input.aliases {
-            entity.aliases = aliases;
+            entity.aliases = aliases
+                .into_iter()
+                .map(|alias| alias.trim().to_owned())
+                .filter(|alias| !alias.is_empty())
+                .collect();
         }
         if let Some(notes) = input.notes {
             entity.notes = notes;
         }
+        if let Some(introduced_at) = input.introduced_at {
+            entity.introduced_at = introduced_at;
+        }
         entity.updated_at = Utc::now();
         self.repository.update_entity(&entity).await?;
+        // A renamed entity keeps its facts: move them to the new key.
+        let new_key = entity.key();
+        if new_key != old_key {
+            for mut fact in self.repository.list_facts(entity.project_id).await? {
+                if fact.entity_key == old_key {
+                    fact.entity_key = new_key.clone();
+                    fact.updated_at = Utc::now();
+                    self.repository.update_fact(&fact).await?;
+                }
+            }
+        }
+        self.schedule_refresh(entity.project_id);
         Ok(entity)
+    }
+
+    pub async fn delete_entity(&self, id: EntityId) -> Result<()> {
+        let entity = self.get_entity(id).await?;
+        self.repository.delete_entity(id).await?;
+        self.schedule_refresh(entity.project_id);
+        Ok(())
+    }
+
+    /// Merge `source` into `target`: the source's name becomes an alias, its
+    /// facts and events move over, and the source is removed.
+    pub async fn merge_entities(&self, target: EntityId, source: EntityId) -> Result<CanonEntity> {
+        if target == source {
+            return Err(ApplicationError::Validation(
+                "choose two different entities".into(),
+            ));
+        }
+        let mut target_entity = self.get_entity(target).await?;
+        let source_entity = self.get_entity(source).await?;
+        if target_entity.project_id != source_entity.project_id {
+            return Err(ApplicationError::Validation(
+                "entities belong to different projects".into(),
+            ));
+        }
+        let (target_key, source_key) = (target_entity.key(), source_entity.key());
+        for alias in
+            std::iter::once(source_entity.name.clone()).chain(source_entity.aliases.iter().cloned())
+        {
+            if !target_entity
+                .aliases
+                .iter()
+                .any(|existing| normalize_key(existing) == normalize_key(&alias))
+                && normalize_key(&alias) != normalize_key(&target_entity.name)
+            {
+                target_entity.aliases.push(alias);
+            }
+        }
+        target_entity.updated_at = Utc::now();
+        self.repository.update_entity(&target_entity).await?;
+        for mut fact in self.repository.list_facts(target_entity.project_id).await? {
+            if fact.entity_key == source_key {
+                fact.entity_key = target_key.clone();
+                fact.updated_at = Utc::now();
+                self.repository.update_fact(&fact).await?;
+            }
+        }
+        for mut event in self
+            .repository
+            .list_events(target_entity.project_id)
+            .await?
+        {
+            let mut changed = false;
+            if event.entity_id == Some(source) {
+                event.entity_id = Some(target);
+                changed = true;
+            }
+            if event.participants.contains(&source_key) {
+                for key in &mut event.participants {
+                    if *key == source_key {
+                        *key = target_key.clone();
+                    }
+                }
+                changed = true;
+            }
+            if changed {
+                event.updated_at = Utc::now();
+                self.repository.update_event(&event).await?;
+            }
+        }
+        self.repository.delete_entity(source).await?;
+        self.schedule_refresh(target_entity.project_id);
+        Ok(target_entity)
     }
 
     pub async fn list_events(&self, project_id: ProjectId) -> Result<Vec<TimelineEvent>> {
         self.get_project(project_id).await?;
         self.repository.list_events(project_id).await
+    }
+
+    pub async fn get_event(&self, id: TimelineEventId) -> Result<TimelineEvent> {
+        self.repository
+            .find_event(id)
+            .await?
+            .ok_or(ApplicationError::NotFound { entity: "event" })
     }
 
     pub async fn create_event(&self, input: CreateTimelineEvent) -> Result<TimelineEvent> {
@@ -219,14 +333,32 @@ impl crate::Application {
             entity_id: input.entity_id,
             document_id: input.document_id,
             title: title.to_owned(),
-            story_time: empty_to_none(input.story_time),
+            story_time: crate::empty_to_none(input.story_time),
             reading_order: input.reading_order,
-            duration: empty_to_none(input.duration),
+            duration: crate::empty_to_none(input.duration),
             notes: input.notes.trim().to_owned(),
+            kind: input.kind.unwrap_or(EventKind::Acts),
+            participants: input
+                .participants
+                .into_iter()
+                .map(|key| asten_domain::entity_key_from_title(&key))
+                .filter(|key| !key.is_empty())
+                .collect(),
+            context: input.context.unwrap_or_default(),
+            status: input.status.unwrap_or(FactStatus::Confirmed),
+            confidence: 1.0,
+            anchor: input.anchor,
+            tick: input.tick,
+            tick_lo: input.tick_lo,
+            tick_hi: input.tick_hi,
+            provenance: Provenance::Author {
+                action: "create".into(),
+            },
             created_at: now,
             updated_at: now,
         };
         self.repository.insert_event(&event).await?;
+        self.schedule_refresh(event.project_id);
         Ok(event)
     }
 
@@ -235,11 +367,7 @@ impl crate::Application {
         id: TimelineEventId,
         input: UpdateTimelineEvent,
     ) -> Result<TimelineEvent> {
-        let mut event = self
-            .repository
-            .find_event(id)
-            .await?
-            .ok_or(ApplicationError::NotFound { entity: "event" })?;
+        let mut event = self.get_event(id).await?;
         if let Some(title) = input.title {
             let title = title.trim();
             if title.is_empty() {
@@ -254,20 +382,53 @@ impl crate::Application {
             event.document_id = document_id;
         }
         if let Some(story_time) = input.story_time {
-            event.story_time = empty_to_none(story_time);
+            event.story_time = crate::empty_to_none(story_time);
         }
         if let Some(reading_order) = input.reading_order {
             event.reading_order = reading_order;
         }
         if let Some(duration) = input.duration {
-            event.duration = empty_to_none(duration);
+            event.duration = crate::empty_to_none(duration);
         }
         if let Some(notes) = input.notes {
             event.notes = notes;
         }
+        if let Some(kind) = input.kind {
+            event.kind = kind;
+        }
+        if let Some(participants) = input.participants {
+            event.participants = participants
+                .into_iter()
+                .map(|key| asten_domain::entity_key_from_title(&key))
+                .filter(|key| !key.is_empty())
+                .collect();
+        }
+        if let Some(context) = input.context {
+            event.context = context;
+        }
+        if let Some(status) = input.status {
+            event.status = status;
+        }
+        if let Some(tick) = input.tick {
+            event.tick = tick;
+        }
+        if let Some(tick_lo) = input.tick_lo {
+            event.tick_lo = tick_lo;
+        }
+        if let Some(tick_hi) = input.tick_hi {
+            event.tick_hi = tick_hi;
+        }
         event.updated_at = Utc::now();
         self.repository.update_event(&event).await?;
+        self.schedule_refresh(event.project_id);
         Ok(event)
+    }
+
+    pub async fn delete_event(&self, id: TimelineEventId) -> Result<()> {
+        let event = self.get_event(id).await?;
+        self.repository.delete_event(id).await?;
+        self.schedule_refresh(event.project_id);
+        Ok(())
     }
 
     pub async fn list_comments(&self, document_id: DocumentId) -> Result<Vec<Comment>> {
@@ -328,8 +489,14 @@ impl crate::Application {
         self.repository.list_snapshots(document_id).await
     }
 
+    /// A named snapshot: the content plus the event head and Merkle root it commits to.
     pub async fn create_snapshot(&self, input: CreateSnapshot) -> Result<DocumentSnapshot> {
         let document = self.get_document(input.document_id).await?;
+        let state = self
+            .repository
+            .document_state(document.id)
+            .await?
+            .unwrap_or_default();
         let snapshot = DocumentSnapshot {
             id: SnapshotId::new(),
             document_id: document.id,
@@ -339,12 +506,16 @@ impl crate::Application {
                 .map(|value| value.trim().to_owned())
                 .filter(|value| !value.is_empty()),
             content_json: document.content_json.clone(),
+            seq: document.head_seq,
+            chain_hash: document.chain_hash.clone(),
+            merkle_root: merkle_root(&state),
             created_at: Utc::now(),
         };
         self.repository.insert_snapshot(&snapshot).await?;
         Ok(snapshot)
     }
 
+    /// Restore appends events; it never rewrites history.
     pub async fn restore_snapshot(
         &self,
         snapshot_id: SnapshotId,
@@ -357,12 +528,9 @@ impl crate::Application {
         self.update_document(
             snapshot.document_id,
             crate::UpdateDocument {
-                title: None,
                 content_json: Some(snapshot.content_json),
-                parent_id: None,
-                position: None,
-                exclude_from_compile: None,
                 actor: Some("restore".into()),
+                ..Default::default()
             },
         )
         .await
@@ -379,17 +547,45 @@ impl crate::Application {
         if rule_code.is_empty() {
             return Err(ApplicationError::Validation("which rule?".into()));
         }
+        let scope = input.scope.unwrap_or(
+            match (&input.diagnostic_id, &input.entity_key, &input.document_id) {
+                (Some(_), _, _) => SuppressionScope::Occurrence,
+                (_, Some(_), _) => SuppressionScope::Entity,
+                (_, _, Some(_)) => SuppressionScope::Document,
+                _ => SuppressionScope::Project,
+            },
+        );
         let suppression = Suppression {
             id: SuppressionId::new(),
             project_id: input.project_id,
             rule_code: rule_code.to_owned(),
             document_id: input.document_id,
-            entity_key: input.entity_key.map(|value| normalize_key(&value)),
+            entity_key: input
+                .entity_key
+                .map(|value| asten_domain::entity_key_from_title(&value)),
             reason: input.reason.trim().to_owned(),
+            scope,
+            diagnostic_id: input.diagnostic_id,
+            evidence_fingerprint: input.evidence_fingerprint,
+            stale: false,
             created_at: Utc::now(),
         };
         self.repository.insert_suppression(&suppression).await?;
+        self.schedule_refresh(suppression.project_id);
         Ok(suppression)
+    }
+
+    pub async fn delete_suppression(&self, id: SuppressionId) -> Result<()> {
+        let suppression =
+            self.repository
+                .find_suppression(id)
+                .await?
+                .ok_or(ApplicationError::NotFound {
+                    entity: "suppression",
+                })?;
+        self.repository.delete_suppression(id).await?;
+        self.schedule_refresh(suppression.project_id);
+        Ok(())
     }
 
     pub async fn list_packs(&self) -> Result<Vec<MethodPack>> {
@@ -413,6 +609,10 @@ impl crate::Application {
         }
         pack.enabled = input.enabled;
         self.repository.update_pack(&pack).await?;
+        // Packs are global: every open project re-analyses.
+        for project in self.repository.list_projects().await? {
+            self.schedule_refresh(project.id);
+        }
         Ok(pack)
     }
 
@@ -464,15 +664,4 @@ impl crate::Application {
         self.repository.update_tracked_change(&change).await?;
         Ok(change)
     }
-}
-
-fn empty_to_none(value: Option<String>) -> Option<String> {
-    value.and_then(|item| {
-        let trimmed = item.trim();
-        if trimmed.is_empty() {
-            None
-        } else {
-            Some(trimmed.to_owned())
-        }
-    })
 }

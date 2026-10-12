@@ -6,12 +6,18 @@ rust-version.workspace = true
 
 [dependencies]
 async-trait.workspace = true
-chrono.workspace = true
 asten-application = { path = "../asten-application" }
+asten-blocks = { path = "../asten-blocks" }
 asten-domain = { path = "../asten-domain" }
+asten-ir = { path = "../asten-ir" }
+chrono.workspace = true
+serde.workspace = true
 serde_json.workspace = true
 sqlx.workspace = true
 uuid.workspace = true
 
 [dev-dependencies]
+asten-auth = { path = "../asten-auth" }
+asten-diagnostics = { path = "../asten-diagnostics" }
+asten-ls = { path = "../asten-ls" }
 tokio.workspace = true

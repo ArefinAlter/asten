@@ -5,12 +5,22 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+asten-auth = { path = "../asten-auth" }
+asten-blocks = { path = "../asten-blocks" }
+asten-diagnostics = { path = "../asten-diagnostics" }
+asten-domain = { path = "../asten-domain" }
+asten-engine = { path = "../asten-engine" }
+asten-ir = { path = "../asten-ir" }
+asten-ls = { path = "../asten-ls" }
+asten-perceive = { path = "../asten-perceive" }
+asten-time = { path = "../asten-time" }
 async-trait.workspace = true
 base64.workspace = true
 chrono.workspace = true
-asten-diagnostics = { path = "../asten-diagnostics" }
-asten-domain = { path = "../asten-domain" }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
+tokio = { workspace = true, features = ["sync", "rt"] }
+tracing.workspace = true
+uuid.workspace = true
 zip.workspace = true
