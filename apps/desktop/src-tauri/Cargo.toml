@@ -4,6 +4,10 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 
+[lib]
+# Desktop links the rlib; Android needs a cdylib and iOS a staticlib.
+crate-type = ["staticlib", "cdylib", "rlib"]
+
 [dependencies]
 asten-api = { path = "../../../services/asten-api" }
 asten-application = { path = "../../../crates/asten-application" }
