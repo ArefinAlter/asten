@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import type {
@@ -27,6 +28,7 @@ import { PaletteMark } from "./brand/Palette";
 import { ThemeToggle } from "./brand/ThemeToggle";
 import { ManuscriptEditor, type Jump } from "./editor/ManuscriptEditor";
 import { Inspector } from "./inspector/Inspector";
+import { useAnnounceNew, useAnnouncement, useFocusTrap } from "./lib/a11y";
 import { ApiError, createAstenClient } from "./lib/asten-client";
 import {
   SAVE_DOCUMENT_KEY,
@@ -85,6 +87,12 @@ const WorldWorkspace = lazy(() =>
 const viewFallback = <p className="status">Opening…</p>;
 
 const client = createAstenClient();
+
+const newMarksPhrase = (count: number) =>
+  `${count} new mark${count === 1 ? "" : "s"}`;
+
+/** Siblings that stay live while a drawer or sheet holds focus. */
+const KEEP_LIVE = ".scrim, .live-region";
 
 export type View =
   | "overview"
@@ -318,6 +326,32 @@ function Desk() {
     enabled: Boolean(selectedProjectId && selectedDocumentId && showBlame),
   });
 
+  // On small desks the binder drawer and the inspector sheet are dialogs:
+  // focus stays inside, the rest of the shell is inert, Escape closes, and
+  // focus returns to the toggle. One polite live region serves the desk.
+  const sidebarRef = useRef<HTMLElement>(null);
+  const inspectorRef = useRef<HTMLElement>(null);
+  const binderToggleRef = useRef<HTMLButtonElement>(null);
+  const inspectorToggleRef = useRef<HTMLButtonElement>(null);
+  const drawerOpen = narrow && sidebarOpen;
+  const sheetOpen = compact && inspectorOpen;
+  useFocusTrap(sidebarRef, drawerOpen, {
+    onClose: () => setSidebarOpen(false),
+    returnTo: binderToggleRef,
+    keep: KEEP_LIVE,
+  });
+  useFocusTrap(inspectorRef, sheetOpen, {
+    onClose: () => setInspectorOpen(false),
+    returnTo: inspectorToggleRef,
+    keep: KEEP_LIVE,
+  });
+  const announcement = useAnnouncement();
+  useAnnounceNew(
+    diagnostics.data?.diagnostics,
+    selectedProjectId,
+    newMarksPhrase,
+  );
+
   const createProject = useMutation({
     mutationFn: (input: CreateProject) => client.createProject(input),
     onSuccess: async (project) => {
@@ -518,10 +552,17 @@ function Desk() {
     <div
       className={`app-shell view-${view}${scalesCollapsed === "closed" ? " scales-closed" : ""}${compact ? " compact" : ""}${narrow ? " narrow" : ""}${sidebarOpen ? " sidebar-open" : ""}${inspectorOpen ? " inspector-open" : ""}`}
     >
+      <a className="skip-link" href="#workspace">
+        Skip to the page
+      </a>
+      <div className="sr-only live-region" role="status" aria-live="polite">
+        {announcement}
+      </div>
       <header className="titlebar">
         <span className="brand">
           <button
             type="button"
+            ref={binderToggleRef}
             className={`shell-toggle binder-toggle${sidebarOpen ? " active" : ""}`}
             aria-label={sidebarOpen ? "Close the binder" : "Open the binder"}
             aria-expanded={sidebarOpen}
@@ -577,6 +618,7 @@ function Desk() {
           <ThemeToggle />
           <button
             type="button"
+            ref={inspectorToggleRef}
             className={`shell-toggle inspector-toggle${inspectorOpen ? " active" : ""}`}
             aria-label={
               inspectorOpen ? "Close the inspector" : "Open the inspector"
@@ -617,7 +659,13 @@ function Desk() {
         ))}
       </nav>
 
-      <aside className="sidebar">
+      <aside
+        className="sidebar"
+        ref={sidebarRef}
+        role={drawerOpen ? "dialog" : undefined}
+        aria-modal={drawerOpen || undefined}
+        aria-label="Projects and binder"
+      >
         <div className="pane-heading">
           <span className="mono">Projects</span>
           <button
@@ -717,7 +765,11 @@ function Desk() {
         )}
       </aside>
 
-      <main className={`workspace${view === "world" ? " world-open" : ""}`}>
+      <main
+        id="workspace"
+        tabIndex={-1}
+        className={`workspace${view === "world" ? " world-open" : ""}`}
+      >
         <Suspense fallback={viewFallback}>
           {!selectedProject ? (
             view === "guests" ? (
@@ -784,8 +836,7 @@ function Desk() {
               documentId={selectedDocumentId}
               onSelectDocument={setSelectedDocumentId}
             />
-          ) : view === "guests" ? (
-            <Guests />
+          ) : view === "guests" ? (            <Guests />
           ) : view === "settings" ? (
             <Settings
               projectId={selectedProject.id}
@@ -865,7 +916,13 @@ function Desk() {
         </Suspense>
       </main>
 
-      <aside className="inspector">
+      <aside
+        className="inspector"
+        ref={inspectorRef}
+        role={sheetOpen ? "dialog" : undefined}
+        aria-modal={sheetOpen || undefined}
+        aria-label="Inspector"
+      >
         {selectedProject && view === "world" ? (
           <Suspense fallback={viewFallback}>
             <WorldInspector
