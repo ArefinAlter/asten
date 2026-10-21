@@ -667,8 +667,7 @@ fn craft_hints(inputs: &ProjectInputs) -> Vec<Diagnostic> {
                 if !before_ok || !after_ok {
                     continue;
                 }
-                let s = folded.origin[start] as u32;
-                let e = folded.origin[end - 1] as u32 + 1;
+                let (s, e) = folded.original_span(start, end);
                 let anchor = Anchor::new(block.document.clone(), block.block.clone(), s, e)
                     .with_text(&block.text);
                 let violation = Violation {
