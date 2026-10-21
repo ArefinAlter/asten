@@ -895,6 +895,8 @@ mod tests {
             embedded: false,
             auth_mode: asten_application::AuthMode::Pairing,
             database_path: None,
+            logs_path: Some("C:/logs".into()),
+            backups_path: Some("C:/backups".into()),
         };
         assert_fits(&mut failures, &components, "DeskInfo", "DeskInfo", &desk);
 

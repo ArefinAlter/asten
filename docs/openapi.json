@@ -565,7 +565,7 @@
           "desk"
         ],
         "summary": "What this API runs on",
-        "description": "The version, host, auth mode and whether a shell embeds the API. The database path is included for desk and owner-session tokens only; a guest learns the version and host.",
+        "description": "The version, host, auth mode and whether a shell embeds the API. The database, log and backup paths are included for desk and owner-session tokens only; a guest learns the version and host.",
         "operationId": "desk_info",
         "responses": {
           "200": {
@@ -7720,6 +7720,20 @@
               "null"
             ],
             "description": "Where the SQLite file lives. Only desk and owner sessions see it."
+          },
+          "logs_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Where the hosting shell writes its log files, when a shell hosts the\nAPI. Only desk and owner sessions see it."
+          },
+          "backups_path": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Where the hosting shell keeps its launch-time copies of the database.\nOnly desk and owner sessions see it."
           }
         }
       },
