@@ -12,6 +12,14 @@ knowledge, relations, author invariants. Every mark explains itself and offers
 repairs the author owns. Word and Docs remain guests. No account, no sync, no
 generative model.
 
+## Platforms
+
+Windows (x64, ARM64), macOS 11+ (Apple silicon and Intel, one universal
+build), Linux (x86_64, aarch64) as a desktop app; any modern browser against
+the local API; Android and iOS through the same Tauri shell once the platform
+projects are generated. See `docs/PLATFORMS.md` for the support matrix, build
+recipes and signing.
+
 ## Prerequisites
 
 - Rust 1.85 or newer (edition 2024; CI uses stable)

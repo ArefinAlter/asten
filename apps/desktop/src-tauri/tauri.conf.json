@@ -15,8 +15,8 @@
         "title": "Asten",
         "width": 1440,
         "height": 900,
-        "minWidth": 960,
-        "minHeight": 640,
+        "minWidth": 360,
+        "minHeight": 480,
         "resizable": true
       }
     ],
@@ -26,10 +26,7 @@
   },
   "bundle": {
     "active": true,
-    "targets": [
-      "nsis",
-      "msi"
-    ],
+    "targets": "all",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -41,13 +38,6 @@
     "shortDescription": "A writing desk that notices when the story contradicts itself.",
     "longDescription": "Asten keeps your manuscript on this machine and weighs every page against the canon you settle. It never writes your prose.",
     "category": "Productivity",
-    "windows": {
-      "nsis": {
-        "installMode": "currentUser"
-      },
-      "webviewInstallMode": {
-        "type": "downloadBootstrapper"
-      }
-    }
+    "createUpdaterArtifacts": false
   }
 }

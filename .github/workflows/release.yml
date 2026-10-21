@@ -1,8 +1,13 @@
 name: Release
 
-# Builds the desktop installers when a version tag is pushed and attaches
-# them to a draft GitHub release. The installers are unsigned until a code
-# signing certificate is added as repository secrets (see docs/HANDOFF.md).
+# Builds the desktop installers for every supported platform and processor
+# when a version tag is pushed, and attaches them to a draft GitHub release.
+#
+# Signing is off until certificates exist as repository secrets:
+#   Windows  WINDOWS_CERTIFICATE, WINDOWS_CERTIFICATE_PASSWORD
+#   macOS    APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY,
+#            APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID (notarisation)
+# Unsigned builds still install; the OS warns first. See docs/PLATFORMS.md.
 
 on:
   push:
@@ -19,9 +24,32 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: windows-latest
+          # Windows, x64 and ARM64 (Surface and Snapdragon laptops).
+          - name: windows-x64
+            os: windows-latest
             args: ""
+          - name: windows-arm64
+            os: windows-latest
+            target: aarch64-pc-windows-msvc
+            args: "--target aarch64-pc-windows-msvc --bundles nsis"
+          # macOS: one universal binary for Apple silicon and Intel.
+          - name: macos-universal
+            os: macos-latest
+            target: aarch64-apple-darwin x86_64-apple-darwin
+            args: "--target universal-apple-darwin"
+          # Linux x86_64. 22.04 keeps the glibc floor low enough for older distros.
+          - name: linux-x64
+            os: ubuntu-22.04
+            args: ""
+          # Linux aarch64 (Raspberry Pi 5, Ampere, Apple silicon VMs). Needs an
+          # ARM runner, which private repositories must enable; the job is
+          # allowed to fail until then.
+          - name: linux-arm64
+            os: ubuntu-24.04-arm
+            args: ""
+            optional: true
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.optional == true }}
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -32,24 +60,42 @@ jobs:
           node-version: 22
           cache: pnpm
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: ". -> target"
+          key: ${{ matrix.name }}
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
+            librsvg2-dev patchelf libxdo-dev libssl-dev build-essential curl wget file
       - run: pnpm install --frozen-lockfile
       - name: Build the desk and the installers
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Optional Windows code signing. Leave unset for unsigned builds.
+          # Optional Windows code signing.
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+          # Optional macOS signing and notarisation.
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         with:
           projectPath: apps/desktop/src-tauri
           tagName: ${{ github.ref_name }}
           releaseName: "Asten ${{ github.ref_name }}"
           releaseBody: |
-            Early-access desktop build. The installer is unsigned; Windows
-            will warn before it runs. Your manuscript stays on your machine.
+            Early-access desktop build for Windows (x64, ARM64), macOS (universal)
+            and Linux (x86_64, aarch64). Installers are unsigned; the operating
+            system will warn before the first run. Your manuscript stays on your
+            machine.
           releaseDraft: true
           prerelease: true
           args: ${{ matrix.args }}
