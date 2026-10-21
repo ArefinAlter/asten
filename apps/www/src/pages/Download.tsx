@@ -12,7 +12,7 @@ import { accessHref, site } from "../site";
 const faqs: QA[] = [
   { q: "Is there a public download of Asten?", a: "Not yet. Asten is in early access, and builds go to invited writers with setup notes. A signed desktop installer is next on the [roadmap](/roadmap)." },
   { q: "How much does Asten cost?", a: "There is nothing to buy today. Pricing hasn’t been decided. Whatever happens, your projects will stay readable and exportable without a subscription or a server." },
-  { q: "What do I need on my computer?", a: "Windows 10 or 11 (x64 or ARM), macOS 11 or later (Apple silicon or Intel), or a Linux desktop with WebKitGTK (Ubuntu 22.04 and newer). Asten runs as a desktop shell, or in your browser against a small server on your own machine; a phone on the same network can install the desk from its browser. Invited writers receive the build for their system." },
+  { q: "What do I need on my computer?", a: "Windows 10 or 11 (x64 or ARM), macOS 11 or later (Apple silicon or Intel), or a Linux desktop with WebKitGTK (Ubuntu 22.04 and newer). Asten runs as a desktop shell, or in your browser against a small server on your own machine; phone browser installation requires HTTPS with a certificate trusted by the phone. These are configured platform targets; installers for each system still need verification before distribution." },
   { q: "Is Asten open source?", a: "No. Asten’s source repository is private today. Its rules and diagnostic codes are documented publicly on this site." },
 ];
 
