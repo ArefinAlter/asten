@@ -97,6 +97,10 @@ services/
 docs/
   ENGINE_DESIGN.md        The engine design
   architecture.md         Crate layering and transport
+  DECISIONS.md            Why things are the way they are
+  ROADMAP.md              Shipped, in review, next, later, never
+  PLATFORMS.md            Support matrix, build recipes, signing
+  PARITY.md               What each client can do
   SECURITY.md             Threat model and auth modes
   BRAND.md                Brand guidelines
   HANDOFF.md              Current stage

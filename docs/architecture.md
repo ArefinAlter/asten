@@ -79,6 +79,15 @@ Plain-file project bundles and CRDT synchronisation belong behind additional
 repository implementations. They must not leak filesystem or CRDT types into
 the domain crate.
 
+## Clients
+
+Three doors share the one transport: the Tauri shell for Windows, macOS, Linux
+and (from the same crate) Android and iOS; the browser desk, which is the same
+React app with a responsive shell and can be installed on a phone; and the
+Word and Docs guests. `docs/PLATFORMS.md` is the support matrix and
+`docs/PARITY.md` the capability matrix. Decisions D6, D12, D13 and D14 in
+`docs/DECISIONS.md` explain the shape.
+
 ## Transport parity
 
 There is one transport. The browser calls `/api/v1` on the API it was served
@@ -127,4 +136,5 @@ regenerates and fails on a diff. An OpenAPI document is still to come.
 - a plugin runtime for third-party packs;
 - map and drawing renderers;
 - an OpenAPI document for the routes (the types are already generated);
+- store listings for the mobile shells and the guests;
 - product licensing and distribution terms.
