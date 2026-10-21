@@ -730,6 +730,7 @@ function Desk() {
               <span className="mono">Binder</span>
             </div>
             <Binder
+              projectId={selectedProject.id}
               documents={documents.data ?? []}
               selectedId={selectedDocumentId}
               marks={openMarks}

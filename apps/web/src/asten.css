@@ -835,6 +835,33 @@ code,
   padding: 4px;
 }
 
+/* The row is the tree item: it takes focus; the ring sits on the row alone,
+   not around the folded children beneath it. */
+.binder-title {
+  cursor: pointer;
+}
+
+.binder-node:focus-visible {
+  outline: none;
+}
+
+.binder-node:focus-visible > .binder-row {
+  outline: 2px solid var(--lapis);
+  outline-offset: -2px;
+}
+
+.binder-twist {
+  flex: 0 0 auto;
+  width: 16px;
+  margin-left: 2px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1;
+}
+
 .binder-add {
   margin: 10px 14px;
   font-size: 13px;
