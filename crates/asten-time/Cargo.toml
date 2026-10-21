@@ -13,3 +13,6 @@ serde.workspace = true
 [features]
 # Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
 ts = ["dep:ts-rs", "asten-ir/ts"]
+
+[dev-dependencies]
+proptest.workspace = true
