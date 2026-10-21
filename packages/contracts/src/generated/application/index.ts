@@ -17,6 +17,7 @@ export * from "./CreateSuppression";
 export * from "./CreateTimelineEvent";
 export * from "./CreateTrackedChange";
 export * from "./CreateWorldEntry";
+export * from "./DeskInfo";
 export * from "./ImportFormat";
 export * from "./ImportRequest";
 export * from "./MergePreview";

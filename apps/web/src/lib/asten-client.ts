@@ -22,6 +22,7 @@ import type {
   CreateSuppression,
   CreateTimelineEvent,
   CreateWorldEntry,
+  DeskInfo,
   DiagnosticsSnapshot,
   AstenDocument,
   DocumentSnapshot,
@@ -145,6 +146,10 @@ export class AstenClient {
   }
   me(): Promise<AuthenticatedClient> {
     return this.request("/auth/me");
+  }
+  /** Version, host and (for desk sessions) where the database lives. */
+  deskInfo(): Promise<DeskInfo> {
+    return this.request("/desk");
   }
   async pair(code: string, label: string): Promise<PairingComplete> {
     const paired = await this.request<PairingComplete>("/auth/pair", {

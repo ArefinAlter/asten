@@ -158,6 +158,7 @@ export type _UpdateWorldEntry = Check<
 export type _WorldPulse = Check<Mutual<H.WorldPulse, G.domain.WorldPulse>>;
 
 // Auth
+export type _DeskInfo = Check<Mutual<H.DeskInfo, G.application.DeskInfo>>;
 export type _AuthStatus = Check<Mutual<H.AuthStatus, G.application.AuthStatus>>;
 export type _PairingStart = Check<
   Mutual<H.PairingStart, G.application.PairingStart>

@@ -13,10 +13,10 @@ verified. Adding a workflow does not demonstrate a successful build.
 
 | Platform                   | Processor         | Desktop shell                 | Browser desk                     | Status                                     |
 | -------------------------- | ----------------- | ----------------------------- | -------------------------------- | ------------------------------------------ |
-| Windows 10 1809+ / 11      | x64               | NSIS and MSI installers       | Edge, Chrome, Firefox            | Release workflow configured; installer verification pending                    |
+| Windows 10 1809+ / 11      | x64               | NSIS and MSI installers       | Edge, Chrome, Firefox            | Release workflow configured; installer verification pending |
 | Windows 11 on ARM          | ARM64             | NSIS installer                | Edge, Chrome                     | Cross-build configured; installer and hardware verification pending |
-| macOS 11 Big Sur and later | Apple silicon, Intel | Universal `.app` and `.dmg` | Safari, Chrome, Firefox          | Universal build configured; installer verification pending         |
-| Linux (glibc 2.35+)        | x86_64            | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Release workflow configured; installer verification pending                    |
+| macOS 11 Big Sur and later | Apple silicon, Intel | Universal `.app` and `.dmg` | Safari, Chrome, Firefox          | Universal build configured; installer verification pending |
+| Linux (glibc 2.35+)        | x86_64            | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Release workflow configured; installer verification pending |
 | Linux                      | aarch64           | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Release job present; needs an ARM runner   |
 | Android 8+                 | arm64, x86_64     | Tauri app (see below)         | Chrome, as an installed web app  | Shell scaffold; project files generated on a machine with the SDK |
 | iOS and iPadOS 15+         | arm64             | Tauri app (see below)         | Safari, as an installed web app  | Shell scaffold; project files generated on a Mac with Xcode |
@@ -123,9 +123,11 @@ phone's API is not reachable from another device; see `docs/PARITY.md`.
 ### Installed web app instead of a store app
 
 Writers who host the API on their own computer can open the browser desk from
-a phone on the same network and install it from the browser menu. The desk
-ships a web-app manifest and icons for this. Pairing works the same way: type
-the code from the desk's Guests panel once.
+a phone on the same network. Installation and the service worker require an
+HTTPS origin with a certificate trusted by the phone. Plain HTTP to another
+computer's LAN address supports browser access only; it is not the localhost
+development exception. Follow [Phone setup](PHONE_SETUP.md) to proxy the desk
+and API together and configure certificate trust before pairing and installing.
 
 ## Checks
 

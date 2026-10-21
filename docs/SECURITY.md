@@ -72,6 +72,11 @@ The API refuses to start with `ASTEN_AUTH=off` on a non-loopback bind.
   log holds nothing worth stealing.
 - Request tracing spans record the method and path only, never the query
   string.
+- `GET /desk` tells a paired client the API version and host. The database
+  path is included only for `desk` and owner `session` tokens.
+- The browser desk registers a service worker for installability on phones. It
+  caches only the shell's static files and never a response under `/api/`, so
+  the browser cache holds no manuscript, canon or token.
 - Token kinds carry authority. `desk` and owner `session` tokens may mint
   pairing codes, list and revoke tokens and set or change the passphrase.
   `guest` tokens (Word, Docs, a paired browser pane) may read and write the
@@ -156,6 +161,11 @@ file):
    client rather than to the proxy as a whole.
 
 ## Reporting
+
+Phone installation requires an HTTPS origin trusted by the phone. Use the
+same reverse proxy for the desk and `/api/`; see [Phone setup](PHONE_SETUP.md).
+The localhost secure-context exception does not apply to another computer's
+plain-HTTP LAN address. Do not disable browser security checks to install.
 
 Report a vulnerability by opening a private security advisory on the GitHub
 repository, or by writing to the address in the public site's `security.txt`.

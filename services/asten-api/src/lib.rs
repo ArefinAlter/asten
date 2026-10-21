@@ -13,13 +13,13 @@ use std::{net::IpAddr, net::SocketAddr, path::PathBuf, sync::Arc, time::Duration
 
 use asten_application::{
     Application, ApplicationError, AuthMode, CreateDocument, CreateFact, CreateProject,
-    CreateWorldEntry, UpdateDocument, UpdateFact, UpdateWorldEntry,
+    CreateWorldEntry, DeskInfo, UpdateDocument, UpdateFact, UpdateWorldEntry,
 };
 use asten_domain::{
     Document, DocumentId, Fact, FactId, Project, ProjectId, WorldEntry, WorldEntryId, WorldPulse,
 };
 use axum::{
-    Json, Router,
+    Extension, Json, Router,
     body::Body,
     extract::{DefaultBodyLimit, Path, State},
     http::{HeaderName, HeaderValue, Method, Request, StatusCode, header},
@@ -54,6 +54,10 @@ pub struct ApiConfig {
     /// Reverse proxies whose `X-Forwarded-For` is believed, as addresses or
     /// CIDR blocks. Empty means the TCP peer is the client.
     pub trusted_proxies: Vec<IpNet>,
+    /// Where the SQLite file lives, shown to desk and owner sessions.
+    pub database_path: Option<String>,
+    /// True when a desktop or mobile shell hosts this API in-process.
+    pub embedded: bool,
 }
 
 impl Default for ApiConfig {
@@ -64,6 +68,8 @@ impl Default for ApiConfig {
             serve_desk: None,
             cookie_secure: false,
             trusted_proxies: Vec::new(),
+            database_path: None,
+            embedded: false,
         }
     }
 }
@@ -158,6 +164,10 @@ impl ApiConfig {
                         .collect()
                 })
                 .unwrap_or_default(),
+            database_path: Some(
+                std::env::var("ASTEN_DATABASE_PATH").unwrap_or_else(|_| "data/asten.db".into()),
+            ),
+            embedded: false,
         }
     }
 }
@@ -250,6 +260,7 @@ pub fn router(application: Application, config: ApiConfig) -> Router {
     };
 
     let api = Router::new()
+        .route("/desk", get(desk_info))
         .route("/projects", get(list_projects).post(create_project))
         .route("/projects/{project_id}", get(get_project))
         .route(
@@ -377,6 +388,26 @@ async fn health() -> Json<HealthResponse> {
         status: "ok",
         service: "asten-api",
         version: env!("CARGO_PKG_VERSION"),
+    })
+}
+
+/// What the desk shows about the machine it runs on. The database path is
+/// for desk and owner sessions; a guest learns only the version and host.
+async fn desk_info(
+    State(state): State<ApiState>,
+    Extension(auth::AuthenticatedClient(client)): Extension<auth::AuthenticatedClient>,
+) -> Json<DeskInfo> {
+    let privileged = client.kind.can_administer();
+    Json(DeskInfo {
+        version: env!("CARGO_PKG_VERSION").to_owned(),
+        host: format!("{} {}", std::env::consts::OS, std::env::consts::ARCH),
+        embedded: state.config.embedded,
+        auth_mode: state.config.auth_mode,
+        database_path: if privileged {
+            state.config.database_path.clone()
+        } else {
+            None
+        },
     })
 }
 
