@@ -759,10 +759,13 @@ mod tests {
         let mut archive = ZipArchive::new(Cursor::new(bytes)).unwrap();
         {
             let first = archive.by_index(0).unwrap();
-            assert_eq!(first.name(), "mimetype");
+            assert_eq!(first.name().unwrap(), "mimetype");
             assert_eq!(first.compression(), CompressionMethod::Stored);
         }
-        let names: HashSet<String> = archive.file_names().map(str::to_owned).collect();
+        let names: HashSet<String> = archive
+            .file_names()
+            .map(|name| name.unwrap().into_owned())
+            .collect();
         assert!(
             read_entry(&mut archive, "META-INF/container.xml")
                 .contains("full-path=\"OEBPS/package.opf\"")
