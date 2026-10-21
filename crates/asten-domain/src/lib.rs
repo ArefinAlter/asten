@@ -178,6 +178,7 @@ impl Document {
 /// history list. Bodies travel one at a time, for the open page only.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct DocumentSummary {
     pub id: DocumentId,
     pub project_id: ProjectId,

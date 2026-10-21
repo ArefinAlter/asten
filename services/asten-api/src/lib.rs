@@ -8,6 +8,7 @@ mod auth;
 mod extra;
 mod headers;
 mod history;
+pub mod openapi;
 mod story;
 
 use std::{net::IpAddr, net::SocketAddr, path::PathBuf, sync::Arc, time::Duration};
@@ -300,7 +301,8 @@ pub fn router(application: Application, config: ApiConfig) -> Router {
             state.clone(),
             auth::require_auth,
         ))
-        .merge(auth::public_router());
+        .merge(auth::public_router())
+        .merge(openapi::public_router());
 
     let mut app = Router::new()
         .route("/health", get(health))
@@ -368,6 +370,16 @@ async fn security_headers(
     response
 }
 
+#[utoipa::path(
+    get,
+    path = "/health",
+    tag = "desk",
+    summary = "Liveness check",
+    description = "Answers without a token, so a shell or a proxy can tell the API is up. Lives outside `/api/v1`.",
+    responses(
+        (status = 200, description = "The service is up", body = HealthResponse)
+    )
+)]
 async fn health() -> Json<HealthResponse> {
     Json(HealthResponse {
         status: "ok",
@@ -378,6 +390,18 @@ async fn health() -> Json<HealthResponse> {
 
 /// What the desk shows about the machine it runs on. The database path is
 /// for desk and owner sessions; a guest learns only the version and host.
+#[utoipa::path(
+    get,
+    path = "/desk",
+    tag = "desk",
+    summary = "What this API runs on",
+    description = "The version, host, auth mode and whether a shell embeds the API. The database path is included for desk and owner-session tokens only; a guest learns the version and host.",
+    responses(
+        (status = 200, description = "The desk information", body = DeskInfo),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn desk_info(
     State(state): State<ApiState>,
     Extension(auth::AuthenticatedClient(client)): Extension<auth::AuthenticatedClient>,
@@ -396,10 +420,34 @@ async fn desk_info(
     })
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects",
+    tag = "projects",
+    summary = "List projects",
+    responses(
+        (status = 200, description = "Every project, oldest first", body = Vec<Project>),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn list_projects(State(state): State<ApiState>) -> Result<Json<Vec<Project>>, ApiError> {
     Ok(Json(state.application.list_projects().await?))
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}",
+    tag = "projects",
+    summary = "Fetch one project",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    responses(
+        (status = 200, description = "The project", body = Project),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No project with that id", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn get_project(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -409,6 +457,19 @@ async fn get_project(
     ))
 }
 
+#[utoipa::path(
+    post,
+    path = "/projects",
+    tag = "projects",
+    summary = "Create a project",
+    request_body = CreateProject,
+    responses(
+        (status = 201, description = "The new project", body = Project),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 422, description = "The name is empty", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn create_project(
     State(state): State<ApiState>,
     Json(input): Json<CreateProject>,
@@ -425,6 +486,24 @@ struct ListDocumentsQuery {
     fields: Option<String>,
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}/documents",
+    tag = "documents",
+    summary = "List a project's documents",
+    description = "With `fields=summary` each item is a `DocumentSummary`: everything but the body, plus a server-side word count. The desk lists summaries and fetches one body at a time.",
+    params(
+        ("project_id" = Uuid, Path, description = "The project"),
+        ("fields" = Option<String>, Query, description = "`summary` or `full` (the default)")
+    ),
+    responses(
+        (status = 200, description = "The documents in binder order; `DocumentSummary` items when `fields=summary`", body = Vec<Document>),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No project with that id", body = ErrorResponse),
+        (status = 422, description = "Unknown `fields` selection", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn list_documents(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -449,6 +528,22 @@ async fn list_documents(
     }
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}/documents/{document_id}",
+    tag = "documents",
+    summary = "Fetch one document with its body",
+    params(
+        ("project_id" = Uuid, Path, description = "The project"),
+        ("document_id" = Uuid, Path, description = "The document")
+    ),
+    responses(
+        (status = 200, description = "The document", body = Document),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No such document in this project", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn get_document(
     State(state): State<ApiState>,
     Path((project_id, document_id)): Path<(Uuid, Uuid)>,
@@ -461,6 +556,22 @@ async fn get_document(
     ))
 }
 
+#[utoipa::path(
+    post,
+    path = "/projects/{project_id}/documents",
+    tag = "documents",
+    summary = "Create a document",
+    description = "The `project_id` in the body is replaced by the one in the path. Content defaults to an empty ProseMirror document; every top-level node gets a stable block id.",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    request_body = CreateDocument,
+    responses(
+        (status = 201, description = "The new document", body = Document),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No project with that id", body = ErrorResponse),
+        (status = 422, description = "The title is empty or the parent is not in this project", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn create_document(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -471,9 +582,26 @@ async fn create_document(
     Ok((StatusCode::CREATED, Json(document)))
 }
 
+#[utoipa::path(
+    put,
+    path = "/projects/{project_id}/documents/{document_id}",
+    tag = "documents",
+    summary = "Update a document",
+    description = "New content is committed as hash-chained block events and every anchor in the document is remapped. Send `expected_head_seq` to have the write refused when the document moved on.",
+    params(("project_id" = Uuid, Path, description = "The project"), ("document_id" = Uuid, Path, description = "The document")),
+    request_body = UpdateDocument,
+    responses(
+        (status = 200, description = "The document after the commit", body = Document),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No document with that id", body = ErrorResponse),
+        (status = 409, description = "The document's head moved past `expected_head_seq`", body = ErrorResponse),
+        (status = 422, description = "The title is empty or the content is not a ProseMirror document", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn update_document(
     State(state): State<ApiState>,
-    Path((_, document_id)): Path<(Uuid, Uuid)>,
+    Path((_project_id, document_id)): Path<(Uuid, Uuid)>,
     Json(input): Json<UpdateDocument>,
 ) -> Result<Json<Document>, ApiError> {
     Ok(Json(
@@ -484,9 +612,22 @@ async fn update_document(
     ))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/projects/{project_id}/documents/{document_id}",
+    tag = "documents",
+    summary = "Delete a document",
+    params(("project_id" = Uuid, Path, description = "The project"), ("document_id" = Uuid, Path, description = "The document")),
+    responses(
+        (status = 204, description = "Deleted"),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No document with that id", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn delete_document(
     State(state): State<ApiState>,
-    Path((_, document_id)): Path<(Uuid, Uuid)>,
+    Path((_project_id, document_id)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, ApiError> {
     state
         .application
@@ -495,6 +636,19 @@ async fn delete_document(
     Ok(StatusCode::NO_CONTENT)
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}/facts",
+    tag = "canon",
+    summary = "List a project's facts",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    responses(
+        (status = 200, description = "The facts", body = Vec<Fact>),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No project with that id", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn list_facts(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -504,6 +658,22 @@ async fn list_facts(
     ))
 }
 
+#[utoipa::path(
+    post,
+    path = "/projects/{project_id}/facts",
+    tag = "canon",
+    summary = "Create a fact",
+    description = "The `project_id` in the body is replaced by the one in the path.",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    request_body = CreateFact,
+    responses(
+        (status = 201, description = "The new fact", body = Fact),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No project with that id", body = ErrorResponse),
+        (status = 422, description = "The entity key, predicate or value is empty", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn create_fact(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -514,9 +684,24 @@ async fn create_fact(
     Ok((StatusCode::CREATED, Json(fact)))
 }
 
+#[utoipa::path(
+    put,
+    path = "/projects/{project_id}/facts/{fact_id}",
+    tag = "canon",
+    summary = "Update a fact",
+    params(("project_id" = Uuid, Path, description = "The project"), ("fact_id" = Uuid, Path, description = "The fact")),
+    request_body = UpdateFact,
+    responses(
+        (status = 200, description = "The fact", body = Fact),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No fact with that id", body = ErrorResponse),
+        (status = 422, description = "The value or predicate is empty", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn update_fact(
     State(state): State<ApiState>,
-    Path((_, fact_id)): Path<(Uuid, Uuid)>,
+    Path((_project_id, fact_id)): Path<(Uuid, Uuid)>,
     Json(input): Json<UpdateFact>,
 ) -> Result<Json<Fact>, ApiError> {
     Ok(Json(
@@ -527,14 +712,41 @@ async fn update_fact(
     ))
 }
 
+#[utoipa::path(
+    delete,
+    path = "/projects/{project_id}/facts/{fact_id}",
+    tag = "canon",
+    summary = "Delete a fact",
+    params(("project_id" = Uuid, Path, description = "The project"), ("fact_id" = Uuid, Path, description = "The fact")),
+    responses(
+        (status = 204, description = "Deleted"),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No fact with that id", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn delete_fact(
     State(state): State<ApiState>,
-    Path((_, fact_id)): Path<(Uuid, Uuid)>,
+    Path((_project_id, fact_id)): Path<(Uuid, Uuid)>,
 ) -> Result<StatusCode, ApiError> {
     state.application.delete_fact(FactId(fact_id)).await?;
     Ok(StatusCode::NO_CONTENT)
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}/diagnostics",
+    tag = "story",
+    summary = "Analyse a project",
+    description = "Runs the engine over the project and returns the full diagnostics snapshot. The same answer as `GET /projects/{project_id}/story/diagnostics`.",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    responses(
+        (status = 200, description = "The snapshot at the current revision", body = asten_ls::DiagnosticsSnapshot),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No project with that id", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn list_diagnostics(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -547,6 +759,19 @@ async fn list_diagnostics(
     ))
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}/world-entries",
+    tag = "world",
+    summary = "List world entries",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    responses(
+        (status = 200, description = "The entries on the board", body = Vec<WorldEntry>),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No project with that id", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn list_world_entries(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -559,6 +784,22 @@ async fn list_world_entries(
     ))
 }
 
+#[utoipa::path(
+    post,
+    path = "/projects/{project_id}/world-entries",
+    tag = "world",
+    summary = "Create a world entry",
+    description = "The `project_id` in the body is replaced by the one in the path. The hue defaults by kind.",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    request_body = CreateWorldEntry,
+    responses(
+        (status = 201, description = "The new entry", body = WorldEntry),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No project with that id", body = ErrorResponse),
+        (status = 422, description = "The title is empty", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn create_world_entry(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -569,9 +810,24 @@ async fn create_world_entry(
     Ok((StatusCode::CREATED, Json(entry)))
 }
 
+#[utoipa::path(
+    put,
+    path = "/projects/{project_id}/world-entries/{entry_id}",
+    tag = "world",
+    summary = "Update a world entry",
+    params(("project_id" = Uuid, Path, description = "The project"), ("entry_id" = Uuid, Path, description = "The world entry")),
+    request_body = UpdateWorldEntry,
+    responses(
+        (status = 200, description = "The entry", body = WorldEntry),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No entry with that id", body = ErrorResponse),
+        (status = 422, description = "The title is empty", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn update_world_entry(
     State(state): State<ApiState>,
-    Path((_, entry_id)): Path<(Uuid, Uuid)>,
+    Path((_project_id, entry_id)): Path<(Uuid, Uuid)>,
     Json(input): Json<UpdateWorldEntry>,
 ) -> Result<Json<WorldEntry>, ApiError> {
     Ok(Json(
@@ -582,6 +838,20 @@ async fn update_world_entry(
     ))
 }
 
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}/world-pulse",
+    tag = "world",
+    summary = "The world's pulse",
+    description = "Counts of sparks, sketches and settled entries, how much of the world sits under the waterline, and the discoveries the author has made.",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    responses(
+        (status = 200, description = "The pulse", body = WorldPulse),
+        (status = 401, description = "No valid token or session cookie", body = ErrorResponse),
+        (status = 404, description = "No project with that id", body = ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn world_pulse(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -591,7 +861,7 @@ async fn world_pulse(
     ))
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 struct HealthResponse {
     status: &'static str,
     service: &'static str,
@@ -632,12 +902,14 @@ impl IntoResponse for ApiError {
     }
 }
 
-#[derive(Serialize)]
+/// Every error the API returns has this shape; the HTTP status is repeated
+/// in `error.code`.
+#[derive(Serialize, utoipa::ToSchema)]
 struct ErrorResponse {
     error: ErrorBody,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 struct ErrorBody {
     code: String,
     message: String,

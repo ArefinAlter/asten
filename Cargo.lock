@@ -78,6 +78,7 @@ dependencies = [
  "asten-ir",
  "asten-ls",
  "asten-storage",
+ "asten-time",
  "axum",
  "base64 0.22.1",
  "futures",
@@ -92,6 +93,7 @@ dependencies = [
  "tower-http",
  "tracing",
  "tracing-subscriber",
+ "utoipa",
  "uuid",
 ]
 

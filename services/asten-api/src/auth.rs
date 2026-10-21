@@ -311,6 +311,20 @@ pub fn protected_router() -> Router<ApiState> {
         .route("/projects/{project_id}/stream-ticket", post(stream_ticket))
 }
 
+#[utoipa::path(
+    post,
+    path = "/projects/{project_id}/stream-ticket",
+    tag = "auth",
+    summary = "Mint a stream ticket",
+    description = "A random ticket bound to this project, valid for sixty seconds and spent on first use, for `GET /projects/{project_id}/stream?ticket=…`. An EventSource cannot send headers, so the ticket stands in for the token; only the ticket ever travels in a URL. It inherits the caller's token kind.",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    responses(
+        (status = 201, description = "The ticket and when it expires", body = asten_application::auth::StreamTicketIssued),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse),
+        (status = 404, description = "No project with that id", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn stream_ticket(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
@@ -329,18 +343,30 @@ async fn stream_ticket(
     Ok((StatusCode::CREATED, Json(issued)))
 }
 
+#[utoipa::path(
+    get,
+    path = "/auth/status",
+    tag = "auth",
+    summary = "Authentication status",
+    description = "The auth mode, whether an owner passphrase is set, how many clients are paired and whether a token is needed at all. Public.",
+    responses(
+        (status = 200, description = "The status", body = AuthStatus)
+    )
+)]
 async fn status(State(state): State<ApiState>) -> Result<Json<AuthStatus>, ApiError> {
     Ok(Json(state.application.auth_status().await?))
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 struct PairRequest {
+    /// The six-digit code the desk shows, or the API printed at start-up.
     code: String,
+    /// A name for this client, shown in the Guests panel.
     #[serde(default)]
     label: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, utoipa::ToSchema)]
 struct PairResponse {
     #[serde(flatten)]
     paired: PairingComplete,
@@ -348,6 +374,18 @@ struct PairResponse {
     cookie: bool,
 }
 
+#[utoipa::path(
+    post,
+    path = "/auth/pair",
+    tag = "auth",
+    summary = "Redeem a pairing code",
+    description = "Exchanges a six-digit code for a bearer token of the kind the code grants (`guest`, or `desk` for the bootstrap code and codes minted for another desk). The token is shown once. A same-origin caller also receives the `asten_session` cookie (`HttpOnly`, `SameSite=Strict`). Rate limited per client and per route.",
+    request_body = PairRequest,
+    responses(
+        (status = 201, description = "The token, its id and kind, and whether a cookie was set", body = PairResponse),
+        (status = 401, description = "The code is wrong, spent or expired, or too many attempts were made", body = crate::ErrorResponse)
+    )
+)]
 async fn pair(
     State(state): State<ApiState>,
     Extension(ClientKey(key)): Extension<ClientKey>,
@@ -375,11 +413,23 @@ async fn pair(
     Ok(response)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 struct LoginRequest {
     passphrase: String,
 }
 
+#[utoipa::path(
+    post,
+    path = "/auth/login",
+    tag = "auth",
+    summary = "Log in with the owner passphrase",
+    description = "Answered only in `owner` mode. Issues a `session` token that expires after thirty days; a same-origin caller also receives the cookie. Rate limited.",
+    request_body = LoginRequest,
+    responses(
+        (status = 201, description = "The session token", body = PairResponse),
+        (status = 401, description = "The passphrase is wrong or not set, the server is not in owner mode, or too many attempts were made", body = crate::ErrorResponse)
+    )
+)]
 async fn login(
     State(state): State<ApiState>,
     Extension(ClientKey(key)): Extension<ClientKey>,
@@ -412,7 +462,7 @@ async fn login(
     Ok(response)
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 struct SetupOwnerRequest {
     passphrase: String,
 }
@@ -420,6 +470,22 @@ struct SetupOwnerRequest {
 /// First-run setup of the owner passphrase. Allowed without a token only while
 /// no passphrase exists and the server runs in owner mode; afterwards it needs
 /// an authenticated caller, and the change route asks for the current one.
+#[utoipa::path(
+    post,
+    path = "/auth/owner/setup",
+    tag = "auth",
+    summary = "Set the owner passphrase for the first time",
+    description = "Allowed without a token only while no passphrase exists and the server runs in `owner` mode. In other modes the caller must present a desk or owner-session token. Once a passphrase is set, change it with `PUT /auth/owner/passphrase`. At least twelve characters; hashed with argon2id. Rate limited.",
+    request_body = SetupOwnerRequest,
+    responses(
+        (status = 201, description = "The passphrase is set"),
+        (status = 401, description = "No token where one is needed, or too many attempts were made", body = crate::ErrorResponse),
+        (status = 403, description = "A guest token may not do this; use the desk", body = crate::ErrorResponse),
+        (status = 409, description = "An owner passphrase is already set", body = crate::ErrorResponse),
+        (status = 422, description = "The passphrase is shorter than twelve characters", body = crate::ErrorResponse)
+    ),
+    security((), ("asten_token" = []))
+)]
 async fn setup_owner(
     State(state): State<ApiState>,
     Extension(ClientKey(key)): Extension<ClientKey>,
@@ -454,12 +520,28 @@ async fn setup_owner(
     Ok(StatusCode::CREATED.into_response())
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, utoipa::ToSchema)]
 struct ChangePassphraseRequest {
     current: String,
     next: String,
 }
 
+#[utoipa::path(
+    put,
+    path = "/auth/owner/passphrase",
+    tag = "auth",
+    summary = "Change the owner passphrase",
+    description = "Asks for the current passphrase. Desk and owner-session tokens only. Rate limited.",
+    request_body = ChangePassphraseRequest,
+    responses(
+        (status = 204, description = "Changed"),
+        (status = 401, description = "No valid token, the current passphrase is wrong, or too many attempts were made", body = crate::ErrorResponse),
+        (status = 403, description = "A guest token may not do this; use the desk", body = crate::ErrorResponse),
+        (status = 404, description = "No owner passphrase is set", body = crate::ErrorResponse),
+        (status = 422, description = "The new passphrase is shorter than twelve characters", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn change_passphrase(
     State(state): State<ApiState>,
     Extension(ClientKey(key)): Extension<ClientKey>,
@@ -476,12 +558,36 @@ async fn change_passphrase(
     Ok(StatusCode::NO_CONTENT.into_response())
 }
 
+#[utoipa::path(
+    get,
+    path = "/auth/me",
+    tag = "auth",
+    summary = "Who am I",
+    description = "The token id, kind and label behind the presented credential.",
+    responses(
+        (status = 200, description = "The caller", body = asten_application::auth::AuthenticatedClient),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn me(
     Extension(AuthenticatedClient(client)): Extension<AuthenticatedClient>,
 ) -> Json<asten_application::auth::AuthenticatedClient> {
     Json(client)
 }
 
+#[utoipa::path(
+    post,
+    path = "/auth/logout",
+    tag = "auth",
+    summary = "Log out",
+    description = "Revokes the presented token and clears the session cookie.",
+    responses(
+        (status = 204, description = "Logged out"),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn logout(State(state): State<ApiState>, headers: HeaderMap) -> Result<Response, ApiError> {
     // `require_auth` has already refused a cookie from another origin.
     if let Some(presented) = presented_token(&headers) {
@@ -494,7 +600,7 @@ async fn logout(State(state): State<ApiState>, headers: HeaderMap) -> Result<Res
     Ok(response)
 }
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Default, utoipa::ToSchema)]
 struct StartPairingRequest {
     #[serde(default)]
     label: String,
@@ -504,6 +610,20 @@ struct StartPairingRequest {
     grants: Option<TokenKind>,
 }
 
+#[utoipa::path(
+    post,
+    path = "/auth/pairing-codes",
+    tag = "auth",
+    summary = "Mint a pairing code",
+    description = "A six-digit code valid for ten minutes and single use; five wrong guesses lock it. `grants` chooses the kind of token the code yields: `guest` (default) or `desk`. Desk and owner-session tokens only.",
+    request_body = StartPairingRequest,
+    responses(
+        (status = 201, description = "The code, shown once, and when it expires", body = asten_application::auth::PairingStart),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse),
+        (status = 403, description = "A guest token may not do this; use the desk", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn start_pairing(
     State(state): State<ApiState>,
     Extension(client): Extension<AuthenticatedClient>,
@@ -523,7 +643,8 @@ async fn start_pairing(
     Ok((StatusCode::CREATED, Json(start)).into_response())
 }
 
-#[derive(Serialize)]
+/// A paired client as the Guests panel lists it; never the token itself.
+#[derive(Serialize, utoipa::ToSchema)]
 struct TokenView {
     id: AuthTokenId,
     kind: asten_domain::TokenKind,
@@ -551,12 +672,28 @@ impl From<AuthToken> for TokenView {
     }
 }
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Default, utoipa::IntoParams)]
+#[into_params(parameter_in = Query)]
 struct TokenQuery {
+    /// Also list tokens that were revoked.
     #[serde(default)]
     include_revoked: bool,
 }
 
+#[utoipa::path(
+    get,
+    path = "/auth/tokens",
+    tag = "auth",
+    summary = "List paired clients",
+    description = "Desk and owner-session tokens only. Revoked tokens are hidden unless `include_revoked` is set. Hashes are never returned.",
+    params(TokenQuery),
+    responses(
+        (status = 200, description = "The tokens", body = Vec<TokenView>),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse),
+        (status = 403, description = "A guest token may not do this; use the desk", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn list_tokens(
     State(state): State<ApiState>,
     Extension(client): Extension<AuthenticatedClient>,
@@ -576,6 +713,21 @@ async fn list_tokens(
 
 /// A guest may revoke only itself (which `/auth/logout` also does); a desk may
 /// revoke anything.
+#[utoipa::path(
+    delete,
+    path = "/auth/tokens/{token_id}",
+    tag = "auth",
+    summary = "Revoke a token",
+    description = "A guest may revoke only itself (which `POST /auth/logout` also does); a desk or owner session may revoke anything. Revocation is immediate.",
+    params(("token_id" = Uuid, Path, description = "The token")),
+    responses(
+        (status = 204, description = "Revoked"),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse),
+        (status = 403, description = "A guest token may not do this; use the desk", body = crate::ErrorResponse),
+        (status = 404, description = "No token with that id", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
 async fn revoke_token(
     State(state): State<ApiState>,
     Extension(client): Extension<AuthenticatedClient>,
