@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useEffect, useState } from "react";
 import type {
-  AstenDocument,
+  DocumentSummary,
   CanonEntity,
   EntityKind,
   FactStatus,
@@ -15,7 +15,7 @@ interface Props {
   projectId: string;
   selectedKey?: string;
   onSelectKey: (key: string | undefined) => void;
-  documents: AstenDocument[];
+  documents: DocumentSummary[];
   onJump: (location: Location) => void;
 }
 
@@ -202,7 +202,7 @@ function EntityDetail({
 }: {
   projectId: string;
   entity: CanonEntity;
-  documents: AstenDocument[];
+  documents: DocumentSummary[];
   entities: CanonEntity[];
   onJump: (location: Location) => void;
   onChanged: () => Promise<void>;

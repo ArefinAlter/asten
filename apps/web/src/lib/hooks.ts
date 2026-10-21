@@ -1,7 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import type { ProjectId, StreamEvent } from "@asten/contracts";
+import type { AstenDocument, ProjectId, StreamEvent } from "@asten/contracts";
 import { createAstenClient } from "./asten-client";
+
+/** The mutation key of the desk's own document saves (see `App.tsx`). */
+export const SAVE_DOCUMENT_KEY = ["save-document"] as const;
 
 /**
  * Keep the desk live: subscribe to the project's server-sent events and
@@ -22,9 +25,25 @@ export function useProjectStream(projectId: ProjectId | undefined) {
         projectId,
         (event: StreamEvent) => {
           if (event.type === "document") {
+            // The summaries are cheap; the body is refetched only for the
+            // one document that moved, and not when the desk already holds
+            // that head or is the client saving it (its response carries
+            // the new body).
             void queryClient.invalidateQueries({
               queryKey: ["documents", projectId],
             });
+            const bodyKey = ["document", projectId, event.document];
+            const held = queryClient.getQueryData<AstenDocument>(bodyKey);
+            const saving =
+              queryClient.isMutating({
+                mutationKey: SAVE_DOCUMENT_KEY,
+                predicate: (mutation) =>
+                  (mutation.state.variables as { documentId?: string })
+                    ?.documentId === event.document,
+              }) > 0;
+            if (!saving && held?.head_seq !== event.seq) {
+              void queryClient.invalidateQueries({ queryKey: bodyKey });
+            }
             void queryClient.invalidateQueries({ queryKey: ["history"] });
             void queryClient.invalidateQueries({ queryKey: ["blame"] });
             void queryClient.invalidateQueries({ queryKey: ["comments"] });

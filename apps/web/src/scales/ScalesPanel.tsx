@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import type {
   AstenDiagnostic,
-  AstenDocument,
+  DocumentSummary,
   DiagnosticsSnapshot,
   Location,
   Severity,
@@ -18,7 +18,7 @@ interface Props {
   projectId: string;
   snapshot?: DiagnosticsSnapshot;
   loading: boolean;
-  documents: AstenDocument[];
+  documents: DocumentSummary[];
   selectedMarkId?: string;
   onSelectMark: (id: string | undefined) => void;
   onJump: (location: Location) => void;

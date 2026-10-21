@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
 import type {
   AstenDiagnostic,
-  AstenDocument,
+  DocumentSummary,
   Location,
 } from "@asten/contracts";
 import { createAstenClient } from "../lib/asten-client";
@@ -10,8 +10,8 @@ import { percent, severityWord, timeAgo } from "../lib/format";
 
 interface Props {
   projectId: string;
-  document?: AstenDocument;
-  documents: AstenDocument[];
+  document?: DocumentSummary;
+  documents: DocumentSummary[];
   entityKey?: string;
   marks: AstenDiagnostic[];
   selectedMarkId?: string;

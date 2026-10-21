@@ -1,20 +1,19 @@
 import type {
-  AstenDocument,
   CanonEntity,
   DiagnosticsSnapshot,
+  DocumentSummary,
   Project,
 } from "@asten/contracts";
 import { Glyph } from "../brand/Glyphs";
-import { countWords } from "../lib/pm";
 import type { View } from "../App";
 
 interface Props {
   project: Project;
-  documents: AstenDocument[];
+  documents: DocumentSummary[];
   entities: CanonEntity[];
   snapshot?: DiagnosticsSnapshot;
   onGo: (view: View) => void;
-  onOpenDocument: (document: AstenDocument) => void;
+  onOpenDocument: (document: DocumentSummary) => void;
 }
 
 /** The project's front page: what is on the desk and how it weighs. */
@@ -32,10 +31,9 @@ export function Overview({
       document.kind === "chapter" ||
       document.kind === "scene",
   );
-  const words = prose.reduce(
-    (total, document) => total + countWords(document.content_json),
-    0,
-  );
+  // Counted on the server by the same rule the editor applies to the open
+  // page, so the binder never needs a body to weigh the project.
+  const words = prose.reduce((total, document) => total + document.words, 0);
   const marks =
     snapshot?.diagnostics.filter((mark) => !mark.suppressed_by) ?? [];
   const errors = marks.filter((mark) => mark.severity === "error").length;

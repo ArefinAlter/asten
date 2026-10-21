@@ -1,17 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   type FormEvent,
+  Suspense,
+  lazy,
   useCallback,
   useEffect,
   useMemo,
   useState,
 } from "react";
 import type {
-  AstenDocument,
   CompileArtifact,
   CompileFormat,
   CreateProject,
   DocumentKind,
+  DocumentSummary,
   ImportFormat,
   Location,
   ProjectId,
@@ -23,24 +25,64 @@ import { Binder } from "./binder/Binder";
 import { Glyph, type GlyphKey } from "./brand/Glyphs";
 import { PaletteMark } from "./brand/Palette";
 import { ThemeToggle } from "./brand/ThemeToggle";
-import { Canon } from "./canon/Canon";
-import { Cast } from "./cast/Cast";
-import { CompileDock } from "./compile/CompileDock";
 import { ManuscriptEditor, type Jump } from "./editor/ManuscriptEditor";
-import { Guests } from "./guests/Guests";
-import { History } from "./history/History";
 import { Inspector } from "./inspector/Inspector";
 import { ApiError, createAstenClient } from "./lib/asten-client";
-import { useMediaQuery, useProjectStream, useStoredState } from "./lib/hooks";
+import {
+  SAVE_DOCUMENT_KEY,
+  useMediaQuery,
+  useProjectStream,
+  useStoredState,
+} from "./lib/hooks";
 import { emptyDoc } from "./lib/pm";
 import { Overview } from "./overview/Overview";
-import { Packs } from "./packs/Packs";
 import { ScalesPanel } from "./scales/ScalesPanel";
-import { Settings } from "./settings/Settings";
-import { Timeline } from "./timeline/Timeline";
-import { WorldInspector } from "./world/WorldInspector";
-import { WorldWorkspace } from "./world/WorldWorkspace";
 import type { WorldLens } from "./world/useWorld";
+
+// The overview and the editor are what the desk opens on; every other view
+// loads the first time it is visited, so the first paint carries less script.
+const Canon = lazy(() =>
+  import("./canon/Canon").then((module) => ({ default: module.Canon })),
+);
+const Cast = lazy(() =>
+  import("./cast/Cast").then((module) => ({ default: module.Cast })),
+);
+const CompileDock = lazy(() =>
+  import("./compile/CompileDock").then((module) => ({
+    default: module.CompileDock,
+  })),
+);
+const Guests = lazy(() =>
+  import("./guests/Guests").then((module) => ({ default: module.Guests })),
+);
+const History = lazy(() =>
+  import("./history/History").then((module) => ({ default: module.History })),
+);
+const Packs = lazy(() =>
+  import("./packs/Packs").then((module) => ({ default: module.Packs })),
+);
+const Settings = lazy(() =>
+  import("./settings/Settings").then((module) => ({
+    default: module.Settings,
+  })),
+);
+const Timeline = lazy(() =>
+  import("./timeline/Timeline").then((module) => ({
+    default: module.Timeline,
+  })),
+);
+const WorldInspector = lazy(() =>
+  import("./world/WorldInspector").then((module) => ({
+    default: module.WorldInspector,
+  })),
+);
+const WorldWorkspace = lazy(() =>
+  import("./world/WorldWorkspace").then((module) => ({
+    default: module.WorldWorkspace,
+  })),
+);
+
+const viewFallback = <p className="status">Opening…</p>;
 
 const client = createAstenClient();
 
@@ -247,10 +289,18 @@ function Desk() {
     queryKey: ["projects"],
     queryFn: () => client.listProjects(),
   });
+  // The binder, overview, timeline and history read summaries (no bodies);
+  // only the open page fetches its body, and the change stream refreshes
+  // that one query when the document moves.
   const documents = useQuery({
     queryKey: ["documents", selectedProjectId],
-    queryFn: () => client.listDocuments(selectedProjectId!),
+    queryFn: () => client.listDocumentSummaries(selectedProjectId!),
     enabled: Boolean(selectedProjectId),
+  });
+  const openDocument = useQuery({
+    queryKey: ["document", selectedProjectId, selectedDocumentId],
+    queryFn: () => client.getDocument(selectedProjectId!, selectedDocumentId!),
+    enabled: Boolean(selectedProjectId && selectedDocumentId),
   });
   const entities = useQuery({
     queryKey: ["entities", selectedProjectId],
@@ -298,6 +348,7 @@ function Desk() {
     },
   });
   const updateDocument = useMutation({
+    mutationKey: SAVE_DOCUMENT_KEY,
     mutationFn: (input: {
       documentId: string;
       content_json?: JsonValue;
@@ -316,19 +367,34 @@ function Desk() {
         expected_head_seq: input.expected_head_seq,
         actor: "author",
       }),
-    onSuccess: async () => {
+    onSuccess: async (saved) => {
       setSaveError(undefined);
+      // The response is the new body; no refetch of it is needed. The
+      // summaries are small, so they refresh in full.
+      queryClient.setQueryData(["document", saved.project_id, saved.id], saved);
       await queryClient.invalidateQueries({
         queryKey: ["documents", selectedProjectId],
       });
     },
-    onError: (error) => setSaveError(error.message),
+    onError: (error, input) => {
+      setSaveError(error.message);
+      // A conflict means someone else moved the page: fetch their head so
+      // "reload theirs" has something to reload.
+      if (error instanceof ApiError && error.status === 409) {
+        void queryClient.invalidateQueries({
+          queryKey: ["document", selectedProjectId, input.documentId],
+        });
+      }
+    },
   });
   const deleteDocument = useMutation({
     mutationFn: (documentId: string) =>
       client.deleteDocument(selectedProjectId!, documentId),
-    onSuccess: async () => {
+    onSuccess: async (_, documentId) => {
       setSelectedDocumentId(undefined);
+      queryClient.removeQueries({
+        queryKey: ["document", selectedProjectId, documentId],
+      });
       await queryClient.invalidateQueries({
         queryKey: ["documents", selectedProjectId],
       });
@@ -364,11 +430,15 @@ function Desk() {
   const selectedProject = projects.data?.find(
     (project) => project.id === selectedProjectId,
   );
-  const selectedDocument = useMemo(
+  const selectedSummary = useMemo(
     () =>
       documents.data?.find((document) => document.id === selectedDocumentId),
     [documents.data, selectedDocumentId],
   );
+  const selectedDocument =
+    openDocument.data?.id === selectedDocumentId
+      ? openDocument.data
+      : undefined;
   const marks = diagnostics.data?.diagnostics ?? [];
   const openMarks = marks.filter((mark) => !mark.suppressed_by);
 
@@ -404,7 +474,7 @@ function Desk() {
     });
   }
 
-  function selectDocument(document: AstenDocument) {
+  function selectDocument(document: DocumentSummary) {
     setSelectedDocumentId(document.id);
     setView("write");
   }
@@ -464,8 +534,8 @@ function Desk() {
         </span>
         <span className="title-crumb">
           {selectedProject?.name ?? "Project library"}
-          {selectedDocument && view === "write" ? (
-            <span className="crumb-doc"> · {selectedDocument.title}</span>
+          {selectedSummary && view === "write" ? (
+            <span className="crumb-doc"> · {selectedSummary.title}</span>
           ) : null}
         </span>
         <div className="titlebar-actions">
@@ -648,153 +718,165 @@ function Desk() {
       </aside>
 
       <main className={`workspace${view === "world" ? " world-open" : ""}`}>
-        {!selectedProject ? (
-          view === "guests" ? (
+        <Suspense fallback={viewFallback}>
+          {!selectedProject ? (
+            view === "guests" ? (
+              <Guests />
+            ) : view === "packs" ? (
+              <Packs />
+            ) : (
+              <section className="empty-state">
+                <PaletteMark className="hero-mark" />
+                <h1>A writing desk with a memory.</h1>
+                <p>
+                  Select a project or create one. Your words stay black. Asten
+                  only ever writes in red.
+                </p>
+                {narrow && (
+                  <button
+                    type="button"
+                    className="btn btn--primary"
+                    onClick={() => setSidebarOpen(true)}
+                  >
+                    Open the project list
+                  </button>
+                )}
+              </section>
+            )
+          ) : view === "world" ? (
+            <WorldWorkspace
+              projectId={selectedProject.id}
+              projectName={selectedProject.name}
+              lens={worldLens}
+              selectedId={selectedWorldId}
+              onLensChange={setWorldLens}
+              onSelect={setSelectedWorldId}
+              onWriteScene={() => setView("write")}
+            />
+          ) : view === "cast" ? (
+            <Cast
+              projectId={selectedProject.id}
+              selectedKey={selectedEntityKey}
+              onSelectKey={setSelectedEntityKey}
+              documents={documents.data ?? []}
+              onJump={jumpTo}
+            />
+          ) : view === "canon" ? (
+            <Canon
+              projectId={selectedProject.id}
+              documents={documents.data ?? []}
+              entities={entities.data ?? []}
+              snapshot={diagnostics.data}
+            />
+          ) : view === "time" ? (
+            <Timeline
+              projectId={selectedProject.id}
+              documents={documents.data ?? []}
+              entities={entities.data ?? []}
+              onOpenDocument={(id) =>
+                jumpTo({ document: id, start: 0, end: 0, quote: "", label: "" })
+              }
+            />
+          ) : view === "history" ? (
+            <History
+              projectId={selectedProject.id}
+              documents={documents.data ?? []}
+              documentId={selectedDocumentId}
+              onSelectDocument={setSelectedDocumentId}
+            />
+          ) : view === "guests" ? (
             <Guests />
+          ) : view === "settings" ? (
+            <Settings
+              projectId={selectedProject.id}
+              snapshot={diagnostics.data}
+            />
+          ) : view === "compile" ? (
+            <CompileDock
+              compiling={compile.isPending}
+              artifact={artifact}
+              onCompile={(format) => compile.mutate(format)}
+              onImportFile={(file) => importDocument.mutate(file)}
+              error={compile.error?.message ?? importDocument.error?.message}
+            />
           ) : view === "packs" ? (
             <Packs />
-          ) : (
-            <section className="empty-state">
-              <PaletteMark className="hero-mark" />
-              <h1>A writing desk with a memory.</h1>
-              <p>
-                Select a project or create one. Your words stay black. Asten
-                only ever writes in red.
-              </p>
-              {narrow && (
-                <button
-                  type="button"
-                  className="btn btn--primary"
-                  onClick={() => setSidebarOpen(true)}
-                >
-                  Open the project list
-                </button>
+          ) : view === "write" ? (
+            <section className="write-pane">
+              {saveError && (
+                <p className="error banner" role="alert">
+                  {saveError}
+                </p>
+              )}
+              {selectedDocument ? (
+                <ManuscriptEditor
+                  key={selectedDocument.id}
+                  projectId={selectedProject.id}
+                  document={selectedDocument}
+                  diagnostics={marks}
+                  entities={entities.data ?? []}
+                  pageView={pageView === "on"}
+                  trackChanges={trackChanges}
+                  findQuery={findQuery}
+                  showBlame={showBlame}
+                  blame={blame.data}
+                  selectedMarkId={selectedMarkId}
+                  jump={jump}
+                  saving={updateDocument.isPending}
+                  onSave={(content_json, headSeq) =>
+                    updateDocument.mutateAsync({
+                      documentId: selectedDocument.id,
+                      content_json,
+                      expected_head_seq: headSeq,
+                    })
+                  }
+                  onSelectMark={setSelectedMarkId}
+                  onSelectEntity={openEntity}
+                />
+              ) : selectedDocumentId && openDocument.isPending ? (
+                <p className="status">Opening the page…</p>
+              ) : openDocument.error ? (
+                <section className="editor-placeholder register">
+                  <p className="eyebrow mono">Binder</p>
+                  <h1>That page could not be opened</h1>
+                  <p className="error">{openDocument.error.message}</p>
+                </section>
+              ) : (
+                <section className="editor-placeholder register">
+                  <p className="eyebrow mono">Binder</p>
+                  <h1>Start a scene</h1>
+                  <p>
+                    Add a scene in the binder, or import a manuscript under
+                    Compile. The world tools are not the gate.
+                  </p>
+                </section>
               )}
             </section>
-          )
-        ) : view === "world" ? (
-          <WorldWorkspace
-            projectId={selectedProject.id}
-            projectName={selectedProject.name}
-            lens={worldLens}
-            selectedId={selectedWorldId}
-            onLensChange={setWorldLens}
-            onSelect={setSelectedWorldId}
-            onWriteScene={() => setView("write")}
-          />
-        ) : view === "cast" ? (
-          <Cast
-            projectId={selectedProject.id}
-            selectedKey={selectedEntityKey}
-            onSelectKey={setSelectedEntityKey}
-            documents={documents.data ?? []}
-            onJump={jumpTo}
-          />
-        ) : view === "canon" ? (
-          <Canon
-            projectId={selectedProject.id}
-            documents={documents.data ?? []}
-            entities={entities.data ?? []}
-            snapshot={diagnostics.data}
-          />
-        ) : view === "time" ? (
-          <Timeline
-            projectId={selectedProject.id}
-            documents={documents.data ?? []}
-            entities={entities.data ?? []}
-            onOpenDocument={(id) =>
-              jumpTo({ document: id, start: 0, end: 0, quote: "", label: "" })
-            }
-          />
-        ) : view === "history" ? (
-          <History
-            projectId={selectedProject.id}
-            documents={documents.data ?? []}
-            documentId={selectedDocumentId}
-            onSelectDocument={setSelectedDocumentId}
-          />
-        ) : view === "guests" ? (
-          <Guests />
-        ) : view === "settings" ? (
-          <Settings
-            projectId={selectedProject.id}
-            snapshot={diagnostics.data}
-          />
-        ) : view === "compile" ? (
-          <CompileDock
-            compiling={compile.isPending}
-            artifact={artifact}
-            onCompile={(format) => compile.mutate(format)}
-            onImportFile={(file) => importDocument.mutate(file)}
-            error={compile.error?.message ?? importDocument.error?.message}
-          />
-        ) : view === "packs" ? (
-          <Packs />
-        ) : view === "write" ? (
-          <section className="write-pane">
-            {saveError && (
-              <p className="error banner" role="alert">
-                {saveError}
-              </p>
-            )}
-            {selectedDocument ? (
-              <ManuscriptEditor
-                key={selectedDocument.id}
-                projectId={selectedProject.id}
-                document={selectedDocument}
-                diagnostics={marks}
-                entities={entities.data ?? []}
-                pageView={pageView === "on"}
-                trackChanges={trackChanges}
-                findQuery={findQuery}
-                showBlame={showBlame}
-                blame={blame.data}
-                selectedMarkId={selectedMarkId}
-                jump={jump}
-                saving={updateDocument.isPending}
-                onSave={(content_json, headSeq) =>
-                  updateDocument.mutateAsync({
-                    documentId: selectedDocument.id,
-                    content_json,
-                    expected_head_seq: headSeq,
-                  })
-                }
-                onSelectMark={setSelectedMarkId}
-                onSelectEntity={openEntity}
-              />
-            ) : (
-              <section className="editor-placeholder register">
-                <p className="eyebrow mono">Binder</p>
-                <h1>Start a scene</h1>
-                <p>
-                  Add a scene in the binder, or import a manuscript under
-                  Compile. The world tools are not the gate.
-                </p>
-              </section>
-            )}
-          </section>
-        ) : (
-          <Overview
-            project={selectedProject}
-            documents={documents.data ?? []}
-            entities={entities.data ?? []}
-            snapshot={diagnostics.data}
-            onGo={setView}
-            onOpenDocument={(document) => selectDocument(document)}
-          />
-        )}
+          ) : (
+            <Overview
+              project={selectedProject}
+              documents={documents.data ?? []}
+              entities={entities.data ?? []}
+              snapshot={diagnostics.data}
+              onGo={setView}
+              onOpenDocument={(document) => selectDocument(document)}
+            />
+          )}
+        </Suspense>
       </main>
 
       <aside className="inspector">
         {selectedProject && view === "world" ? (
-          <WorldInspector
-            projectId={selectedProject.id}
-            selectedId={selectedWorldId}
-          />
+          <Suspense fallback={viewFallback}>
+            <WorldInspector
+              projectId={selectedProject.id}
+              selectedId={selectedWorldId}
+            />
+          </Suspense>
         ) : selectedProject ? (
           <Inspector
             projectId={selectedProject.id}
-            document={selectedDocument}
+            document={selectedSummary}
             documents={documents.data ?? []}
             entityKey={selectedEntityKey}
             marks={marks}

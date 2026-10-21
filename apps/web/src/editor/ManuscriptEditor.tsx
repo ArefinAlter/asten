@@ -212,6 +212,10 @@ export function ManuscriptEditor({
           editor.getJSON() as JsonValue,
           syncedSeq.current,
         );
+        // The response is the newest server state the editor knows; holding
+        // it here means a reconcile before the next render cannot mistake
+        // the previous prop for an external change.
+        latestDocument.current = saved;
         syncedSeq.current = saved.head_seq;
         sentVersion.current = version;
         inFlight.current = false;

@@ -22,6 +22,9 @@ export type _CreateProject = Check<
 
 // Documents
 export type _Document = Check<Mutual<H.AstenDocument, G.domain.Document>>;
+export type _DocumentSummary = Check<
+  Mutual<H.DocumentSummary, G.domain.DocumentSummary>
+>;
 export type _ScenePlacement = Check<
   Mutual<H.ScenePlacement, G.domain.ScenePlacement>
 >;
