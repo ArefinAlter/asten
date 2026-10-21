@@ -404,7 +404,7 @@ export function Home() {
                 <li>The desk: binder, comments, page view, track changes, snapshots</li>
                 <li>Canon with seventeen continuity rules, read from the page and from what you settle</li>
                 <li>Cast, two clocks, optional world</li>
-                <li>Compile and import: Markdown, Fountain, HTML, .docx</li>
+                <li>Compile and import: Markdown, Fountain, HTML, .docx, EPUB, FDX</li>
               </ul>
             </div>
             <div className="status-col" style={{ "--status": "var(--gold)" } as CSSProperties}>
@@ -413,7 +413,7 @@ export function Home() {
                 <li>A public download or signed installer</li>
                 <li>Trained perception models (today the reading is rule-based)</li>
                 <li>Any AI model, local or cloud</li>
-                <li>EPUB, FDX, and collaboration</li>
+                <li>Collaboration</li>
               </ul>
             </div>
             <div className="status-col" style={{ "--status": "var(--rubric)" } as CSSProperties}>

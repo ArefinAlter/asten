@@ -52,7 +52,7 @@ export const features: Feature[] = [
         heading: "What is the desk for?",
         blocks: [
           { kind: "p", text: "The desk is where the book gets written. Everything else in Asten (canon, cast, time, world) exists to serve the page, and none of it is required before you start typing." },
-          { kind: "p", text: "Think of it as a writer’s subset of a word processor: the parts you use every day on a manuscript, without the layout features you only need for a printed brochure. When the book needs to leave, you [compile](/features/word-and-google-docs) it to Markdown, Fountain, HTML, or Word." },
+          { kind: "p", text: "Think of it as a writer’s subset of a word processor: the parts you use every day on a manuscript, without the layout features you only need for a printed brochure. When the book needs to leave, you [compile](/features/word-and-google-docs) it to Markdown, Fountain, HTML, Word, EPUB, or Final Draft." },
         ],
       },
       {
@@ -74,7 +74,7 @@ export const features: Feature[] = [
     ],
     faqs: [
       { q: "Is the Asten desk a replacement for Microsoft Word?", a: "Not entirely. The Asten desk covers what a manuscript needs day to day, including a binder, comments, find, counts, page view, and track-change marks, and it compiles to .docx when a publisher or editor wants Word." },
-      { q: "Can I import an existing manuscript into Asten?", a: "Yes. Asten imports Markdown, plain text, Fountain, HTML, and .docx. The .docx import is deliberately conservative: it keeps your text and basic structure, not complex layout." },
+      { q: "Can I import an existing manuscript into Asten?", a: "Yes. Asten imports Markdown, plain text, Fountain, Final Draft (.fdx), HTML, and .docx. The .docx import is deliberately conservative: it keeps your text and basic structure, not complex layout." },
       { q: "How do I see how long my book is in Asten?", a: "The Asten desk shows live word counts, and its page view lays a chapter out on letter-sized sheets with a running header, so you can feel the length in pages." },
     ],
     demo: "desk",
@@ -417,17 +417,17 @@ export const features: Feature[] = [
     path: "/features/word-and-google-docs",
     name: "Word & Google Docs",
     glyph: "door",
-    short: "Compile to Markdown, Fountain, HTML, and .docx. Optional Word and Docs add-ins talk to your own machine.",
+    short: "Compile to Markdown, Fountain, HTML, .docx, EPUB, and Final Draft. Optional Word and Docs add-ins talk to your own machine.",
     title: "Word and Google Docs: welcome guests",
     description:
-      "Asten compiles to Markdown, plain text, Fountain, HTML, and .docx, and imports them back. Optional Word and Google Docs add-ins show marks from your local Asten.",
+      "Asten compiles to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx), and imports all but EPUB back. Optional Word and Google Docs add-ins show marks from your local Asten.",
     h1: "Word and Google Docs are welcome guests.",
     lede: "Your editor wants a .docx. Your co-writer lives in Google Docs. Asten sends the manuscript out and takes it back, and two small add-ins let those apps show Asten’s marks without your canon leaving your machine.",
     answer:
-      "Asten compiles a manuscript to Markdown, plain text, Fountain, HTML, or .docx, and imports those formats back. PDF comes from printing the HTML. Optional Word and Google Docs add-ins pair once with a six-digit code shown in the desk, then list your local projects, show the Scales, and can file a selected passage into Asten; they talk only to the Asten API on 127.0.0.1:4317 and hold a token you can revoke.",
+      "Asten compiles a manuscript to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, or Final Draft (.fdx), and imports every one of those except EPUB. PDF comes from printing the HTML. Optional Word and Google Docs add-ins pair once with a six-digit code shown in the desk, then list your local projects, show the Scales, and can file a selected passage into Asten; they talk only to the Asten API on 127.0.0.1:4317 and hold a token you can revoke.",
     points: [
-      { title: "Compile", text: "Markdown, plain text, Fountain, HTML, and .docx. Excluded scenes stay out." },
-      { title: "Import", text: "Bring drafts home from the same formats. The .docx import is conservative on purpose." },
+      { title: "Compile", text: "Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx). Excluded scenes stay out; the EPUB’s table of contents follows your binder." },
+      { title: "Import", text: "Bring drafts home from the same formats, EPUB aside. The .docx import is conservative on purpose." },
       { title: "Word task pane", text: "See Asten’s marks next to your Word document and file a selection into a local project." },
       { title: "Docs sidebar", text: "The same, inside Google Docs, through Apps Script." },
     ],
@@ -442,6 +442,8 @@ export const features: Feature[] = [
             ["Fountain", "Yes", "Yes", "Screenplays"],
             ["HTML", "Yes", "Yes", "Web, and PDF by printing"],
             [".docx", "Yes", "Yes (conservative)", "Editors, agents, publishers"],
+            ["EPUB 3", "Yes", "No", "E-readers and reading apps"],
+            ["Final Draft (.fdx)", "Yes", "Yes", "Final Draft and other screenwriting tools"],
           ] },
         ],
       },
@@ -455,9 +457,9 @@ export const features: Feature[] = [
       },
     ],
     faqs: [
-      { q: "Can Asten export to Word?", a: "Yes. Asten compiles a manuscript to .docx, as well as Markdown, plain text, Fountain, and HTML." },
+      { q: "Can Asten export to Word?", a: "Yes. Asten compiles a manuscript to .docx, as well as Markdown, plain text, Fountain, HTML, EPUB, and Final Draft (.fdx)." },
       { q: "Does the Asten Google Docs add-on send my book to Verne?", a: "No. The Asten Docs sidebar talks only to the Asten API running on your own computer at 127.0.0.1:4317. Verne never receives your text." },
-      { q: "Can Asten export EPUB or PDF?", a: "PDF comes from printing Asten’s HTML output. EPUB is planned but not available yet." },
+      { q: "Can Asten export EPUB or PDF?", a: "EPUB, yes: Asten compiles the binder to an EPUB 3 file whose table of contents follows your chapters and scenes. PDF comes from printing Asten’s HTML output." },
     ],
     demo: "compile",
     art: "scroll",
@@ -475,7 +477,7 @@ export const features: Feature[] = [
     h1: "Your manuscript never leaves home.",
     lede: "No account. No cloud. No telemetry. No training. Your project is a single file on your own disk, and if Asten disappeared tomorrow your words would still be yours, in formats anything can open.",
     answer:
-      "Asten is local-first: every project lives in a SQLite database file on your computer (asten.db, in the operating system’s app-data folder). There is no account, no sync service, and no telemetry, and Verne never receives your manuscript. You can export to Markdown, plain text, Fountain, HTML, or .docx at any time.",
+      "Asten is local-first: every project lives in a SQLite database file on your computer (asten.db, in the operating system’s app-data folder). There is no account, no sync service, and no telemetry, and Verne never receives your manuscript. You can export to Markdown, plain text, Fountain, HTML, .docx, EPUB, or Final Draft (.fdx) at any time.",
     points: [
       { title: "One file", text: "Projects, scenes, facts, comments, snapshots, and marks live in `asten.db` on your disk." },
       { title: "No account", text: "Nothing to sign up for, nothing to log into, nothing to lose access to." },

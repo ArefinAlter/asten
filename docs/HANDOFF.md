@@ -95,7 +95,7 @@ writing app.
   fuzzy reattach cost, number overflow, editor autosave caret jump and
   lost-save states, Settings keystroke saves, `.docx` import size limit,
   insecure-context UUIDs, 401 handling.
-- Compile and import unchanged: markdown, plain, fountain, HTML, docx.
+- Compile: markdown, plain, fountain, HTML, docx, EPUB 3, Final Draft (.fdx), all in binder order; import of the same except EPUB, with one screenplay classifier behind Fountain and FDX.
 
 ### Desktop
 

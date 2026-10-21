@@ -31,7 +31,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Can I write a screenplay in Asten?",
-        a: "Asten can compile your project to Fountain, the plain-text screenplay format, and import Fountain files, and its canon checks work the same way on a script as on a novel. Export to Final Draft’s FDX format is planned but not available yet. See [Asten for screenwriters](/for/screenwriters).",
+        a: "Asten can compile your project to Fountain, the plain-text screenplay format, or to Final Draft’s FDX, and import either, and its canon checks work the same way on a script as on a novel. See [Asten for screenwriters](/for/screenwriters).",
       },
       {
         q: "Can I use Asten for non-fiction?",
@@ -133,7 +133,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What file formats can Asten export?",
-        a: "Asten compiles to Markdown, plain text, Fountain for screenplays, HTML, and .docx. For a PDF, compile to HTML and print it. Import reads the same family of formats, with a conservative .docx extract, and EPUB and FDX export are planned.",
+        a: "Asten compiles to Markdown, plain text, Fountain and Final Draft (.fdx) for screenplays, HTML, .docx, and EPUB 3. For a PDF, compile to HTML and print it. Import reads the same family of formats except EPUB, with a conservative .docx extract.",
       },
       {
         q: "How do I back up my Asten projects?",
@@ -179,7 +179,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What’s on the Asten roadmap?",
-        a: "Asten’s roadmap includes a signed desktop installer; small local perception models that propose, never generate; generated API contracts; EPUB and FDX export; a graph, maps, boards, research, and citations; a runtime for plugins and packs; and, later, collaboration that keeps offline work. Everything on it is planned, with no promised dates. See [the roadmap](/roadmap).",
+        a: "Asten’s roadmap includes a signed desktop installer; small local perception models that propose, never generate; generated API contracts; a graph, maps, boards, research, and citations; a runtime for plugins and packs; and, later, collaboration that keeps offline work. Everything on it is planned, with no promised dates. See [the roadmap](/roadmap).",
       },
       {
         q: "How do I report a bug or security issue in Asten?",

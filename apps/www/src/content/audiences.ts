@@ -146,13 +146,13 @@ export const audiences: Audience[] = [
       ],
     },
     honest: [
-      "Asten is not a full screenplay editor: no production revisions, page locking, or FDX yet.",
-      "Fountain is supported for import and compile; FDX is planned.",
+      "Asten is not a full screenplay editor: no production revisions or page locking.",
+      "Fountain and Final Draft (.fdx) are supported for import and compile.",
       "A flashback is never marked on its own. CANON-E201 appears only inside a run of scenes you declared continuous.",
     ],
     faqs: [
-      { q: "Does Asten support Fountain?", a: "Yes. Asten imports and compiles Fountain, the plain-text screenplay format, alongside Markdown, plain text, HTML, and .docx." },
-      { q: "Can Asten replace Final Draft?", a: "No. Asten is not a production screenplay suite; it has no FDX, page locking, or revision colors yet. It is for keeping a script’s story and continuity straight." },
+      { q: "Does Asten support Fountain?", a: "Yes. Asten imports and compiles Fountain, the plain-text screenplay format, alongside Final Draft (.fdx), Markdown, plain text, HTML, and .docx." },
+      { q: "Can Asten replace Final Draft?", a: "No. Asten is not a production screenplay suite: it exchanges .fdx files with Final Draft, but has no page locking or revision colors. It is for keeping a script’s story and continuity straight." },
     ],
     art: "moon",
     related: ["/features/time", "/journal/story-time-and-reading-order", "/features/word-and-google-docs", "/roadmap"],
