@@ -5,7 +5,10 @@ edition.workspace = true
 rust-version.workspace = true
 
 [lib]
-# Desktop links the rlib; Android needs a cdylib and iOS a staticlib.
+# The Tauri convention: a distinct library name so the binary and the
+# library do not collide. Desktop links the rlib; Android needs a cdylib and
+# iOS a staticlib.
+name = "asten_desktop_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [dependencies]
