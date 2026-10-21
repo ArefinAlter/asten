@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 /// `story/diagnostics`: the full set at a revision.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct DiagnosticsSnapshot {
     pub revision: String,
     pub diagnostics: Vec<Diagnostic>,
@@ -33,6 +34,7 @@ pub struct DiagnosticsSnapshot {
 
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Timings {
     pub perceive: u64,
     pub analyze: u64,
@@ -42,6 +44,7 @@ pub struct Timings {
 /// `story/diagnostics` as a diff since a revision.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct DiagnosticsDelta {
     pub from_revision: String,
     pub revision: String,
@@ -52,6 +55,7 @@ pub struct DiagnosticsDelta {
 /// A pending obligation from the setup/payoff ledger.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Obligation {
     pub invariant: String,
     pub label: String,
@@ -62,6 +66,7 @@ pub struct Obligation {
 /// The support tier for a script seen in the project (§13.2).
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct LanguageTier {
     pub script: String,
     pub tier: String,
@@ -71,6 +76,7 @@ pub struct LanguageTier {
 /// `story/factCard`: hovering a name.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct FactCard {
     pub entity: EntityId,
     pub name: String,
@@ -89,6 +95,7 @@ pub struct FactCard {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct FactSummary {
     pub id: String,
     pub predicate: String,
@@ -104,6 +111,7 @@ pub struct FactSummary {
 /// `story/mentions`: every mention of an entity.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct MentionRef {
     pub document: DocId,
     pub document_title: String,
@@ -119,6 +127,7 @@ pub struct MentionRef {
 /// `story/whereSettled`: jump to where a fact was settled.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct WhereSettled {
     pub fact: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -138,6 +147,7 @@ pub struct WhereSettled {
 /// `story/rename` preview: every change the rename would make.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct RenamePreview {
     pub entity: EntityId,
@@ -148,6 +158,7 @@ pub struct RenamePreview {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct RenameChange {
     pub document: DocId,
@@ -161,6 +172,7 @@ pub struct RenameChange {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct RenameRequest {
     pub to: String,
@@ -173,6 +185,7 @@ pub struct RenameRequest {
 /// `story/sceneSummary`: the line above a scene.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct SceneSummary {
     pub document: DocId,
     pub title: String,
@@ -196,6 +209,7 @@ pub struct SceneSummary {
 /// `story/castSearch`.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct CastSearchHit {
     pub entity: EntityId,
     pub name: String,
@@ -207,6 +221,7 @@ pub struct CastSearchHit {
 /// `story/repairs` application request.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct ApplyRepairRequest {
     pub diagnostic_id: String,
@@ -222,6 +237,7 @@ pub struct ApplyRepairRequest {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct ApplyRepairResponse {
     pub applied: Repair,
@@ -231,6 +247,7 @@ pub struct ApplyRepairResponse {
 /// `story/bisect`: which edit introduced a mark.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct BisectResult {
     pub diagnostic_id: String,
     pub found: bool,
@@ -250,6 +267,8 @@ pub struct BisectResult {
 /// A baseline: the marks the author has accepted as known.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ls/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "openapi", schema(as = ls::Baseline))]
 pub struct Baseline {
     pub name: String,
     pub created_at: String,
@@ -277,4 +296,73 @@ pub enum StreamEvent {
         what: String,
     },
     Heartbeat,
+}
+
+/// `StreamEvent` is an internally tagged enum with a newtype variant, which
+/// utoipa's derive cannot express; the schema is written by hand with the
+/// helpers in `asten_ir::openapi` and checked against serialised values in
+/// asten-api's tests.
+#[cfg(feature = "openapi")]
+mod openapi_schema {
+    use std::borrow::Cow;
+
+    use asten_ir::DocId;
+    use asten_ir::openapi::{depend_on, reference, tag_object, tagged_newtype};
+    use utoipa::openapi::RefOr;
+    use utoipa::openapi::schema::{OneOfBuilder, Schema};
+    use utoipa::{PartialSchema, ToSchema};
+
+    use super::{DiagnosticsDelta, StreamEvent};
+
+    impl PartialSchema for StreamEvent {
+        fn schema() -> RefOr<Schema> {
+            let tag = "type";
+            RefOr::T(Schema::OneOf(
+                OneOfBuilder::new()
+                    .description(Some(
+                        "One server-sent event on a project's stream, tagged by `type`; the \
+                         SSE event name is the same word. `diagnostics` carries the delta's \
+                         fields beside the tag.",
+                    ))
+                    .item(Schema::Object(
+                        tag_object(tag, "revision")
+                            .property("revision", String::schema())
+                            .required("revision")
+                            .build(),
+                    ))
+                    .item(tagged_newtype(
+                        tag,
+                        "diagnostics",
+                        reference::<DiagnosticsDelta>(),
+                    ))
+                    .item(Schema::Object(
+                        tag_object(tag, "document")
+                            .property("document", reference::<DocId>())
+                            .property("seq", i64::schema())
+                            .required("document")
+                            .required("seq")
+                            .build(),
+                    ))
+                    .item(Schema::Object(
+                        tag_object(tag, "canon")
+                            .property("what", String::schema())
+                            .required("what")
+                            .build(),
+                    ))
+                    .item(Schema::Object(tag_object(tag, "heartbeat").build()))
+                    .build(),
+            ))
+        }
+    }
+
+    impl ToSchema for StreamEvent {
+        fn name() -> Cow<'static, str> {
+            Cow::Borrowed("StreamEvent")
+        }
+
+        fn schemas(schemas: &mut Vec<(String, RefOr<Schema>)>) {
+            depend_on::<DiagnosticsDelta>(schemas);
+            depend_on::<DocId>(schemas);
+        }
+    }
 }

@@ -7,6 +7,7 @@ description = "The Story IR: the language-independent representation the Asten c
 
 [dependencies]
 ts-rs = { workspace = true, optional = true }
+utoipa = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 sha2.workspace = true
@@ -14,6 +15,8 @@ sha2.workspace = true
 [features]
 # Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
 ts = ["dep:ts-rs"]
+# Derive OpenAPI schemas for the API contracts (`node scripts/openapi-export.mjs`).
+openapi = ["dep:utoipa"]
 
 [dev-dependencies]
 proptest.workspace = true

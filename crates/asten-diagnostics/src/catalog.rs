@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Area {
     Attributes,
@@ -31,6 +32,7 @@ pub enum Area {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct CodeInfo {
     pub code: &'static str,
     pub area: Area,

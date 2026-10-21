@@ -13,6 +13,8 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 pub mod lattice;
+#[cfg(feature = "openapi")]
+pub mod openapi;
 pub mod time;
 
 pub use lattice::{ConceptId, ConceptLattice, Lexicalisation};
@@ -22,9 +24,10 @@ pub use time::{Tick, TimeBounds};
 
 macro_rules! string_id {
     ($(#[$meta:meta])* $name:ident) => {
-        $(#[$meta])*
         #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
         #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+        #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+        $(#[$meta])*
         #[serde(transparent)]
         pub struct $name(pub String);
 
@@ -72,10 +75,12 @@ string_id!(
 );
 string_id!(
     /// An entity key. Normalised, language-independent once assigned.
+    #[cfg_attr(feature = "openapi", schema(as = ir::EntityId))]
     EntityId
 );
 string_id!(
     /// A fact identity.
+    #[cfg_attr(feature = "openapi", schema(as = ir::FactId))]
     FactId
 );
 string_id!(
@@ -96,6 +101,7 @@ string_id!(
 /// Where a span of text was valid: the document revision and the block fingerprint.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct AnchorRevision {
     /// The document's event sequence number at which the offsets were valid.
     pub seq: i64,
@@ -108,6 +114,7 @@ pub struct AnchorRevision {
 /// code converts to grapheme clusters at the boundary.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Anchor {
     pub document: DocId,
     pub block: BlockId,
@@ -170,6 +177,7 @@ impl Anchor {
 /// What kind of thing an entity is. Packs may add sorts through `Other`.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Sort {
     Character,
@@ -203,6 +211,7 @@ impl Sort {
 /// How many values a predicate may hold at one time, and whether it may change.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Cardinality {
     /// One value at a time (hair color). Drives contradiction checks.
@@ -213,6 +222,7 @@ pub enum Cardinality {
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Mutability {
     Mutable,
@@ -223,6 +233,7 @@ pub enum Mutability {
 /// The value domain of a predicate.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum ValueDomain {
     /// Values are concepts in a named lattice (colors, materials, lifecycle states).
@@ -244,6 +255,7 @@ pub enum ValueDomain {
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Dimension {
     Length,
@@ -256,6 +268,7 @@ pub enum Dimension {
 /// Algebraic properties of relation predicates (`parent_of`, `married_to`).
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct RelationProps {
     #[serde(default)]
     pub symmetric: bool,
@@ -273,6 +286,7 @@ pub struct RelationProps {
 /// A predicate signature: `hair_color : Character → Color`.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct PredicateSig {
     pub id: PredicateId,
     pub label: String,
@@ -296,6 +310,8 @@ pub struct PredicateSig {
 /// intervals and entity ids do.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "openapi", schema(as = ir::Value))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Value {
     Concept {
@@ -378,6 +394,7 @@ impl Value {
 /// computed inside one context after inheritance.
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Context {
     /// World truth: what is actually so in the story world.
@@ -450,6 +467,7 @@ impl Context {
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Status {
     /// Author-confirmed. Exact checks apply.
@@ -473,6 +491,7 @@ impl Status {
 /// computed from it (§6.2).
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Provenance {
     /// An explicit author action in the desk, the wiki, or the cast.
@@ -560,9 +579,11 @@ impl Provenance {
 /// A name an entity goes by, possibly scoped in story time or to a speaker.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Alias {
     pub form: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "openapi", schema(value_type = Option<i64>))]
     pub from_tick: Option<Tick>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub used_by: Option<EntityId>,
@@ -570,6 +591,7 @@ pub struct Alias {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Entity {
     pub id: EntityId,
     pub sort: Sort,
@@ -593,6 +615,7 @@ impl Entity {
 /// An anchored span that refers to an entity, with a link confidence.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Mention {
     pub anchor: Anchor,
     pub entity: EntityId,
@@ -608,9 +631,11 @@ pub struct Mention {
 /// A property that can hold or stop holding over story time.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Fluent {
     pub predicate: PredicateId,
     pub subject: EntityId,
+    #[cfg_attr(feature = "openapi", schema(value_type = openapi::IrValue))]
     pub value: Value,
 }
 
@@ -635,6 +660,8 @@ impl Fluent {
 /// A fact: a fluent that holds in a context over a validity interval.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "openapi", schema(as = ir::Fact))]
 pub struct Fact {
     pub id: FactId,
     pub fluent: Fluent,
@@ -662,6 +689,7 @@ fn one() -> f32 {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct SettledAt {
     pub actor: String,
     pub at: String,
@@ -670,12 +698,21 @@ pub struct SettledAt {
 /// Where a statement sits in story time.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum TimeRef {
     /// Known exactly.
-    Tick { tick: Tick },
+    Tick {
+        #[cfg_attr(feature = "openapi", schema(value_type = i64))]
+        tick: Tick,
+    },
     /// Known within bounds (from the temporal network or a fuzzy label).
-    Bounds { lo: Option<Tick>, hi: Option<Tick> },
+    Bounds {
+        #[cfg_attr(feature = "openapi", schema(value_type = Option<i64>))]
+        lo: Option<Tick>,
+        #[cfg_attr(feature = "openapi", schema(value_type = Option<i64>))]
+        hi: Option<Tick>,
+    },
     /// Placed at a scene: it inherits the scene's time.
     Scene { document: DocId },
     #[default]
@@ -685,6 +722,7 @@ pub enum TimeRef {
 /// A statement in the prose that *reports* a fluent without causing it.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Observation {
     pub id: ObservationId,
     pub fluent: Fluent,
@@ -705,6 +743,7 @@ pub struct Observation {
 /// What kind of thing happened. Packs can add kinds through `Other`.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum EventKind {
     Born,
@@ -785,6 +824,7 @@ impl EventKind {
 /// Something that happens at a story time and can initiate or terminate fluents.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Event {
     pub id: EventId,
     pub kind: EventKind,
@@ -821,6 +861,7 @@ pub struct Event {
 /// A unit of narration with a reading position and a story-time placement.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Scene {
     pub document: DocId,
     pub title: String,
@@ -847,6 +888,7 @@ pub struct Scene {
 /// What a temporal constraint relates: a scene or an event, each a time point.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum TimePoint {
     Origin,
@@ -877,10 +919,13 @@ impl TimePoint {
 /// `lo ≤ to − from ≤ hi`, in ticks, with provenance (§9.6).
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct TemporalConstraint {
     pub from: TimePoint,
     pub to: TimePoint,
+    #[cfg_attr(feature = "openapi", schema(value_type = Option<i64>))]
     pub lo: Option<Tick>,
+    #[cfg_attr(feature = "openapi", schema(value_type = Option<i64>))]
     pub hi: Option<Tick>,
     pub label: String,
     #[serde(default)]
@@ -918,6 +963,7 @@ pub enum Atom {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Evidence {
     pub atom: Atom,
     pub confidence: f32,
@@ -930,6 +976,7 @@ pub struct Evidence {
 /// An atomic proposition over a scene's state, for author invariants (§9.10).
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum Proposition {
     /// A fluent holds at the scene's time.
@@ -948,6 +995,7 @@ pub enum Proposition {
 /// A coarse pattern over event kinds so authors can say "dies" without arguments.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum EventKindPattern {
     Born,
@@ -988,6 +1036,7 @@ impl EventKindPattern {
 /// The Dwyer, Avrunin and Corbett specification patterns authors see instead of LTLf.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case", tag = "pattern")]
 pub enum InvariantPattern {
     /// Once `after` holds, `never` never holds again. "Once Oren dies, he never speaks."
@@ -1017,6 +1066,7 @@ pub enum InvariantPattern {
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum TraceClock {
     #[default]
@@ -1026,6 +1076,7 @@ pub enum TraceClock {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Invariant {
     pub id: String,
     pub label: String,
@@ -1041,11 +1092,14 @@ pub struct Invariant {
 /// A route between two places with a travel duration range, in ticks.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Route {
     pub from: EntityId,
     pub to: EntityId,
+    #[cfg_attr(feature = "openapi", schema(value_type = i64))]
     pub min_ticks: Tick,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "openapi", schema(value_type = Option<i64>))]
     pub max_ticks: Option<Tick>,
     #[serde(default)]
     pub mode: String,
@@ -1061,17 +1115,20 @@ pub struct Route {
 /// Project-wide analysis settings.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Settings {
     pub strictness: Strictness,
     /// Narration projects into world truth unless the author marks it unreliable.
     pub narrator_reliable: bool,
     /// Ticks per day in this project's base unit (1 for days, 24 for hours, 1440 for minutes).
+    #[cfg_attr(feature = "openapi", schema(value_type = i64))]
     pub ticks_per_day: Tick,
     /// Sorts for which resurrection is allowed by a world rule.
     #[serde(default)]
     pub resurrection_allowed: Vec<Sort>,
     /// Minimum parent age at a child's birth, in ticks. None disables the check.
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "openapi", schema(value_type = Option<i64>))]
     pub min_parent_age_ticks: Option<Tick>,
 }
 
@@ -1089,6 +1146,7 @@ impl Default for Settings {
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, PartialOrd, Ord, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Strictness {
     /// Only settled-versus-settled conflicts.
@@ -1104,6 +1162,7 @@ pub enum Strictness {
 /// canon and the perception of every block; consumed by every analysis.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct StoryIr {
     pub entities: Vec<Entity>,
     pub predicates: Vec<PredicateSig>,

@@ -67,6 +67,7 @@ pub type Result<T> = std::result::Result<T, ApplicationError>;
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct DeskInfo {
     pub version: String,
     /// Operating system and processor of the machine running the API.
@@ -85,6 +86,7 @@ pub struct DeskInfo {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateProject {
     pub name: String,
@@ -98,6 +100,7 @@ pub struct CreateProject {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateDocument {
     #[serde(default)]
@@ -122,6 +125,7 @@ pub struct CreateDocument {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateDocument {
     pub title: Option<String>,
@@ -144,6 +148,7 @@ pub struct UpdateDocument {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateFact {
     #[serde(default)]
@@ -178,6 +183,7 @@ pub struct CreateFact {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateFact {
     pub value: Option<String>,
@@ -198,6 +204,7 @@ pub struct UpdateFact {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateWorldEntry {
     #[serde(default)]
@@ -223,6 +230,7 @@ pub struct CreateWorldEntry {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateWorldEntry {
     pub kind: Option<WorldKind>,

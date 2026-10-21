@@ -20,6 +20,7 @@ pub const ZERO_HASH_HEX: &str = "00000000000000000000000000000000000000000000000
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(tag = "type")]
 pub enum EventPayload {
     NodeCreated {
@@ -91,6 +92,7 @@ impl EventPayload {
 /// A stored event with its chain position and hashes (lowercase hex).
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct EventRecord {
     pub id: String,
     pub seq: i64,

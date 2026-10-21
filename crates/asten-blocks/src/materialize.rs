@@ -13,6 +13,7 @@ use crate::{blocks_of, node_id, plain_text, pos};
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct MaterializedNode {
     pub id: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -44,6 +45,7 @@ impl MaterializedNode {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct DocState {
     pub nodes: BTreeMap<String, MaterializedNode>,
     #[serde(default)]

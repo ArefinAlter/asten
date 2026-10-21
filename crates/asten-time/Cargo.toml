@@ -7,12 +7,15 @@ description = "Story time for the Asten canon engine: ticks, calendars, label pa
 
 [dependencies]
 ts-rs = { workspace = true, optional = true }
+utoipa = { workspace = true, optional = true }
 asten-ir = { path = "../asten-ir" }
 serde.workspace = true
 
 [features]
 # Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
 ts = ["dep:ts-rs", "asten-ir/ts"]
+# Derive OpenAPI schemas for the API contracts (`node scripts/openapi-export.mjs`).
+openapi = ["dep:utoipa", "asten-ir/openapi"]
 
 [dev-dependencies]
 proptest.workspace = true

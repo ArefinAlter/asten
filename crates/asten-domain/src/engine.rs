@@ -22,6 +22,7 @@ entity_id!(PairingCodeId);
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum EntityKind {
     Character,
@@ -50,6 +51,7 @@ impl EntityKind {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct CanonEntity {
     pub id: EntityId,
     pub project_id: ProjectId,
@@ -76,6 +78,7 @@ impl CanonEntity {
 /// understands and a placement in story time.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct TimelineEvent {
     pub id: TimelineEventId,
     pub project_id: ProjectId,
@@ -123,6 +126,7 @@ fn one() -> f32 {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Comment {
     pub id: CommentId,
     pub document_id: DocumentId,
@@ -139,6 +143,7 @@ pub struct Comment {
 /// hash-chained block event log.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct DocumentOp {
     pub id: DocumentOpId,
     pub document_id: DocumentId,
@@ -151,6 +156,7 @@ pub struct DocumentOp {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct DocumentSnapshot {
     pub id: SnapshotId,
     pub document_id: DocumentId,
@@ -169,6 +175,7 @@ pub struct DocumentSnapshot {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum SuppressionScope {
     /// One mark, bound to its evidence.
@@ -181,6 +188,7 @@ pub enum SuppressionScope {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Suppression {
     pub id: SuppressionId,
     pub project_id: ProjectId,
@@ -201,6 +209,7 @@ pub struct Suppression {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct MethodPack {
     pub id: MethodPackId,
     pub pack_key: String,
@@ -214,6 +223,7 @@ pub struct MethodPack {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum TrackedKind {
     Insert,
@@ -222,6 +232,7 @@ pub enum TrackedKind {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct TrackedChange {
     pub id: TrackedChangeId,
     pub document_id: DocumentId,
@@ -235,6 +246,7 @@ pub struct TrackedChange {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct CompileArtifact {
     pub filename: String,
     pub mime: String,
@@ -245,6 +257,7 @@ pub struct CompileArtifact {
 /// A materialised checkpoint of a document's event log with a Merkle commitment.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct BlockSnapshot {
     pub id: SnapshotId,
     pub document_id: DocumentId,
@@ -258,6 +271,7 @@ pub struct BlockSnapshot {
 /// A personal branch of a document, merged back three-way.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Draft {
     pub id: DraftId,
     pub document_id: DocumentId,
@@ -276,6 +290,7 @@ pub struct Draft {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct StoredInvariant {
     pub id: InvariantId,
     pub project_id: ProjectId,
@@ -285,6 +300,7 @@ pub struct StoredInvariant {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct StoredRoute {
     pub id: RouteId,
     pub project_id: ProjectId,
@@ -295,6 +311,7 @@ pub struct StoredRoute {
 /// A frozen set of accepted marks; only marks new since it are highlighted.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Baseline {
     pub id: BaselineId,
     pub project_id: ProjectId,
@@ -307,6 +324,7 @@ pub struct Baseline {
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum TokenKind {
     Desk,
@@ -348,6 +366,7 @@ impl TokenKind {
 /// A paired client. Only the hash of its token is stored.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct AuthToken {
     pub id: AuthTokenId,
     pub hash: String,
@@ -372,6 +391,7 @@ impl AuthToken {
 /// A short code the desk shows so a guest can pair once.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct PairingCode {
     pub id: PairingCodeId,
     pub code_hash: String,
@@ -390,6 +410,7 @@ pub struct PairingCode {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct OwnerCredential {
     pub phc: String,
     pub created_at: DateTime<Utc>,

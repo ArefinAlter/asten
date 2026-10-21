@@ -36,6 +36,7 @@ use crate::{Application, ApplicationError, Result};
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateSettings {
     pub strictness: Option<asten_ir::Strictness>,
@@ -51,6 +52,7 @@ pub struct UpdateSettings {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateInvariant {
     pub label: String,
@@ -73,6 +75,7 @@ fn yes() -> bool {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateRoute {
     pub route: Route,
@@ -84,6 +87,7 @@ pub struct CreateRoute {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateBaseline {
     pub name: String,

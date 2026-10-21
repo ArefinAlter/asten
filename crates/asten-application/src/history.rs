@@ -26,6 +26,7 @@ const SNAPSHOT_EVERY: i64 = 500;
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateDraft {
     pub name: String,
@@ -37,6 +38,7 @@ pub struct CreateDraft {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateDraft {
     pub name: Option<String>,
@@ -49,6 +51,7 @@ pub struct UpdateDraft {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct MergeRequest {
     /// `"{node_id}:{field}"` → `"ours"` | `"theirs"`.
@@ -63,6 +66,7 @@ pub struct MergeRequest {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct MergePreview {
     pub draft_id: DraftId,
@@ -81,6 +85,7 @@ pub struct MergePreview {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct VerifyReport {
     pub document_id: DocumentId,
     pub events: usize,
