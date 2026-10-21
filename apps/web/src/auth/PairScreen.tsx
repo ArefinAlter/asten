@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import type { AuthStatus } from "@asten/contracts";
 import { PaletteMark } from "../brand/Palette";
 import { Glyph } from "../brand/Glyphs";
@@ -8,6 +8,8 @@ interface Props {
   status: AuthStatus;
   onPaired: () => void;
 }
+
+const ERROR_ID = "pair-error";
 
 /**
  * The browser desk pairs with the API once. The code is printed by the API
@@ -24,6 +26,13 @@ export function PairScreen({ status, onPaired }: Props) {
   const [label, setLabel] = useState("This browser");
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
+  const codeRef = useRef<HTMLInputElement>(null);
+  const passphraseRef = useRef<HTMLInputElement>(null);
+
+  // Focus lands on the secret field when the screen opens or the mode changes.
+  useEffect(() => {
+    (mode === "code" ? codeRef : passphraseRef).current?.focus();
+  }, [mode]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,6 +51,9 @@ export function PairScreen({ status, onPaired }: Props) {
     }
   }
 
+  const describedBy = error ? ERROR_ID : undefined;
+  const invalid = error ? true : undefined;
+
   return (
     <main className="pair-screen">
       <section className="pair-card register">
@@ -55,11 +67,13 @@ export function PairScreen({ status, onPaired }: Props) {
           started; a paired desk can mint another under <em>Guests</em>.
         </p>
         {status.mode === "owner" && (
-          <div className="segmented" role="tablist">
+          <div className="segmented" role="tablist" aria-label="How to unlock">
             <button
               type="button"
               role="tab"
+              id="pair-tab-code"
               aria-selected={mode === "code"}
+              aria-controls="pair-form"
               className={mode === "code" ? "active" : ""}
               onClick={() => setMode("code")}
             >
@@ -68,7 +82,9 @@ export function PairScreen({ status, onPaired }: Props) {
             <button
               type="button"
               role="tab"
+              id="pair-tab-passphrase"
               aria-selected={mode === "passphrase"}
+              aria-controls="pair-form"
               className={mode === "passphrase" ? "active" : ""}
               onClick={() => setMode("passphrase")}
               disabled={!status.owner_configured}
@@ -77,44 +93,65 @@ export function PairScreen({ status, onPaired }: Props) {
             </button>
           </div>
         )}
-        <form className="stacked-form pair-form" onSubmit={submit}>
+        <form
+          id="pair-form"
+          className="stacked-form pair-form"
+          onSubmit={submit}
+          aria-labelledby={
+            status.mode === "owner" ? `pair-tab-${mode}` : undefined
+          }
+        >
           {mode === "code" ? (
             <>
-              <label>
+              <label htmlFor="pair-code">
                 <span>Pairing code</span>
                 <input
+                  id="pair-code"
+                  ref={codeRef}
+                  name="code"
                   className="code-input"
                   inputMode="numeric"
                   autoComplete="one-time-code"
+                  pattern="[0-9 ]*"
+                  maxLength={7}
                   placeholder="000 000"
                   value={code}
                   onChange={(event) => setCode(event.target.value)}
-                  autoFocus
+                  aria-describedby={describedBy}
+                  aria-invalid={invalid}
                   required
                 />
               </label>
-              <label>
+              <label htmlFor="pair-label">
                 <span>Call this client</span>
                 <input
+                  id="pair-label"
+                  name="label"
+                  autoComplete="off"
                   value={label}
                   onChange={(event) => setLabel(event.target.value)}
                 />
               </label>
             </>
           ) : (
-            <label>
+            <label htmlFor="pair-passphrase">
               <span>Owner passphrase</span>
               <input
+                id="pair-passphrase"
+                ref={passphraseRef}
+                name="passphrase"
                 type="password"
+                autoComplete="current-password"
                 value={passphrase}
                 onChange={(event) => setPassphrase(event.target.value)}
-                autoFocus
+                aria-describedby={describedBy}
+                aria-invalid={invalid}
                 required
               />
             </label>
           )}
           {error && (
-            <p className="error" role="alert">
+            <p id={ERROR_ID} className="error" role="alert">
               {error}
             </p>
           )}

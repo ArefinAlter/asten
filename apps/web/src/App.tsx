@@ -858,7 +858,8 @@ function Desk() {
               documentId={selectedDocumentId}
               onSelectDocument={setSelectedDocumentId}
             />
-          ) : view === "guests" ? (            <Guests />
+          ) : view === "guests" ? (
+            <Guests />
           ) : view === "settings" ? (
             <Settings
               projectId={selectedProject.id}
@@ -922,7 +923,8 @@ function Desk() {
                     Add a scene in the binder, or import a manuscript under
                     Compile. The world tools are not the gate.
                   </p>
-                </section>              )}
+                </section>
+              )}
             </section>
           ) : (
             <Overview
