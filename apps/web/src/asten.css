@@ -2070,11 +2070,13 @@ body {
   border-left: 2px solid var(--rule-strong);
   box-shadow: -12px 0 30px rgb(30 26 21 / 18%);
   transform: translateX(100%);
+  visibility: hidden;
   transition: transform 180ms var(--ease-ink);
 }
 
 .app-shell.compact.inspector-open .inspector {
   transform: none;
+  visibility: visible;
 }
 
 .app-shell.compact .shell-toggle.inspector-toggle {
@@ -2132,11 +2134,13 @@ body {
   border-right: 2px solid var(--rule-strong);
   box-shadow: 12px 0 30px rgb(30 26 21 / 18%);
   transform: translateX(-100%);
+  visibility: hidden;
   transition: transform 180ms var(--ease-ink);
 }
 
 .app-shell.narrow.sidebar-open .sidebar {
   transform: none;
+  visibility: visible;
 }
 
 .app-shell.narrow .inspector {
@@ -2290,4 +2294,12 @@ body {
     min-height: 40px;
     font-size: 16px; /* keeps iOS from zooming the page on focus */
   }
+}
+
+.desk-path {
+  display: inline-flex;
+  gap: 8px;
+  align-items: baseline;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
