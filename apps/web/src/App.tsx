@@ -31,7 +31,7 @@ import { Guests } from "./guests/Guests";
 import { History } from "./history/History";
 import { Inspector } from "./inspector/Inspector";
 import { ApiError, createAstenClient } from "./lib/asten-client";
-import { useProjectStream, useStoredState } from "./lib/hooks";
+import { useMediaQuery, useProjectStream, useStoredState } from "./lib/hooks";
 import { emptyDoc } from "./lib/pm";
 import { Overview } from "./overview/Overview";
 import { Packs } from "./packs/Packs";
@@ -201,6 +201,25 @@ function Desk() {
   const [saveError, setSaveError] = useState<string>();
   const queryClient = useQueryClient();
   const connected = useProjectStream(selectedProjectId);
+
+  // Tablets fold the inspector into a sheet; phones stack the desk in one
+  // column with the binder as a drawer. The classes drive the stylesheet.
+  const compact = useMediaQuery("(max-width: 1279px)");
+  const narrow = useMediaQuery("(max-width: 959px)");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
+  useEffect(() => {
+    if (!narrow) {
+      setSidebarOpen(false);
+      return;
+    }
+    // Choosing anything closes the drawer. With no project open it stays
+    // open, so the project list is reachable on a phone.
+    setSidebarOpen(!selectedProjectId);
+  }, [narrow, view, selectedDocumentId, selectedProjectId]);
+  useEffect(() => {
+    if (!compact) setInspectorOpen(false);
+  }, [compact]);
 
   // Keep the address in step with the desk, and the desk with the address
   // (back, forward, a hand-edited hash).
@@ -405,6 +424,10 @@ function Desk() {
         event.preventDefault();
         document.querySelector<HTMLInputElement>(".find-input")?.focus();
       }
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+        setInspectorOpen(false);
+      }
       if ((event.ctrlKey || event.metaKey) && event.key === "j") {
         event.preventDefault();
         setScalesCollapsed(scalesCollapsed === "open" ? "closed" : "open");
@@ -423,10 +446,19 @@ function Desk() {
 
   return (
     <div
-      className={`app-shell view-${view}${scalesCollapsed === "closed" ? " scales-closed" : ""}`}
+      className={`app-shell view-${view}${scalesCollapsed === "closed" ? " scales-closed" : ""}${compact ? " compact" : ""}${narrow ? " narrow" : ""}${sidebarOpen ? " sidebar-open" : ""}${inspectorOpen ? " inspector-open" : ""}`}
     >
       <header className="titlebar">
         <span className="brand">
+          <button
+            type="button"
+            className={`shell-toggle binder-toggle${sidebarOpen ? " active" : ""}`}
+            aria-label={sidebarOpen ? "Close the binder" : "Open the binder"}
+            aria-expanded={sidebarOpen}
+            onClick={() => setSidebarOpen((value) => !value)}
+          >
+            ≡
+          </button>
           <PaletteMark />
           <span className="wordmark">Asten</span>
         </span>
@@ -473,8 +505,30 @@ function Desk() {
             Blame
           </button>
           <ThemeToggle />
+          <button
+            type="button"
+            className={`shell-toggle inspector-toggle${inspectorOpen ? " active" : ""}`}
+            aria-label={
+              inspectorOpen ? "Close the inspector" : "Open the inspector"
+            }
+            aria-expanded={inspectorOpen}
+            onClick={() => setInspectorOpen((value) => !value)}
+          >
+            <Glyph name="eye" />
+          </button>
         </div>
       </header>
+      {((narrow && sidebarOpen) || (compact && inspectorOpen)) && (
+        <button
+          type="button"
+          className="scrim"
+          aria-label="Close the panel"
+          onClick={() => {
+            setSidebarOpen(false);
+            setInspectorOpen(false);
+          }}
+        />
+      )}
 
       <nav className="activitybar" aria-label="Workspace views">
         {ACTIVITIES.map((activity) => (
@@ -607,6 +661,15 @@ function Desk() {
                 Select a project or create one. Your words stay black. Asten
                 only ever writes in red.
               </p>
+              {narrow && (
+                <button
+                  type="button"
+                  className="btn btn--primary"
+                  onClick={() => setSidebarOpen(true)}
+                >
+                  Open the project list
+                </button>
+              )}
             </section>
           )
         ) : view === "world" ? (
@@ -777,7 +840,7 @@ function Desk() {
         >
           {connected ? "live" : "offline"}
         </span>
-        <span>Local first · no account · no sync</span>
+        <span className="trivia">Local first · no account · no sync</span>
         {selectedProject && diagnostics.data ? (
           <span className="mono">
             {errorCount} error{errorCount === 1 ? "" : "s"} · {warningCount}{" "}
@@ -785,7 +848,7 @@ function Desk() {
             {diagnostics.data.revision.slice(0, 8)}
           </span>
         ) : null}
-        <span>Designed and built by Verne Ltd.</span>
+        <span className="trivia">Designed and built by Verne Ltd.</span>
       </footer>
     </div>
   );

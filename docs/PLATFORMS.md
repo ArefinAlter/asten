@@ -107,7 +107,11 @@ pnpm --filter @asten/desktop ios:build
 
 On a phone the embedded API still binds loopback inside the app's sandbox, the
 database lives in the app's data directory, and the desk opens in its
-one-column layout. Word and Docs guests cannot pair with a phone, because the
+one-column layout: the activity bar runs along the bottom, the binder is a
+drawer from the left (the ≡ button), the inspector is a sheet from the right
+(the eye button), and the Scales rise from the bottom. Below 1280px wide the
+inspector already becomes a sheet; below 960px the whole desk stacks. Touch
+targets grow to 40px when the pointer is a finger. Word and Docs guests cannot pair with a phone, because the
 phone's API is not reachable from another device; see `docs/PARITY.md`.
 
 ### Installed web app instead of a store app
