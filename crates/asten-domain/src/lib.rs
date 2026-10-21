@@ -44,9 +44,11 @@ entity_id!(WorldEntryId);
 
 mod engine;
 mod pm;
+mod screenplay;
 
 pub use engine::*;
 pub use pm::*;
+pub use screenplay::*;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]

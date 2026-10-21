@@ -42,6 +42,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 uuid = { version = "1.18", features = ["serde", "v7"] }
 base64 = "0.22"
 zip = { version = "9.0", default-features = false, features = ["deflate"] }
+quick-xml = "0.42"
 sha2 = "0.10"
 ulid = "1"
 aho-corasick = "1.1"

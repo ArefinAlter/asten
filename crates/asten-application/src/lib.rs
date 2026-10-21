@@ -28,6 +28,8 @@ use tokio::sync::broadcast;
 pub mod auth;
 mod compile;
 mod engine_app;
+mod epub;
+mod fdx;
 pub mod history;
 mod import;
 pub mod story;

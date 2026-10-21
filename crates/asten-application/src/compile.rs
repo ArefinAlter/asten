@@ -1,10 +1,14 @@
+use std::collections::{HashMap, HashSet};
+
 use asten_domain::{
-    CompileArtifact, Document, document_plain_text, prosemirror_to_fountain,
+    CompileArtifact, Document, DocumentId, document_plain_text, prosemirror_to_fountain,
     prosemirror_to_markdown,
 };
 use base64::{Engine as _, engine::general_purpose::STANDARD};
 use serde::{Deserialize, Serialize};
 
+use crate::epub::to_epub;
+use crate::fdx::to_fdx;
 use crate::{ApplicationError, Result};
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
@@ -21,6 +25,8 @@ pub enum CompileFormat {
     Fountain,
     Html,
     Docx,
+    Epub,
+    Fdx,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -44,18 +50,8 @@ pub fn compile_documents(
     documents: &[Document],
     format: &CompileFormat,
 ) -> Result<CompileArtifact> {
-    let included: Vec<&Document> = documents
-        .iter()
-        .filter(|document| !document.exclude_from_compile)
-        .filter(|document| {
-            matches!(
-                document.kind,
-                asten_domain::DocumentKind::Manuscript
-                    | asten_domain::DocumentKind::Chapter
-                    | asten_domain::DocumentKind::Scene
-            )
-        })
-        .collect();
+    let ordered = binder_order(documents);
+    let included: Vec<&Document> = ordered.iter().map(|(_, document)| *document).collect();
     if included.is_empty() {
         return Err(ApplicationError::Validation(
             "nothing to compile — include a scene, chapter, or manuscript".into(),
@@ -97,6 +93,83 @@ pub fn compile_documents(
                 body: STANDARD.encode(bytes),
             })
         }
+        CompileFormat::Epub => {
+            let bytes = to_epub(project_name, &ordered)?;
+            Ok(CompileArtifact {
+                filename: format!("{slug}.epub"),
+                mime: "application/epub+zip".into(),
+                encoding: "base64".into(),
+                body: STANDARD.encode(bytes),
+            })
+        }
+        CompileFormat::Fdx => Ok(CompileArtifact {
+            filename: format!("{slug}.fdx"),
+            mime: "application/xml".into(),
+            encoding: "utf-8".into(),
+            body: to_fdx(project_name, &included),
+        }),
+    }
+}
+
+/// The documents that compile, in binder order: a depth-first walk of the
+/// project tree with siblings by position then creation time, the order the
+/// desk's binder shows. Only prose kinds not excluded from compile are kept.
+/// The depth counts kept ancestors, so a scene under an excluded or non-prose
+/// parent sits one level up rather than vanishing. A document whose parent is
+/// not in the set (a filtered compile, or an orphan) is a root.
+pub(crate) fn binder_order(documents: &[Document]) -> Vec<(usize, &Document)> {
+    let ids: HashSet<DocumentId> = documents.iter().map(|document| document.id).collect();
+    let mut children: HashMap<Option<DocumentId>, Vec<&Document>> = HashMap::new();
+    for document in documents {
+        let parent = document.parent_id.filter(|parent| ids.contains(parent));
+        children.entry(parent).or_default().push(document);
+    }
+    for siblings in children.values_mut() {
+        siblings.sort_by(|a, b| {
+            a.position
+                .cmp(&b.position)
+                .then(a.created_at.cmp(&b.created_at))
+                .then(a.id.cmp(&b.id))
+        });
+    }
+    let mut ordered = Vec::new();
+    let mut visited = HashSet::new();
+    walk_binder(None, 0, &children, &mut visited, &mut ordered);
+    // Documents inside a parent cycle are reachable from no root; keep them
+    // rather than lose prose, in storage order at the top level.
+    for document in documents {
+        if !visited.contains(&document.id) && compiles(document) {
+            ordered.push((0, document));
+        }
+    }
+    ordered
+}
+
+fn compiles(document: &Document) -> bool {
+    !document.exclude_from_compile && document.kind.is_prose()
+}
+
+fn walk_binder<'a>(
+    parent: Option<DocumentId>,
+    depth: usize,
+    children: &HashMap<Option<DocumentId>, Vec<&'a Document>>,
+    visited: &mut HashSet<DocumentId>,
+    ordered: &mut Vec<(usize, &'a Document)>,
+) {
+    let Some(siblings) = children.get(&parent) else {
+        return;
+    };
+    for document in siblings {
+        if !visited.insert(document.id) {
+            continue;
+        }
+        let next_depth = if compiles(document) {
+            ordered.push((depth, *document));
+            depth + 1
+        } else {
+            depth
+        };
+        walk_binder(Some(document.id), next_depth, children, visited, ordered);
     }
 }
 
@@ -228,12 +301,23 @@ fn docx_paragraph(text: &str, heading: bool) -> String {
     )
 }
 
-fn escape_xml(value: &str) -> String {
-    value
-        .replace('&', "&amp;")
-        .replace('<', "&lt;")
-        .replace('>', "&gt;")
-        .replace('"', "&quot;")
+/// Text or attribute content for XML: the five special characters escaped
+/// and the control characters XML 1.0 forbids dropped, so every part stays
+/// well-formed whatever was pasted into the manuscript.
+pub(crate) fn escape_xml(value: &str) -> String {
+    let mut escaped = String::with_capacity(value.len());
+    for ch in value.chars() {
+        match ch {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\t' | '\n' | '\r' => escaped.push(ch),
+            ch if u32::from(ch) < 0x20 || matches!(ch, '\u{FFFE}' | '\u{FFFF}') => {}
+            ch => escaped.push(ch),
+        }
+    }
+    escaped
 }
 
 fn slugify(value: &str) -> String {

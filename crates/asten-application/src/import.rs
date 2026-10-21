@@ -1,6 +1,9 @@
-use asten_domain::{DocumentKind, markdown_to_prosemirror, plaintext_to_prosemirror};
+use asten_domain::{
+    DocumentKind, fountain_to_prosemirror, markdown_to_prosemirror, plaintext_to_prosemirror,
+};
 use serde::{Deserialize, Serialize};
 
+use crate::fdx::fdx_to_prosemirror;
 use crate::{ApplicationError, Result};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -16,6 +19,7 @@ pub enum ImportFormat {
     Fountain,
     Html,
     Docx,
+    Fdx,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -48,11 +52,13 @@ pub fn imported_title(filename: &str) -> String {
 pub fn imported_document_json(request: &ImportRequest) -> Result<serde_json::Value> {
     let text = decode_body(request)?;
     match request.format {
-        ImportFormat::Markdown | ImportFormat::Fountain | ImportFormat::Html => Ok(
-            markdown_to_prosemirror(&strip_html_if_needed(&text, &request.format)),
-        ),
+        ImportFormat::Markdown | ImportFormat::Html => Ok(markdown_to_prosemirror(
+            &strip_html_if_needed(&text, &request.format),
+        )),
+        ImportFormat::Fountain => Ok(fountain_to_prosemirror(&text)),
         ImportFormat::Plain => Ok(plaintext_to_prosemirror(&text)),
         ImportFormat::Docx => Ok(plaintext_to_prosemirror(&extract_docx_text(&text)?)),
+        ImportFormat::Fdx => fdx_to_prosemirror(&text),
     }
 }
 
