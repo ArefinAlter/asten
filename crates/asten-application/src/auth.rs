@@ -13,6 +13,19 @@ const PAIRING_TTL_MINUTES: i64 = 10;
 const PAIRING_MAX_ATTEMPTS: i64 = 5;
 const SESSION_DAYS: i64 = 30;
 const STREAM_TICKET_SECONDS: i64 = 60;
+/// A label names a client in the Guests panel; it is not a place for a page.
+const LABEL_MAX_CHARS: usize = 80;
+
+/// Trim a client or code label and refuse one long enough to be a payload.
+fn checked_label(label: &str) -> Result<&str> {
+    let label = label.trim();
+    if label.chars().count() > LABEL_MAX_CHARS {
+        return Err(ApplicationError::Validation(format!(
+            "a label may have at most {LABEL_MAX_CHARS} characters"
+        )));
+    }
+    Ok(label)
+}
 
 /// A short-lived, single-use credential for opening the change stream.
 /// `EventSource` cannot send headers, so the browser puts the ticket in the
@@ -126,7 +139,7 @@ impl Application {
 
     /// Mint a pairing code the desk shows to a guest (or to another desk).
     pub async fn start_pairing(&self, label: &str, grants: TokenKind) -> Result<PairingStart> {
-        let label = label.trim();
+        let label = checked_label(label)?;
         let label = if label.is_empty() {
             if grants == TokenKind::Desk {
                 "Another desk"
@@ -196,6 +209,7 @@ impl Application {
                 "too many attempts; wait a minute".into(),
             ));
         }
+        let label = checked_label(label)?;
         let now = Utc::now();
         let codes = self.repository.list_pairing_codes().await?;
         let mut matched: Option<PairingCode> = None;
@@ -228,13 +242,10 @@ impl Application {
                 "that code is not valid".into(),
             ));
         }
-        let label = {
-            let trimmed = label.trim();
-            if trimmed.is_empty() {
-                record.label.clone()
-            } else {
-                trimmed.to_owned()
-            }
+        let label = if label.is_empty() {
+            record.label.clone()
+        } else {
+            label.to_owned()
         };
         self.issue_token(record.grants, &label, None).await
     }
@@ -448,23 +459,41 @@ impl Application {
     }
 
     /// Spend a stream ticket. Returns the client it was issued to when the
-    /// ticket is live and was minted for this project.
-    #[must_use]
-    pub fn redeem_stream_ticket(
+    /// ticket is live, was minted for this project, and the token that asked
+    /// for it has not been revoked in the meantime: a ticket is worth no more
+    /// than the credential behind it.
+    pub async fn redeem_stream_ticket(
         &self,
         ticket: &str,
         project: ProjectId,
-    ) -> Option<AuthenticatedClient> {
+    ) -> Result<Option<AuthenticatedClient>> {
         let hash = asten_auth::hash_token(ticket);
-        let mut tickets = self
-            .stream_tickets
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner());
-        let issued = tickets.remove(&hash)?;
-        if issued.project != project || issued.expires_at <= Utc::now() {
-            return None;
+        let issued = {
+            let mut tickets = self
+                .stream_tickets
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner());
+            tickets.remove(&hash)
+        };
+        let Some(issued) = issued else {
+            return Ok(None);
+        };
+        let now = Utc::now();
+        if issued.project != project || issued.expires_at <= now {
+            return Ok(None);
         }
-        Some(issued.client)
+        if let Some(token_id) = issued.client.token_id {
+            let live = self
+                .repository
+                .list_tokens()
+                .await?
+                .into_iter()
+                .any(|token| token.id == token_id && token.is_valid_at(now));
+            if !live {
+                return Ok(None);
+            }
+        }
+        Ok(Some(issued.client))
     }
 
     /// Remove expired and consumed pairing codes.

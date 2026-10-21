@@ -1,0 +1,55 @@
+# Weekly dependency updates for the three ecosystems in this repository.
+# Minor and patch bumps arrive grouped, so a week's worth is one pull request
+# per ecosystem. Majors of the frameworks the desk stands on (axum, tauri,
+# sqlx, react, vite, tiptap) are held back here and taken on purpose, with
+# the migration read first; everything else may move freely.
+version: 2
+updates:
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      rust-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      - dependency-name: axum
+        update-types: ["version-update:semver-major"]
+      - dependency-name: tauri
+        update-types: ["version-update:semver-major"]
+      - dependency-name: tauri-build
+        update-types: ["version-update:semver-major"]
+      - dependency-name: sqlx
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      npm-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    ignore:
+      - dependency-name: react
+        update-types: ["version-update:semver-major"]
+      - dependency-name: react-dom
+        update-types: ["version-update:semver-major"]
+      - dependency-name: vite
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@tiptap/*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5

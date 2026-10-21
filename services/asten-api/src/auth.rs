@@ -10,7 +10,7 @@ use axum::{
     Extension, Json, Router,
     body::Body,
     extract::{ConnectInfo, Path, Query, State},
-    http::{HeaderMap, HeaderValue, Request, StatusCode, header},
+    http::{HeaderMap, HeaderValue, Request, StatusCode, Uri, header, uri::Authority},
     middleware::Next,
     response::{IntoResponse, Response},
     routing::{get, post},
@@ -18,7 +18,7 @@ use axum::{
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{ApiConfig, ApiError, ApiState};
+use crate::{ApiConfig, ApiError, ApiState, IpNet};
 
 pub const SESSION_COOKIE: &str = "asten_session";
 
@@ -31,8 +31,9 @@ pub struct ClientKey(pub String);
 pub struct AuthenticatedClient(pub asten_application::auth::AuthenticatedClient);
 
 /// Derive the client key from the connection, before authentication. Behind a
-/// trusted reverse proxy the key is the first `X-Forwarded-For` hop; IPv6
-/// clients are keyed by their /64 so a host cannot rotate through its block.
+/// trusted reverse proxy the key is the nearest `X-Forwarded-For` hop that is
+/// not itself a trusted proxy; IPv6 clients are keyed by their /64 so a host
+/// cannot rotate through its block.
 pub async fn client_key(
     State(config): State<Arc<ApiConfig>>,
     mut request: Request<Body>,
@@ -45,24 +46,63 @@ pub async fn client_key(
     let forwarded = request
         .headers()
         .get("x-forwarded-for")
-        .and_then(|value| value.to_str().ok())
-        .and_then(|value| value.split(',').next())
-        .and_then(|first| first.trim().parse::<IpAddr>().ok());
-    let client = match (peer, forwarded) {
-        (Some(peer), Some(forwarded))
-            if config.trusted_proxies.iter().any(|net| net.contains(peer)) =>
-        {
-            Some(forwarded)
-        }
-        (peer, _) => peer,
-    };
+        .and_then(|value| value.to_str().ok());
+    let client = resolve_client(peer, forwarded, &config.trusted_proxies);
     let key = client.map_or_else(|| "local".to_owned(), bucket_key);
     request.extensions_mut().insert(ClientKey(key));
     next.run(request).await
 }
 
+/// The address a request is counted against: the TCP peer, unless the peer is
+/// a trusted proxy. Then it is the rightmost `X-Forwarded-For` hop that is not
+/// also a trusted proxy, because the hops a proxy appends are the only ones it
+/// vouches for; the leftmost is whatever the client chose to send, and keying
+/// on it would hand every client a fresh bucket per request.
+fn resolve_client(
+    peer: Option<IpAddr>,
+    forwarded: Option<&str>,
+    trusted: &[IpNet],
+) -> Option<IpAddr> {
+    let is_proxy = |ip: IpAddr| trusted.iter().any(|net| net.contains(ip));
+    let peer = peer?.to_canonical();
+    if !is_proxy(peer) {
+        return Some(peer);
+    }
+    let hops: Vec<IpAddr> = forwarded
+        .into_iter()
+        .flat_map(|value| value.split(','))
+        .filter_map(parse_forwarded_hop)
+        .map(|hop| hop.to_canonical())
+        .collect();
+    hops.into_iter()
+        .rev()
+        .find(|hop| !is_proxy(*hop))
+        // Every hop was a proxy, or the header was missing: the proxy itself
+        // is the best key there is.
+        .or(Some(peer))
+}
+
+/// One `X-Forwarded-For` entry: `203.0.113.9`, `203.0.113.9:4567`,
+/// `2001:db8::1` or `[2001:db8::1]:4567`.
+fn parse_forwarded_hop(hop: &str) -> Option<IpAddr> {
+    let hop = hop.trim().trim_matches('"');
+    if let Ok(ip) = hop.parse::<IpAddr>() {
+        return Some(ip);
+    }
+    if let Some(inner) = hop.strip_prefix('[') {
+        return inner.split_once(']')?.0.parse().ok();
+    }
+    let (host, port) = hop.rsplit_once(':')?;
+    if port.is_empty() || !port.bytes().all(|byte| byte.is_ascii_digit()) {
+        return None;
+    }
+    host.parse::<std::net::Ipv4Addr>().ok().map(IpAddr::V4)
+}
+
+/// IPv4 clients of a dual-stack listener arrive as `::ffff:a.b.c.d`; they are
+/// keyed as the IPv4 address they are, not as one shared /64.
 fn bucket_key(ip: IpAddr) -> String {
-    match ip {
+    match ip.to_canonical() {
         IpAddr::V4(v4) => v4.to_string(),
         IpAddr::V6(v6) => {
             let segments = v6.segments();
@@ -94,39 +134,81 @@ fn stream_project(path: &str) -> Option<ProjectId> {
 }
 
 /// Did this request come from the page the API itself serves (or a proxy in
-/// front of both)? Only then is a cookie useful; a cross-origin desk keeps its
-/// bearer token, and a cookie would leak to every other port on the host.
-fn same_origin(headers: &HeaderMap) -> bool {
+/// front of both)? The `Origin` header must name the host the request was
+/// sent to; without an `Origin` (a navigation, a non-browser client) the
+/// answer is yes. Only then is a cookie set or honoured. A cross-origin desk
+/// keeps its bearer token, and a same-site page on another port or subdomain,
+/// whose form posts the browser would still attach a `SameSite=Strict` cookie
+/// to, gets nothing from it.
+fn same_origin(headers: &HeaderMap, uri: &Uri) -> bool {
     let Some(origin) = headers.get(header::ORIGIN).and_then(|v| v.to_str().ok()) else {
         return true;
     };
-    let Some(host) = headers.get(header::HOST).and_then(|v| v.to_str().ok()) else {
+    // HTTP/2 carries the host in `:authority` rather than a `Host` header.
+    let host = headers
+        .get(header::HOST)
+        .and_then(|v| v.to_str().ok())
+        .or_else(|| uri.authority().map(Authority::as_str));
+    let Some(host) = host else {
         return false;
     };
     origin
         .split_once("://")
-        .is_some_and(|(_, origin_host)| origin_host.eq_ignore_ascii_case(host))
+        .is_some_and(|(_, origin_host)| origin_host.eq_ignore_ascii_case(host.trim()))
 }
 
-fn presented_token(headers: &HeaderMap, query: Option<&str>) -> Option<String> {
-    if let Some(value) = headers
+/// How a credential reached us. A cookie deserves less trust than a header:
+/// the browser attaches it on its own, to requests the page did not write.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+enum Carrier {
+    Header,
+    Cookie,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+struct Presented {
+    token: String,
+    carrier: Carrier,
+}
+
+fn presented_token(headers: &HeaderMap) -> Option<Presented> {
+    if let Some(token) = headers
         .get(header::AUTHORIZATION)
         .and_then(|value| value.to_str().ok())
+        .and_then(asten_auth::bearer)
     {
-        if let Some(token) = asten_auth_bearer(value) {
-            return Some(token.to_owned());
-        }
+        return Some(Presented {
+            token: token.to_owned(),
+            carrier: Carrier::Header,
+        });
     }
-    if let Some(cookie) = headers
-        .get(header::COOKIE)
-        .and_then(|value| value.to_str().ok())
-    {
-        if let Some(token) = asten_auth::cookie_value(cookie, SESSION_COOKIE) {
-            return Some(token.to_owned());
+    // HTTP/2 may split one cookie jar over several `Cookie` fields.
+    headers
+        .get_all(header::COOKIE)
+        .iter()
+        .filter_map(|value| value.to_str().ok())
+        .find_map(|cookie| asten_auth::cookie_value(cookie, SESSION_COOKIE))
+        .map(|token| Presented {
+            token: token.to_owned(),
+            carrier: Carrier::Cookie,
+        })
+}
+
+/// The credential a request may use: a bearer header always, the session
+/// cookie only when the request is same-origin (see [`same_origin`]). A cookie
+/// from anywhere else is answered with a 401 rather than ignored, so the
+/// failure is visible instead of a silent fall-through.
+fn credential(headers: &HeaderMap, uri: &Uri) -> Result<Option<String>, &'static str> {
+    match presented_token(headers) {
+        Some(Presented {
+            carrier: Carrier::Cookie,
+            ..
+        }) if !same_origin(headers, uri) => {
+            Err("the session cookie is honoured only from the desk's own origin")
         }
+        Some(presented) => Ok(Some(presented.token)),
+        None => Ok(None),
     }
-    let _ = query;
-    None
 }
 
 /// `ticket=` from a query string.
@@ -136,10 +218,6 @@ fn query_ticket(query: Option<&str>) -> Option<String> {
             .split('&')
             .find_map(|pair| pair.strip_prefix("ticket=").map(|ticket| ticket.to_owned()))
     })
-}
-
-fn asten_auth_bearer(value: &str) -> Option<&str> {
-    asten_auth::bearer(value)
 }
 
 /// Reject unauthenticated requests with a JSON 401.
@@ -155,16 +233,24 @@ pub async fn require_auth(
     // one-minute single-use ticket minted by an authenticated call.
     if let Some(project) = stream_project(request.uri().path()) {
         if let Some(ticket) = query_ticket(request.uri().query()) {
-            return match state.application.redeem_stream_ticket(&ticket, project) {
-                Some(client) => {
+            return match state
+                .application
+                .redeem_stream_ticket(&ticket, project)
+                .await
+            {
+                Ok(Some(client)) => {
                     request.extensions_mut().insert(AuthenticatedClient(client));
                     next.run(request).await
                 }
-                None => unauthorized("that stream ticket is spent or expired"),
+                Ok(None) => unauthorized("that stream ticket is spent or expired"),
+                Err(error) => ApiError(error).into_response(),
             };
         }
     }
-    let presented = presented_token(request.headers(), None);
+    let presented = match credential(request.headers(), request.uri()) {
+        Ok(presented) => presented,
+        Err(message) => return unauthorized(message),
+    };
     match state.application.authenticate(presented.as_deref()).await {
         Ok(Some(client)) => {
             request.extensions_mut().insert(AuthenticatedClient(client));
@@ -266,13 +352,14 @@ async fn pair(
     State(state): State<ApiState>,
     Extension(ClientKey(key)): Extension<ClientKey>,
     headers: HeaderMap,
+    uri: Uri,
     Json(input): Json<PairRequest>,
 ) -> Result<Response, ApiError> {
     let paired = state
         .application
         .complete_pairing(&input.code, &input.label, &key)
         .await?;
-    let set_cookie = same_origin(&headers);
+    let set_cookie = same_origin(&headers, &uri);
     let cookie = session_cookie(&paired.token, state.config.cookie_secure, 365);
     let mut response = (
         StatusCode::CREATED,
@@ -297,6 +384,7 @@ async fn login(
     State(state): State<ApiState>,
     Extension(ClientKey(key)): Extension<ClientKey>,
     headers: HeaderMap,
+    uri: Uri,
     Json(input): Json<LoginRequest>,
 ) -> Result<Response, ApiError> {
     if state.config.auth_mode != AuthMode::Owner {
@@ -308,7 +396,7 @@ async fn login(
         .application
         .login_owner(&input.passphrase, &key)
         .await?;
-    let set_cookie = same_origin(&headers);
+    let set_cookie = same_origin(&headers, &uri);
     let cookie = session_cookie(&session.token, state.config.cookie_secure, 30);
     let mut response = (
         StatusCode::CREATED,
@@ -336,6 +424,7 @@ async fn setup_owner(
     State(state): State<ApiState>,
     Extension(ClientKey(key)): Extension<ClientKey>,
     headers: HeaderMap,
+    uri: Uri,
     Json(input): Json<SetupOwnerRequest>,
 ) -> Result<Response, ApiError> {
     let status = state.application.auth_status().await?;
@@ -345,7 +434,10 @@ async fn setup_owner(
         )));
     }
     if state.config.auth_mode != AuthMode::Owner {
-        let presented = presented_token(&headers, None);
+        let presented = match credential(&headers, &uri) {
+            Ok(presented) => presented,
+            Err(message) => return Ok(unauthorized(message)),
+        };
         let Some(client) = state.application.authenticate(presented.as_deref()).await? else {
             return Err(ApiError(asten_application::ApplicationError::Unauthorized(
                 "pair first, then set the passphrase".into(),
@@ -391,8 +483,9 @@ async fn me(
 }
 
 async fn logout(State(state): State<ApiState>, headers: HeaderMap) -> Result<Response, ApiError> {
-    if let Some(presented) = presented_token(&headers, None) {
-        state.application.logout(&presented).await?;
+    // `require_auth` has already refused a cookie from another origin.
+    if let Some(presented) = presented_token(&headers) {
+        state.application.logout(&presented.token).await?;
     }
     let mut response = StatusCode::NO_CONTENT.into_response();
     response
@@ -499,4 +592,221 @@ async fn revoke_token(
         .revoke_token(AuthTokenId(token_id))
         .await?;
     Ok(StatusCode::NO_CONTENT.into_response())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn ip(text: &str) -> IpAddr {
+        text.parse().unwrap()
+    }
+
+    fn nets(texts: &[&str]) -> Vec<IpNet> {
+        texts.iter().map(|t| IpNet::parse(t).unwrap()).collect()
+    }
+
+    #[test]
+    fn without_a_trusted_proxy_the_peer_is_the_client() {
+        let forged = Some("203.0.113.9");
+        assert_eq!(
+            resolve_client(Some(ip("198.51.100.4")), forged, &[]),
+            Some(ip("198.51.100.4"))
+        );
+        assert_eq!(resolve_client(None, forged, &[]), None);
+    }
+
+    #[test]
+    fn behind_a_trusted_proxy_the_client_is_the_hop_the_proxy_appended() {
+        let trusted = nets(&["10.0.0.0/8"]);
+        let proxy = Some(ip("10.0.0.5"));
+        // A client that sends its own X-Forwarded-For cannot pick its key.
+        assert_eq!(
+            resolve_client(proxy, Some("1.2.3.4, 203.0.113.9"), &trusted),
+            Some(ip("203.0.113.9"))
+        );
+        // Two proxies in a row: skip both, take the hop before them.
+        assert_eq!(
+            resolve_client(proxy, Some("203.0.113.9, 10.0.0.7"), &trusted),
+            Some(ip("203.0.113.9"))
+        );
+        // No header, or nothing but proxies: the proxy itself.
+        assert_eq!(resolve_client(proxy, None, &trusted), proxy);
+        assert_eq!(resolve_client(proxy, Some("10.0.0.7"), &trusted), proxy);
+        // Entries with ports and brackets still parse.
+        assert_eq!(
+            resolve_client(proxy, Some("203.0.113.9:4567"), &trusted),
+            Some(ip("203.0.113.9"))
+        );
+        assert_eq!(
+            resolve_client(proxy, Some("[2001:db8::1]:4567"), &trusted),
+            Some(ip("2001:db8::1"))
+        );
+        // An unparseable entry is skipped, not trusted.
+        assert_eq!(
+            resolve_client(proxy, Some("203.0.113.9, unknown"), &trusted),
+            Some(ip("203.0.113.9"))
+        );
+    }
+
+    #[test]
+    fn mapped_ipv4_peers_match_ipv4_proxy_rules_and_keys() {
+        let trusted = nets(&["10.0.0.5"]);
+        assert_eq!(
+            resolve_client(Some(ip("::ffff:10.0.0.5")), Some("203.0.113.9"), &trusted),
+            Some(ip("203.0.113.9"))
+        );
+        assert_eq!(bucket_key(ip("::ffff:203.0.113.9")), "203.0.113.9");
+        assert_eq!(bucket_key(ip("203.0.113.9")), "203.0.113.9");
+        assert_eq!(bucket_key(ip("2001:db8:1:2:3:4:5:6")), "2001:db8:1:2::/64");
+        assert_eq!(
+            bucket_key(ip("2001:db8:1:2:ffff::1")),
+            bucket_key(ip("2001:db8:1:2::1"))
+        );
+    }
+
+    fn headers(pairs: &[(&str, &str)]) -> HeaderMap {
+        let mut map = HeaderMap::new();
+        for (name, value) in pairs {
+            map.append(
+                axum::http::HeaderName::from_bytes(name.as_bytes()).unwrap(),
+                HeaderValue::from_str(value).unwrap(),
+            );
+        }
+        map
+    }
+
+    #[test]
+    fn same_origin_compares_origin_with_host_or_authority() {
+        let uri: Uri = "/api/v1/auth/pair".parse().unwrap();
+        assert!(same_origin(&headers(&[("host", "localhost:4398")]), &uri));
+        assert!(same_origin(
+            &headers(&[
+                ("host", "localhost:4398"),
+                ("origin", "http://LocalHost:4398")
+            ]),
+            &uri
+        ));
+        assert!(!same_origin(
+            &headers(&[
+                ("host", "localhost:4398"),
+                ("origin", "http://localhost:8080")
+            ]),
+            &uri
+        ));
+        assert!(!same_origin(
+            &headers(&[
+                ("host", "desk.example.net"),
+                ("origin", "https://evil.example.net")
+            ]),
+            &uri
+        ));
+        assert!(!same_origin(
+            &headers(&[("host", "localhost:4398"), ("origin", "null")]),
+            &uri
+        ));
+        assert!(!same_origin(
+            &headers(&[("origin", "http://localhost:4398")]),
+            &uri
+        ));
+        let h2: Uri = "https://desk.example.net/api/v1/auth/pair".parse().unwrap();
+        assert!(same_origin(
+            &headers(&[("origin", "https://desk.example.net")]),
+            &h2
+        ));
+        assert!(!same_origin(
+            &headers(&[("origin", "https://desk.example.org")]),
+            &h2
+        ));
+    }
+
+    #[test]
+    fn a_bearer_header_wins_and_a_split_cookie_jar_is_read() {
+        let both = headers(&[
+            ("authorization", "Bearer ast_header"),
+            ("cookie", "asten_session=ast_cookie"),
+        ]);
+        assert_eq!(
+            presented_token(&both),
+            Some(Presented {
+                token: "ast_header".into(),
+                carrier: Carrier::Header,
+            })
+        );
+        let split = headers(&[
+            ("cookie", "theme=night"),
+            ("cookie", "asten_session=ast_cookie"),
+        ]);
+        assert_eq!(
+            presented_token(&split),
+            Some(Presented {
+                token: "ast_cookie".into(),
+                carrier: Carrier::Cookie,
+            })
+        );
+        let junk = headers(&[("authorization", "Bearer ast_x y"), ("cookie", "a=1")]);
+        assert_eq!(presented_token(&junk), None);
+    }
+
+    #[test]
+    fn a_cookie_counts_only_from_the_same_origin() {
+        let uri: Uri = "/api/v1/auth/logout".parse().unwrap();
+        let foreign = headers(&[
+            ("host", "localhost:4398"),
+            ("origin", "http://localhost:8080"),
+            ("cookie", "asten_session=ast_cookie"),
+        ]);
+        assert!(
+            credential(&foreign, &uri)
+                .unwrap_err()
+                .contains("own origin")
+        );
+        let own = headers(&[
+            ("host", "localhost:4398"),
+            ("origin", "http://localhost:4398"),
+            ("cookie", "asten_session=ast_cookie"),
+        ]);
+        assert_eq!(
+            credential(&own, &uri).unwrap().as_deref(),
+            Some("ast_cookie")
+        );
+        let bearer = headers(&[
+            ("host", "localhost:4398"),
+            ("origin", "http://localhost:8080"),
+            ("authorization", "Bearer ast_header"),
+        ]);
+        assert_eq!(
+            credential(&bearer, &uri).unwrap().as_deref(),
+            Some("ast_header")
+        );
+        assert_eq!(credential(&headers(&[]), &uri).unwrap(), None);
+    }
+
+    #[test]
+    fn the_stream_route_and_its_ticket_are_recognised_exactly() {
+        let id = Uuid::now_v7();
+        assert_eq!(
+            stream_project(&format!("/api/v1/projects/{id}/stream")),
+            Some(ProjectId(id))
+        );
+        assert_eq!(
+            stream_project(&format!("/projects/{id}/stream")),
+            Some(ProjectId(id))
+        );
+        assert_eq!(
+            stream_project(&format!("/api/v1/projects/{id}/stream-ticket")),
+            None
+        );
+        assert_eq!(stream_project("/api/v1/projects/not-a-uuid/stream"), None);
+        assert_eq!(
+            query_ticket(Some("ticket=ast_abc")).as_deref(),
+            Some("ast_abc")
+        );
+        assert_eq!(
+            query_ticket(Some("a=1&ticket=ast_abc&b=2")).as_deref(),
+            Some("ast_abc")
+        );
+        assert_eq!(query_ticket(Some("xticket=ast_abc")), None);
+        assert_eq!(query_ticket(None), None);
+    }
 }
