@@ -942,7 +942,8 @@ pub struct TemporalConstraint {
 /// Any perceptual output. Reasoning never reads raw text; it reads these.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
-#[serde(rename_all = "snake_case", tag = "kind")]
+// Tagged `atom`, not `kind`: the Event variant carries its own `kind` field.
+#[serde(rename_all = "snake_case", tag = "atom")]
 pub enum Atom {
     Mention(Mention),
     Observation(Observation),

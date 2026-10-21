@@ -60,11 +60,11 @@ pub fn depend_on<T: ToSchema>(schemas: &mut Vec<(String, RefOr<Schema>)>) {
 
 impl PartialSchema for Atom {
     fn schema() -> RefOr<Schema> {
-        let tag = "kind";
+        let tag = "atom";
         RefOr::T(Schema::OneOf(
             OneOfBuilder::new()
                 .description(Some(
-                    "One perceived unit of evidence, tagged by `kind`. The newtype variants \
+                    "One perceived unit of evidence, tagged by `atom`. The newtype variants \
                      carry the inner record's fields beside the tag.",
                 ))
                 .item(tagged_newtype(tag, "mention", reference::<Mention>()))

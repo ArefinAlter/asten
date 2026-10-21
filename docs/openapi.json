@@ -1528,6 +1528,7 @@
           "documents"
         ],
         "summary": "List a project's documents",
+        "description": "With `fields=summary` each item is a `DocumentSummary`: everything but the body, plus a server-side word count. The desk lists summaries and fetches one body at a time.",
         "operationId": "list_documents",
         "parameters": [
           {
@@ -1539,11 +1540,20 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "`summary` or `full` (the default)",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "The documents in binder order",
+            "description": "The documents in binder order; `DocumentSummary` items when `fields=summary`",
             "content": {
               "application/json": {
                 "schema": {
@@ -1567,6 +1577,16 @@
           },
           "404": {
             "description": "No project with that id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unknown `fields` selection",
             "content": {
               "application/json": {
                 "schema": {
@@ -1661,6 +1681,72 @@
       }
     },
     "/api/v1/projects/{project_id}/documents/{document_id}": {
+      "get": {
+        "tags": [
+          "documents"
+        ],
+        "summary": "Fetch one document with its body",
+        "operationId": "get_document",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "The project",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "document_id",
+            "in": "path",
+            "description": "The document",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid token or session cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such document in this project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "asten_token": []
+          }
+        ]
+      },
       "put": {
         "tags": [
           "documents"
@@ -6830,7 +6916,9 @@
           "plain",
           "fountain",
           "html",
-          "docx"
+          "docx",
+          "epub",
+          "fdx"
         ]
       },
       "CompileRequest": {
@@ -8083,6 +8171,80 @@
           }
         }
       },
+      "DocumentSummary": {
+        "type": "object",
+        "description": "A document without its body: what the binder, overview, timeline and\nhistory list. Bodies travel one at a time, for the open page only.",
+        "required": [
+          "id",
+          "project_id",
+          "kind",
+          "title",
+          "position",
+          "revision",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/DocumentId"
+          },
+          "project_id": {
+            "$ref": "#/components/schemas/ProjectId"
+          },
+          "parent_id": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DocumentId"
+              }
+            ]
+          },
+          "kind": {
+            "$ref": "#/components/schemas/DocumentKind"
+          },
+          "title": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "exclude_from_compile": {
+            "type": "boolean"
+          },
+          "scene": {
+            "$ref": "#/components/schemas/ScenePlacement"
+          },
+          "head_seq": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Head of the document's hash-chained event log."
+          },
+          "chain_hash": {
+            "type": "string"
+          },
+          "words": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Words in the body: its plain text split on Unicode whitespace.",
+            "minimum": 0
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "Draft": {
         "type": "object",
         "description": "A personal branch of a document, merged back three-way.",
@@ -9112,7 +9274,8 @@
           "plain",
           "fountain",
           "html",
-          "docx"
+          "docx",
+          "fdx"
         ]
       },
       "ImportRequest": {

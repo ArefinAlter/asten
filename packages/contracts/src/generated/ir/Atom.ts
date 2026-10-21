@@ -9,4 +9,4 @@ import type { TemporalConstraint } from "./TemporalConstraint";
 /**
  * Any perceptual output. Reasoning never reads raw text; it reads these.
  */
-export type Atom = { "kind": "mention" } & Mention | { "kind": "observation" } & Observation | { "kind": "event" } & Event | { "kind": "constraint" } & TemporalConstraint | { "kind": "unknown_name", anchor: Anchor, surface: string, reading_pos: number, } | { "kind": "context_span", anchor: Anchor, context: Context, };
+export type Atom = { "atom": "mention" } & Mention | { "atom": "observation" } & Observation | { "atom": "event" } & Event | { "atom": "constraint" } & TemporalConstraint | { "atom": "unknown_name", anchor: Anchor, surface: string, reading_pos: number, } | { "atom": "context_span", anchor: Anchor, context: Context, };
