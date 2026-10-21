@@ -127,13 +127,31 @@ writing app.
 - Public site (`apps/www`): features, FAQ, glossary, audience pages, roadmap
   and reference refreshed on 12 October to match what shipped.
 
+## In review (21 October, stacked pull requests)
+
+1. Cross-platform builds: Windows x64 and ARM64, macOS universal, Linux
+   x86_64 and aarch64; CI on three operating systems; mobile-ready crate;
+   `docs/PLATFORMS.md`.
+2. Responsive desk: one column on phones and tablets, drawer binder, sheet
+   inspector, bottom activity bar; Android 8 and iOS 15 floors.
+3. Client parity: `GET /desk`, "This desk" in Settings, installable web app
+   for phones, `docs/PARITY.md`.
+4. `docs/DECISIONS.md` and `docs/ROADMAP.md`, with the site roadmap and FAQ
+   brought into line.
+
+`docs/ROADMAP.md` is now the engineering roadmap; the list below is the short
+version.
+
 ## Still to do
 
-- Signed desktop installer. `.github/workflows/release.yml` builds unsigned
-  NSIS and MSI installers on a `v*` tag and drafts a GitHub release. Signing
-  turns on when `WINDOWS_CERTIFICATE` and `WINDOWS_CERTIFICATE_PASSWORD`
-  exist as repository secrets. The download page still says to run from
-  source until a signed build exists.
+- Signed installers for Windows, macOS and Linux. The release workflow targets
+  the configured desktop platforms on a `v*` tag; installer verification is
+  still pending; signing turns on when the Windows and Apple
+  secrets exist (see `docs/PLATFORMS.md`). The download page still says to run
+  from source until a signed build exists.
+- Mobile shells generated, built and tested on devices (`tauri android init`,
+  `tauri ios init` on machines with the SDKs); hardware testing of the ARM
+  builds; an ARM runner for the Linux aarch64 release job.
 - Tier A perception models (M1–M5 in the design) and the training pipeline.
   Everything today is Tier B/C.
 - An OpenAPI document for the routes. The TypeScript types are now generated
@@ -151,6 +169,17 @@ writing app.
   vernesystems.com/legal/company. Confirm which name is right. Counsel review
   before launch.
 - Rotate the Vercel token that an earlier session printed, if not done.
+
+## Where things are written down
+
+- `docs/DECISIONS.md`: the decisions and why, as a record that is appended to.
+- `docs/ROADMAP.md`: shipped, in review, next, later, never.
+- `docs/PLATFORMS.md`: support matrix, build recipes, signing.
+- `docs/PARITY.md`: what each client can do and why.
+- `docs/PHONE_SETUP.md`: trusted HTTPS, pairing and phone acceptance checks.
+- `docs/SECURITY.md`: threat model and authentication.
+- `docs/architecture.md`: crates and transport. `docs/ENGINE_DESIGN.md`: the
+  engine design.
 
 ## Left out on purpose
 
