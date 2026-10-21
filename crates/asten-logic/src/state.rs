@@ -132,9 +132,23 @@ pub fn families<'a>(ir: &'a StoryIr, times: &TimeTable) -> BTreeMap<(String, Con
                     source.may.hi = Some(source.may.hi.map_or(may_hi, |hi| hi.min(may_hi)));
                 }
             }
+            // A change that may happen no later than the source starts clips the
+            // interval past its own start: the value never (certainly, or at
+            // all) holds. `TimeBounds` has no other way to say "never" than
+            // `lo > hi`, so write that as the one form `hi == lo - 1`.
+            source.must = canonical_empty(source.must);
+            source.may = canonical_empty(source.may);
         }
     }
     out
+}
+
+/// Collapse any inverted interval to the canonical empty form `hi == lo - 1`.
+fn canonical_empty(bounds: TimeBounds) -> TimeBounds {
+    match (bounds.lo, bounds.hi) {
+        (Some(lo), Some(hi)) if hi < lo => TimeBounds::between(lo, lo - 1),
+        _ => bounds,
+    }
 }
 
 fn values_equal(a: &Value, b: &Value) -> bool {
@@ -289,6 +303,23 @@ pub fn check(ir: &StoryIr, times: &TimeTable) -> Vec<Violation> {
         }
     }
 
+    // Observations by family and comparison context, so each family below
+    // reads only its own observations rather than scanning the whole project.
+    let mut observations_by_key: BTreeMap<(String, Context), Vec<&Observation>> = BTreeMap::new();
+    for observation in &ir.observations {
+        let key = (
+            observation.fluent.family(),
+            observation
+                .context
+                .comparison_key(ir.settings.narrator_reliable),
+        );
+        observations_by_key
+            .entry(key)
+            .or_default()
+            .push(observation);
+    }
+    let no_observations = Vec::new();
+
     // E013: incompatible values of a functional predicate in one context and time.
     for ((family_key, context), family) in &groups {
         let Some(predicate_id) = family_key.split('·').nth(1).map(PredicateId::new) else {
@@ -324,13 +355,10 @@ pub fn check(ir: &StoryIr, times: &TimeTable) -> Vec<Violation> {
             }
         }
         // Observations against sources.
-        for observation in ir.observations.iter().filter(|observation| {
-            observation.fluent.family() == *family_key
-                && observation
-                    .context
-                    .comparison_key(ir.settings.narrator_reliable)
-                    == *context
-        }) {
+        let relevant = observations_by_key
+            .get(&(family_key.clone(), context.clone()))
+            .unwrap_or(&no_observations);
+        for observation in relevant.iter().copied() {
             let at = observation_time(observation, times);
             for source in &family.sources {
                 if observation.negated {
