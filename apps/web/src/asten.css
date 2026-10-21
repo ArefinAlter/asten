@@ -1989,12 +1989,37 @@ code,
   text-align: center;
 }
 
+/* Reduced motion removes movement and keeps opacity (BRAND.md, Motion).
+   The drawer, the sheet, the scales' beam, the moon's shadow and the
+   cartouche tie bar jump to their still state; margin cards fade without
+   rising; the reed stroke under a mark is a colour fade, so it stays. */
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
+  .app-shell.compact .inspector,
+  .app-shell.narrow .sidebar,
+  .scales .beam,
+  .theme-toggle .tt-shadow,
+  .btn,
+  .btn::after,
+  .linkish::after {
+    transition: none;
+  }
+
+  .btn:hover::after {
+    transform: none;
+  }
+
+  .margin-mark {
+    animation-name: fade;
+  }
+
+  html {
+    scroll-behavior: auto;
   }
 }
 
