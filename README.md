@@ -102,6 +102,7 @@ docs/
   PLATFORMS.md            Support matrix, build recipes, signing
   PARITY.md               What each client can do
   SECURITY.md             Threat model and auth modes
+  API.md                  Calling the HTTP API: pairing, tokens, the stream ticket, every route
   BRAND.md                Brand guidelines
   HANDOFF.md              Current stage
 ```
