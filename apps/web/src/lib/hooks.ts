@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 import type { ProjectId, StreamEvent } from "@asten/contracts";
 import { createAstenClient } from "./asten-client";
 
@@ -82,6 +82,77 @@ export function useProjectStream(projectId: ProjectId | undefined) {
   }, [projectId, queryClient]);
 
   return connected;
+}
+
+/** Whether a CSS media query matches, kept live as the viewport changes. */
+export function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() =>
+    typeof window === "undefined" ? false : window.matchMedia(query).matches,
+  );
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const update = () => setMatches(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, [query]);
+  return matches;
+}
+
+/** Focus an overlay when opened and return to its visible trigger on dismissal. */
+export function usePanelFocus(
+  open: boolean,
+  triggerRef: RefObject<HTMLButtonElement | null>,
+) {
+  const panelRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const panel = panelRef.current;
+    const trigger = triggerRef.current;
+    if (!panel) return;
+    panel.focus({ preventScroll: true });
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") return;
+      const controls = Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          ":is(button, input, select, textarea, a[href], [tabindex])",
+        ),
+      ).filter(
+        (element) =>
+          element.tabIndex >= 0 &&
+          !element.matches(":disabled") &&
+          element.getClientRects().length > 0 &&
+          !element.closest("[inert]"),
+      );
+      const first = controls[0];
+      const last = controls.at(-1);
+      if (!first || !last) {
+        event.preventDefault();
+        panel.focus({ preventScroll: true });
+      } else if (
+        event.shiftKey &&
+        (document.activeElement === first || document.activeElement === panel)
+      ) {
+        event.preventDefault();
+        last.focus({ preventScroll: true });
+      } else if (
+        !event.shiftKey &&
+        (document.activeElement === last || document.activeElement === panel)
+      ) {
+        event.preventDefault();
+        first.focus({ preventScroll: true });
+      }
+    };
+    panel.addEventListener("keydown", onKey);
+    return () => {
+      panel.removeEventListener("keydown", onKey);
+      // Resizing back to desktop hides the toggle; do not move focus to it.
+      if (trigger?.isConnected && trigger.getClientRects().length > 0) {
+        trigger.focus({ preventScroll: true });
+      }
+    };
+  }, [open, triggerRef]);
+  return panelRef;
 }
 
 /** Persist a small UI preference per viewer. */

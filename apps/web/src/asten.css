@@ -2008,3 +2008,298 @@ code,
 .save-conflict span {
   flex: 1;
 }
+
+/* ───────── Narrow desks: tablets and phones ─────────
+   The shell adds `compact` below 1280px and `narrow` below 960px (from
+   matchMedia, so React knows too). Compact folds the inspector into a sheet;
+   narrow stacks everything in one column, puts the activity bar along the
+   bottom, and turns the binder into a drawer. */
+
+body {
+  min-width: 320px;
+}
+
+.shell-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.shell-toggle.active {
+  color: var(--rubric);
+}
+
+.scrim {
+  position: fixed;
+  inset: 44px 0 0 0;
+  z-index: 29;
+  border: 0;
+  padding: 0;
+  background: rgb(30 26 21 / 38%);
+  cursor: default;
+}
+
+/* Compact: the inspector becomes a sheet from the right. */
+.app-shell.compact {
+  grid-template:
+    "title title title" 44px
+    "activity side work" minmax(0, 1fr)
+    "activity side scales" 220px
+    "status status status" 26px
+    / 60px 240px minmax(0, 1fr);
+}
+
+.app-shell.compact.scales-closed {
+  grid-template-rows: 44px minmax(0, 1fr) 34px 26px;
+}
+
+.app-shell.compact .inspector {
+  position: fixed;
+  top: 44px;
+  right: 0;
+  bottom: 26px;
+  z-index: 30;
+  width: min(380px, 92vw);
+  border-left: 2px solid var(--rule-strong);
+  box-shadow: -12px 0 30px rgb(30 26 21 / 18%);
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform 180ms var(--ease-ink);
+}
+
+.app-shell.compact.inspector-open .inspector {
+  transform: none;
+  visibility: visible;
+}
+
+.app-shell.compact .shell-toggle.inspector-toggle {
+  display: inline-flex;
+}
+
+/* Narrow: one column, activity bar along the bottom, binder as a drawer. */
+.app-shell.narrow,
+.app-shell.narrow.view-world {
+  grid-template:
+    "title" 44px
+    "work" minmax(0, 1fr)
+    "scales" min(42vh, 360px)
+    "activity" 56px
+    "status" 22px
+    / minmax(0, 1fr);
+}
+
+.app-shell.narrow.scales-closed {
+  grid-template-rows: 44px minmax(0, 1fr) 34px 56px 22px;
+}
+
+.app-shell.narrow .shell-toggle.binder-toggle {
+  display: inline-flex;
+}
+
+.app-shell.narrow .titlebar {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+.app-shell.narrow .wordmark {
+  display: none;
+}
+
+.app-shell.narrow .title-crumb {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14px;
+}
+
+.app-shell.narrow .find-input {
+  width: 120px;
+}
+
+.app-shell.narrow .sidebar {
+  position: fixed;
+  top: 44px;
+  left: 0;
+  bottom: 78px;
+  z-index: 30;
+  width: min(340px, 86vw);
+  border-right: 2px solid var(--rule-strong);
+  box-shadow: 12px 0 30px rgb(30 26 21 / 18%);
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition: transform 180ms var(--ease-ink);
+}
+
+.app-shell.narrow.sidebar-open .sidebar {
+  transform: none;
+  visibility: visible;
+}
+
+.app-shell.narrow .inspector {
+  bottom: 78px;
+  width: min(420px, 100vw);
+}
+
+.app-shell.narrow .activitybar {
+  grid-area: activity;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 4px 6px calc(4px + env(safe-area-inset-bottom));
+  border-right: 0;
+  border-top: 1px solid var(--rule);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+}
+
+.app-shell.narrow .activitybar button {
+  flex: 0 0 auto;
+  min-width: 60px;
+  padding: 4px 6px;
+  scroll-snap-align: start;
+}
+
+.app-shell.narrow .activitybar button.selected {
+  box-shadow: inset 0 2px 0 var(--rubric);
+}
+
+.app-shell.narrow .activity-label {
+  font-size: 8px;
+}
+
+.app-shell.narrow .statusbar {
+  gap: 10px;
+  padding: 0 8px;
+  font-size: 10px;
+}
+
+.app-shell.narrow .statusbar .trivia {
+  display: none;
+}
+
+.app-shell.narrow .scales-panel {
+  border-top-width: 2px;
+}
+
+.app-shell.narrow .workspace {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Content that assumed a wide desk. */
+@media (max-width: 959px) {
+  .register,
+  .editor-placeholder {
+    width: calc(100% - 16px);
+    margin: 10px auto;
+    padding: 22px 18px 28px;
+  }
+
+  .scene-header,
+  .page-with-margin {
+    width: calc(100% - 16px);
+  }
+
+  .page-with-margin {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page-margin {
+    display: none;
+  }
+
+  .page-sheet,
+  .page-view .page-sheet {
+    width: auto;
+    min-height: 50vh;
+    padding: 22px 18px 40px;
+  }
+
+  .editor-toolbar {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .stat-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .overview-columns,
+  .timeline-columns,
+  .history-columns,
+  .guest-columns,
+  .compile-columns,
+  .settings-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .cast {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 18px 14px 32px;
+  }
+
+  .atlas-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .world-ribbon {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .empty-state {
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 599px) {
+  .app-shell.narrow .title-crumb {
+    display: none;
+  }
+
+  .app-shell.narrow .find-input {
+    display: none;
+  }
+}
+
+/* Fingers, not pointers. */
+@media (pointer: coarse) {
+  button,
+  .tree > button,
+  .binder-row,
+  .activitybar button {
+    min-height: 40px;
+  }
+
+  .binder-title {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .binder-tools {
+    gap: 12px;
+  }
+
+  input,
+  select,
+  textarea {
+    min-height: 40px;
+    font-size: 16px; /* keeps iOS from zooming the page on focus */
+  }
+}
+
+.desk-path {
+  display: inline-flex;
+  gap: 8px;
+  align-items: baseline;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}

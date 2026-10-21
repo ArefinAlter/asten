@@ -38,6 +38,12 @@
     "shortDescription": "A writing desk that notices when the story contradicts itself.",
     "longDescription": "Asten keeps your manuscript on this machine and weighs every page against the canon you settle. It never writes your prose.",
     "category": "Productivity",
-    "createUpdaterArtifacts": false
+    "createUpdaterArtifacts": false,
+    "android": {
+      "minSdkVersion": 26
+    },
+    "iOS": {
+      "minimumSystemVersion": "15.0"
+    }
   }
 }
