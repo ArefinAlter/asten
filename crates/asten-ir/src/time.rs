@@ -62,9 +62,21 @@ impl TimeBounds {
         matches!((self.lo, self.hi), (Some(a), Some(b)) if a == b)
     }
 
-    /// Whether the two intervals can overlap under some choice within their bounds.
+    /// Whether the interval holds no tick at all: `lo > hi`. The analyses use
+    /// this form when clipping shows a value never holds (§9.3); no other
+    /// `TimeBounds` can say "never".
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        matches!((self.lo, self.hi), (Some(lo), Some(hi)) if lo > hi)
+    }
+
+    /// Whether the two intervals can overlap under some choice within their
+    /// bounds. An empty interval overlaps nothing.
     #[must_use]
     pub fn may_overlap(&self, other: &TimeBounds) -> bool {
+        if self.is_empty() || other.is_empty() {
+            return false;
+        }
         let starts_before_other_ends = match (self.lo, other.hi) {
             (Some(lo), Some(hi)) => lo <= hi,
             _ => true,
@@ -77,9 +89,13 @@ impl TimeBounds {
     }
 
     /// Whether `point`, whose own time is only known within `point_bounds`, is
-    /// necessarily inside this interval under every allowed placement.
+    /// necessarily inside this interval under every allowed placement. An
+    /// empty interval contains nothing, and an empty point has no placement.
     #[must_use]
     pub fn must_contain(&self, point_bounds: &TimeBounds) -> bool {
+        if self.is_empty() || point_bounds.is_empty() {
+            return false;
+        }
         let (Some(p_lo), Some(p_hi)) = (point_bounds.lo, point_bounds.hi) else {
             // An unbounded point could lie anywhere; only an unbounded interval must contain it.
             return self.is_unbounded();

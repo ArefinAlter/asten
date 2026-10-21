@@ -14,3 +14,6 @@ sha2.workspace = true
 [features]
 # Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
 ts = ["dep:ts-rs"]
+
+[dev-dependencies]
+proptest.workspace = true
