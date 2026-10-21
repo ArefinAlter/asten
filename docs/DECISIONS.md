@@ -313,3 +313,177 @@ Shipped, Next, Later, Never. "Never" lists promises, not plans.
 counterpart. The cost is site edits in feature PRs.
 
 **Status.** Accepted.
+
+## D17. The desk is verified in a real browser against the real API
+
+*October 2026*
+
+**Context.** Hosted CI was unavailable (account billing) and unit tests cannot
+see a livelock between the desk's queries and the change stream.
+
+**Decision.** A Playwright suite (`apps/web/e2e`) starts `asten-api` on a fresh
+database in pairing mode, serves the built desk from it, reads the bootstrap
+code without logging it, and drives the desk through pairing, the binder, a
+contradiction, a repair, Settings and the phone layout. It runs locally in
+under ten seconds warm and is the release gate alongside the Rust suite.
+Traces are off by default so no token is persisted.
+
+**Consequences.** The suite found that a plain diagnostics fetch announced a
+revision and sent every subscriber back to fetch, forever. The cost is a
+Chromium download and a serial, API-backed run.
+
+**Status.** Accepted.
+
+## D18. A read never announces a revision
+
+*October 2026*
+
+**Context.** `analyze_project` announced a revision after every analysis,
+including the one a `GET /story/diagnostics` triggers, so the desk livelocked.
+
+**Decision.** A revision event is sent only when the analysis changed the
+revision. Reads are silent; writes announce.
+
+**Consequences.** New marks and applied repairs reach every subscriber once.
+Amends D6's stream description.
+
+**Status.** Accepted.
+
+## D19. Documents travel as summaries; one body at a time
+
+*October 2026*
+
+**Context.** The document list carried every body on every refetch: 1.4 MB
+per keystroke-commit on a 225k-word project.
+
+**Decision.** `GET /projects/{id}/documents?fields=summary` returns everything
+but the body plus a server-side word count (split on Unicode white space, the
+same rule in Rust and TypeScript). The desk lists summaries and fetches the
+open page's body in one query that the stream invalidates on its own. SQLite
+runs in WAL mode with the hot indexes in place; views beyond Overview and the
+editor load lazily.
+
+**Consequences.** 63x less on the wire for the list, a smaller first paint,
+and a word count that agrees everywhere. The cost is one more query for the
+open page and a second shape for the same record.
+
+**Status.** Accepted.
+
+## D20. Updates are user-initiated and signed; the key never enters the repository
+
+*October 2026*
+
+**Context.** A desktop app without an updater strands early-access users on
+old builds; an updater that phones home on a timer breaks the no-telemetry
+promise.
+
+**Decision.** The shell checks for an update only when the author presses the
+button under Settings, verifies the artifact against a public key committed in
+the config, and installs on a second confirmation. The private key lives
+outside every repository on the release machine and reaches CI only as a
+secret. Backups of the database are taken on launch, and logs rotate in the
+app-data folder; both paths are shown to the author.
+
+**Consequences.** No background network traffic; a signed, verifiable update
+path. The cost is a key to guard and secrets to configure before the first
+release.
+
+**Status.** Accepted.
+
+## D21. The API document is generated from the handlers and held to the router
+
+*October 2026*
+
+**Context.** A hand-written OpenAPI file drifts the day after it is written.
+
+**Decision.** Every handler carries a `utoipa::path` annotation and every
+contract type derives a schema behind an `openapi` feature that coexists with
+the `ts` feature. The document is served publicly at `/api/v1/openapi.json`,
+exported to `docs/openapi.json`, and a test parses the route literals from the
+source and fails when a route lacks an annotation or an annotation lacks a
+route. Shapes that utoipa cannot express are written by hand and validated
+against real serialised values.
+
+**Consequences.** Tinkerers get a document that cannot lie about the routes.
+The cost is an attribute block per handler and a regeneration step.
+
+**Status.** Accepted.
+
+## D22. Properties, not only examples, for the algorithmic crates
+
+*October 2026*
+
+**Context.** Example tests passed while negative dates, decomposed accents and
+sub-tick relative amounts were wrong.
+
+**Decision.** The block model, calendars, the temporal network, perception's
+folding and matching, and the event-calculus clipping are specified as
+properties with proptest (256 cases per run, more on demand), checked against
+brute-force models where one exists. A failing property is a bug in the
+implementation unless the property is shown to be wrong, and the record says
+which.
+
+**Consequences.** Found and fixed: unparseable negative years, clock times
+never read back, a month-name prefix match, sub-tick units scaled up, a
+fortnight of seven days, patterns and text folded differently, an inverted
+interval treated as overlap, and three quadratic scans. The cost is a few
+seconds per crate suite.
+
+**Status.** Accepted.
+
+## D23. A session cookie counts only when the Origin matches
+
+*October 2026*
+
+**Context.** `SameSite=Strict` does not stop another port or subdomain on the
+same site, and several routes take no body, so a forged request could ride the
+cookie.
+
+**Decision.** The cookie is honoured only when the request's `Origin` matches
+the host; requests without an `Origin` (same-origin navigations and plain
+GETs) pass; a mismatch is a 401. Bearer tokens are unaffected. Behind a
+trusted proxy the client is the rightmost untrusted forwarded hop.
+
+**Consequences.** CSRF on bodiless routes is closed; the desk's own flows are
+unchanged. Amends D7.
+
+**Status.** Accepted.
+
+## D24. EPUB and Final Draft are deterministic writers on one screenplay classifier
+
+*October 2026*
+
+**Context.** Screenwriters and publishers asked for `.fdx` and EPUB; the
+Fountain compile glued dialogue wrongly and compile order was flat.
+
+**Decision.** One classifier in the domain crate decides scene headings,
+action, character, parenthetical, dialogue and transitions for Fountain, FDX
+and EPUB alike. Compile walks the binder depth-first for every format. The
+EPUB is written with `mimetype` first and stored, a navigation document, an
+NCX for older readers and one XHTML per document; FDX import reads only the
+script content and marks forced elements so a round trip is stable.
+
+**Consequences.** Three formats share one source of truth and the structural
+tests read the archives back. Conformance beyond structure is unverified
+offline (no epubcheck, no Final Draft).
+
+**Status.** Accepted.
+
+## D25. Accessibility is audited per component; the brand tokens stay
+
+*October 2026*
+
+**Context.** The brand's accessibility promise had no measurement behind it,
+and the new drawer and sheet had no focus management.
+
+**Decision.** A script computes WCAG 2.1 contrast for every text and control
+pair in both themes; failures are fixed with component-level overrides, never
+by changing the brand tokens. Drawers and sheets are dialogs with focus traps
+and `inert` siblings; the binder is a keyboard tree; save state and new marks
+go through one live region; reduced motion removes movement and keeps
+opacity. Onboarding is three lines and one button, no tour.
+
+**Consequences.** Every audited pair meets AA; the desk is usable from the
+keyboard end to end. Screen-reader runs are still to be done by a person.
+
+**Status.** Accepted.
