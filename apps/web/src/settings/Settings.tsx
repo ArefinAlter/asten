@@ -8,6 +8,7 @@ import type {
 } from "@asten/contracts";
 import { type InputHTMLAttributes, useEffect, useState } from "react";
 import { createAstenClient } from "../lib/asten-client";
+import { DeskPath, UpdateCheck } from "./ThisDesk";
 
 interface Props {
   projectId: string;
@@ -281,40 +282,26 @@ export function Settings({ projectId, snapshot }: Props) {
                 <strong>Authentication</strong>
                 <small className="mono">{desk.data.auth_mode}</small>
               </li>
-              <li className="row">
-                <strong>Your file</strong>
-                {desk.data.database_path ? (
-                  <small
-                    className="mono desk-path"
-                    title={desk.data.database_path}
-                  >
-                    {desk.data.database_path}
-                    <button
-                      type="button"
-                      className="linkish"
-                      onClick={() => {
-                        void navigator.clipboard
-                          ?.writeText(desk.data?.database_path ?? "")
-                          .catch(() => undefined);
-                      }}
-                    >
-                      copy
-                    </button>
-                  </small>
-                ) : (
-                  <small className="hint">
-                    On the machine that runs the API. Only its desk sees the
-                    path.
-                  </small>
-                )}
-              </li>
+              <DeskPath
+                label="Your file"
+                path={desk.data.database_path}
+                missing="On the machine that runs the API. Only its desk sees the path."
+              />
+              {desk.data.logs_path && (
+                <DeskPath label="Logs" path={desk.data.logs_path} />
+              )}
+              {desk.data.backups_path && (
+                <DeskPath label="Backups" path={desk.data.backups_path} />
+              )}
+              <UpdateCheck host={desk.data.host} version={desk.data.version} />
             </ul>
           ) : (
             <p className="hint">Asking the API about itself\u2026</p>
           )}
           <p className="hint">
-            Back up by copying that one file while Asten is closed. Compile to
-            Markdown or .docx for a copy that needs no Asten at all.
+            {desk.data?.backups_path
+              ? "Asten copies your file into Backups each time it opens, six hours apart at most, and keeps the newest seven. Compile to Markdown or .docx for a copy that needs no Asten at all."
+              : "Back up by copying that one file while Asten is closed. Compile to Markdown or .docx for a copy that needs no Asten at all."}
           </p>
         </fieldset>
       </div>

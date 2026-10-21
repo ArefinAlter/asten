@@ -60,6 +60,11 @@ pub struct ApiConfig {
     pub database_path: Option<String>,
     /// True when a desktop or mobile shell hosts this API in-process.
     pub embedded: bool,
+    /// Where the hosting shell writes its logs, shown to desk and owner sessions.
+    pub logs_path: Option<String>,
+    /// Where the hosting shell keeps database backups, shown to desk and owner
+    /// sessions.
+    pub backups_path: Option<String>,
 }
 
 impl Default for ApiConfig {
@@ -72,6 +77,8 @@ impl Default for ApiConfig {
             trusted_proxies: Vec::new(),
             database_path: None,
             embedded: false,
+            logs_path: None,
+            backups_path: None,
         }
     }
 }
@@ -170,6 +177,8 @@ impl ApiConfig {
                 std::env::var("ASTEN_DATABASE_PATH").unwrap_or_else(|_| "data/asten.db".into()),
             ),
             embedded: false,
+            logs_path: None,
+            backups_path: None,
         }
     }
 }
@@ -388,14 +397,15 @@ async fn health() -> Json<HealthResponse> {
     })
 }
 
-/// What the desk shows about the machine it runs on. The database path is
-/// for desk and owner sessions; a guest learns only the version and host.
+/// What the desk shows about the machine it runs on. The database, log and
+/// backup paths are for desk and owner sessions; a guest learns only the
+/// version and host.
 #[utoipa::path(
     get,
     path = "/desk",
     tag = "desk",
     summary = "What this API runs on",
-    description = "The version, host, auth mode and whether a shell embeds the API. The database path is included for desk and owner-session tokens only; a guest learns the version and host.",
+    description = "The version, host, auth mode and whether a shell embeds the API. The database, log and backup paths are included for desk and owner-session tokens only; a guest learns the version and host.",
     responses(
         (status = 200, description = "The desk information", body = DeskInfo),
         (status = 401, description = "No valid token or session cookie", body = ErrorResponse)
@@ -407,16 +417,15 @@ async fn desk_info(
     Extension(auth::AuthenticatedClient(client)): Extension<auth::AuthenticatedClient>,
 ) -> Json<DeskInfo> {
     let privileged = client.kind.can_administer();
+    let only_privileged = |value: &Option<String>| if privileged { value.clone() } else { None };
     Json(DeskInfo {
         version: env!("CARGO_PKG_VERSION").to_owned(),
         host: format!("{} {}", std::env::consts::OS, std::env::consts::ARCH),
         embedded: state.config.embedded,
         auth_mode: state.config.auth_mode,
-        database_path: if privileged {
-            state.config.database_path.clone()
-        } else {
-            None
-        },
+        database_path: only_privileged(&state.config.database_path),
+        logs_path: only_privileged(&state.config.logs_path),
+        backups_path: only_privileged(&state.config.backups_path),
     })
 }
 

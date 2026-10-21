@@ -2,8 +2,19 @@
 //! directory, hosts the same loopback API the browser desk and the Word and
 //! Docs guests use, and hands its own webview a desk token. One transport, no
 //! parity drift between desktop and web.
+//!
+//! Around that it does the housekeeping a shipped app owes its writer: a copy
+//! of the database at launch, a log file, one running copy at a time, and an
+//! update check that runs only when asked.
 
-use std::{net::SocketAddr, sync::Arc};
+mod backup;
+mod logging;
+
+use std::{
+    net::SocketAddr,
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 use asten_api::ApiConfig;
 use asten_application::{Application, AuthMode};
@@ -22,6 +33,23 @@ pub struct DeskSession {
 struct DesktopState {
     application: Application,
     session: DeskSession,
+}
+
+/// Where this desk keeps its things, all under the OS app-data directory.
+struct DeskPaths {
+    database: PathBuf,
+    logs: PathBuf,
+    backups: PathBuf,
+}
+
+impl DeskPaths {
+    fn under(data: &Path) -> Self {
+        Self {
+            database: data.join("asten.db"),
+            logs: data.join("logs"),
+            backups: data.join("backups"),
+        }
+    }
 }
 
 #[tauri::command]
@@ -57,18 +85,63 @@ async fn start_pairing(
     })
 }
 
+/// Bring the one running window forward when a second copy is launched.
+#[cfg(desktop)]
+fn focus_main_window(app: &tauri::AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.unminimize();
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let _ = tracing_subscriber::fmt()
-        .with_env_filter("asten_desktop=info,asten_api=info")
-        .try_init();
-    tauri::Builder::default()
+    let builder = tauri::Builder::default();
+    // Desktop only. The single-instance guard goes first so a second launch
+    // is turned away before anything else starts (and before a second API
+    // server could bind). The updater asks GitHub for `latest.json` only when
+    // the writer presses the button in Settings; nothing checks on its own.
+    #[cfg(desktop)]
+    let builder = builder
+        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            focus_main_window(app);
+        }))
+        .plugin(tauri_plugin_updater::Builder::new().build());
+    builder
+        .plugin(tauri_plugin_process::init())
         .setup(|app| {
             let data_directory = app.path().app_data_dir()?;
             std::fs::create_dir_all(&data_directory)?;
-            let database_path = data_directory.join("asten.db");
+            let paths = DeskPaths::under(&data_directory);
+            std::fs::create_dir_all(&paths.logs)?;
+            std::fs::create_dir_all(&paths.backups)?;
+            // The guard flushes the log file at exit; managed state lives as
+            // long as the app does, which is exactly as long as it is needed.
+            app.manage(logging::init(&paths.logs));
+            tracing::info!(
+                version = env!("CARGO_PKG_VERSION"),
+                data = %data_directory.display(),
+                "Asten is starting"
+            );
             let (application, session) = tauri::async_runtime::block_on(async {
-                let repository = asten_storage::SqliteRepository::open(&database_path).await?;
+                // Copy the file before anything opens it, so a migration that
+                // goes wrong still leaves a known-good file to return to.
+                match backup::back_up(&paths.database, &paths.backups).await {
+                    Ok(backup::Outcome::Written(path)) => {
+                        tracing::info!(path = %path.display(), "backed up the database");
+                    }
+                    Ok(backup::Outcome::Recent(path)) => {
+                        tracing::debug!(path = %path.display(), "the newest backup is recent");
+                    }
+                    Ok(backup::Outcome::NothingToCopy) => {
+                        tracing::debug!("no database yet; nothing to back up");
+                    }
+                    Err(error) => {
+                        tracing::warn!(%error, "could not back up the database; continuing");
+                    }
+                }
+                let repository = asten_storage::SqliteRepository::open(&paths.database).await?;
                 let application = Application::with_auth(Arc::new(repository), AuthMode::Pairing);
                 // Each launch gets a fresh desk token; older desk tokens are revoked.
                 for token in application.list_tokens().await? {
@@ -84,7 +157,9 @@ pub fn run() {
                 let config = ApiConfig {
                     auth_mode: AuthMode::Pairing,
                     serve_desk: None,
-                    database_path: Some(database_path.display().to_string()),
+                    database_path: Some(paths.database.display().to_string()),
+                    logs_path: Some(paths.logs.display().to_string()),
+                    backups_path: Some(paths.backups.display().to_string()),
                     embedded: true,
                     ..ApiConfig::default()
                 };
@@ -99,7 +174,7 @@ pub fn run() {
                 let session = DeskSession {
                     origin,
                     token: desk.token,
-                    database_path: database_path.display().to_string(),
+                    database_path: paths.database.display().to_string(),
                     version: env!("CARGO_PKG_VERSION").to_owned(),
                 };
                 Ok::<_, Box<dyn std::error::Error>>((application, session))

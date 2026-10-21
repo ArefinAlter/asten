@@ -24,6 +24,14 @@
       "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' asset: data: blob:; connect-src 'self' ipc: http://ipc.localhost http://127.0.0.1:* http://localhost:*; object-src 'none'; base-uri 'none'; form-action 'self'"
     }
   },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDg5RjM1RkU2MDZFQUNGODIKUldTQ3orb0c1bC96aWZYaGIwOEwwZWJzRldiMFZzYVNGdFV6WkVINDd3blpzM0FINWNSeW10UzkK",
+      "endpoints": [
+        "https://github.com/ArefinAlter/asten/releases/latest/download/latest.json"
+      ]
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",
@@ -38,7 +46,7 @@
     "shortDescription": "A writing desk that notices when the story contradicts itself.",
     "longDescription": "Asten keeps your manuscript on this machine and weighs every page against the canon you settle. It never writes your prose.",
     "category": "Productivity",
-    "createUpdaterArtifacts": false,
+    "createUpdaterArtifacts": true,
     "android": {
       "minSdkVersion": 26
     },

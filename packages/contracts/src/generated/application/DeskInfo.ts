@@ -13,4 +13,14 @@ embedded: boolean, auth_mode: AuthMode,
 /**
  * Where the SQLite file lives. Only desk and owner sessions see it.
  */
-database_path?: string | null, };
+database_path?: string | null, 
+/**
+ * Where the hosting shell writes its log files, when a shell hosts the
+ * API. Only desk and owner sessions see it.
+ */
+logs_path?: string | null, 
+/**
+ * Where the hosting shell keeps its launch-time copies of the database.
+ * Only desk and owner sessions see it.
+ */
+backups_path?: string | null, };

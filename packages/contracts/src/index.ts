@@ -1053,6 +1053,8 @@ export interface DeskInfo {
   embedded: boolean;
   auth_mode: AuthMode;
   database_path?: string | null;
+  logs_path?: string | null;
+  backups_path?: string | null;
 }
 
 export interface AuthStatus {

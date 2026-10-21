@@ -8,6 +8,13 @@ name: Release
 #   macOS    APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY,
 #            APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID (notarisation)
 # Unsigned builds still install; the OS warns first. See docs/PLATFORMS.md.
+#
+# The in-app updater is separate from code signing and its key is required:
+# every installer gets a minisign signature and the job writes latest.json,
+# which the desk's "Check for updates" reads from the latest published
+# release. The key pair lives outside the repository; docs/PLATFORMS.md says
+# where.
+#   TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD
 
 on:
   push:
@@ -77,6 +84,9 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signs the updater artifacts (required; see the header).
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           # Optional Windows code signing.
           WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
           WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
@@ -95,7 +105,9 @@ jobs:
             Early-access desktop build for Windows (x64, ARM64), macOS (universal)
             and Linux (x86_64, aarch64). Installers are unsigned; the operating
             system will warn before the first run. Your manuscript stays on your
-            machine.
+            machine. Later versions arrive through Settings, This desk, Check
+            for updates; nothing checks on its own.
           releaseDraft: true
           prerelease: true
+          includeUpdaterJson: true
           args: ${{ matrix.args }}
