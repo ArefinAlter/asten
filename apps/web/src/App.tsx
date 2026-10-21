@@ -777,6 +777,27 @@ function Desk() {
               <Guests />
             ) : view === "packs" ? (
               <Packs />
+            ) : projects.data?.length === 0 ? (
+              <section className="empty-state">
+                <PaletteMark className="hero-mark" />
+                <h1>A writing desk with a memory.</h1>
+                <p>Your words stay black. Asten only ever writes in red.</p>
+                <ol className="first-steps">
+                  <li>Create a project.</li>
+                  <li>Write a scene.</li>
+                  <li>Settle a fact when it matters.</li>
+                </ol>
+                <button
+                  type="button"
+                  className="btn btn--primary"
+                  onClick={() => {
+                    setIsCreating(true);
+                    if (narrow) setSidebarOpen(true);
+                  }}
+                >
+                  Create a project
+                </button>
+              </section>
             ) : (
               <section className="empty-state">
                 <PaletteMark className="hero-mark" />
@@ -901,8 +922,7 @@ function Desk() {
                     Add a scene in the binder, or import a manuscript under
                     Compile. The world tools are not the gate.
                   </p>
-                </section>
-              )}
+                </section>              )}
             </section>
           ) : (
             <Overview

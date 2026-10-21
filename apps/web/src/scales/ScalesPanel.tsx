@@ -10,6 +10,7 @@ import type {
 import { Scales } from "../brand/Scales";
 import { createAstenClient } from "../lib/asten-client";
 import { percent, severityWord } from "../lib/format";
+import { useStoredState } from "../lib/hooks";
 
 type Filter =
   "all" | "error" | "warning" | "information" | "hint" | "new" | "suppressed";
@@ -50,6 +51,12 @@ export function ScalesPanel({
   const [reasonFor, setReasonFor] = useState<string>();
   const [reason, setReason] = useState("");
   const [bisecting, setBisecting] = useState<Record<string, string>>({});
+  // The first time a mark appears, one line says what a mark is. Dismissed
+  // once, it stays dismissed on this machine.
+  const [markNote, setMarkNote] = useStoredState<"shown" | "dismissed">(
+    "asten-first-mark-note",
+    "shown",
+  );
 
   const marks = useMemo(() => snapshot?.diagnostics ?? [], [snapshot]);
   const visible = useMemo(() => {
@@ -197,6 +204,20 @@ export function ScalesPanel({
       </header>
       {!collapsed && (
         <div className="scales-body">
+          {counts.all > 0 && markNote !== "dismissed" && (
+            <p className="hint first-mark-note">
+              <span>
+                Marks are suggestions, not corrections. You decide what stands.
+              </span>
+              <button
+                type="button"
+                className="linkish"
+                onClick={() => setMarkNote("dismissed")}
+              >
+                Dismiss
+              </button>
+            </p>
+          )}
           {loading && marks.length === 0 ? (
             <p className="status">Weighing the pages…</p>
           ) : visible.length === 0 ? (
