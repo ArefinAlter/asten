@@ -12,6 +12,7 @@
     "check": "pnpm -r check && cargo check --workspace",
     "lint": "pnpm -r lint && cargo clippy --workspace --all-targets -- -D warnings",
     "test": "pnpm -r test && cargo test --workspace --exclude asten-desktop",
+    "e2e": "pnpm --filter @asten/web e2e",
     "format": "pnpm -r format && cargo fmt --all",
     "format:check": "pnpm -r format:check && cargo fmt --all -- --check",
     "contracts:gen": "node scripts/contracts-gen.mjs"
