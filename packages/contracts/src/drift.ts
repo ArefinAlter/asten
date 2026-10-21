@@ -151,6 +151,12 @@ export type _CompileArtifact = Check<
 export type _ImportRequest = Check<
   Mutual<H.ImportRequest, G.application.ImportRequest>
 >;
+export type _CompileFormat = Check<
+  Mutual<H.CompileFormat, G.application.CompileFormat>
+>;
+export type _ImportFormat = Check<
+  Mutual<H.ImportFormat, G.application.ImportFormat>
+>;
 export type _WorldEntry = Check<Mutual<H.WorldEntry, G.domain.WorldEntry>>;
 export type _CreateWorldEntry = Check<
   Mutual<H.CreateWorldEntry, G.application.CreateWorldEntry>

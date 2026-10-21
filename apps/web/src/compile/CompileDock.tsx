@@ -16,6 +16,8 @@ const FORMATS: { id: CompileFormat; label: string }[] = [
   { id: "fountain", label: "Fountain" },
   { id: "html", label: "HTML (print to PDF)" },
   { id: "docx", label: "Word (.docx)" },
+  { id: "epub", label: "EPUB" },
+  { id: "fdx", label: "Final Draft (.fdx)" },
 ];
 
 export function CompileDock({
@@ -93,13 +95,13 @@ export function CompileDock({
             <Glyph name="door" /> Bring prose home
           </h2>
           <p className="hint">
-            Markdown, plain text, Fountain, HTML, or .docx. Each top-level
-            paragraph becomes a block with a stable id, so the engine can follow
-            it through every later edit.
+            Markdown, plain text, Fountain, Final Draft (.fdx), HTML, or .docx.
+            Each top-level paragraph becomes a block with a stable id, so the
+            engine can follow it through every later edit.
           </p>
           <input
             type="file"
-            accept=".md,.txt,.fountain,.html,.docx"
+            accept=".md,.txt,.fountain,.fdx,.html,.htm,.docx"
             onChange={(event) => {
               const file = event.target.files?.[0];
               if (file) onImportFile(file);

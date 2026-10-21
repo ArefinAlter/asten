@@ -944,7 +944,8 @@ export interface TrackedChange {
   created_at: string;
 }
 
-export type CompileFormat = "markdown" | "plain" | "fountain" | "html" | "docx";
+export type CompileFormat =
+  "markdown" | "plain" | "fountain" | "html" | "docx" | "epub" | "fdx";
 
 export interface CompileRequest {
   format?: CompileFormat;
@@ -958,7 +959,8 @@ export interface CompileArtifact {
   body: string;
 }
 
-export type ImportFormat = "markdown" | "plain" | "fountain" | "html" | "docx";
+export type ImportFormat =
+  "markdown" | "plain" | "fountain" | "html" | "docx" | "fdx";
 
 export interface ImportRequest {
   filename: string;
