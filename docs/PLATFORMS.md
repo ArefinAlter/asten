@@ -119,7 +119,9 @@ the code from the desk's Guests panel once.
 
 ## Checks
 
-CI checks the Tauri shell on Windows, Ubuntu and macOS on every push
-(`.github/workflows/ci.yml`, job `desktop`). The Rust workspace and the desk are
+CI checks the Tauri shell on Windows and Ubuntu on every push, and on macOS
+weekly and on demand (Actions → CI → Run workflow), because macOS minutes bill
+at ten times the Linux rate (`.github/workflows/ci.yml`, job `desktop`). Release
+builds always include macOS. The Rust workspace and the desk are
 checked on Ubuntu. Hardware testing for Windows on ARM and Linux aarch64 has not
 been done; the builds compile and the code has no architecture-specific paths.

@@ -3,6 +3,12 @@ name: CI
 on:
   push:
   pull_request:
+  # The macOS shell check bills at ten times the Linux rate, so it runs on a
+  # weekly schedule and on demand rather than on every push. Release builds
+  # always include macOS.
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
 
 permissions:
   contents: read
@@ -51,7 +57,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: ${{ fromJSON((github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && '["windows-latest", "ubuntu-latest", "macos-latest"]' || '["windows-latest", "ubuntu-latest"]') }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
