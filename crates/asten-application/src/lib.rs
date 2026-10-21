@@ -65,6 +65,24 @@ pub type Result<T> = std::result::Result<T, ApplicationError>;
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+pub struct DeskInfo {
+    pub version: String,
+    /// Operating system and processor of the machine running the API.
+    pub host: String,
+    /// True when the API is embedded in the desktop or mobile shell.
+    pub embedded: bool,
+    pub auth_mode: AuthMode,
+    /// Where the SQLite file lives. Only desk and owner sessions see it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub database_path: Option<String>,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateProject {
     pub name: String,

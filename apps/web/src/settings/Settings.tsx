@@ -34,6 +34,17 @@ export function Settings({ projectId, snapshot }: Props) {
       });
     },
   });
+  const desk = useQuery({
+    queryKey: ["desk-info"],
+    queryFn: () => client.deskInfo(),
+  });
+  const [origin, setOrigin] = useState("");
+  useEffect(() => {
+    client
+      .origin()
+      .then((value) => setOrigin(value || window.location.origin))
+      .catch(() => setOrigin(window.location.origin));
+  }, [client]);
   const data = settings.data;
   if (!data) return <p className="status">Loading…</p>;
 
@@ -248,6 +259,62 @@ export function Settings({ projectId, snapshot }: Props) {
             Tier C: checks between settled facts, any language. Tier B: plus
             names and lexicon attributes read from the page. Tier A: trained
             perception models, planned and local.
+          </p>
+        </fieldset>
+        <fieldset>
+          <legend className="mono">This desk</legend>
+          {desk.data ? (
+            <ul className="plain-list">
+              <li className="row">
+                <strong>Asten {desk.data.version}</strong>
+                <small className="mono">{desk.data.host}</small>
+              </li>
+              <li className="row">
+                <strong>
+                  {desk.data.embedded
+                    ? "The API runs inside this app"
+                    : "The API is a server you started"}
+                </strong>
+                <small className="mono">{origin || "\u2026"}</small>
+              </li>
+              <li className="row">
+                <strong>Authentication</strong>
+                <small className="mono">{desk.data.auth_mode}</small>
+              </li>
+              <li className="row">
+                <strong>Your file</strong>
+                {desk.data.database_path ? (
+                  <small
+                    className="mono desk-path"
+                    title={desk.data.database_path}
+                  >
+                    {desk.data.database_path}
+                    <button
+                      type="button"
+                      className="linkish"
+                      onClick={() => {
+                        void navigator.clipboard
+                          ?.writeText(desk.data?.database_path ?? "")
+                          .catch(() => undefined);
+                      }}
+                    >
+                      copy
+                    </button>
+                  </small>
+                ) : (
+                  <small className="hint">
+                    On the machine that runs the API. Only its desk sees the
+                    path.
+                  </small>
+                )}
+              </li>
+            </ul>
+          ) : (
+            <p className="hint">Asking the API about itself\u2026</p>
+          )}
+          <p className="hint">
+            Back up by copying that one file while Asten is closed. Compile to
+            Markdown or .docx for a copy that needs no Asten at all.
           </p>
         </fieldset>
       </div>

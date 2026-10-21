@@ -1022,6 +1022,15 @@ export interface WorldPulse {
 export type AuthMode = "off" | "pairing" | "owner";
 export type TokenKind = "desk" | "guest" | "session";
 
+/** What the desk shows about the machine running the API. */
+export interface DeskInfo {
+  version: string;
+  host: string;
+  embedded: boolean;
+  auth_mode: AuthMode;
+  database_path?: string | null;
+}
+
 export interface AuthStatus {
   mode: AuthMode;
   owner_configured: boolean;

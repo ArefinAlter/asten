@@ -2291,3 +2291,11 @@ body {
     font-size: 16px; /* keeps iOS from zooming the page on focus */
   }
 }
+
+.desk-path {
+  display: inline-flex;
+  gap: 8px;
+  align-items: baseline;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Asten",
+  "short_name": "Asten",
+  "description": "A writing desk with a memory. Your words in black; Asten's marks in red.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5eedf",
+  "theme_color": "#f5eedf",
+  "categories": ["productivity"],
+  "icons": [
+    { "src": "/icons/asten-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/asten-512.png", "sizes": "512x512", "type": "image/png" },
+    {
+      "src": "/icons/asten-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

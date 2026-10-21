@@ -84,6 +84,8 @@ pub fn run() {
                 let config = ApiConfig {
                     auth_mode: AuthMode::Pairing,
                     serve_desk: None,
+                    database_path: Some(database_path.display().to_string()),
+                    embedded: true,
                     ..ApiConfig::default()
                 };
                 let serving = application.clone();

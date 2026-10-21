@@ -12,6 +12,19 @@ import { applyStoredTheme } from "./brand/ThemeToggle";
 
 applyStoredTheme();
 
+// Installable web app: the shell is cached so a phone can reopen the desk
+// without the network; the API is never cached. The desktop and mobile shells
+// load from their bundle and need no worker.
+if (
+  import.meta.env.PROD &&
+  "serviceWorker" in navigator &&
+  !("__TAURI_INTERNALS__" in window)
+) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => undefined);
+  });
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
