@@ -353,6 +353,13 @@ impl Application {
                 }
             }
         }
+        // A read re-analyses the revision the engine already had. Announcing
+        // that as a new revision would send every subscriber back to fetch,
+        // which re-analyses, which announces again, without end.
+        let revision_changed = outcome
+            .delta
+            .as_ref()
+            .is_none_or(|delta| delta.from_revision != delta.revision);
         if let Some(delta) = outcome.delta {
             if !(delta.diff.added.is_empty()
                 && delta.diff.removed.is_empty()
@@ -361,12 +368,14 @@ impl Application {
                 self.notify(project_id, StreamEvent::Diagnostics(delta));
             }
         }
-        self.notify(
-            project_id,
-            StreamEvent::Revision {
-                revision: outcome.snapshot.revision.clone(),
-            },
-        );
+        if revision_changed {
+            self.notify(
+                project_id,
+                StreamEvent::Revision {
+                    revision: outcome.snapshot.revision.clone(),
+                },
+            );
+        }
         Ok(outcome.snapshot)
     }
 
