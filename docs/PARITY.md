@@ -33,7 +33,7 @@ what each door can do, why a gap exists where it does, and how it would close.
 | Guests panel: mint codes, revoke tokens      | ✓       | ✓ (desk token)     | ✓ (desk token)  | ◐ no reachable guests⁵ | ✗ (guest) | ✗ (guest) |
 | Owner passphrase                             | ✓       | ✓                  | ✓               | ◐ not needed⁵ | ✗         | ✗            |
 | Where the database file lives                | ✓       | ✓ (`/desk`, desk token) | ✓          | ✓ (sandbox path) | ✗      | ✗            |
-| Live change stream                           | ✓       | ✓                  | ✓               | ✓             | ✗ (refresh button) | ✗ (refresh button) |
+| Live change stream                           | ✓       | ✓                  | ✓               | ✓             | ✓ (ticket)⁶ | ✓ (ticket)⁶ |
 | Dark and light theme                         | ✓       | ✓                  | ✓               | ✓             | ◐ follows Office | ◐ follows Docs |
 | Keyboard shortcuts (Ctrl/⌘ F, J)             | ✓       | ✓                  | —               | —             | —         | —            |
 | Works with no network at all                 | ✓       | ✓ (same machine)   | ✗ needs the LAN | ✓             | ✗         | ✗            |
@@ -49,6 +49,10 @@ platform's way out and is on the list below.
 ⁵ A phone's embedded API is not reachable from another device, so there is
 nothing to pair with it. The owner passphrase exists for hosting the API beyond
 the machine, which a phone does not do.
+⁶ The panes open the same `EventSource` the desk does, each connection paid
+for with a single-use stream ticket, and re-fetch the Scales on every revision.
+If the stream drops they reconnect with backoff on a fresh ticket; the Refresh
+button stays as the fallback.
 
 ## Why the gaps are where they are
 
@@ -81,6 +85,5 @@ Three decisions keep the doors aligned:
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | Compile download on mobile            | Tauri `dialog` + `fs` plugins to save, or the share sheet via the `share` community plugin             |
 | Guest panes: repairs                  | Only if the pane can show the explanation chain; otherwise it stays a window onto the Scales           |
-| Guest panes: live updates             | `EventSource` with a stream ticket, as the desk does; the panes refresh on a button today              |
 | Phone browser needs the LAN           | By design: the manuscript stays on the machine that owns it. The mobile shell is the offline answer    |
 | Office and Workspace store listing    | Separate review processes; the panes are sideloaded until then                                         |

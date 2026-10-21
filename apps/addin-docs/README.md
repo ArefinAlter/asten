@@ -14,6 +14,16 @@ iframe origin changes between loads, the token is kept in the script's user
 properties (private to your Google account and this script), not in the
 browser. **Forget this pairing** revokes it; so does the desk's Guests panel.
 
+## Live Scales
+
+Once paired, the sidebar follows the project's change stream: it asks the API
+for a stream ticket (`POST /projects/{id}/stream-ticket`, single use, valid
+for one minute) and opens an `EventSource` on `/projects/{id}/stream` with
+it, so the token never appears in a URL. The Scales re-weigh on every
+revision, whoever made it. If the stream drops, the sidebar fetches a fresh
+ticket and reconnects with backoff; **Refresh the Scales** stays as a
+fallback. A revoked pairing returns the sidebar to the code screen.
+
 ## Sideload
 
 1. Start the local API: `pnpm dev:api` in the Asten repository, or open the

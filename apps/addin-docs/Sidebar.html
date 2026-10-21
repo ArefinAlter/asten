@@ -18,6 +18,8 @@
       li { margin: 10px 0; padding-left: 10px; border-left: 2px solid var(--rule); }
       li.error { border-left-color: var(--rubric); }
       li .code { color: var(--rubric); }
+      #live { margin: 8px 0 0; min-height: 1.4em; }
+      #live.on::before { content: "\25CF"; color: #2f7a3d; margin-right: 6px; }
       [hidden] { display: none !important; }
       hr { border: 0; border-top: 1px solid var(--rule); margin: 16px 0; }
     </style>
@@ -35,6 +37,7 @@
 
     <section id="desk" hidden>
       <label>Project<select id="project"></select></label>
+      <p class="quiet" id="live" aria-live="polite"></p>
       <button type="button" id="refresh">Refresh the Scales</button>
       <button type="button" class="quiet-button" id="file">File the selection as a scene</button>
       <ul id="problems"></ul>
@@ -45,6 +48,7 @@
 
     <script>
       const status = document.getElementById("status");
+      const live = document.getElementById("live");
       const pairing = document.getElementById("pairing");
       const desk = document.getElementById("desk");
       const project = document.getElementById("project");
@@ -82,6 +86,7 @@
       }
 
       function showPairing(message) {
+        stopStream();
         pairing.hidden = false;
         desk.hidden = true;
         if (message) say(message);
@@ -119,6 +124,7 @@
       }
 
       async function forget() {
+        stopStream();
         try {
           await call("/auth/logout", { method: "POST" });
         } catch (_) {
@@ -143,7 +149,12 @@
           project.append(option);
         }
         showDesk();
-        say(items.length ? "Paired with the desk on this machine." : "Paired. There is no project yet; make one in the desk.");
+        if (!items.length) {
+          say("Paired. There is no project yet; make one in the desk.");
+          return;
+        }
+        say("Paired with the desk on this machine.");
+        await watchProject();
       }
 
       async function loadDiagnostics() {
@@ -173,6 +184,95 @@
           problems.append(line);
         }
         say(items.length + (items.length === 1 ? " mark." : " marks.") + " Repairs live in the desk.");
+      }
+
+      // ── The change stream ──
+      // EventSource cannot send headers, so each connection spends a fresh
+      // single-use ticket from the desk (valid for one minute) instead of
+      // putting the bearer token in a URL. When the stream drops, the sidebar
+      // asks for another ticket and reconnects with backoff. The Refresh
+      // button stays as the fallback.
+      let stream = null;
+      let streamTimer = 0;
+      let streamAttempt = 0;
+      let weighTimer = 0;
+
+      function setLive(message, on) {
+        live.textContent = message;
+        live.className = on ? "quiet on" : "quiet";
+      }
+
+      function stopStream() {
+        clearTimeout(streamTimer);
+        clearTimeout(weighTimer);
+        streamTimer = 0;
+        weighTimer = 0;
+        if (stream) {
+          stream.close();
+          stream = null;
+        }
+        setLive("", false);
+      }
+
+      function scheduleReconnect() {
+        clearTimeout(streamTimer);
+        const delay = Math.min(30000, 1000 * Math.pow(2, Math.min(streamAttempt, 5)));
+        streamAttempt += 1;
+        setLive("Not live. Reconnecting to the desk…", false);
+        streamTimer = setTimeout(() => guard(openStream)(), delay);
+      }
+
+      async function openStream() {
+        const id = project.value;
+        if (!id || desk.hidden) return;
+        if (stream) {
+          stream.close();
+          stream = null;
+        }
+        let ticket;
+        try {
+          const response = await call("/projects/" + id + "/stream-ticket", { method: "POST" });
+          if (!response.ok) throw new Error("The desk did not issue a stream ticket.");
+          ticket = (await response.json()).ticket;
+        } catch (error) {
+          if (error instanceof Unauthorized) throw error;
+          scheduleReconnect();
+          return;
+        }
+        if (id !== project.value || desk.hidden) return;
+        const source = new EventSource(
+          api() + "/api/v1/projects/" + id + "/stream?ticket=" + encodeURIComponent(ticket),
+        );
+        stream = source;
+        const weigh = () => {
+          if (stream !== source) return;
+          // A revision and its diagnostics arrive together; weigh once.
+          clearTimeout(weighTimer);
+          weighTimer = setTimeout(() => guard(loadDiagnostics)(), 150);
+        };
+        source.addEventListener("diagnostics", weigh);
+        source.addEventListener("revision", weigh);
+        source.addEventListener("lagged", weigh);
+        source.onopen = () => {
+          streamAttempt = 0;
+          setLive("Live. The Scales follow the desk.", true);
+        };
+        source.onerror = () => {
+          if (stream !== source) return;
+          // A spent ticket cannot be replayed, so a dropped stream is
+          // reopened by hand rather than left to EventSource's own retry.
+          source.close();
+          stream = null;
+          scheduleReconnect();
+        };
+      }
+
+      async function watchProject() {
+        stopStream();
+        streamAttempt = 0;
+        if (!project.value) return;
+        await loadDiagnostics();
+        await openStream();
       }
 
       async function fileSelection() {
@@ -217,9 +317,11 @@
       document.getElementById("refresh").onclick = guard(loadDiagnostics);
       document.getElementById("file").onclick = guard(fileSelection);
       document.getElementById("forget").onclick = guard(forget);
+      project.onchange = guard(watchProject);
       codeInput.addEventListener("keydown", (event) => {
         if (event.key === "Enter") guard(pair)();
       });
+      window.addEventListener("pagehide", stopStream);
 
       async function boot() {
         try {
