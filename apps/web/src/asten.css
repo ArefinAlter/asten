@@ -51,6 +51,11 @@ textarea {
   width: 100%;
   padding: 6px 8px;
   border: 1px solid var(--rule);
+  /* A field's edge must read at 3:1 (WCAG 1.4.11); --rule is a divider
+     hairline, so the edge is ink-3 softened toward the field. The first line
+     is the fallback where color-mix is not understood. */
+  border-color: var(--rule-strong);
+  border-color: color-mix(in srgb, var(--ink-3) 80%, var(--papyrus-raised));
   border-radius: var(--radius-s);
   background: var(--papyrus-raised);
 }
@@ -543,6 +548,9 @@ code,
 
 .theme-toggle .tt-disk {
   fill: var(--gold);
+  /* Gold alone is 2.85:1 on papyrus; the ink outline identifies the control. */
+  stroke: var(--ink);
+  stroke-width: 1.2;
 }
 
 .theme-toggle .tt-rays line {
@@ -2298,4 +2306,39 @@ body {
   align-items: baseline;
   max-width: 100%;
   overflow-wrap: anywhere;
+}
+
+/* ───────── Contrast ─────────
+   Every pair is audited by scripts/contrast-audit.mjs against the brand
+   tokens; what fails on tokens alone is fixed here, per component, so the
+   pigments themselves stay as the brand set them. */
+
+/* Night: the primary button's natron label reads 3.1:1 on the night rubric,
+   the code cartouche 4.1:1 on its wash, and --warn is a day pigment. The
+   :where() keeps these at class specificity so the information-mark chip
+   (ink-3) still wins. */
+:where(:root[data-theme="night"]) .btn--primary {
+  --btn-fg: var(--papyrus);
+}
+
+:where(:root[data-theme="night"]) .chip--code {
+  color: var(--rubric-deep);
+}
+
+:where(:root[data-theme="night"]) .warn {
+  color: var(--gold);
+}
+
+@media (prefers-color-scheme: dark) {
+  :where(:root:not([data-theme="day"])) .btn--primary {
+    --btn-fg: var(--papyrus);
+  }
+
+  :where(:root:not([data-theme="day"])) .chip--code {
+    color: var(--rubric-deep);
+  }
+
+  :where(:root:not([data-theme="day"])) .warn {
+    color: var(--gold);
+  }
 }
