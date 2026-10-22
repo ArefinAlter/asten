@@ -151,7 +151,7 @@ pub fn resolve_times(ir: &StoryIr) -> (TimeTable, Vec<Violation>) {
     let mut guard = 0;
     let solution = loop {
         match stn.solve() {
-            Solution::Consistent { .. } => break stn.solve(),
+            solution @ Solution::Consistent { .. } => break solution,
             Solution::Inconsistent { cycle } => {
                 violations.push(cycle_violation(ir, &stn, &cycle));
                 // Drop the least trusted constraint in the cycle and try again.

@@ -23,14 +23,21 @@ pub const PERCEIVE_VERSION: &str = "tier-b/1";
 
 // ───────────────────────── folding and offsets ─────────────────────────
 
-/// A text folded for matching, with a map from folded scalars back to the
-/// original scalar index. NFKC, then per-character lowercasing.
+/// A text folded for matching, with a map from folded chars back to the
+/// original scalars. Each grapheme cluster is folded on its own (NFKC, then
+/// per-character lowercasing): NFKC composes and reorders marks only inside
+/// a cluster, so the result equals the fold of the whole text, which is how
+/// patterns are folded, while every folded char still knows the scalars it
+/// came from.
 #[derive(Clone, Debug)]
 pub struct Folded {
     pub chars: Vec<char>,
-    /// `origin[i]` is the original scalar index of folded char `i`.
+    /// `origin[i]` is the first original scalar of the cluster folded char
+    /// `i` came from (the scalar itself, for a character that folds alone).
     pub origin: Vec<usize>,
     pub text: String,
+    /// One past the last original scalar of that cluster.
+    origin_end: Vec<usize>,
     /// Byte offset of each folded char in `text`, plus the end.
     byte_starts: Vec<usize>,
 }
@@ -40,10 +47,15 @@ impl Folded {
     pub fn new(original: &str) -> Self {
         let mut chars = Vec::with_capacity(original.len());
         let mut origin = Vec::with_capacity(original.len());
-        for (index, ch) in original.chars().enumerate() {
-            for folded in ch.nfkc().flat_map(char::to_lowercase) {
+        let mut origin_end = Vec::with_capacity(original.len());
+        let mut scalar = 0usize;
+        for cluster in original.graphemes(true) {
+            let start = scalar;
+            scalar += cluster.chars().count();
+            for folded in cluster.nfkc().flat_map(fold_char) {
                 chars.push(folded);
-                origin.push(index);
+                origin.push(start);
+                origin_end.push(scalar);
             }
         }
         let text: String = chars.iter().collect();
@@ -58,25 +70,31 @@ impl Folded {
             chars,
             origin,
             text,
+            origin_end,
             byte_starts,
         }
     }
 
-    /// Folded char index for a byte offset in `text`.
-    fn char_index(&self, byte: usize) -> usize {
+    /// Folded char index for a byte offset in `text` (the end offset maps to
+    /// `chars.len()`).
+    #[must_use]
+    pub fn char_index(&self, byte: usize) -> usize {
         match self.byte_starts.binary_search(&byte) {
             Ok(index) => index,
             Err(index) => index.saturating_sub(1),
         }
     }
 
-    /// Original scalar span `[start, end)` for a folded char span.
-    fn original_span(&self, start: usize, end: usize) -> (u32, u32) {
+    /// Original scalar span `[start, end)` for a folded char span: the
+    /// scalars of the grapheme clusters the span was folded from, so a span
+    /// never cuts a cluster. An empty span gives `(0, 0)`.
+    #[must_use]
+    pub fn original_span(&self, start: usize, end: usize) -> (u32, u32) {
         if self.origin.is_empty() || start >= end {
             return (0, 0);
         }
         let s = self.origin[start.min(self.origin.len() - 1)];
-        let e = self.origin[(end - 1).min(self.origin.len() - 1)] + 1;
+        let e = self.origin_end[(end - 1).min(self.origin_end.len() - 1)];
         (s as u32, e as u32)
     }
 }
@@ -84,7 +102,19 @@ impl Folded {
 /// The matching form of a surface string.
 #[must_use]
 pub fn matching_form(text: &str) -> String {
-    text.trim().nfkc().flat_map(char::to_lowercase).collect()
+    text.trim().nfkc().flat_map(fold_char).collect()
+}
+
+/// Case-fold one scalar: lowercase, with Greek final sigma folded to sigma as
+/// Unicode case folding does, so a name matches however the word was cased.
+fn fold_char(ch: char) -> impl Iterator<Item = char> {
+    ch.to_lowercase().map(|folded| {
+        if folded == '\u{03C2}' {
+            '\u{03C3}'
+        } else {
+            folded
+        }
+    })
 }
 
 fn is_word_char(ch: char) -> bool {
@@ -183,7 +213,10 @@ pub struct Segments {
 
 #[must_use]
 pub fn segment(text: &str) -> Segments {
-    let byte_to_scalar = |byte: usize| text[..byte.min(text.len())].chars().count() as u32;
+    // Both iterators yield byte offsets in increasing order, so one cursor
+    // converts them to scalar offsets in a single pass instead of recounting
+    // the text from the start at every boundary.
+    let mut cursor = ScalarCursor::new(text);
     let mut sentences = Vec::new();
     let mut offset = 0usize;
     for sentence in text.unicode_sentences() {
@@ -192,14 +225,44 @@ pub fn segment(text: &str) -> Segments {
             .map(|found| offset + found)
             .unwrap_or(offset);
         let end = start + sentence.len();
-        sentences.push((byte_to_scalar(start), byte_to_scalar(end)));
+        sentences.push((cursor.scalar(start), cursor.scalar(end)));
         offset = end;
     }
+    let mut cursor = ScalarCursor::new(text);
     let words = text
         .unicode_word_indices()
-        .map(|(byte, word)| (byte_to_scalar(byte), byte_to_scalar(byte + word.len())))
+        .map(|(byte, word)| (cursor.scalar(byte), cursor.scalar(byte + word.len())))
         .collect();
     Segments { sentences, words }
+}
+
+/// Converts byte offsets to scalar offsets, counting only the text between
+/// successive queries when they arrive in increasing order.
+struct ScalarCursor<'a> {
+    text: &'a str,
+    byte: usize,
+    scalar: u32,
+}
+
+impl<'a> ScalarCursor<'a> {
+    fn new(text: &'a str) -> Self {
+        Self {
+            text,
+            byte: 0,
+            scalar: 0,
+        }
+    }
+
+    fn scalar(&mut self, byte: usize) -> u32 {
+        let byte = byte.min(self.text.len());
+        if byte < self.byte {
+            self.byte = 0;
+            self.scalar = 0;
+        }
+        self.scalar += self.text[self.byte..byte].chars().count() as u32;
+        self.byte = byte;
+        self.scalar
+    }
 }
 
 /// Spans inside quotation marks, as scalar offsets. Handles “ ”, " ", « », „ “, 「 」 and ‘ ’.
@@ -207,7 +270,8 @@ pub fn segment(text: &str) -> Segments {
 pub fn quoted_spans(text: &str) -> Vec<(u32, u32)> {
     let mut spans = Vec::new();
     let mut open: Option<(char, u32)> = None;
-    for (index, ch) in text.chars().enumerate() {
+    let chars: Vec<char> = text.chars().collect();
+    for (index, ch) in chars.iter().copied().enumerate() {
         let index = index as u32;
         match open {
             None => {
@@ -229,15 +293,11 @@ pub fn quoted_spans(text: &str) -> Vec<(u32, u32)> {
                 if ch == closer {
                     // An apostrophe inside a word is not a closing single quote.
                     if closer == '\u{2019}' {
-                        let next_is_letter = text
-                            .chars()
-                            .nth(index as usize + 1)
-                            .is_some_and(char::is_alphanumeric);
-                        let prev_is_letter = index > 0
-                            && text
-                                .chars()
-                                .nth(index as usize - 1)
-                                .is_some_and(char::is_alphanumeric);
+                        let next_is_letter = chars
+                            .get(index as usize + 1)
+                            .is_some_and(|next| next.is_alphanumeric());
+                        let prev_is_letter =
+                            index > 0 && chars[index as usize - 1].is_alphanumeric();
                         if next_is_letter && prev_is_letter {
                             continue;
                         }
@@ -250,7 +310,7 @@ pub fn quoted_spans(text: &str) -> Vec<(u32, u32)> {
     }
     if let Some((_, start)) = open {
         // Unclosed quote runs to the end of the block.
-        spans.push((start, text.chars().count() as u32));
+        spans.push((start, chars.len() as u32));
     }
     spans
 }
@@ -514,12 +574,6 @@ impl Lexicon {
             if candidates.is_empty() {
                 continue;
             }
-            let sentence_words: Vec<&str> = segments
-                .words
-                .iter()
-                .filter(|(lo, hi)| *lo >= sentence.0 && *hi <= sentence.1)
-                .map(|(lo, hi)| folded_slice(folded, *lo, *hi))
-                .collect();
             // Distance from the value to the nearest cue word of each candidate predicate.
             let sentence_word_spans: Vec<((u32, u32), &str)> = segments
                 .words
@@ -547,7 +601,6 @@ impl Lexicon {
                 })
                 .collect();
             cued.sort_by_key(|(_, distance)| *distance);
-            let _ = &sentence_words;
             let (predicate, mut confidence) = match (cued.len(), candidates.len()) {
                 (1, _) => (cued[0].0, 0.82),
                 (0, 1) => (candidates[0], 0.45),

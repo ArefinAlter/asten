@@ -241,7 +241,8 @@ impl Clock {
 
     fn parse_absolute(&self, text: &str) -> Option<TimeBounds> {
         let per_day = self.ticks_per_day();
-        let (text, time_of_day) = split_time_of_day(text);
+        let (text, clock_time) = split_clock_time(text);
+        let (text, time_of_day) = split_time_of_day(&text);
         let text = text.trim_matches(|c: char| c == ',' || c == ' ');
 
         let day_bounds = match &self.calendar {
@@ -254,7 +255,13 @@ impl Clock {
         let hi = (day_bounds.1 + 1) * per_day - 1;
         let mut bounds = TimeBounds::between(lo, hi.max(lo));
         if day_bounds.0 == day_bounds.1 && self.unit != TimeUnit::Day {
-            if let Some((from_hour, to_hour)) = time_of_day {
+            if let Some((hour, minute)) = clock_time {
+                // "17:30" as `format` writes it: one tick, at the clock's resolution.
+                let per_hour = per_day / 24;
+                let per_minute = per_day / 1440;
+                let start = lo + Tick::from(hour) * per_hour + Tick::from(minute) * per_minute;
+                bounds = TimeBounds::at(start.clamp(lo, hi.max(lo)));
+            } else if let Some((from_hour, to_hour)) = time_of_day {
                 let per_hour = per_day / 24;
                 let start = lo + Tick::from(from_hour) * per_hour;
                 let end = lo + Tick::from(to_hour) * per_hour - 1;
@@ -376,7 +383,7 @@ impl Clock {
         // "<amount> <unit>(s) <direction> [the] <anchor>" and "<amount> <unit> later".
         let (amount_lo, amount_hi, consumed) = parse_amount(&words)?;
         let unit_word = words.get(consumed)?;
-        let (unit_ticks, _) = unit_ticks(unit_word, per_day)?;
+        let (unit_minutes, _) = unit_minutes(unit_word)?;
         let direction = words.get(consumed + 1)?;
         let (relation, anchor_from) = match *direction {
             "after" | "since" | "following" | "past" | "from" | "into" => {
@@ -405,10 +412,12 @@ impl Clock {
         } else {
             Some(anchor_words.join(" "))
         };
+        // Amounts are exact in minutes; at a coarser tick they round outwards,
+        // so "three hours" on a day clock is zero to one day, not three days.
         Some(Parsed::Relative {
             relation,
-            lo: amount_lo.saturating_mul(unit_ticks),
-            hi: amount_hi.saturating_mul(unit_ticks),
+            lo: ticks_from_minutes(amount_lo.saturating_mul(unit_minutes), per_day, false),
+            hi: ticks_from_minutes(amount_hi.saturating_mul(unit_minutes), per_day, true),
             anchor,
         })
     }
@@ -518,6 +527,58 @@ fn split_time_of_day(text: &str) -> (String, Option<(u32, u32)>) {
     (words.join(" "), hours)
 }
 
+/// Split a clock time ("17:00", "5:30") out of the words and return its hour
+/// and minute. Only the form `format` writes is read: one or two hour digits,
+/// a colon, two minute digits. A dangling "at" before it goes too.
+fn split_clock_time(text: &str) -> (String, Option<(u32, u32)>) {
+    let mut words: Vec<&str> = text
+        .split(|c: char| c == ',' || c.is_whitespace())
+        .filter(|w| !w.is_empty())
+        .collect();
+    let mut found = None;
+    if let Some(index) = words.iter().position(|word| clock_time(word).is_some()) {
+        found = clock_time(words[index]);
+        words.remove(index);
+        if index > 0 && words.get(index - 1) == Some(&"at") {
+            words.remove(index - 1);
+        }
+    }
+    (words.join(" "), found)
+}
+
+fn clock_time(word: &str) -> Option<(u32, u32)> {
+    let (hour, minute) = word.split_once(':')?;
+    let digits = |part: &str| !part.is_empty() && part.chars().all(|c| c.is_ascii_digit());
+    if hour.len() > 2 || minute.len() != 2 || !digits(hour) || !digits(minute) {
+        return None;
+    }
+    let hour: u32 = hour.parse().ok()?;
+    let minute: u32 = minute.parse().ok()?;
+    (hour < 24 && minute < 60).then_some((hour, minute))
+}
+
+/// A number that may carry a leading minus: years before the epoch and day
+/// counts before day zero, as `format` writes them.
+fn parse_signed_number(word: &str) -> Option<i64> {
+    match word.strip_prefix('-') {
+        Some(rest) if !rest.is_empty() => parse_number(rest).map(|n| -n),
+        _ => parse_number(word),
+    }
+}
+
+/// Minutes to ticks at `per_day` ticks per day, rounding down or up. A span
+/// finer than the tick widens to the ticks that could hold it.
+fn ticks_from_minutes(minutes: Tick, per_day: Tick, round_up: bool) -> Tick {
+    let minutes_per_tick = (1440 / per_day).max(1);
+    if round_up {
+        minutes
+            .saturating_add(minutes_per_tick - 1)
+            .div_euclid(minutes_per_tick)
+    } else {
+        minutes.div_euclid(minutes_per_tick)
+    }
+}
+
 /// Numbers in story time are capped at nine digits: enough for any year or
 /// day count a story needs, small enough that no tick arithmetic can overflow.
 fn parse_number(word: &str) -> Option<i64> {
@@ -587,23 +648,26 @@ fn parse_amount(words: &[&str]) -> Option<(Tick, Tick, usize)> {
     None
 }
 
-fn unit_ticks(word: &str, per_day: Tick) -> Option<(Tick, Granularity)> {
+/// The length of a unit word in minutes, the finest tick, with its granularity.
+fn unit_minutes(word: &str) -> Option<(Tick, Granularity)> {
+    const DAY: Tick = 1440;
     let word = word.trim_end_matches(',');
     let singular = word.strip_suffix('s').unwrap_or(word);
     Some(match singular {
-        "minute" | "min" => ((per_day / 1440).max(1), Granularity::Minute),
-        "hour" | "hr" => ((per_day / 24).max(1), Granularity::Hour),
+        "minute" | "min" => (1, Granularity::Minute),
+        "hour" | "hr" => (60, Granularity::Hour),
         "day" | "night" | "morning" | "evening" | "sunrise" | "sunset" | "dawn" => {
-            (per_day, Granularity::Day)
+            (DAY, Granularity::Day)
         }
-        "week" | "fortnight" => (7 * per_day, Granularity::Week),
-        "month" | "moon" => (30 * per_day, Granularity::Month),
-        "season" => (91 * per_day, Granularity::Season),
+        "week" => (7 * DAY, Granularity::Week),
+        "fortnight" => (14 * DAY, Granularity::Week),
+        "month" | "moon" => (30 * DAY, Granularity::Month),
+        "season" => (91 * DAY, Granularity::Season),
         "year" | "winter" | "summer" | "spring" | "autumn" | "fall" => {
-            (365 * per_day, Granularity::Year)
+            (365 * DAY, Granularity::Year)
         }
-        "decade" => (3650 * per_day, Granularity::Year),
-        "century" | "centurie" => (36500 * per_day, Granularity::Year),
+        "decade" => (3650 * DAY, Granularity::Year),
+        "century" | "centurie" => (36500 * DAY, Granularity::Year),
         _ => return None,
     })
 }
@@ -614,10 +678,10 @@ fn unit_ticks(word: &str, per_day: Tick) -> Option<(Tick, Granularity)> {
 fn parse_day_count(text: &str) -> Option<(i64, i64)> {
     let words: Vec<&str> = text.split_whitespace().collect();
     match words.as_slice() {
-        ["day", n] | ["d", n] | ["d.", n] => parse_number(n).map(|n| (n, n)),
-        [n, "day"] | [n] => parse_number(n).map(|n| (n, n)),
+        ["day", n] | ["d", n] | ["d.", n] => parse_signed_number(n).map(|n| (n, n)),
+        [n, "day"] | [n] => parse_signed_number(n).map(|n| (n, n)),
         ["days", a, "-", b] | ["day", a, "-", b] | ["days", a, "to", b] | ["day", a, "to", b] => {
-            Some((parse_number(a)?, parse_number(b)?))
+            Some((parse_signed_number(a)?, parse_signed_number(b)?))
         }
         ["week", n] => parse_number(n).map(|n| (n * 7, n * 7 + 6)),
         ["year", n] => parse_number(n).map(|n| (n * 365, n * 365 + 364)),
@@ -712,15 +776,27 @@ fn season_bounds(word: &str, year: i64) -> Option<(i64, i64)> {
 
 fn parse_gregorian(text: &str) -> Option<(i64, i64)> {
     let text = text.trim();
-    // ISO forms: YYYY-MM-DD, YYYY-MM, YYYY (optionally with a sign).
-    let parts: Vec<&str> = text.split('-').collect();
+    // ISO forms: YYYY-MM-DD, YYYY-MM, YYYY, with a leading minus for years
+    // before year 0 as `format` writes them. Years keep the nine-digit cap so
+    // the day arithmetic cannot overflow.
+    let (sign, body) = match text.strip_prefix('-') {
+        Some(rest) => (-1, rest),
+        None => (1, text),
+    };
+    let parts: Vec<&str> = body.split('-').collect();
     if parts
         .iter()
         .all(|part| !part.is_empty() && part.chars().all(|c| c.is_ascii_digit()))
     {
+        let iso_year = |year: &str| -> Option<i64> {
+            if year.len() > 9 {
+                return None;
+            }
+            year.parse::<i64>().ok().map(|y| sign * y)
+        };
         match parts.as_slice() {
             [year, month, day] if year.len() >= 3 => {
-                let y: i64 = year.parse().ok()?;
+                let y = iso_year(year)?;
                 let m: u32 = month.parse().ok()?;
                 let d: u32 = day.parse().ok()?;
                 if !(1..=12).contains(&m) || d == 0 || d > days_in_month(y, m) {
@@ -730,7 +806,7 @@ fn parse_gregorian(text: &str) -> Option<(i64, i64)> {
                 return Some((days, days));
             }
             [year, month] if year.len() >= 3 => {
-                let y: i64 = year.parse().ok()?;
+                let y = iso_year(year)?;
                 let m: u32 = month.parse().ok()?;
                 if !(1..=12).contains(&m) {
                     return None;
@@ -741,7 +817,7 @@ fn parse_gregorian(text: &str) -> Option<(i64, i64)> {
                 ));
             }
             [year] if year.len() >= 3 => {
-                let y: i64 = year.parse().ok()?;
+                let y = iso_year(year)?;
                 return Some((days_from_civil(y, 1, 1), days_from_civil(y, 12, 31)));
             }
             _ => {}
@@ -932,13 +1008,17 @@ fn fictional_from_days(calendar: &FictionalCalendar, days: i64) -> (i64, usize, 
 
 fn parse_fictional(calendar: &FictionalCalendar, text: &str) -> Option<(i64, i64)> {
     // ISO-like "412-03-01": year-month-day numerically in the fictional calendar.
-    let parts: Vec<&str> = text.split('-').collect();
+    let (sign, body) = match text.strip_prefix('-') {
+        Some(rest) => (-1, rest),
+        None => (1, text),
+    };
+    let parts: Vec<&str> = body.split('-').collect();
     if let [year, month, day] = parts.as_slice() {
         if parts
             .iter()
             .all(|part| !part.is_empty() && part.chars().all(|c| c.is_ascii_digit()))
         {
-            let y = parse_number(year)?;
+            let y = sign * parse_number(year)?;
             let m = parse_number(month)? as usize;
             let d = parse_number(day)?;
             if m == 0 || m > calendar.months.len() {
@@ -958,11 +1038,23 @@ fn parse_fictional(calendar: &FictionalCalendar, text: &str) -> Option<(i64, i64
             words.pop();
         }
     }
+    // Names fold per scalar as `normalise` folds the label. An exact name wins
+    // over a prefix, so "Sun" is not read as "Sunder" when both are months.
+    let folded = |name: &str| -> String { name.chars().flat_map(char::to_lowercase).collect() };
     let month_index = |word: &str| -> Option<usize> {
-        calendar.months.iter().position(|month| {
-            let name = month.name.to_lowercase();
-            name == word || (word.len() >= 3 && name.starts_with(word))
-        })
+        calendar
+            .months
+            .iter()
+            .position(|month| folded(&month.name) == word)
+            .or_else(|| {
+                if word.len() < 3 {
+                    return None;
+                }
+                calendar
+                    .months
+                    .iter()
+                    .position(|month| folded(&month.name).starts_with(word))
+            })
     };
     let season_index = |word: &str| -> Option<usize> {
         calendar
@@ -972,31 +1064,35 @@ fn parse_fictional(calendar: &FictionalCalendar, text: &str) -> Option<(i64, i64
     };
     match words.as_slice() {
         ["year", year] | [year, "year"] => {
-            let y = parse_number(year)?;
+            let y = parse_signed_number(year)?;
             let lo = days_before_year(calendar, y);
             Some((lo, lo + year_days(calendar, y) - 1))
         }
         ["day", n] => {
-            let n = parse_number(n)?;
+            let n = parse_signed_number(n)?;
             Some((n, n))
         }
         [day, month, year] => {
-            if let (Some(d), Some(m), Some(y)) =
-                (parse_number(day), month_index(month), parse_number(year))
-            {
+            if let (Some(d), Some(m), Some(y)) = (
+                parse_number(day),
+                month_index(month),
+                parse_signed_number(year),
+            ) {
                 let days = fictional_days(calendar, y, m, d);
                 return Some((days, days));
             }
-            if let (Some(m), Some(d), Some(y)) =
-                (month_index(day), parse_number(month), parse_number(year))
-            {
+            if let (Some(m), Some(d), Some(y)) = (
+                month_index(day),
+                parse_number(month),
+                parse_signed_number(year),
+            ) {
                 let days = fictional_days(calendar, y, m, d);
                 return Some((days, days));
             }
             None
         }
         [month_or_season, year] => {
-            let y = parse_number(year)?;
+            let y = parse_signed_number(year)?;
             if let Some(m) = month_index(month_or_season) {
                 let lo = fictional_days(calendar, y, m, 1);
                 return Some((lo, lo + month_days(calendar, y, m) - 1));
@@ -1011,7 +1107,7 @@ fn parse_fictional(calendar: &FictionalCalendar, text: &str) -> Option<(i64, i64
             None
         }
         [single] => {
-            let y = parse_number(single)?;
+            let y = parse_signed_number(single)?;
             let lo = days_before_year(calendar, y);
             Some((lo, lo + year_days(calendar, y) - 1))
         }
