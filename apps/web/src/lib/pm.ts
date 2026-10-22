@@ -61,21 +61,42 @@ export function toEditorDoc(content: unknown): JSONContent {
   return emptyDoc();
 }
 
+/**
+ * Unicode `White_Space`, the set Rust's `str::split_whitespace` splits on.
+ * JavaScript's `\s` differs at the edges (it adds U+FEFF and lacks U+0085),
+ * so the class is written out to keep both counts identical.
+ */
+const WHITESPACE =
+  /[\t\n\v\f\r \u0085\u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000]+/;
+
+/**
+ * The desk's one word-count rule, shared with the server's `words` field:
+ * the plain text of the document split on Unicode whitespace, empty runs
+ * dropped. `asten_blocks::word_count` is the Rust twin.
+ */
 export function countWords(content: unknown): number {
-  const text = collectText(content).trim();
-  if (!text) return 0;
-  return text.split(/\s+/).length;
+  return plainText(content).split(WHITESPACE).filter(Boolean).length;
 }
 
-function collectText(value: unknown): string {
-  if (!value) return "";
-  if (typeof value === "string") return value;
-  if (Array.isArray(value)) return value.map(collectText).join(" ");
-  if (typeof value === "object") {
-    const node = value as { text?: string; content?: unknown };
-    return `${node.text ?? ""} ${collectText(node.content)}`;
-  }
-  return "";
+/**
+ * Plain text the way the engine reads a document (`asten_blocks::plain_text`):
+ * text nodes concatenated, a hard break is a newline, a formula is its source,
+ * and the children of a `doc` are joined with newlines, everything else with
+ * nothing.
+ */
+export function plainText(value: unknown): string {
+  if (!value || typeof value !== "object") return "";
+  const node = value as {
+    type?: string;
+    text?: string;
+    attrs?: { latex?: unknown };
+    content?: unknown;
+  };
+  if (typeof node.text === "string") return node.text;
+  if (node.type === "hardBreak") return "\n";
+  if (typeof node.attrs?.latex === "string") return node.attrs.latex;
+  if (!Array.isArray(node.content)) return "";
+  return node.content.map(plainText).join(node.type === "doc" ? "\n" : "");
 }
 
 /**

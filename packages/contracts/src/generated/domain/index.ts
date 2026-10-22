@@ -14,6 +14,7 @@ export * from "./DocumentKind";
 export * from "./DocumentOp";
 export * from "./DocumentOpId";
 export * from "./DocumentSnapshot";
+export * from "./DocumentSummary";
 export * from "./Draft";
 export * from "./DraftId";
 export * from "./EntityId";

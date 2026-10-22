@@ -1,7 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { type RefObject, useEffect, useRef, useState } from "react";
-import type { ProjectId, StreamEvent } from "@asten/contracts";
+import type { AstenDocument, ProjectId, StreamEvent } from "@asten/contracts";
 import { createAstenClient } from "./asten-client";
+
+/** The mutation key of the desk's own document saves (see `App.tsx`). */
+export const SAVE_DOCUMENT_KEY = ["save-document"] as const;
 
 /**
  * Keep the desk live: subscribe to the project's server-sent events and
@@ -16,15 +19,49 @@ export function useProjectStream(projectId: ProjectId | undefined) {
     if (!projectId) return;
     let dispose: (() => void) | undefined;
     let cancelled = false;
+    const pendingBodies = new Map<string, number>();
+    const savingDocument = (documentId: string) =>
+      queryClient.isMutating({
+        mutationKey: SAVE_DOCUMENT_KEY,
+        predicate: (mutation) =>
+          (mutation.state.variables as { documentId?: string })?.documentId ===
+          documentId,
+      }) > 0;
+    // Events can arrive while our save is pending. Keep their sequence until
+    // it settles: the save response may precede a second client's write.
+    const unsubscribe = queryClient.getMutationCache().subscribe(() => {
+      for (const [documentId, seq] of pendingBodies) {
+        if (savingDocument(documentId)) continue;
+        pendingBodies.delete(documentId);
+        const key = ["document", projectId, documentId];
+        const held = queryClient.getQueryData<AstenDocument>(key);
+        if (!held || held.head_seq < seq)
+          void queryClient.invalidateQueries({ queryKey: key });
+      }
+    });
     const client = createAstenClient();
     client
       .subscribe(
         projectId,
         (event: StreamEvent) => {
           if (event.type === "document") {
+            // The summaries are cheap; the body is refetched only for the
+            // one document that moved, and not when the desk already holds
+            // that head or is the client saving it (its response carries
+            // the new body).
             void queryClient.invalidateQueries({
               queryKey: ["documents", projectId],
             });
+            const bodyKey = ["document", projectId, event.document];
+            const held = queryClient.getQueryData<AstenDocument>(bodyKey);
+            if (savingDocument(event.document)) {
+              pendingBodies.set(
+                event.document,
+                Math.max(pendingBodies.get(event.document) ?? 0, event.seq),
+              );
+            } else if (!held || held.head_seq < event.seq) {
+              void queryClient.invalidateQueries({ queryKey: bodyKey });
+            }
             void queryClient.invalidateQueries({ queryKey: ["history"] });
             void queryClient.invalidateQueries({ queryKey: ["blame"] });
             void queryClient.invalidateQueries({ queryKey: ["comments"] });
@@ -77,6 +114,7 @@ export function useProjectStream(projectId: ProjectId | undefined) {
       .catch(() => setConnected(false));
     return () => {
       cancelled = true;
+      unsubscribe();
       dispose?.();
     };
   }, [projectId, queryClient]);

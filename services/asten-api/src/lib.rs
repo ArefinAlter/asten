@@ -21,13 +21,13 @@ use asten_domain::{
 use axum::{
     Extension, Json, Router,
     body::Body,
-    extract::{DefaultBodyLimit, Path, State},
+    extract::{DefaultBodyLimit, Path, Query, State},
     http::{HeaderName, HeaderValue, Method, Request, StatusCode, header},
     middleware::{self, Next},
     response::{IntoResponse, Response},
     routing::get,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use tower_http::{
     catch_panic::CatchPanicLayer,
     compression::CompressionLayer,
@@ -269,7 +269,9 @@ pub fn router(application: Application, config: ApiConfig) -> Router {
         )
         .route(
             "/projects/{project_id}/documents/{document_id}",
-            axum::routing::put(update_document).delete(delete_document),
+            get(get_document)
+                .put(update_document)
+                .delete(delete_document),
         )
         .route(
             "/projects/{project_id}/facts",
@@ -432,14 +434,46 @@ async fn create_project(
     Ok((StatusCode::CREATED, Json(project)))
 }
 
+/// `?fields=summary` lists documents without their bodies (plus a server-side
+/// word count); the default carries everything.
+#[derive(Debug, Default, Deserialize)]
+struct ListDocumentsQuery {
+    #[serde(default)]
+    fields: Option<String>,
+}
+
 async fn list_documents(
     State(state): State<ApiState>,
     Path(project_id): Path<Uuid>,
-) -> Result<Json<Vec<Document>>, ApiError> {
+    Query(query): Query<ListDocumentsQuery>,
+) -> Result<Response, ApiError> {
+    let project_id = ProjectId(project_id);
+    match query.fields.as_deref() {
+        Some("summary") => Ok(Json(
+            state
+                .application
+                .list_document_summaries(project_id)
+                .await?,
+        )
+        .into_response()),
+        None | Some("full") => {
+            Ok(Json(state.application.list_documents(project_id).await?).into_response())
+        }
+        Some(other) => Err(ApplicationError::Validation(format!(
+            "unknown fields selection {other:?}; use \"summary\" or \"full\""
+        ))
+        .into()),
+    }
+}
+
+async fn get_document(
+    State(state): State<ApiState>,
+    Path((project_id, document_id)): Path<(Uuid, Uuid)>,
+) -> Result<Json<Document>, ApiError> {
     Ok(Json(
         state
             .application
-            .list_documents(ProjectId(project_id))
+            .get_project_document(ProjectId(project_id), DocumentId(document_id))
             .await?,
     ))
 }

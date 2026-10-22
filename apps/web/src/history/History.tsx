@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import type { AstenDocument, MergePreview } from "@asten/contracts";
+import type { DocumentSummary, MergePreview } from "@asten/contracts";
 import { createAstenClient } from "../lib/asten-client";
 import { shortHash, timeAgo } from "../lib/format";
 import { ManuscriptEditor } from "../editor/ManuscriptEditor";
 
 interface Props {
   projectId: string;
-  documents: AstenDocument[];
+  documents: DocumentSummary[];
   documentId?: string;
   onSelectDocument: (id: string) => void;
 }

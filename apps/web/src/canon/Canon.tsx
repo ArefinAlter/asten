@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
 import type {
-  AstenDocument,
+  DocumentSummary,
   CanonEntity,
   CreateInvariant,
   DiagnosticsSnapshot,
@@ -17,7 +17,7 @@ import { CONTEXT_CHOICES, entityKey, humanKey, timeAgo } from "../lib/format";
 
 interface Props {
   projectId: string;
-  documents: AstenDocument[];
+  documents: DocumentSummary[];
   entities: CanonEntity[];
   snapshot?: DiagnosticsSnapshot;
 }

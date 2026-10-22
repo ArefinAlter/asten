@@ -142,6 +142,58 @@ pub struct Document {
     pub updated_at: DateTime<Utc>,
 }
 
+impl Document {
+    /// The document without its body, with the word count the caller
+    /// measured from the body (`asten_blocks::word_count`).
+    #[must_use]
+    pub fn summary(&self, words: u64) -> DocumentSummary {
+        DocumentSummary {
+            id: self.id,
+            project_id: self.project_id,
+            parent_id: self.parent_id,
+            kind: self.kind.clone(),
+            title: self.title.clone(),
+            position: self.position,
+            revision: self.revision,
+            exclude_from_compile: self.exclude_from_compile,
+            scene: self.scene.clone(),
+            head_seq: self.head_seq,
+            chain_hash: self.chain_hash.clone(),
+            words,
+            created_at: self.created_at,
+            updated_at: self.updated_at,
+        }
+    }
+}
+
+/// A document without its body: what the binder, overview, timeline and
+/// history list. Bodies travel one at a time, for the open page only.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+pub struct DocumentSummary {
+    pub id: DocumentId,
+    pub project_id: ProjectId,
+    pub parent_id: Option<DocumentId>,
+    pub kind: DocumentKind,
+    pub title: String,
+    pub position: i64,
+    pub revision: i64,
+    #[serde(default)]
+    pub exclude_from_compile: bool,
+    #[serde(default)]
+    pub scene: ScenePlacement,
+    /// Head of the document's hash-chained event log.
+    #[serde(default)]
+    pub head_seq: i64,
+    #[serde(default)]
+    pub chain_hash: String,
+    /// Words in the body: its plain text split on Unicode whitespace.
+    #[serde(default)]
+    pub words: u64,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
 #[serde(rename_all = "snake_case")]

@@ -129,6 +129,42 @@ regenerates and fails on a diff. An OpenAPI document is still to come.
 - Incrementality: fingerprint-keyed perception cache in the engine rather than
   a salsa database. Analyses are whole-project and fast enough at 250k words.
 
+## Performance
+
+Rules the desk and the API hold to, so a 250k-word project stays quick on a
+laptop and on a phone:
+
+- **Bodies travel one at a time.** `GET /projects/{id}/documents?fields=summary`
+  returns `DocumentSummary` rows: everything in `Document` except
+  `content_json`, plus `head_seq` and a server-side `words` count. The binder,
+  overview, timeline, history and cast read only summaries; the editor fetches
+  the open page with `GET /projects/{id}/documents/{document_id}`, and the
+  `document` stream event refreshes that one query (skipped when the desk
+  already holds that head or is itself saving). The plain list without
+  `fields` still carries bodies for clients that want them.
+- **One word-count rule.** Words are the plain text of the document (text
+  nodes concatenated, a hard break a newline, blocks joined with newlines)
+  split on Unicode `White_Space`, empty runs dropped. `asten_blocks::word_count`
+  and the desk's `countWords` implement the same rule, so the overview's total
+  and the editor's live count agree.
+- **SQLite pragmas.** The repository opens with `journal_mode=WAL`,
+  `synchronous=NORMAL`, `foreign_keys=ON` and a five-second `busy_timeout`:
+  readers never wait on a commit, durability holds across application crashes,
+  and a concurrent writer waits rather than failing. Migration `0007_indexes`
+  gives every per-document and per-project list an index; a test asserts each
+  hot query's plan is an index search.
+- **Assembly and analysis are linear in the project.** Reading order, scene
+  lookups and entity lookups in `assemble_inputs` and `build_ir` go through
+  maps built once per pass; the engine takes its inputs by value
+  (`analyze_owned`), memoises the lexicon fingerprint, and shares the IR with
+  its queries through an `Arc`. The ignored benchmarks
+  (`cargo test -p asten-engine -- --ignored --nocapture bench`, likewise for
+  `asten-application` and `asten-api --test documents`) print the timings and
+  payload sizes to check against.
+- **The desk loads views on demand.** Overview and the editor ship in the main
+  chunk; Cast, Canon, Time, World, History, Guests, Settings, Compile and Packs
+  are `React.lazy` chunks fetched on first visit.
+
 ## Still deferred
 
 - collaboration CRDT and multi-author merge beyond drafts;

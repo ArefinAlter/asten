@@ -7,12 +7,12 @@ use std::sync::{Arc, Mutex};
 use asten_blocks::{DocState, EventRecord};
 use asten_domain::{
     AuthToken, AuthTokenId, Baseline, BaselineId, BlockSnapshot, CanonEntity, Comment, CommentId,
-    CompileArtifact, Document, DocumentId, DocumentKind, DocumentOp, DocumentSnapshot, Draft,
-    DraftId, EntityId, Fact, FactId, FactModality, FactStatus, IdeaPrompt, InvariantId, MethodPack,
-    MethodPackId, OwnerCredential, PairingCode, PairingCodeId, Project, ProjectId, ProjectKind,
-    ProjectSettings, RouteId, ScenePlacement, SnapshotId, SourceAnchor, StoredInvariant,
-    StoredRoute, Suppression, SuppressionId, TimelineEvent, TimelineEventId, TrackedChange,
-    TrackedChangeId, WorldEntry, WorldEntryId, WorldKind, WorldPulse, WorldStatus,
+    CompileArtifact, Document, DocumentId, DocumentKind, DocumentOp, DocumentSnapshot,
+    DocumentSummary, Draft, DraftId, EntityId, Fact, FactId, FactModality, FactStatus, IdeaPrompt,
+    InvariantId, MethodPack, MethodPackId, OwnerCredential, PairingCode, PairingCodeId, Project,
+    ProjectId, ProjectKind, ProjectSettings, RouteId, ScenePlacement, SnapshotId, SourceAnchor,
+    StoredInvariant, StoredRoute, Suppression, SuppressionId, TimelineEvent, TimelineEventId,
+    TrackedChange, TrackedChangeId, WorldEntry, WorldEntryId, WorldKind, WorldPulse, WorldStatus,
     compute_world_pulse, default_world_hue, empty_prosemirror_doc, ensure_block_ids,
     entity_key_from_title, normalize_key,
 };
@@ -494,11 +494,40 @@ impl Application {
         self.repository.list_documents(project_id).await
     }
 
+    /// Every document of the project without its body. The desk lists these
+    /// and fetches one body at a time with `get_project_document`, so a
+    /// keystroke-commit on a long manuscript never moves the whole book.
+    pub async fn list_document_summaries(
+        &self,
+        project_id: ProjectId,
+    ) -> Result<Vec<DocumentSummary>> {
+        Ok(self
+            .list_documents(project_id)
+            .await?
+            .iter()
+            .map(document_summary)
+            .collect())
+    }
+
     pub async fn get_document(&self, id: DocumentId) -> Result<Document> {
         self.repository
             .find_document(id)
             .await?
             .ok_or(ApplicationError::NotFound { entity: "document" })
+    }
+
+    /// A document addressed through its project: not found when it belongs
+    /// to another one.
+    pub async fn get_project_document(
+        &self,
+        project_id: ProjectId,
+        id: DocumentId,
+    ) -> Result<Document> {
+        let document = self.get_document(id).await?;
+        if document.project_id != project_id {
+            return Err(ApplicationError::NotFound { entity: "document" });
+        }
+        Ok(document)
     }
 
     pub async fn create_document(&self, input: CreateDocument) -> Result<Document> {
@@ -936,6 +965,13 @@ impl Application {
             .into_iter()
             .find(|entity| entity.key() == key || normalize_key(&entity.name) == key))
     }
+}
+
+/// The document without its body, with `words` counted by the one rule the
+/// desk and the API share (`asten_blocks::word_count`).
+#[must_use]
+pub fn document_summary(document: &Document) -> DocumentSummary {
+    document.summary(asten_blocks::word_count(&document.content_json) as u64)
 }
 
 fn fact_from_world(entry: &WorldEntry) -> Option<(String, String)> {

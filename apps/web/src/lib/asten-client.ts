@@ -26,6 +26,7 @@ import type {
   DiagnosticsSnapshot,
   AstenDocument,
   DocumentSnapshot,
+  DocumentSummary,
   Draft,
   EventRecord,
   Fact,
@@ -211,6 +212,17 @@ export class AstenClient {
   }
   listDocuments(projectId: ProjectId): Promise<AstenDocument[]> {
     return this.request(`/projects/${projectId}/documents`);
+  }
+  /** Every document without its body; what the binder and overview list. */
+  listDocumentSummaries(projectId: ProjectId): Promise<DocumentSummary[]> {
+    return this.request(`/projects/${projectId}/documents?fields=summary`);
+  }
+  /** One document with its body; fetched only for the open page. */
+  getDocument(
+    projectId: ProjectId,
+    documentId: string,
+  ): Promise<AstenDocument> {
+    return this.request(`/projects/${projectId}/documents/${documentId}`);
   }
   createDocument(input: CreateDocument): Promise<AstenDocument> {
     return this.request(`/projects/${input.project_id}/documents`, {

@@ -2,9 +2,9 @@
 //! stored canon, running the engine, answering hover/mentions/rename/summary
 //! queries, applying repairs, baselines, settings, invariants, routes and bisect.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
-use asten_blocks::{blocks_of, doc_from_state, fingerprint, replace_text};
+use asten_blocks::{block_nodes, blocks_of, doc_from_state, fingerprint, plain_text, replace_text};
 use asten_diagnostics::{
     RepairKind, Suppression as DiagSuppression, SuppressionScope as DiagScope,
 };
@@ -999,33 +999,42 @@ pub fn override_document(
     inputs.revision = format!("{}+override", inputs.revision);
 }
 
-/// Binder reading order: depth-first by parent and position.
+/// Binder reading order: depth-first by parent and position. Children are
+/// grouped once, so a binder of n documents costs n log n rather than n².
 fn reading_order(documents: &[Document]) -> Vec<&Document> {
-    fn visit<'a>(
-        parent: Option<DocumentId>,
-        documents: &[&'a Document],
-        out: &mut Vec<&'a Document>,
-    ) {
-        let mut children: Vec<&&Document> = documents
-            .iter()
-            .filter(|document| document.parent_id == parent)
-            .collect();
-        children.sort_by(|a, b| {
+    let mut children: HashMap<Option<DocumentId>, Vec<&Document>> = HashMap::new();
+    for document in documents {
+        children
+            .entry(document.parent_id)
+            .or_default()
+            .push(document);
+    }
+    for siblings in children.values_mut() {
+        siblings.sort_by(|a, b| {
             a.position
                 .cmp(&b.position)
                 .then_with(|| a.created_at.cmp(&b.created_at))
         });
-        for child in children {
-            out.push(child);
-            visit(Some(child.id), documents, out);
+    }
+    let mut out = Vec::with_capacity(documents.len());
+    let mut seen: HashSet<DocumentId> = HashSet::with_capacity(documents.len());
+    // A stack of what is still to visit, first sibling on top.
+    let mut pending: Vec<&Document> = children
+        .get(&None)
+        .map(|roots| roots.iter().rev().copied().collect())
+        .unwrap_or_default();
+    while let Some(document) = pending.pop() {
+        if !seen.insert(document.id) {
+            continue;
+        }
+        out.push(document);
+        if let Some(descendants) = children.get(&Some(document.id)) {
+            pending.extend(descendants.iter().rev().copied());
         }
     }
-    let all: Vec<&Document> = documents.iter().collect();
-    let mut out = Vec::with_capacity(documents.len());
-    visit(None, &all, &mut out);
     // Orphans whose parent is missing still get a place.
-    for document in &all {
-        if !out.iter().any(|seen| seen.id == document.id) {
+    for document in documents {
+        if seen.insert(document.id) {
             out.push(document);
         }
     }
@@ -1203,47 +1212,54 @@ fn assemble_inputs(
             language: placement.language.clone(),
             blocks: Vec::new(),
         });
-        for block in blocks_of(&document.content_json) {
+        // The nodes are read in place: only the id, text and fingerprint of
+        // each block are kept.
+        for (id, node) in block_nodes(&document.content_json) {
             blocks.push(BlockInput {
                 document: doc.clone(),
-                block: asten_ir::BlockId::new(block.id),
-                text: block.text,
-                fingerprint: fingerprint(&block.node),
+                block: asten_ir::BlockId::new(id),
+                text: plain_text(node),
+                fingerprint: fingerprint(node),
                 reading_pos: *reading_pos,
             });
         }
         previous_point = Some(point);
     }
 
-    // Entities: the cast plus world places and items.
+    // Entities: the cast plus world places and items. The first prose
+    // document that says it introduces a key wins, as reading order has it.
+    let mut introduced: HashMap<&str, i64> = HashMap::new();
+    for (document, reading_pos) in &prose {
+        for key in &document.scene.introduces {
+            introduced.entry(key.as_str()).or_insert(*reading_pos);
+        }
+    }
     let mut ir_entities: Vec<Entity> = entities
         .iter()
-        .map(|entity| Entity {
-            id: IrEntityId::new(entity.key()),
-            sort: entity.kind.to_sort(),
-            name: entity.name.clone(),
-            aliases: entity
-                .aliases
-                .iter()
-                .map(|form| Alias {
-                    form: form.clone(),
-                    from_tick: None,
-                    used_by: None,
-                })
-                .collect(),
-            introduced_at: entity.introduced_at.or_else(|| {
-                prose
+        .map(|entity| {
+            let key = entity.key();
+            Entity {
+                introduced_at: entity
+                    .introduced_at
+                    .or_else(|| introduced.get(key.as_str()).copied()),
+                id: IrEntityId::new(key),
+                sort: entity.kind.to_sort(),
+                name: entity.name.clone(),
+                aliases: entity
+                    .aliases
                     .iter()
-                    .find(|(document, _)| {
-                        document
-                            .scene
-                            .introduces
-                            .iter()
-                            .any(|key| *key == entity.key())
+                    .map(|form| Alias {
+                        form: form.clone(),
+                        from_tick: None,
+                        used_by: None,
                     })
-                    .map(|(_, pos)| *pos)
-            }),
+                    .collect(),
+            }
         })
+        .collect();
+    let mut known_keys: HashSet<String> = ir_entities
+        .iter()
+        .map(|entity| entity.id.0.clone())
         .collect();
     for entry in world {
         let sort = match entry.kind {
@@ -1254,7 +1270,7 @@ fn assemble_inputs(
             _ => continue,
         };
         let key = entity_key_from_title(&entry.title);
-        if key.is_empty() || ir_entities.iter().any(|entity| entity.id.0 == key) {
+        if key.is_empty() || !known_keys.insert(key.clone()) {
             continue;
         }
         ir_entities.push(Entity {
@@ -1369,11 +1385,20 @@ fn assemble_inputs(
         });
     }
 
+    // Lookups the event loop needs: cast rows by id, scenes by document.
+    let entity_keys: HashMap<asten_domain::EntityId, String> = entities
+        .iter()
+        .map(|entity| (entity.id, entity.key()))
+        .collect();
+    let scene_positions: HashMap<&str, i64> = scenes
+        .iter()
+        .map(|scene| (scene.document.0.as_str(), scene.reading_pos))
+        .collect();
     for event in events {
         let subject = event
             .entity_id
-            .and_then(|id| entities.iter().find(|entity| entity.id == id))
-            .map(|entity| IrEntityId::new(entity.key()));
+            .and_then(|id| entity_keys.get(&id))
+            .map(|key| IrEntityId::new(key.clone()));
         let point = TimePoint::Event {
             id: EventId::new(event.id.to_string()),
         };
@@ -1432,8 +1457,8 @@ fn assemble_inputs(
         };
         let reading_pos = event.reading_order.or_else(|| {
             doc.as_ref()
-                .and_then(|document| scenes.iter().find(|scene| scene.document == *document))
-                .map(|scene| scene.reading_pos)
+                .and_then(|document| scene_positions.get(document.0.as_str()))
+                .copied()
         });
         ir_events.push(Event {
             id: EventId::new(event.id.to_string()),
@@ -1602,4 +1627,230 @@ fn _context_bridge(context: &Context) -> &Context {
 fn clamp_tick(tick: i64) -> i64 {
     const MAX_TICK: i64 = 1 << 53;
     tick.clamp(-MAX_TICK, MAX_TICK)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use asten_domain::DocumentKind;
+    use std::time::Instant;
+
+    fn paragraph(id: &str, text: &str) -> serde_json::Value {
+        serde_json::json!({
+            "type": "paragraph",
+            "attrs": { "id": id },
+            "content": [{ "type": "text", "text": text }]
+        })
+    }
+
+    fn document(
+        project: ProjectId,
+        parent: Option<DocumentId>,
+        kind: DocumentKind,
+        title: &str,
+        position: i64,
+        blocks: Vec<serde_json::Value>,
+    ) -> Document {
+        let now = Utc::now();
+        Document {
+            id: DocumentId::new(),
+            project_id: project,
+            parent_id: parent,
+            kind,
+            title: title.to_owned(),
+            content_json: serde_json::json!({ "type": "doc", "content": blocks }),
+            position,
+            revision: 0,
+            exclude_from_compile: false,
+            scene: ScenePlacement::default(),
+            head_seq: 0,
+            chain_hash: String::new(),
+            created_at: now,
+            updated_at: now,
+        }
+    }
+
+    fn entity(project: ProjectId, name: &str) -> CanonEntity {
+        let now = Utc::now();
+        CanonEntity {
+            id: asten_domain::EntityId::new(),
+            project_id: project,
+            kind: EntityKind::Character,
+            name: name.to_owned(),
+            aliases: Vec::new(),
+            notes: String::new(),
+            introduced_at: None,
+            created_at: now,
+            updated_at: now,
+        }
+    }
+
+    /// 250k words as the desk stores them: one manuscript, 50 chapters of 50
+    /// paragraphs, each paragraph ~100 words.
+    fn large_project() -> (Vec<Document>, Vec<CanonEntity>, ProjectSettings) {
+        let project = ProjectId::new();
+        let sentence = "Mira walked along the harbor wall while Oren counted the boats and the gulls argued over the nets. ";
+        let manuscript = document(
+            project,
+            None,
+            DocumentKind::Manuscript,
+            "The Harbor",
+            0,
+            Vec::new(),
+        );
+        let mut documents = vec![manuscript.clone()];
+        for chapter in 0..50 {
+            let blocks = (0..50)
+                .map(|index| paragraph(&format!("c{chapter}-{index}"), &sentence.repeat(5)))
+                .collect();
+            documents.push(document(
+                project,
+                Some(manuscript.id),
+                DocumentKind::Chapter,
+                &format!("Chapter {chapter}"),
+                chapter,
+                blocks,
+            ));
+        }
+        let entities = vec![entity(project, "Mira"), entity(project, "Captain Oren")];
+        (documents, entities, ProjectSettings::for_project(project))
+    }
+
+    fn assemble(
+        documents: &[Document],
+        entities: &[CanonEntity],
+        settings: &ProjectSettings,
+    ) -> ProjectInputs {
+        assemble_inputs(
+            documents,
+            entities,
+            &[],
+            &[],
+            &[],
+            settings,
+            &[],
+            &[],
+            &[],
+            &[],
+            &[],
+        )
+    }
+
+    /// `cargo test -p asten-application -- --ignored --nocapture bench` prints
+    /// how long assembling inputs from storage rows and analysing them takes.
+    #[test]
+    #[ignore = "benchmark; run by hand with --nocapture"]
+    fn bench_assemble_and_analyze_250k_words() {
+        let (documents, entities, settings) = large_project();
+        let started = Instant::now();
+        let inputs = assemble(&documents, &entities, &settings);
+        let assemble_ms = started.elapsed().as_millis();
+        println!(
+            "assemble: {assemble_ms} ms ({} blocks, {} scenes)",
+            inputs.blocks.len(),
+            inputs.scenes.len()
+        );
+        let mut engine = Engine::new();
+        let cold = engine.analyze(&inputs);
+        println!(
+            "cold: perceive {} ms, analyze {} ms, total {} ms",
+            cold.snapshot.timings_ms.perceive,
+            cold.snapshot.timings_ms.analyze,
+            cold.snapshot.timings_ms.total
+        );
+        // The round trip the desk pays per keystroke-commit: rebuild inputs
+        // from rows, then analyse with one paragraph changed.
+        let mut documents = documents;
+        for pass in 0..3 {
+            let node = &mut documents[25].content_json["content"][10]["content"][0];
+            let text = node["text"].as_str().unwrap_or_default().to_owned();
+            node["text"] = serde_json::Value::String(format!("{text} Mira smiled."));
+            let started = Instant::now();
+            let inputs = assemble(&documents, &entities, &settings);
+            let assemble_ms = started.elapsed().as_millis();
+            let warm = engine.analyze(&inputs);
+            println!(
+                "edit {pass}: assemble {assemble_ms} ms, perceive {} ms, analyze {} ms, total {} ms ({} cached)",
+                warm.snapshot.timings_ms.perceive,
+                warm.snapshot.timings_ms.analyze,
+                warm.snapshot.timings_ms.total,
+                warm.snapshot.cached_blocks
+            );
+        }
+    }
+
+    #[test]
+    fn reading_order_is_depth_first_and_keeps_orphans() {
+        let project = ProjectId::new();
+        let book = document(project, None, DocumentKind::Manuscript, "Book", 0, vec![]);
+        let part_two = document(
+            project,
+            Some(book.id),
+            DocumentKind::Chapter,
+            "Part two",
+            2,
+            vec![],
+        );
+        let part_one = document(
+            project,
+            Some(book.id),
+            DocumentKind::Chapter,
+            "Part one",
+            1,
+            vec![],
+        );
+        let scene = document(
+            project,
+            Some(part_one.id),
+            DocumentKind::Scene,
+            "Scene",
+            0,
+            vec![],
+        );
+        let orphan = document(
+            project,
+            Some(DocumentId::new()),
+            DocumentKind::Note,
+            "Orphan",
+            0,
+            vec![],
+        );
+        let notes = document(project, None, DocumentKind::Note, "Notes", 5, vec![]);
+        let documents = vec![
+            orphan.clone(),
+            part_two.clone(),
+            scene.clone(),
+            notes.clone(),
+            book.clone(),
+            part_one.clone(),
+        ];
+        let titles: Vec<&str> = reading_order(&documents)
+            .iter()
+            .map(|document| document.title.as_str())
+            .collect();
+        assert_eq!(
+            titles,
+            ["Book", "Part one", "Scene", "Part two", "Notes", "Orphan"]
+        );
+    }
+
+    #[test]
+    fn assembled_inputs_number_prose_in_reading_order() {
+        let (documents, entities, settings) = large_project();
+        let inputs = assemble(&documents, &entities, &settings);
+        assert_eq!(inputs.scenes.len(), 51);
+        assert_eq!(inputs.blocks.len(), 2500);
+        let positions: Vec<i64> = inputs
+            .scenes
+            .iter()
+            .map(|scene| scene.reading_pos)
+            .collect();
+        assert_eq!(positions, (1..=51).collect::<Vec<i64>>());
+        assert!(
+            inputs
+                .blocks
+                .windows(2)
+                .all(|pair| pair[0].reading_pos <= pair[1].reading_pos)
+        );
+    }
 }

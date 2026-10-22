@@ -1,28 +1,28 @@
 import { type FormEvent, useState } from "react";
 import type {
   AstenDiagnostic,
-  AstenDocument,
   DocumentKind,
+  DocumentSummary,
 } from "@asten/contracts";
 
 interface Props {
-  documents: AstenDocument[];
+  documents: DocumentSummary[];
   selectedId?: string;
   marks: AstenDiagnostic[];
-  onSelect: (document: AstenDocument) => void;
+  onSelect: (document: DocumentSummary) => void;
   onCreate: (input: {
     title: string;
     kind: DocumentKind;
     parent_id?: string | null;
   }) => void;
-  onToggleCompile: (document: AstenDocument) => void;
-  onRename: (document: AstenDocument, title: string) => void;
+  onToggleCompile: (document: DocumentSummary) => void;
+  onRename: (document: DocumentSummary, title: string) => void;
   onMove: (
-    document: AstenDocument,
+    document: DocumentSummary,
     position: number,
     parent_id: string | null,
   ) => void;
-  onDelete: (document: AstenDocument) => void;
+  onDelete: (document: DocumentSummary) => void;
   creating?: boolean;
 }
 
@@ -136,7 +136,7 @@ export function Binder({
   );
 }
 
-function sorted(items: AstenDocument[]): AstenDocument[] {
+function sorted(items: DocumentSummary[]): DocumentSummary[] {
   return [...items].sort(
     (a, b) =>
       a.position - b.position || a.created_at.localeCompare(b.created_at),
@@ -157,22 +157,22 @@ function BinderNode({
   onMove,
   onDelete,
 }: {
-  document: AstenDocument;
-  siblings: AstenDocument[];
+  document: DocumentSummary;
+  siblings: DocumentSummary[];
   index: number;
-  documents: AstenDocument[];
+  documents: DocumentSummary[];
   depth: number;
   selectedId?: string;
   marks: AstenDiagnostic[];
-  onSelect: (document: AstenDocument) => void;
-  onToggleCompile: (document: AstenDocument) => void;
-  onRename: (document: AstenDocument, title: string) => void;
+  onSelect: (document: DocumentSummary) => void;
+  onToggleCompile: (document: DocumentSummary) => void;
+  onRename: (document: DocumentSummary, title: string) => void;
   onMove: (
-    document: AstenDocument,
+    document: DocumentSummary,
     position: number,
     parent_id: string | null,
   ) => void;
-  onDelete: (document: AstenDocument) => void;
+  onDelete: (document: DocumentSummary) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(document.title);

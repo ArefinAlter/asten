@@ -6,7 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { type FormEvent, useState } from "react";
 import type {
-  AstenDocument,
+  DocumentSummary,
   CanonEntity,
   CreateTimelineEvent,
   SceneSummary,
@@ -21,7 +21,7 @@ import {
 
 interface Props {
   projectId: string;
-  documents: AstenDocument[];
+  documents: DocumentSummary[];
   entities: CanonEntity[];
   onOpenDocument: (id: string) => void;
 }
@@ -80,7 +80,7 @@ export function Timeline({
     },
   });
   const placeScene = useMutation({
-    mutationFn: (input: { document: AstenDocument; story_time: string }) =>
+    mutationFn: (input: { document: DocumentSummary; story_time: string }) =>
       client.updateDocument(projectId, input.document.id, {
         scene: {
           ...input.document.scene,

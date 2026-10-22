@@ -9,6 +9,7 @@
 //! previous revision, which clients receive as a change set, not the full list.
 
 use std::collections::{BTreeMap, HashMap};
+use std::sync::Arc;
 use std::time::Instant;
 
 use asten_diagnostics::{
@@ -326,7 +327,8 @@ pub fn core_predicates() -> Vec<PredicateSig> {
 #[derive(Clone, Debug)]
 pub struct Outcome {
     pub snapshot: DiagnosticsSnapshot,
-    pub ir: StoryIr,
+    /// Shared with the engine's `last_ir`, so a pass does not copy the IR.
+    pub ir: Arc<StoryIr>,
     pub ledger: Vec<asten_logic::invariants::Obligation>,
     pub delta: Option<DiagnosticsDelta>,
 }
@@ -336,9 +338,18 @@ pub struct Outcome {
 pub struct Engine {
     cache: HashMap<String, BlockPerception>,
     previous: Option<(String, Vec<Diagnostic>)>,
-    last_ir: Option<StoryIr>,
+    last_ir: Option<Arc<StoryIr>>,
     last_perceptions: Vec<BlockPerception>,
+    /// The lexicon fingerprint of the last pass and what it was computed
+    /// from, so an unchanged lexicon is not serialised again.
+    lexicon: Option<LexiconMemo>,
     pub max_cache_entries: usize,
+}
+
+struct LexiconMemo {
+    predicates: Vec<PredicateSig>,
+    lattices: BTreeMap<String, ConceptLattice>,
+    fingerprint: String,
 }
 
 impl Engine {
@@ -353,7 +364,7 @@ impl Engine {
     /// The IR of the last analysis, for queries.
     #[must_use]
     pub fn last_ir(&self) -> Option<&StoryIr> {
-        self.last_ir.as_ref()
+        self.last_ir.as_deref()
     }
 
     #[must_use]
@@ -376,8 +387,15 @@ impl Engine {
 
     /// Analyse a project revision.
     pub fn analyze(&mut self, inputs: &ProjectInputs) -> Outcome {
+        self.analyze_owned(inputs.clone())
+    }
+
+    /// Analyse a project revision, taking the inputs by value. A caller that
+    /// built the inputs for this pass alone saves the copy of every block's
+    /// text that `analyze` makes.
+    pub fn analyze_owned(&mut self, inputs: ProjectInputs) -> Outcome {
         let started = Instant::now();
-        let inputs = inputs.clone().with_core();
+        let inputs = inputs.with_core();
         let (perceptions, cached) = self.perceive(&inputs);
         let perceive_ms = started.elapsed().as_millis() as u64;
 
@@ -441,6 +459,7 @@ impl Engine {
             cached_blocks: cached,
             total_blocks: inputs.blocks.len(),
         };
+        let ir = Arc::new(ir);
         self.last_ir = Some(ir.clone());
         self.last_perceptions = perceptions;
         Outcome {
@@ -451,11 +470,28 @@ impl Engine {
         }
     }
 
+    /// The lexicon fingerprint, serialised only when predicates or lattices
+    /// differ from the last pass.
+    fn lexicon_fingerprint(&mut self, inputs: &ProjectInputs) -> String {
+        if let Some(memo) = &self.lexicon {
+            if memo.predicates == inputs.predicates && memo.lattices == inputs.lattices {
+                return memo.fingerprint.clone();
+            }
+        }
+        let fingerprint = lexicon_fingerprint(inputs);
+        self.lexicon = Some(LexiconMemo {
+            predicates: inputs.predicates.clone(),
+            lattices: inputs.lattices.clone(),
+            fingerprint: fingerprint.clone(),
+        });
+        fingerprint
+    }
+
     /// Perceive every block, from the cache where the key matches.
     fn perceive(&mut self, inputs: &ProjectInputs) -> (Vec<BlockPerception>, usize) {
         let matcher = Matcher::new(&inputs.entities);
         let lexicon = Lexicon::new(&inputs.lattices, &inputs.predicates);
-        let lexicon_fingerprint = lexicon_fingerprint(inputs);
+        let lexicon_fingerprint = self.lexicon_fingerprint(inputs);
         let scene_context: HashMap<&DocId, &asten_ir::Context> = inputs
             .scenes
             .iter()
@@ -562,14 +598,19 @@ pub fn build_ir(inputs: &ProjectInputs, perceptions: &[BlockPerception]) -> Stor
             name.contains(' ') || counts.get(&name.to_lowercase()).copied().unwrap_or(0) >= 2
         })
         .collect();
-    // Scenes know their blocks.
+    // Scenes know their blocks: grouped once, not one scan per scene.
+    let mut blocks_by_document: HashMap<&DocId, Vec<BlockId>> = HashMap::new();
+    for block in &inputs.blocks {
+        blocks_by_document
+            .entry(&block.document)
+            .or_default()
+            .push(block.block.clone());
+    }
     for scene in &mut ir.scenes {
-        scene.blocks = inputs
-            .blocks
-            .iter()
-            .filter(|block| block.document == scene.document)
-            .map(|block| block.block.clone())
-            .collect();
+        scene.blocks = blocks_by_document
+            .get(&scene.document)
+            .cloned()
+            .unwrap_or_default();
     }
     ir
 }
@@ -592,21 +633,27 @@ fn language_tiers(perceptions: &[BlockPerception]) -> Vec<LanguageTier> {
         .collect()
 }
 
-/// Craft hints from packs: observations, never canon errors.
+/// Craft hints from packs: observations, never canon errors. Each block is
+/// folded once and searched for every enabled hint; the final order of the
+/// marks is settled by the sort in `analyze`, not by this loop.
 fn craft_hints(inputs: &ProjectInputs) -> Vec<Diagnostic> {
     let mut out = Vec::new();
-    for hint in &inputs.craft_hints {
-        if !inputs.enabled_packs.contains(&hint.pack) {
-            continue;
-        }
-        let needle = asten_perceive::matching_form(&hint.word);
-        if needle.is_empty() {
-            continue;
-        }
-        for block in &inputs.blocks {
-            let folded = asten_perceive::Folded::new(&block.text);
-            let chars = &folded.chars;
-            let needle_chars: Vec<char> = needle.chars().collect();
+    let hints: Vec<(&CraftHint, Vec<char>)> = inputs
+        .craft_hints
+        .iter()
+        .filter(|hint| inputs.enabled_packs.contains(&hint.pack))
+        .filter_map(|hint| {
+            let needle = asten_perceive::matching_form(&hint.word);
+            (!needle.is_empty()).then(|| (hint, needle.chars().collect()))
+        })
+        .collect();
+    if hints.is_empty() {
+        return out;
+    }
+    for block in &inputs.blocks {
+        let folded = asten_perceive::Folded::new(&block.text);
+        let chars = &folded.chars;
+        for (hint, needle_chars) in &hints {
             if chars.len() < needle_chars.len() {
                 continue;
             }
@@ -829,9 +876,8 @@ mod tests {
         );
     }
 
-    #[test]
-    fn large_project_is_fast() {
-        // 250k words: 2,500 blocks of ~100 words.
+    /// 250k words: 50 chapters of 50 blocks, each block ~100 words.
+    fn large_fixture() -> ProjectInputs {
         let mut big = inputs();
         big.blocks.clear();
         big.scenes.clear();
@@ -854,6 +900,43 @@ mod tests {
                 ));
             }
         }
+        big
+    }
+
+    /// `cargo test -p asten-engine -- --ignored --nocapture bench` prints the
+    /// perceive and analyze timings for a cold pass and a one-paragraph edit.
+    #[test]
+    #[ignore = "benchmark; run by hand with --nocapture"]
+    fn bench_large_project() {
+        let mut big = large_fixture();
+        let mut engine = Engine::new();
+        let cold = engine.analyze(&big);
+        println!(
+            "cold: perceive {} ms, analyze {} ms, total {} ms ({} blocks, {} marks)",
+            cold.snapshot.timings_ms.perceive,
+            cold.snapshot.timings_ms.analyze,
+            cold.snapshot.timings_ms.total,
+            cold.snapshot.total_blocks,
+            cold.snapshot.diagnostics.len()
+        );
+        for pass in 0..3 {
+            big.revision = format!("edit{pass}");
+            big.blocks[1234].text.push_str(" Mira smiled.");
+            big.blocks[1234].fingerprint = asten_ir::sha256_hex(big.blocks[1234].text.as_bytes());
+            let warm = engine.analyze(&big);
+            println!(
+                "edit {pass}: perceive {} ms, analyze {} ms, total {} ms ({} cached)",
+                warm.snapshot.timings_ms.perceive,
+                warm.snapshot.timings_ms.analyze,
+                warm.snapshot.timings_ms.total,
+                warm.snapshot.cached_blocks
+            );
+        }
+    }
+
+    #[test]
+    fn large_project_is_fast() {
+        let mut big = large_fixture();
         let mut engine = Engine::new();
         let first = engine.analyze(&big);
         assert_eq!(first.snapshot.total_blocks, 2500);

@@ -62,21 +62,36 @@ pub fn node_id(node: &Value) -> Option<&str> {
         .filter(|id| !id.is_empty())
 }
 
-/// The top-level blocks of a `doc`, in order. Blocks without an id get a
-/// positional placeholder, which is not stable; callers should run
-/// `ensure_block_ids` first.
+/// The top-level blocks of a `doc` as `(id, node)`, in order and without
+/// copying the nodes. Blocks without an id get a positional placeholder,
+/// which is not stable; callers should run `ensure_block_ids` first.
 #[must_use]
-pub fn blocks_of(doc: &Value) -> Vec<Block> {
+pub fn block_nodes(doc: &Value) -> Vec<(String, &Value)> {
     let Some(content) = doc.get("content").and_then(Value::as_array) else {
         return Vec::new();
     };
     content
         .iter()
         .enumerate()
-        .map(|(index, node)| Block {
-            id: node_id(node)
-                .map(str::to_owned)
-                .unwrap_or_else(|| format!("anon-{index}")),
+        .map(|(index, node)| {
+            (
+                node_id(node)
+                    .map(str::to_owned)
+                    .unwrap_or_else(|| format!("anon-{index}")),
+                node,
+            )
+        })
+        .collect()
+}
+
+/// The top-level blocks of a `doc`, in order, each with a copy of its node.
+/// See `block_nodes` for the ids.
+#[must_use]
+pub fn blocks_of(doc: &Value) -> Vec<Block> {
+    block_nodes(doc)
+        .into_iter()
+        .map(|(id, node)| Block {
+            id,
             node_type: node
                 .get("type")
                 .and_then(Value::as_str)
@@ -86,6 +101,14 @@ pub fn blocks_of(doc: &Value) -> Vec<Block> {
             node: node.clone(),
         })
         .collect()
+}
+
+/// Words in a document: its plain text split on Unicode whitespace
+/// (`White_Space`), empty runs dropped. The desk's `countWords` applies the
+/// same rule to the open page, so the two counts agree.
+#[must_use]
+pub fn word_count(doc: &Value) -> usize {
+    plain_text(doc).split_whitespace().count()
 }
 
 /// Plain text of a node. Text nodes are concatenated; a `hardBreak` is a
@@ -314,5 +337,45 @@ mod tests {
         let blocks = blocks_of(&doc);
         assert_eq!(blocks[0].id, "keep");
         assert_eq!(blocks[1].id, "new-1");
+    }
+}
+
+#[cfg(test)]
+mod word_count_tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn counts_whitespace_separated_runs_of_the_plain_text() {
+        let doc = json!({"type":"doc","content":[
+            {"type":"paragraph","attrs":{"id":"a"},"content":[
+                {"type":"text","text":"Mira "},
+                {"type":"text","text":"tied","marks":[{"type":"italic"}]},
+                {"type":"text","text":" back her hair.  "}
+            ]},
+            {"type":"paragraph","attrs":{"id":"b"},"content":[
+                {"type":"text","text":"one\u{a0}two\u{2003}three"},
+                {"type":"hardBreak"},
+                {"type":"text","text":"four"}
+            ]},
+            {"type":"paragraph","attrs":{"id":"c"}}
+        ]});
+        // A mark boundary does not split a word; NBSP and an em space do;
+        // a hard break does; an empty paragraph adds nothing.
+        assert_eq!(word_count(&doc), 9);
+        assert_eq!(word_count(&json!({"type":"doc","content":[]})), 0);
+        assert_eq!(word_count(&json!(null)), 0);
+    }
+
+    #[test]
+    fn block_nodes_and_blocks_of_agree_on_ids() {
+        let doc = json!({"type":"doc","content":[
+            {"type":"paragraph","attrs":{"id":"keep"}},
+            {"type":"paragraph"}
+        ]});
+        let ids: Vec<String> = block_nodes(&doc).into_iter().map(|(id, _)| id).collect();
+        assert_eq!(ids, ["keep", "anon-1"]);
+        let blocks = blocks_of(&doc);
+        assert_eq!(blocks[1].id, "anon-1");
     }
 }

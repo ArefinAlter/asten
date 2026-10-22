@@ -89,6 +89,28 @@ export interface AstenDocument {
   updated_at: string;
 }
 
+/**
+ * A document without its body: what `GET /documents?fields=summary` lists.
+ * `words` is the body's plain text split on Unicode whitespace, the same rule
+ * the desk's `countWords` applies to the open page.
+ */
+export interface DocumentSummary {
+  id: DocumentId;
+  project_id: ProjectId;
+  parent_id: DocumentId | null;
+  kind: DocumentKind;
+  title: string;
+  position: number;
+  revision: number;
+  exclude_from_compile: boolean;
+  scene: ScenePlacement;
+  head_seq: number;
+  chain_hash: string;
+  words: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface CreateDocument {
   project_id?: ProjectId;
   parent_id?: DocumentId | null;

@@ -1,7 +1,7 @@
 //! The SQLite adapter: one file on the writer's machine, migrations applied on
 //! open, and every table the application reads and writes.
 
-use std::path::Path;
+use std::{path::Path, time::Duration};
 
 use asten_application::{ApplicationError, Repository, Result};
 use asten_blocks::{DocState, EventPayload, EventRecord};
@@ -19,7 +19,9 @@ use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use sqlx::{
     Row, SqlitePool,
-    sqlite::{SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteRow},
+    sqlite::{
+        SqliteConnectOptions, SqliteJournalMode, SqlitePoolOptions, SqliteRow, SqliteSynchronous,
+    },
 };
 use uuid::Uuid;
 
@@ -29,12 +31,19 @@ pub struct SqliteRepository {
 }
 
 impl SqliteRepository {
+    /// Open (or create) the database file. Write-ahead logging lets the desk
+    /// read while a commit is being written; `synchronous=NORMAL` is durable
+    /// across application crashes under WAL and costs one fsync per checkpoint
+    /// rather than per commit; a five-second busy timeout outlasts any single
+    /// commit so a concurrent writer waits instead of failing.
     pub async fn open(path: impl AsRef<Path>) -> Result<Self> {
         let options = SqliteConnectOptions::new()
             .filename(path)
             .create_if_missing(true)
             .foreign_keys(true)
-            .journal_mode(SqliteJournalMode::Wal);
+            .journal_mode(SqliteJournalMode::Wal)
+            .synchronous(SqliteSynchronous::Normal)
+            .busy_timeout(Duration::from_secs(5));
         let pool = SqlitePoolOptions::new()
             .max_connections(8)
             .connect_with(options)
