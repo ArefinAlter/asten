@@ -24,33 +24,42 @@ No dates. Items move down the page as they ship.
   through pairing, calling and the stream ticket.
 - Public site in the brand, honest about the above.
 
-## In review (stacked pull requests)
+## In review (stacked pull requests, merge in order)
 
-1. **Cross-platform builds** (PR 1): Windows x64 and ARM64, macOS universal,
-   Linux x86_64 and aarch64; CI on three operating systems; mobile-ready crate.
-2. **Responsive desk** (PR 2): one column on phones and tablets, drawer binder,
-   sheet inspector, bottom activity bar, touch targets; Android 8 and iOS 15
-   floors.
-3. **Client parity** (PR 3): `GET /desk`, "This desk" in Settings, installable
-   web app for phones, the parity matrix.
-4. **Decisions and roadmap** (PR 4): this page, `docs/DECISIONS.md`, site
-   roadmap and FAQ updates.
+1. **Cross-platform builds** (#1): Windows x64 and ARM64, macOS universal,
+   Linux x86_64 and aarch64; mobile-ready crate.
+2. **Responsive desk** (#2): one column on phones and tablets.
+3. **Client parity** (#3): `GET /desk`, "This desk", installable web app.
+4. **Decisions and roadmap** (#4).
+5. **Efficiency**: document summaries, SQLite pragmas and indexes, engine hot
+   paths, lazy views (D20).
+6. **Security**: served-desk CSP and caching, cookie origin rule, forwarded-hop
+   keying, ticket revocation, dependency audit (D24).
+7. **Guests live and end-to-end tests**: Word and Docs panes follow the stream;
+   Playwright suite against the real API; the revision livelock fix (D18, D19).
+8. **Algorithms**: property suites and the bugs they found (D23).
+9. **Accessibility and onboarding**: dialogs, skip link, keyboard binder, live
+   region, contrast audit, first-run steps (D26).
+10. **Formats**: EPUB 3 export, Final Draft export and import, binder-order
+    compile (D25).
+11. **OpenAPI**: generated document held to the router, `docs/API.md` (D22).
+12. **Desktop deployment**: signed user-initiated updates, single instance,
+    file logs, launch backups, the Android project and an unsigned APK (D21).
 
 ## Next
 
-- **Signed installers.** Add the Windows and Apple signing secrets; notarise
-  the macOS build; publish the first tagged release. Download page then stops
-  saying "run from source".
-- **Mobile shells built and tested.** Run `tauri android init` and
-  `tauri ios init` on machines with the SDKs, commit the generated projects,
-  test the one-column desk on a phone and a tablet, and add the share-sheet
-  path for compile output.
+- **Signed installers and updates.** Add the Windows and Apple signing
+  secrets and the updater signing key (`TAURI_SIGNING_PRIVATE_KEY`); notarise
+  the macOS build; publish the first tagged release. The download page then
+  stops saying "run from source".
+- **Mobile shells tested.** The Android project is committed and builds an
+  unsigned APK; it needs a keystore, a device run, and the share-sheet path for
+  compile output. The iOS project needs a Mac with Xcode for `tauri ios init`.
 - **Device testing for ARM.** Windows on ARM and Linux aarch64 have configured
   release jobs; first verify their artifacts, then run them on hardware and record the result in `docs/PLATFORMS.md`.
+
 - **Linux aarch64 runner.** Enable an ARM runner for the private repository so
   the release job stops being optional.
-- **Guest panes live.** `EventSource` with a stream ticket in the Word pane and
-  the Docs sidebar, replacing the refresh button.
 - **Docker images built and smoke-tested** on a machine with the daemon
   running; the compose file is ready.
 

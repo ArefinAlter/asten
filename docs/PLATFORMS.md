@@ -18,7 +18,7 @@ verified. Adding a workflow does not demonstrate a successful build.
 | macOS 11 Big Sur and later | Apple silicon, Intel | Universal `.app` and `.dmg` | Safari, Chrome, Firefox          | Universal build configured; installer verification pending |
 | Linux (glibc 2.35+)        | x86_64            | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Release workflow configured; installer verification pending |
 | Linux                      | aarch64           | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Release job present; needs an ARM runner   |
-| Android 8+                 | arm64, x86_64     | Tauri app (see below)         | Chrome, as an installed web app  | Shell scaffold; project files generated on a machine with the SDK |
+| Android 8+                 | arm64, x86_64     | Tauri app (see below)         | Chrome, as an installed web app  | Project committed; an unsigned arm64 APK built, with Gradle run by hand on Windows (see below) |
 | iOS and iPadOS 15+         | arm64             | Tauri app (see below)         | Safari, as an installed web app  | Shell scaffold; project files generated on a Mac with Xcode |
 
 The browser desk works anywhere a modern browser can reach the API. On a phone
@@ -37,10 +37,56 @@ SIMD or inline-assembly paths.
 
 Per-platform packaging lives beside the main config:
 
-- `apps/desktop/src-tauri/tauri.conf.json`: window, security policy, icons.
+- `apps/desktop/src-tauri/tauri.conf.json`: window, security policy, icons,
+  the updater endpoint and public key.
 - `tauri.windows.conf.json`: NSIS per-user install, WebView2 bootstrapper, MSI.
 - `tauri.macos.conf.json`: minimum macOS 11, DMG layout.
 - `tauri.linux.conf.json`: Debian and RPM dependencies, AppImage.
+
+## What the desktop shell keeps for you
+
+Everything lives under the operating system's application-data folder for
+Asten (Windows `%APPDATA%\com.asten.app`, macOS
+`~/Library/Application Support/com.asten.app`, Linux
+`~/.local/share/com.asten.app`). Settings → This desk shows each path with a
+copy button.
+
+| Path       | What it holds                                                                                                                                                                                                                                                             |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `asten.db` | The manuscript, the canon and the pairing records. One SQLite file.                                                                                                                                                                                                       |
+| `backups/` | A copy of `asten.db` taken at launch, before anything opens the file, named `asten-YYYYMMDD-HHMMSS.db`. Made with SQLite's `VACUUM INTO`, so it is whole even after a bad shutdown. The newest seven are kept; a launch within six hours of the last copy makes none. |
+| `logs/`    | One plain-text file a day (`asten.YYYY-MM-DD.log`), the newest seven kept. Request lines name the method and path only; tokens, stream tickets, pairing codes and passphrases never reach a log. `ASTEN_LOG` (in `RUST_LOG` syntax) changes the level.                 |
+
+A second launch of Asten brings the running window forward instead of
+starting a second copy, and so a second API server.
+
+### Updates
+
+The desk never checks for updates on its own. Settings → This desk → Check
+for updates asks GitHub for `latest.json` from the newest published release,
+reports "You have the latest" or "Version X available", and installs and
+relaunches only after a second, explicit press. That is the only network call
+the desktop app makes beyond loopback.
+
+Updater artifacts are signed with a minisign key pair:
+
+- The public key is in `apps/desktop/src-tauri/tauri.conf.json`
+  (`plugins.updater.pubkey`).
+- The private key lives outside every repository, on the build owner's
+  machine at `B:\margin-keys\asten-updater.key`, with the matching `.pub`
+  beside it. It was generated with an empty password. It must never be copied
+  into a repository, a worktree, a log or a chat.
+- GitHub Actions needs it as two repository secrets:
+  `TAURI_SIGNING_PRIVATE_KEY` (the file's contents) and
+  `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` (empty, but the secret must exist).
+  Without them a release build fails, because `bundle.createUpdaterArtifacts`
+  is on.
+
+The endpoint is `releases/latest/download/latest.json`, which GitHub resolves
+to the newest release that is neither a draft nor a prerelease. The release
+workflow creates drafts marked prerelease, so a build reaches the updater only
+once it is published as a full release. On Linux only the AppImage can update
+itself; `.deb` and `.rpm` installs update through the package manager.
 
 ## Building
 
@@ -88,28 +134,92 @@ Signing is off by default. Add these repository secrets to turn it on:
 | `WINDOWS_CERTIFICATE`, `WINDOWS_CERTIFICATE_PASSWORD`                               | Authenticode-signs the Windows installers |
 | `APPLE_CERTIFICATE`, `APPLE_CERTIFICATE_PASSWORD`, `APPLE_SIGNING_IDENTITY`         | Signs the macOS app                      |
 | `APPLE_ID`, `APPLE_PASSWORD`, `APPLE_TEAM_ID`                                       | Notarises the macOS app                  |
+| `TAURI_SIGNING_PRIVATE_KEY`, `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`                   | Signs the updater artifacts (required)   |
 
 Unsigned builds install; Windows shows a SmartScreen warning and macOS asks
 the user to allow the app under Privacy and Security.
 
 ## Android and iOS
 
-Tauri 2 builds the same shell for phones. The Rust crate already exposes the
-mobile entry point and the library types mobile needs (`cdylib` for Android,
-`staticlib` for iOS). The generated platform projects are not committed because
-they can only be created on a machine with the platform SDK:
+Tauri 2 builds the same shell for phones. The Rust crate exposes the mobile
+entry point and the library types mobile needs (`cdylib` for Android,
+`staticlib` for iOS). The updater and the single-instance guard are compiled
+out on phones; the store handles updates there.
+
+### Android
+
+The generated project is committed at `apps/desktop/src-tauri/gen/android`
+(Gradle 8.14, Android Gradle plugin 8.11, Kotlin 1.9, `compileSdk` 36,
+`minSdk` 26). It holds no machine-specific paths. Tauri writes its
+`tauri.*.gradle` helpers, `local.properties` and the build outputs at build
+time, and the project's own `.gitignore` files keep them out of git.
 
 ```sh
-# Android: Android Studio, SDK 34+, NDK, and JAVA_HOME set
-pnpm --filter @asten/desktop android:init     # writes apps/desktop/src-tauri/gen/android
+# Needs: ANDROID_HOME with platform-tools, build-tools and a platform; an NDK
+# (27.2.12479018 is known to work); JAVA_HOME pointing at a JDK 17 or newer
+# (JDK 24 runs this Gradle); and the Rust Android targets, which android:init
+# installs.
+export ANDROID_HOME=/path/to/sdk NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018
+pnpm --filter @asten/desktop android:init     # regenerates gen/android when needed
 pnpm --filter @asten/desktop android:dev
-pnpm --filter @asten/desktop android:build    # .apk and .aab
+pnpm --filter @asten/desktop exec tauri android build --apk --target aarch64
+```
 
+Status on the Windows build machine, as of this writing: `android:init`
+succeeds, and the whole workspace compiles for `aarch64-linux-android` with
+NDK 27 (the 15 MB `libasten_desktop_lib.so` comes out of a release build in
+about eleven minutes). The build then stops before Gradle runs, because the
+Tauri CLI places the library in `jniLibs/` with a symbolic link and Windows
+refuses to create one unless Developer Mode is on or the shell is elevated:
+
+> Failed to create a symbolic link ... Creation symbolic link is not allowed
+> for this system. For Windows 10 or newer: you should use developer mode.
+
+Turning on Settings → System → For developers → Developer Mode (an
+administrator action) removes the block, and the same command then continues
+into Gradle. Linux and macOS have no such restriction.
+
+Gradle was then exercised on its own, with the library copied into
+`app/src/main/jniLibs/arm64-v8a/` by hand:
+
+```sh
+cd apps/desktop/src-tauri/gen/android
+./gradlew assembleArm64Release -x rustBuildArm64Release --no-daemon
+```
+
+JDK 24 runs it (Kotlin warns that it falls back to a JVM 22 target), Gradle
+8.14.3 and the Android Gradle plugin download, and `buildSrc` compiles.
+Configuring `:app` first failed with a `java.util.concurrent.TimeoutException`
+from Gradle's Kotlin DSL accessor generator. The cause was the disk, not the
+project: `GRADLE_USER_HOME` had been pointed at a spinning drive to spare the
+nearly full system SSD, the generator writes around two thousand small files
+inside a bounded wait, and that drive managed about 35 such writes a second
+against the SSD's 1,800. Either keep `GRADLE_USER_HOME` (by default
+`~/.gradle`) on an SSD, or lengthen the wait:
+
+```sh
+JAVA_TOOL_OPTIONS=-Dorg.gradle.kotlin.dsl.internal.io.timeout=900000 \
+  ./gradlew assembleArm64Release -x rustBuildArm64Release --no-daemon
+```
+
+With the wait at fifteen minutes the same spinning drive finished the build
+in 21 minutes and wrote `app/build/outputs/apk/arm64/release/`
+`app-arm64-release-unsigned.apk` (17 MB). It is unsigned, as the name says:
+an installable release needs a keystore and a `signingConfigs` block in
+`app/build.gradle.kts`, as Tauri's Android signing guide describes;
+`keystore.properties` is already git-ignored for it.
+
+### iOS
+
+```sh
 # iOS: a Mac with Xcode and an Apple developer team
 pnpm --filter @asten/desktop ios:init         # writes apps/desktop/src-tauri/gen/apple
 pnpm --filter @asten/desktop ios:dev
 pnpm --filter @asten/desktop ios:build
 ```
+
+The iOS project is not committed, because it can only be created on a Mac
+with Xcode.
 
 On a phone the embedded API still binds loopback inside the app's sandbox, the
 database lives in the app's data directory, and the desk opens in its

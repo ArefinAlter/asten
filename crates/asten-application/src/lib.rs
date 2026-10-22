@@ -78,6 +78,14 @@ pub struct DeskInfo {
     /// Where the SQLite file lives. Only desk and owner sessions see it.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub database_path: Option<String>,
+    /// Where the hosting shell writes its log files, when a shell hosts the
+    /// API. Only desk and owner sessions see it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub logs_path: Option<String>,
+    /// Where the hosting shell keeps its launch-time copies of the database.
+    /// Only desk and owner sessions see it.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub backups_path: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
