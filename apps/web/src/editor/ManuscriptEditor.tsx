@@ -31,6 +31,7 @@ import {
 } from "./extensions";
 import { FactCardPopover } from "./FactCardPopover";
 import { SceneHeader } from "./SceneHeader";
+import { announce } from "../lib/a11y";
 import { ApiError } from "../lib/asten-client";
 import { countWords, findBlock, scalarToPos, toEditorDoc } from "../lib/pm";
 import { severityWord } from "../lib/format";
@@ -264,6 +265,19 @@ export function ManuscriptEditor({
   useEffect(() => {
     reconcile();
   }, [document.id, document.head_seq, reconcile]);
+
+  // Tell the live region when the save state settles: never on a keystroke
+  // ("unsaved") or on the request itself ("saving"), and "Saved" at most once
+  // every half minute while the author keeps writing.
+  const announced = useRef<SaveState>("saved");
+  useEffect(() => {
+    const previous = announced.current;
+    announced.current = saveState;
+    if (saveState === previous) return;
+    if (saveState === "failed") announce("Not saved, retrying");
+    else if (saveState === "conflict") announce("Conflict");
+    else if (saveState === "saved") announce("Saved", { dedupeMs: 30_000 });
+  }, [saveState]);
 
   function keepMine() {
     syncedSeq.current = latestDocument.current.head_seq;

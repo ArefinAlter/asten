@@ -28,11 +28,11 @@ import { PaletteMark } from "./brand/Palette";
 import { ThemeToggle } from "./brand/ThemeToggle";
 import { ManuscriptEditor, type Jump } from "./editor/ManuscriptEditor";
 import { Inspector } from "./inspector/Inspector";
+import { useAnnounceNew, useAnnouncement, useFocusTrap } from "./lib/a11y";
 import { ApiError, createAstenClient } from "./lib/asten-client";
 import {
   SAVE_DOCUMENT_KEY,
   useMediaQuery,
-  usePanelFocus,
   useProjectStream,
   useStoredState,
 } from "./lib/hooks";
@@ -87,6 +87,12 @@ const WorldWorkspace = lazy(() =>
 const viewFallback = <p className="status">Opening…</p>;
 
 const client = createAstenClient();
+
+const newMarksPhrase = (count: number) =>
+  `${count} new mark${count === 1 ? "" : "s"}`;
+
+/** Siblings that stay live while a drawer or sheet holds focus. */
+const KEEP_LIVE = ".scrim, .live-region";
 
 export type View =
   | "overview"
@@ -252,13 +258,6 @@ function Desk() {
   const narrow = useMediaQuery("(max-width: 959px)");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(false);
-  const binderToggleRef = useRef<HTMLButtonElement>(null);
-  const inspectorToggleRef = useRef<HTMLButtonElement>(null);
-  const binderRef = usePanelFocus(narrow && sidebarOpen, binderToggleRef);
-  const inspectorRef = usePanelFocus(
-    compact && inspectorOpen,
-    inspectorToggleRef,
-  );
   useEffect(() => {
     if (!narrow) {
       setSidebarOpen(false);
@@ -326,6 +325,32 @@ function Desk() {
     queryFn: () => client.blame(selectedProjectId!, selectedDocumentId!),
     enabled: Boolean(selectedProjectId && selectedDocumentId && showBlame),
   });
+
+  // On small desks the binder drawer and the inspector sheet are dialogs:
+  // focus stays inside, the rest of the shell is inert, Escape closes, and
+  // focus returns to the toggle. One polite live region serves the desk.
+  const sidebarRef = useRef<HTMLElement>(null);
+  const inspectorRef = useRef<HTMLElement>(null);
+  const binderToggleRef = useRef<HTMLButtonElement>(null);
+  const inspectorToggleRef = useRef<HTMLButtonElement>(null);
+  const drawerOpen = narrow && sidebarOpen;
+  const sheetOpen = compact && inspectorOpen;
+  useFocusTrap(sidebarRef, drawerOpen, {
+    onClose: () => setSidebarOpen(false),
+    returnTo: binderToggleRef,
+    keep: KEEP_LIVE,
+  });
+  useFocusTrap(inspectorRef, sheetOpen, {
+    onClose: () => setInspectorOpen(false),
+    returnTo: inspectorToggleRef,
+    keep: KEEP_LIVE,
+  });
+  const announcement = useAnnouncement();
+  useAnnounceNew(
+    diagnostics.data?.diagnostics,
+    selectedProjectId,
+    newMarksPhrase,
+  );
 
   const createProject = useMutation({
     mutationFn: (input: CreateProject) => client.createProject(input),
@@ -527,12 +552,25 @@ function Desk() {
     <div
       className={`app-shell view-${view}${scalesCollapsed === "closed" ? " scales-closed" : ""}${compact ? " compact" : ""}${narrow ? " narrow" : ""}${sidebarOpen ? " sidebar-open" : ""}${inspectorOpen ? " inspector-open" : ""}`}
     >
+      <a
+        className="skip-link"
+        href="#workspace"
+        onClick={(event) => {
+          event.preventDefault();
+          window.document.getElementById("workspace")?.focus();
+        }}
+      >
+        Skip to the page
+      </a>
+      <div className="sr-only live-region" role="status" aria-live="polite">
+        {announcement}
+      </div>
       <header className="titlebar">
         <span className="brand">
           <button
             type="button"
-            className={`shell-toggle binder-toggle${sidebarOpen ? " active" : ""}`}
             ref={binderToggleRef}
+            className={`shell-toggle binder-toggle${sidebarOpen ? " active" : ""}`}
             aria-label={sidebarOpen ? "Close the binder" : "Open the binder"}
             aria-expanded={sidebarOpen}
             onClick={() => {
@@ -590,8 +628,8 @@ function Desk() {
           <ThemeToggle />
           <button
             type="button"
-            className={`shell-toggle inspector-toggle${inspectorOpen ? " active" : ""}`}
             ref={inspectorToggleRef}
+            className={`shell-toggle inspector-toggle${inspectorOpen ? " active" : ""}`}
             aria-label={
               inspectorOpen ? "Close the inspector" : "Open the inspector"
             }
@@ -636,11 +674,11 @@ function Desk() {
 
       <aside
         className="sidebar"
-        ref={binderRef}
+        ref={sidebarRef}
         inert={narrow && !sidebarOpen}
-        role={narrow ? "dialog" : undefined}
-        aria-modal={narrow && sidebarOpen ? true : undefined}
-        aria-label="Binder"
+        role={drawerOpen ? "dialog" : undefined}
+        aria-modal={drawerOpen || undefined}
+        aria-label="Projects and binder"
         tabIndex={-1}
       >
         <div className="pane-heading">
@@ -707,6 +745,7 @@ function Desk() {
               <span className="mono">Binder</span>
             </div>
             <Binder
+              projectId={selectedProject.id}
               documents={documents.data ?? []}
               selectedId={selectedDocumentId}
               marks={openMarks}
@@ -742,13 +781,38 @@ function Desk() {
         )}
       </aside>
 
-      <main className={`workspace${view === "world" ? " world-open" : ""}`}>
+      <main
+        id="workspace"
+        tabIndex={-1}
+        className={`workspace${view === "world" ? " world-open" : ""}`}
+      >
         <Suspense fallback={viewFallback}>
           {!selectedProject ? (
             view === "guests" ? (
               <Guests />
             ) : view === "packs" ? (
               <Packs />
+            ) : projects.data?.length === 0 ? (
+              <section className="empty-state">
+                <PaletteMark className="hero-mark" />
+                <h1>A writing desk with a memory.</h1>
+                <p>Your words stay black. Asten only ever writes in red.</p>
+                <ol className="first-steps">
+                  <li>Create a project.</li>
+                  <li>Write a scene.</li>
+                  <li>Settle a fact when it matters.</li>
+                </ol>
+                <button
+                  type="button"
+                  className="btn btn--primary"
+                  onClick={() => {
+                    setIsCreating(true);
+                    if (narrow) setSidebarOpen(true);
+                  }}
+                >
+                  Create a project
+                </button>
+              </section>
             ) : (
               <section className="empty-state">
                 <PaletteMark className="hero-mark" />
@@ -894,8 +958,8 @@ function Desk() {
         className="inspector"
         ref={inspectorRef}
         inert={compact && !inspectorOpen}
-        role={compact ? "dialog" : undefined}
-        aria-modal={compact && inspectorOpen ? true : undefined}
+        role={sheetOpen ? "dialog" : undefined}
+        aria-modal={sheetOpen || undefined}
         aria-label="Inspector"
         tabIndex={-1}
       >

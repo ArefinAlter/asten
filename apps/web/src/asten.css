@@ -51,6 +51,11 @@ textarea {
   width: 100%;
   padding: 6px 8px;
   border: 1px solid var(--rule);
+  /* A field's edge must read at 3:1 (WCAG 1.4.11); --rule is a divider
+     hairline, so the edge is ink-3 softened toward the field. The first line
+     is the fallback where color-mix is not understood. */
+  border-color: var(--rule-strong);
+  border-color: color-mix(in srgb, var(--ink-3) 80%, var(--papyrus-raised));
   border-radius: var(--radius-s);
   background: var(--papyrus-raised);
 }
@@ -59,6 +64,46 @@ textarea {
   outline: 2px solid var(--lapis);
   outline-offset: 3px;
   border-radius: var(--radius-s);
+}
+
+/* Spoken, not seen: the live region. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* First tab stop on the desk; shown only while it has focus. */
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 60;
+  padding: 8px 14px;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  background: var(--papyrus-raised);
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+  outline-offset: 2px;
+}
+
+/* The skip link lands here; keep the ring inside the pane. */
+.workspace:focus-visible {
+  outline-offset: -3px;
 }
 
 h1,
@@ -543,6 +588,9 @@ code,
 
 .theme-toggle .tt-disk {
   fill: var(--gold);
+  /* Gold alone is 2.85:1 on papyrus; the ink outline identifies the control. */
+  stroke: var(--ink);
+  stroke-width: 1.2;
 }
 
 .theme-toggle .tt-rays line {
@@ -787,6 +835,33 @@ code,
   padding: 4px;
 }
 
+/* The row is the tree item: it takes focus; the ring sits on the row alone,
+   not around the folded children beneath it. */
+.binder-title {
+  cursor: pointer;
+}
+
+.binder-node:focus-visible {
+  outline: none;
+}
+
+.binder-node:focus-visible > .binder-row {
+  outline: 2px solid var(--lapis);
+  outline-offset: -2px;
+}
+
+.binder-twist {
+  flex: 0 0 auto;
+  width: 16px;
+  margin-left: 2px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font-size: 10px;
+  line-height: 1;
+}
+
 .binder-add {
   margin: 10px 14px;
   font-size: 13px;
@@ -853,6 +928,43 @@ code,
   height: 2px;
   background: var(--rubric);
   margin: 14px auto 0;
+}
+
+/* First run: three steps, one button for the first of them. */
+.first-steps {
+  list-style: none;
+  margin: 6px auto 10px;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  counter-reset: steps;
+  text-align: left;
+}
+
+.first-steps li {
+  position: relative;
+  padding-left: 30px;
+  counter-increment: steps;
+}
+
+.first-steps li::before {
+  content: counter(steps);
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--rubric);
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--rubric);
+}
+
+.empty-state .btn {
+  justify-self: center;
 }
 
 .status,
@@ -1393,6 +1505,18 @@ code,
 .scales-empty p {
   font-family: var(--font-display);
   font-size: 18px;
+}
+
+/* The first time a mark appears: one line, dismissed once. */
+.first-mark-note {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 8px 0 2px;
+  padding: 6px 8px;
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--radius-s);
 }
 
 .scales .beam {
@@ -1981,12 +2105,37 @@ code,
   text-align: center;
 }
 
+/* Reduced motion removes movement and keeps opacity (BRAND.md, Motion).
+   The drawer, the sheet, the scales' beam, the moon's shadow and the
+   cartouche tie bar jump to their still state; margin cards fade without
+   rising; the reed stroke under a mark is a colour fade, so it stays. */
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    transition-duration: 0.001ms !important;
+  .app-shell.compact .inspector,
+  .app-shell.narrow .sidebar,
+  .scales .beam,
+  .theme-toggle .tt-shadow,
+  .btn,
+  .btn::after,
+  .linkish::after {
+    transition: none;
+  }
+
+  .btn:hover::after {
+    transform: none;
+  }
+
+  .margin-mark {
+    animation-name: fade;
+  }
+
+  html {
+    scroll-behavior: auto;
   }
 }
 
@@ -2302,4 +2451,39 @@ body {
   align-items: baseline;
   max-width: 100%;
   overflow-wrap: anywhere;
+}
+
+/* ───────── Contrast ─────────
+   Every pair is audited by scripts/contrast-audit.mjs against the brand
+   tokens; what fails on tokens alone is fixed here, per component, so the
+   pigments themselves stay as the brand set them. */
+
+/* Night: the primary button's natron label reads 3.1:1 on the night rubric,
+   the code cartouche 4.1:1 on its wash, and --warn is a day pigment. The
+   :where() keeps these at class specificity so the information-mark chip
+   (ink-3) still wins. */
+:where(:root[data-theme="night"]) .btn--primary {
+  --btn-fg: var(--papyrus);
+}
+
+:where(:root[data-theme="night"]) .chip--code {
+  color: var(--rubric-deep);
+}
+
+:where(:root[data-theme="night"]) .warn {
+  color: var(--gold);
+}
+
+@media (prefers-color-scheme: dark) {
+  :where(:root:not([data-theme="day"])) .btn--primary {
+    --btn-fg: var(--papyrus);
+  }
+
+  :where(:root:not([data-theme="day"])) .chip--code {
+    color: var(--rubric-deep);
+  }
+
+  :where(:root:not([data-theme="day"])) .warn {
+    color: var(--gold);
+  }
 }

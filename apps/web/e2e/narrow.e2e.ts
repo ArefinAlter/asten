@@ -29,7 +29,7 @@ test("on a narrow screen the binder is a drawer and the Scales fold", async ({
   ).toBeVisible();
   await expect(binder).toBeInViewport();
 
-  await binder.getByRole("button", { name: /Low water/ }).click();
+  await binder.getByRole("treeitem", { name: /Low water/ }).click();
   await expect(
     page.getByRole("heading", { name: "Low water", level: 1 }),
   ).toBeVisible();
