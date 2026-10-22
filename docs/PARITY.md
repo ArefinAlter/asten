@@ -10,10 +10,16 @@ what each door can do, why a gap exists where it does, and how it would close.
 | -------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------- |
 | Desktop shell              | Tauri app on Windows, macOS, Linux; embeds the API and the desk                       | HTTP to the embedded API, desk token   |
 | Browser desk (computer)    | The same React desk opened in a browser against `pnpm dev:api` or a hosted API        | HTTP, pairing code → token or cookie   |
-| Browser desk (phone/tablet)| The same desk in the one-column layout; installable from the browser menu             | HTTP to a home-hosted API over the LAN |
+| Browser desk (phone/tablet)| The same desk in the one-column layout; installation requires phone-trusted HTTPS     | HTTPS to the desk and API on the home machine |
 | Android / iOS shell        | Tauri mobile app; embeds the API inside the app sandbox                               | HTTP to the embedded API, desk token   |
 | Word task pane             | Office add-in, sideloaded                                                              | HTTP, pairs once as a guest            |
 | Google Docs sidebar        | Apps Script sidebar                                                                   | HTTP, pairs once as a guest            |
+
+For phone installation, use the same HTTPS origin for the static desk and API
+and trust its certificate on the phone. See [Phone setup](PHONE_SETUP.md).
+Plain HTTP over the LAN is browser-only and cannot register the service worker.
+Native Android/iOS columns describe the intended shared-shell capabilities;
+their SDK builds and device testing remain pending, not certified by this matrix.
 
 ## Capability matrix
 

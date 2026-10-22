@@ -3,8 +3,8 @@ import { E2E_ORIGIN } from "./e2e/desk";
 
 /**
  * End-to-end tests drive the built desk served by a real `asten-api` on
- * 127.0.0.1:4391 with a throwaway database. The global setup builds what is
- * missing, starts the API, pairs with it once, and tears it all down.
+ * 127.0.0.1:4391 with a throwaway database. The global setup refreshes the builds,
+ * starts the API, pairs with it once, and tears it all down.
  *
  * Traces and screenshots are off by default: both would capture the pairing
  * code and the bearer token. Opt in for one run with `--trace on`.
