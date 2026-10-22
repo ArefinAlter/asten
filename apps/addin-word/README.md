@@ -13,6 +13,16 @@ The pane exchanges the code for a bearer token once and keeps the token in the
 pane's own storage. **Forget this pairing** at the bottom of the pane revokes
 it; the desk's Guests panel can revoke it too.
 
+## Live Scales
+
+Once paired, the pane follows the project's change stream: it asks the API
+for a stream ticket (`POST /projects/{id}/stream-ticket`, single use, valid
+for one minute) and opens an `EventSource` on `/projects/{id}/stream` with
+it, so the token never appears in a URL. The Scales re-weigh on every
+revision, whoever made it. If the stream drops, the pane fetches a fresh
+ticket and reconnects with backoff; **Refresh the Scales** stays as a
+fallback. A revoked pairing returns the pane to the code screen.
+
 ## Sideload
 
 1. Start the API: `pnpm dev:api` (or open the desktop app, which embeds it).
