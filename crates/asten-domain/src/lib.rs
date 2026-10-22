@@ -13,6 +13,7 @@ macro_rules! entity_id {
             Clone, Copy, Debug, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize,
         )]
         #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+        #[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
         #[serde(transparent)]
         pub struct $name(pub Uuid);
 
@@ -52,6 +53,7 @@ pub use screenplay::*;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum ProjectKind {
     Novel,
@@ -62,6 +64,7 @@ pub enum ProjectKind {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Project {
     pub id: ProjectId,
     pub name: String,
@@ -73,6 +76,7 @@ pub struct Project {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum DocumentKind {
     Manuscript,
@@ -97,6 +101,7 @@ impl DocumentKind {
 /// Where a document sits in story time and what frame it is told in.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct ScenePlacement {
     /// The label the author typed: "day 14", "1890-03-02", "three days after the siege".
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -122,6 +127,7 @@ pub struct ScenePlacement {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Document {
     pub id: DocumentId,
     pub project_id: ProjectId,
@@ -172,6 +178,7 @@ impl Document {
 /// history list. Bodies travel one at a time, for the open page only.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct DocumentSummary {
     pub id: DocumentId,
     pub project_id: ProjectId,
@@ -198,6 +205,7 @@ pub struct DocumentSummary {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum FactModality {
     #[default]
@@ -210,6 +218,7 @@ pub enum FactModality {
 /// `Confirmed` is the wire name for a settled fact.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum FactStatus {
     Proposed,
@@ -235,6 +244,7 @@ impl FactStatus {
 /// block-relative `anchor`.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct SourceAnchor {
     pub document_id: DocumentId,
     pub start: u32,
@@ -243,6 +253,7 @@ pub struct SourceAnchor {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Fact {
     pub id: FactId,
     pub project_id: ProjectId,
@@ -277,6 +288,7 @@ fn one() -> f32 {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum WorldKind {
     Place,
@@ -290,6 +302,7 @@ pub enum WorldKind {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum WorldStatus {
     #[default]
@@ -300,6 +313,7 @@ pub enum WorldStatus {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum IdeaPrompt {
     Why,
@@ -309,6 +323,7 @@ pub enum IdeaPrompt {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct WorldEntry {
     pub id: WorldEntryId,
     pub project_id: ProjectId,
@@ -328,6 +343,7 @@ pub struct WorldEntry {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct WorldPulse {
     pub sparks: u32,
     pub sketched: u32,
@@ -344,6 +360,7 @@ pub struct WorldPulse {
 /// Project-wide engine settings.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "domain/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct ProjectSettings {
     pub project_id: ProjectId,
     #[serde(default)]

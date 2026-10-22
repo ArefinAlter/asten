@@ -44,6 +44,7 @@ pub struct StreamTicket {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct StreamTicketIssued {
     pub ticket: String,
     pub expires_at: DateTime<Utc>,
@@ -55,6 +56,7 @@ pub struct StreamTicketIssued {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct AuthStatus {
     pub mode: AuthMode,
     pub owner_configured: bool,
@@ -69,6 +71,7 @@ pub struct AuthStatus {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct PairingStart {
     pub id: PairingCodeId,
     /// Shown once in the desk; never stored in clear.
@@ -85,6 +88,7 @@ pub struct PairingStart {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct PairingComplete {
     /// Given to the client once.
     pub token: String,
@@ -101,6 +105,7 @@ pub struct PairingComplete {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct AuthenticatedClient {
     pub token_id: Option<AuthTokenId>,
     pub kind: TokenKind,

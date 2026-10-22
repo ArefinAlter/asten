@@ -6,12 +6,12 @@ rust-version.workspace = true
 
 [dependencies]
 anyhow.workspace = true
-asten-application = { path = "../../crates/asten-application" }
-asten-auth = { path = "../../crates/asten-auth" }
-asten-diagnostics = { path = "../../crates/asten-diagnostics" }
-asten-domain = { path = "../../crates/asten-domain" }
-asten-ir = { path = "../../crates/asten-ir" }
-asten-ls = { path = "../../crates/asten-ls" }
+asten-application = { path = "../../crates/asten-application", features = ["openapi"] }
+asten-auth = { path = "../../crates/asten-auth", features = ["openapi"] }
+asten-diagnostics = { path = "../../crates/asten-diagnostics", features = ["openapi"] }
+asten-domain = { path = "../../crates/asten-domain", features = ["openapi"] }
+asten-ir = { path = "../../crates/asten-ir", features = ["openapi"] }
+asten-ls = { path = "../../crates/asten-ls", features = ["openapi"] }
 asten-storage = { path = "../../crates/asten-storage" }
 axum = { workspace = true, features = ["json", "query"] }
 base64.workspace = true
@@ -26,8 +26,10 @@ tower.workspace = true
 tower-http.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+utoipa.workspace = true
 uuid.workspace = true
 
 [dev-dependencies]
 asten-blocks = { path = "../../crates/asten-blocks" }
+asten-time = { path = "../../crates/asten-time" }
 http-body-util = "0.1"

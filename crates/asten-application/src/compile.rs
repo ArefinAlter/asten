@@ -17,6 +17,7 @@ use crate::{ApplicationError, Result};
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum CompileFormat {
     #[default]
@@ -35,6 +36,7 @@ pub enum CompileFormat {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CompileRequest {
     #[serde(default)]

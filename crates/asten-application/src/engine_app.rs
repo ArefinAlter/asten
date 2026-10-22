@@ -17,6 +17,7 @@ use asten_domain::{
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateCanonEntity {
     #[serde(default)]
@@ -40,6 +41,7 @@ pub struct CreateCanonEntity {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateCanonEntity {
     pub kind: Option<EntityKind>,
@@ -55,6 +57,7 @@ pub struct UpdateCanonEntity {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateTimelineEvent {
     #[serde(default)]
@@ -94,6 +97,7 @@ pub struct CreateTimelineEvent {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateTimelineEvent {
     pub title: Option<String>,
@@ -118,6 +122,7 @@ pub struct UpdateTimelineEvent {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateComment {
     #[serde(default)]
@@ -139,6 +144,7 @@ pub struct CreateComment {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateComment {
     pub body: Option<String>,
@@ -151,6 +157,7 @@ pub struct UpdateComment {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateSnapshot {
     #[serde(default)]
@@ -165,6 +172,7 @@ pub struct CreateSnapshot {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateSuppression {
     #[serde(default)]
@@ -190,6 +198,7 @@ pub struct CreateSuppression {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct UpdateMethodPack {
     pub enabled: bool,
@@ -201,6 +210,7 @@ pub struct UpdateMethodPack {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct CreateTrackedChange {
     #[serde(default)]
@@ -219,6 +229,7 @@ pub struct CreateTrackedChange {
     derive(ts_rs::TS),
     ts(export, export_to = "application/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
 pub struct ResolveTrackedChange {
     pub accepted: bool,

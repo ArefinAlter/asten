@@ -7,6 +7,7 @@ description = "The story language server protocol: the request and notification 
 
 [dependencies]
 ts-rs = { workspace = true, optional = true }
+utoipa = { workspace = true, optional = true }
 asten-diagnostics = { path = "../asten-diagnostics" }
 asten-ir = { path = "../asten-ir" }
 serde.workspace = true
@@ -15,3 +16,5 @@ serde_json.workspace = true
 [features]
 # Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
 ts = ["dep:ts-rs", "asten-ir/ts", "asten-diagnostics/ts"]
+# Derive OpenAPI schemas for the API contracts (`node scripts/openapi-export.mjs`).
+openapi = ["dep:utoipa", "asten-ir/openapi", "asten-diagnostics/openapi"]

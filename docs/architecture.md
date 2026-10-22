@@ -102,7 +102,12 @@ every serde-derived type in the contract crates also derives `ts_rs::TS`
 behind the `ts` feature, `pnpm contracts:gen` exports them to
 `src/generated/<crate>/`, and `src/drift.ts` asserts that each handwritten
 type the desk uses is mutually assignable with its generated twin. CI
-regenerates and fails on a diff. An OpenAPI document is still to come.
+regenerates and fails on a diff. The OpenAPI 3.1 document comes from the same
+types: they also derive `utoipa::ToSchema` behind an `openapi` feature, every
+handler carries a `#[utoipa::path]` annotation, and the API serves the result
+at `GET /api/v1/openapi.json` (committed as `docs/openapi.json`; a test fails
+when a route lacks an annotation or the committed copy is stale). `docs/API.md`
+explains how to call the API and lists every route.
 
 ## HTTP middleware
 
@@ -171,6 +176,5 @@ laptop and on a phone:
 - trained local perception models (Tier A) and the training pipeline;
 - a plugin runtime for third-party packs;
 - map and drawing renderers;
-- an OpenAPI document for the routes (the types are already generated);
 - store listings for the mobile shells and the guests;
 - product licensing and distribution terms.

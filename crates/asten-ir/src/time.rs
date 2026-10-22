@@ -10,10 +10,13 @@ pub type Tick = i64;
 /// A closed interval in story time with optional bounds. `None` is unbounded.
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, Hash, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct TimeBounds {
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "openapi", schema(value_type = Option<i64>))]
     pub lo: Option<Tick>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
+    #[cfg_attr(feature = "openapi", schema(value_type = Option<i64>))]
     pub hi: Option<Tick>,
 }
 

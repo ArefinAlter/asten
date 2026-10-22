@@ -29,6 +29,7 @@ use thiserror::Error;
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "auth/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum AuthMode {
     /// No authentication. Development only.
@@ -54,6 +55,8 @@ impl AuthMode {
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "auth/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "openapi", schema(as = auth::TokenKind))]
 #[serde(rename_all = "snake_case")]
 pub enum TokenKind {
     /// The desk itself, issued at first run.
@@ -67,6 +70,7 @@ pub enum TokenKind {
 /// A stored token: only the hash is kept.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "auth/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct TokenRecord {
     pub id: String,
     pub hash: String,

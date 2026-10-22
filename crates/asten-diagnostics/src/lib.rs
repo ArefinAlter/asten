@@ -21,6 +21,7 @@ pub use catalog::{Area, CodeInfo, catalog, info};
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Severity {
     Error,
@@ -36,6 +37,7 @@ pub enum Severity {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Tier {
     Must,
@@ -50,6 +52,7 @@ pub enum Tier {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Pairing {
     SettledSettled,
@@ -65,6 +68,7 @@ pub enum Pairing {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Location {
     pub document: DocId,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -108,6 +112,7 @@ impl Location {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum StatementKind {
     Fact,
@@ -127,6 +132,7 @@ pub enum StatementKind {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Statement {
     pub kind: StatementKind,
     /// The id of the fact, observation, event, scene or constraint.
@@ -208,6 +214,7 @@ impl Statement {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum RepairKind {
     /// Record that a fluent changed between two times.
@@ -268,6 +275,7 @@ pub enum RepairKind {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Repair {
     pub kind: RepairKind,
     /// A verb the author owns: "Add an event", "Mark as a dream", "Keep my sentence".
@@ -305,6 +313,7 @@ impl Repair {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Violation {
     pub code: String,
     /// One line: what disagrees. "Mira's hair was settled as auburn."
@@ -369,6 +378,7 @@ impl Violation {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Diagnosis {
     pub statement_id: String,
     pub probability: f32,
@@ -455,6 +465,7 @@ pub fn confidence_threshold(strictness: Strictness) -> f32 {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Diagnostic {
     /// Stable across re-analysis: hash of code and evidence identities.
     pub id: String,
@@ -493,6 +504,7 @@ pub struct Diagnostic {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct DiagnosticProvenance {
     pub rules: Vec<String>,
     #[serde(default)]
@@ -615,6 +627,8 @@ pub fn finish(violation: Violation, strictness: Strictness, revision: &str) -> O
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "openapi", schema(as = diagnostics::SuppressionScope))]
 #[serde(rename_all = "snake_case", tag = "kind")]
 pub enum SuppressionScope {
     /// This one mark, bound to its evidence.
@@ -633,6 +647,8 @@ pub enum SuppressionScope {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "openapi", schema(as = diagnostics::Suppression))]
 pub struct Suppression {
     pub id: String,
     pub code: String,
@@ -725,6 +741,7 @@ pub fn apply_baseline(diagnostics: &mut [Diagnostic], baseline: &[String]) {
     derive(ts_rs::TS),
     ts(export, export_to = "diagnostics/")
 )]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct MarksDiff {
     pub added: Vec<Diagnostic>,
     pub removed: Vec<String>,

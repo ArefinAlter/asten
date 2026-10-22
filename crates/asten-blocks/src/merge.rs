@@ -16,6 +16,7 @@ use crate::plain_text;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Conflict {
     /// `"{node_id}:{field}"`.
     pub key: String,
@@ -29,6 +30,7 @@ pub struct Conflict {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "blocks/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct MergeResult {
     /// The merged state, with conflicts resolved towards `ours` unless a
     /// resolution says otherwise.

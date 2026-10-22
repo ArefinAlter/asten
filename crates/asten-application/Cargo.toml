@@ -6,6 +6,7 @@ rust-version.workspace = true
 
 [dependencies]
 ts-rs = { workspace = true, optional = true }
+utoipa = { workspace = true, optional = true }
 asten-auth = { path = "../asten-auth" }
 asten-blocks = { path = "../asten-blocks" }
 asten-diagnostics = { path = "../asten-diagnostics" }
@@ -30,3 +31,5 @@ zip.workspace = true
 [features]
 # Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
 ts = ["dep:ts-rs", "asten-auth/ts", "asten-blocks/ts", "asten-diagnostics/ts", "asten-domain/ts", "asten-ir/ts", "asten-ls/ts", "asten-time/ts"]
+# Derive OpenAPI schemas for the API contracts (`node scripts/openapi-export.mjs`).
+openapi = ["dep:utoipa", "asten-auth/openapi", "asten-blocks/openapi", "asten-diagnostics/openapi", "asten-domain/openapi", "asten-ir/openapi", "asten-ls/openapi", "asten-time/openapi"]

@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, Hash, Ord, PartialEq, PartialOrd, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(transparent)]
 pub struct ConceptId(pub String);
 
@@ -27,6 +28,7 @@ impl From<&str> for ConceptId {
 /// A word in some language that names a concept.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Lexicalisation {
     /// NFKC, case-folded matching form.
     pub form: String,
@@ -44,6 +46,7 @@ fn und() -> String {
 /// other, or when they share a descendant that is more specific than both.
 #[derive(Clone, Debug, Default, Deserialize, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "ir/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct ConceptLattice {
     pub name: String,
     /// concept → its parents (more general concepts).

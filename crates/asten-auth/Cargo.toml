@@ -7,6 +7,7 @@ description = "Local authentication for the Asten API: pairing codes, hashed bea
 
 [dependencies]
 ts-rs = { workspace = true, optional = true }
+utoipa = { workspace = true, optional = true }
 argon2.workspace = true
 base64.workspace = true
 rand.workspace = true
@@ -18,3 +19,5 @@ thiserror.workspace = true
 [features]
 # Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
 ts = ["dep:ts-rs"]
+# Derive OpenAPI schemas for the API contracts (`node scripts/openapi-export.mjs`).
+openapi = ["dep:utoipa"]

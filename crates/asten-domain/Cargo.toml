@@ -6,6 +6,7 @@ rust-version.workspace = true
 
 [dependencies]
 ts-rs = { workspace = true, optional = true }
+utoipa = { workspace = true, optional = true }
 asten-ir = { path = "../asten-ir" }
 asten-time = { path = "../asten-time" }
 chrono.workspace = true
@@ -16,3 +17,5 @@ uuid.workspace = true
 [features]
 # Export TypeScript bindings for the API contracts (`pnpm contracts:gen`).
 ts = ["dep:ts-rs", "asten-ir/ts", "asten-time/ts"]
+# Derive OpenAPI schemas for the API contracts (`node scripts/openapi-export.mjs`).
+openapi = ["dep:utoipa", "asten-ir/openapi", "asten-time/openapi"]

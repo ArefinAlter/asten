@@ -18,6 +18,10 @@ No dates. Items move down the page as they ship.
 - TypeScript contracts generated from Rust and drift-checked.
 - Compile to Markdown, plain text, Fountain, HTML, .docx, EPUB 3 and Final
   Draft (.fdx), in binder order; import of all but EPUB.
+- OpenAPI 3.1 document generated from the handler annotations and the same
+  Rust types, served at `/api/v1/openapi.json`, committed as
+  `docs/openapi.json`, held to the router by a test; `docs/API.md` walks
+  through pairing, calling and the stream ticket.
 - Public site in the brand, honest about the above.
 
 ## In review (stacked pull requests)
@@ -45,8 +49,6 @@ No dates. Items move down the page as they ship.
   release jobs; first verify their artifacts, then run them on hardware and record the result in `docs/PLATFORMS.md`.
 - **Linux aarch64 runner.** Enable an ARM runner for the private repository so
   the release job stops being optional.
-- **OpenAPI document.** Describe the routes formally now that the types are
-  generated; publish it for tinkerers.
 - **Guest panes live.** `EventSource` with a stream ticket in the Word pane and
   the Docs sidebar, replacing the refresh button.
 - **Docker images built and smoke-tested** on a machine with the daemon

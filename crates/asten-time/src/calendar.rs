@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum TimeUnit {
     Minute,
@@ -33,6 +34,7 @@ impl TimeUnit {
 /// A month in a fictional calendar.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Month {
     pub name: String,
     pub days: u32,
@@ -41,6 +43,7 @@ pub struct Month {
 /// Every `every` years, `extra_days` are added to month `month` (zero-based).
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct LeapRule {
     pub every: u32,
     pub extra_days: u32,
@@ -80,6 +83,7 @@ impl FictionalCalendar {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct FictionalCalendar {
     pub months: Vec<Month>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -109,6 +113,7 @@ pub enum Calendar {
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 pub struct Clock {
     #[serde(default)]
     pub unit: TimeUnit,
@@ -129,6 +134,7 @@ pub enum Granularity {
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "ts", derive(ts_rs::TS), ts(export, export_to = "time/"))]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
 #[serde(rename_all = "snake_case")]
 pub enum Relation {
     After,
@@ -1318,5 +1324,52 @@ mod tests {
         );
         assert_eq!(clock.format(92), "1 Thawmonth 401");
         assert_eq!(clock.parse("412-02-05"), clock.parse("5 Seedmonth 412"));
+    }
+}
+
+/// `Calendar` is an internally tagged enum with a newtype variant, which
+/// utoipa's derive cannot express; the schema is written by hand with the
+/// helpers in `asten_ir::openapi` and checked against serialised values in
+/// asten-api's tests.
+#[cfg(feature = "openapi")]
+mod openapi_schema {
+    use std::borrow::Cow;
+
+    use asten_ir::openapi::{depend_on, reference, tag_object, tagged_newtype};
+    use utoipa::ToSchema;
+    use utoipa::openapi::RefOr;
+    use utoipa::openapi::schema::{OneOfBuilder, Schema};
+
+    use super::{Calendar, FictionalCalendar};
+
+    impl utoipa::PartialSchema for Calendar {
+        fn schema() -> RefOr<Schema> {
+            let tag = "kind";
+            RefOr::T(Schema::OneOf(
+                OneOfBuilder::new()
+                    .description(Some(
+                        "How ticks map to dates, tagged by `kind`. A fictional calendar \
+                         carries its months and rules beside the tag.",
+                    ))
+                    .item(Schema::Object(tag_object(tag, "day_count").build()))
+                    .item(Schema::Object(tag_object(tag, "gregorian").build()))
+                    .item(tagged_newtype(
+                        tag,
+                        "fictional",
+                        reference::<FictionalCalendar>(),
+                    ))
+                    .build(),
+            ))
+        }
+    }
+
+    impl ToSchema for Calendar {
+        fn name() -> Cow<'static, str> {
+            Cow::Borrowed("Calendar")
+        }
+
+        fn schemas(schemas: &mut Vec<(String, RefOr<Schema>)>) {
+            depend_on::<FictionalCalendar>(schemas);
+        }
     }
 }
