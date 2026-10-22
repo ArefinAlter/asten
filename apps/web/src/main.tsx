@@ -17,6 +17,7 @@ applyStoredTheme();
 // load from their bundle and need no worker.
 if (
   import.meta.env.PROD &&
+  window.isSecureContext &&
   "serviceWorker" in navigator &&
   !("__TAURI_INTERNALS__" in window)
 ) {
