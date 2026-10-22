@@ -39,8 +39,8 @@ No dates. Items move down the page as they ship.
   `tauri ios init` on machines with the SDKs, commit the generated projects,
   test the one-column desk on a phone and a tablet, and add the share-sheet
   path for compile output.
-- **Device testing for ARM.** Windows on ARM and Linux aarch64 builds compile;
-  run them on hardware once and record the result in `docs/PLATFORMS.md`.
+- **Device testing for ARM.** Windows on ARM and Linux aarch64 have configured
+  release jobs; first verify their artifacts, then run them on hardware and record the result in `docs/PLATFORMS.md`.
 - **Linux aarch64 runner.** Enable an ARM runner for the private repository so
   the release job stops being optional.
 - **OpenAPI document.** Describe the routes formally now that the types are

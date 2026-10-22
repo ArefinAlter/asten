@@ -163,11 +163,11 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What platforms does Asten run on?",
-        a: "Asten runs as a desktop app on Windows (x64 and ARM), macOS 11 or later (Apple silicon and Intel, one universal build) and Linux (x86_64 and aarch64), or in your web browser against a local server on your own computer; one interface serves both. Builds for every platform exist and are unsigned while early access lasts. Either way, your projects stay on your machine.",
+        a: "Asten runs as a desktop app on Windows (x64 and ARM), macOS 11 or later (Apple silicon and Intel, one universal build) and Linux (x86_64 and aarch64), or in your web browser against a local server on your own computer; one interface serves both. The release workflow targets these platforms; installer builds and hardware verification are still pending. Early-access installers will be unsigned until signing is configured. Either way, your projects stay on your machine.",
       },
       {
         q: "Is there a mobile app for Asten?",
-        a: "Not in the stores yet. The desk has a one-column layout for phones and tablets, and you can install it from your phone's browser against the Asten running on your own computer at home. Android and iOS apps are built from the same shell and come after the desktop installers are signed.",
+        a: "Not in the stores yet. The desk has a one-column layout for phones and tablets, and installation from your phone's browser requires the Asten on your home computer to be served over HTTPS with a certificate trusted by the phone. Android and iOS apps are built from the same shell and come after the desktop installers are signed.",
       },
       {
         q: "Is Asten open source?",

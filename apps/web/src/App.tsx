@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import type {
@@ -31,6 +32,7 @@ import { ApiError, createAstenClient } from "./lib/asten-client";
 import {
   SAVE_DOCUMENT_KEY,
   useMediaQuery,
+  usePanelFocus,
   useProjectStream,
   useStoredState,
 } from "./lib/hooks";
@@ -250,6 +252,13 @@ function Desk() {
   const narrow = useMediaQuery("(max-width: 959px)");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [inspectorOpen, setInspectorOpen] = useState(false);
+  const binderToggleRef = useRef<HTMLButtonElement>(null);
+  const inspectorToggleRef = useRef<HTMLButtonElement>(null);
+  const binderRef = usePanelFocus(narrow && sidebarOpen, binderToggleRef);
+  const inspectorRef = usePanelFocus(
+    compact && inspectorOpen,
+    inspectorToggleRef,
+  );
   useEffect(() => {
     if (!narrow) {
       setSidebarOpen(false);
@@ -523,9 +532,13 @@ function Desk() {
           <button
             type="button"
             className={`shell-toggle binder-toggle${sidebarOpen ? " active" : ""}`}
+            ref={binderToggleRef}
             aria-label={sidebarOpen ? "Close the binder" : "Open the binder"}
             aria-expanded={sidebarOpen}
-            onClick={() => setSidebarOpen((value) => !value)}
+            onClick={() => {
+              setInspectorOpen(false);
+              setSidebarOpen((value) => !value);
+            }}
           >
             ≡
           </button>
@@ -578,11 +591,15 @@ function Desk() {
           <button
             type="button"
             className={`shell-toggle inspector-toggle${inspectorOpen ? " active" : ""}`}
+            ref={inspectorToggleRef}
             aria-label={
               inspectorOpen ? "Close the inspector" : "Open the inspector"
             }
             aria-expanded={inspectorOpen}
-            onClick={() => setInspectorOpen((value) => !value)}
+            onClick={() => {
+              setSidebarOpen(false);
+              setInspectorOpen((value) => !value);
+            }}
           >
             <Glyph name="eye" />
           </button>
@@ -617,7 +634,15 @@ function Desk() {
         ))}
       </nav>
 
-      <aside className="sidebar">
+      <aside
+        className="sidebar"
+        ref={binderRef}
+        inert={narrow && !sidebarOpen}
+        role={narrow ? "dialog" : undefined}
+        aria-modal={narrow && sidebarOpen ? true : undefined}
+        aria-label="Binder"
+        tabIndex={-1}
+      >
         <div className="pane-heading">
           <span className="mono">Projects</span>
           <button
@@ -865,7 +890,15 @@ function Desk() {
         </Suspense>
       </main>
 
-      <aside className="inspector">
+      <aside
+        className="inspector"
+        ref={inspectorRef}
+        inert={compact && !inspectorOpen}
+        role={compact ? "dialog" : undefined}
+        aria-modal={compact && inspectorOpen ? true : undefined}
+        aria-label="Inspector"
+        tabIndex={-1}
+      >
         {selectedProject && view === "world" ? (
           <Suspense fallback={viewFallback}>
             <WorldInspector
