@@ -81,7 +81,7 @@ jobs:
             librsvg2-dev patchelf libxdo-dev libssl-dev build-essential curl wget file
       - run: pnpm install --frozen-lockfile
       - name: Build the desk and the installers
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Signs the updater artifacts (required; see the header).
