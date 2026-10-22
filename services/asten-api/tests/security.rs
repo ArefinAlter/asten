@@ -500,3 +500,29 @@ async fn a_client_behind_a_trusted_proxy_cannot_reset_its_limit_by_forging_hops(
     );
     assert!(messages[10].contains("too many attempts"), "{messages:?}");
 }
+
+#[tokio::test]
+async fn repeated_forwarding_fields_do_not_let_a_client_reset_its_limit() {
+    let desk = open_desk(|config| {
+        config.trusted_proxies = vec![IpNet::parse("127.0.0.1").unwrap()];
+    })
+    .await;
+    let proxy: SocketAddr = "127.0.0.1:50000".parse().unwrap();
+    let mut last = String::new();
+    for i in 0..11 {
+        let body = serde_json::json!({ "code": "000000" });
+        let mut request = json_post("/api/v1/auth/pair", body.clone())
+            .header("x-forwarded-for", format!("10.0.0.{i}"))
+            .header("x-forwarded-for", "203.0.113.9")
+            .body(Body::from(body.to_string()))
+            .unwrap();
+        request.extensions_mut().insert(ConnectInfo(proxy));
+        let response = send(&desk.router, request).await;
+        assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        last = text(response).await;
+        if i < 10 {
+            assert!(last.contains("not valid"), "{last}");
+        }
+    }
+    assert!(last.contains("too many attempts"), "{last}");
+}
