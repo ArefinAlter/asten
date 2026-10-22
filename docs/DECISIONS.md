@@ -313,3 +313,26 @@ Shipped, Next, Later, Never. "Never" lists promises, not plans.
 counterpart. The cost is site edits in feature PRs.
 
 **Status.** Accepted.
+
+
+## D17. Platform availability requires evidence; phone installation requires trusted HTTPS
+
+*21 October 2026*
+
+**Context.** D12 and D13 described intended platform behavior before the
+installer targets and phone flows had been verified. A configured release
+workflow is not a completed build, and a phone opening another computer's
+plain-HTTP LAN address does not have a secure context for service workers.
+
+**Decision.** Platform tables and public copy distinguish configured targets,
+verified installers and tested devices. Do not claim a platform build exists
+until its artifact has been produced and recorded. Phone browser installation
+requires one phone-trusted HTTPS origin for the desk and API;
+`docs/PHONE_SETUP.md` records the proxy, certificate trust and acceptance steps.
+Plain HTTP over the LAN is browser-only.
+
+**Consequences.** Release and device acceptance remain pending until evidenced.
+A cached shell is not an offline copy of the manuscript database.
+
+**Status.** Accepted. Supersedes availability/verification claims in D12 and
+D13's consequences; their shared-shell and local-first design decisions stand.

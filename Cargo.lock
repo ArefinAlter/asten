@@ -139,6 +139,7 @@ dependencies = [
 name = "asten-blocks"
 version = "0.1.0"
 dependencies = [
+ "proptest",
  "serde",
  "serde_json",
  "sha2",
@@ -219,6 +220,7 @@ dependencies = [
  "asten-diagnostics",
  "asten-ir",
  "asten-time",
+ "proptest",
  "serde",
  "serde_json",
  "unicode-segmentation",
@@ -242,6 +244,7 @@ dependencies = [
  "aho-corasick",
  "asten-blocks",
  "asten-ir",
+ "proptest",
  "serde",
  "serde_json",
  "unicode-normalization",
@@ -273,6 +276,7 @@ name = "asten-time"
 version = "0.1.0"
 dependencies = [
  "asten-ir",
+ "proptest",
  "serde",
  "ts-rs",
 ]

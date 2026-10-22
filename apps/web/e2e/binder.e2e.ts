@@ -14,13 +14,15 @@ test("creates a project and a scene from the binder", async ({ page }) => {
   ).toBeVisible();
 
   const binder = page.getByRole("navigation", { name: "Binder" });
-  await expect(binder).toContainText("Empty. Add a scene below.");
+  await expect(binder).toContainText(
+    "Nothing in the binder yet. Add a scene below.",
+  );
   await page.getByRole("button", { name: "+ Add to the binder" }).click();
   await page.getByPlaceholder("Scene title").fill("The first tide");
   await page.getByRole("button", { name: "Add", exact: true }).click();
 
   await expect(
-    binder.getByRole("button", { name: /The first tide/ }),
+    binder.getByRole("treeitem", { name: /The first tide/ }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "The first tide", level: 1 }),
