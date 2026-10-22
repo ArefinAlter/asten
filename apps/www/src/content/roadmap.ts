@@ -19,7 +19,7 @@ export const roadmap: RoadmapLane[] = [
       { title: "Two clocks and calendars", text: "Story time as day counts, Gregorian dates (“winter of 1890”), or a fictional calendar with your own months, plus relative placements (“three days after the siege”). Flashbacks are a choice: Asten argues only inside a run you declared continuous." },
       { title: "Method packs", text: "Scribe, Lifecycle, Clocks, Relations, Knowledge, Atlas, Invariants, and the optional Diction watch. Suppressions and baselines stored with the project." },
       { title: "World", text: "Wall, atlas, and dossier. Spark, sketched, settled. Routes with travel times feed the atlas checks." },
-      { title: "Compile and import", text: "Markdown, plain text, Fountain, HTML, .docx. PDF by printing HTML." },
+      { title: "Compile and import", text: "Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx); import of all but EPUB. PDF by printing HTML." },
       { title: "Guests", text: "Word task pane and Google Docs sidebar, sideloaded. They pair once with a six-digit code and hold a token you can revoke." },
       { title: "Local-first storage", text: "SQLite on your disk, a desktop shell that embeds the local API, no account, no sync, no telemetry. The API answers only to paired clients." },
     ],
@@ -34,7 +34,6 @@ export const roadmap: RoadmapLane[] = [
       { title: "The desk on phones and tablets", text: "One-column layout with the binder as a drawer and the Scales rising from the bottom. Phone browser installation requires trusted HTTPS to your own computer; Android and iOS apps follow from the same shell." },
       { title: "Trained perception, still local", text: "Small classifiers for mentions, attributes, time phrases, and who is speaking, trained through the same logic, for languages and sentences the rules miss. Always proposals, never silent canon, and never a generative model." },
       { title: "Generated contracts", text: "The TypeScript API contracts generated from the Rust types, with an OpenAPI document for tinkerers." },
-      { title: "More formats", text: "EPUB and FDX." },
     ],
   },
   {

@@ -16,6 +16,8 @@ No dates. Items move down the page as they ship.
 - API with pairing-code authentication, token kinds, stream tickets, rate
   limits; desktop shell embedding it; Word and Docs guests that pair.
 - TypeScript contracts generated from Rust and drift-checked.
+- Compile to Markdown, plain text, Fountain, HTML, .docx, EPUB 3 and Final
+  Draft (.fdx), in binder order; import of all but EPUB.
 - Public site in the brand, honest about the above.
 
 ## In review (stacked pull requests)
@@ -60,8 +62,7 @@ No dates. Items move down the page as they ship.
   tested.
 - **Collaboration that keeps offline work**: drafts and merge exist; a second
   author on a LAN or over a relay is a design question, not a feature yet.
-- **EPUB and FDX** export; graph, maps with scale, boards; a runtime for
-  third-party packs.
+- **Graph, maps with scale, boards**; a runtime for third-party packs.
 - **Research reindex** of the `asten_chunks` collection in the ingest tool.
 
 ## Decisions pending the owner

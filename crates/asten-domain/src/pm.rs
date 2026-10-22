@@ -200,10 +200,76 @@ fn apply_marks(text: &str, marks: Option<&Value>) -> String {
     wrapped
 }
 
+/// Fountain for one document. A slugline title is a scene heading; any other
+/// title is a Fountain section (`# Title`), which readers index but do not
+/// print. Paragraphs are classified together so that a cue, its
+/// parentheticals and its speech stay on consecutive lines, which is how
+/// Fountain tells dialogue from action.
 #[must_use]
 pub fn prosemirror_to_fountain(title: &str, value: &Value) -> String {
-    let body = prosemirror_to_markdown(value);
-    format!("Title: {title}\n\n{body}")
+    use crate::screenplay::{ScreenplayElement, classify_screenplay, is_slugline};
+
+    let mut output = String::new();
+    let title = title.trim();
+    if !title.is_empty() {
+        if !is_slugline(title) {
+            output.push_str("# ");
+        }
+        output.push_str(title);
+        output.push_str("\n\n");
+    }
+    let empty = Vec::new();
+    let blocks = value
+        .get("content")
+        .and_then(Value::as_array)
+        .unwrap_or(&empty);
+    let block_type = |block: &Value| {
+        block
+            .get("type")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned()
+    };
+    let mut index = 0;
+    while index < blocks.len() {
+        if block_type(&blocks[index]) != "paragraph" {
+            write_markdown(&blocks[index], &mut output, 0);
+            index += 1;
+            continue;
+        }
+        let end = (index..blocks.len())
+            .find(|&at| block_type(&blocks[at]) != "paragraph")
+            .unwrap_or(blocks.len());
+        let texts: Vec<String> = blocks[index..end]
+            .iter()
+            .map(|block| {
+                let mut text = String::new();
+                write_inline(block, &mut text);
+                text.trim().to_owned()
+            })
+            .filter(|text| !text.is_empty())
+            .collect();
+        let kinds = classify_screenplay(&texts.iter().map(String::as_str).collect::<Vec<_>>());
+        for (at, text) in texts.iter().enumerate() {
+            output.push_str(text);
+            let speech_continues = matches!(
+                kinds[at],
+                ScreenplayElement::Character
+                    | ScreenplayElement::Parenthetical
+                    | ScreenplayElement::Dialogue
+            ) && matches!(
+                kinds.get(at + 1),
+                Some(ScreenplayElement::Dialogue | ScreenplayElement::Parenthetical)
+            );
+            output.push_str(if speech_continues { "\n" } else { "\n\n" });
+        }
+        index = end;
+    }
+    while output.ends_with('\n') {
+        output.pop();
+    }
+    output.push('\n');
+    output
 }
 
 #[must_use]

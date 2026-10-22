@@ -99,8 +99,8 @@ export const glossary: GlossaryTerm[] = [
     slug: "compile",
     term: "Compile",
     short:
-      "To compile, in Asten, is to turn your project into a finished file: Markdown, plain text, Fountain, HTML, or .docx.",
-    long: "For a PDF, compile to HTML and print the page. Import reads the same family of formats, with a conservative .docx extract. EPUB and FDX export are planned.",
+      "To compile, in Asten, is to turn your project into a finished file: Markdown, plain text, Fountain, HTML, .docx, EPUB, or Final Draft (.fdx).",
+    long: "For a PDF, compile to HTML and print the page. Import reads the same family of formats except EPUB, with a conservative .docx extract.",
     see: "/features/desk",
     related: ["fountain", "binder", "local-first"],
   },
@@ -226,7 +226,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Fountain",
     short:
       "Fountain is a plain-text markup language for screenplays, readable as written and convertible into formatted scripts.",
-    long: "Asten can compile a project to Fountain and import Fountain files. Export to Final Draft’s FDX format is planned.",
+    long: "Asten can compile a project to Fountain or to Final Draft’s FDX, and import either.",
     see: "/for/screenwriters",
     related: ["compile", "binder"],
   },

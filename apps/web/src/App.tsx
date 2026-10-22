@@ -1036,6 +1036,7 @@ function Desk() {
 function importFormat(name: string): ImportFormat {
   const lower = name.toLowerCase();
   if (lower.endsWith(".docx")) return "docx";
+  if (lower.endsWith(".fdx")) return "fdx";
   if (lower.endsWith(".html") || lower.endsWith(".htm")) return "html";
   if (lower.endsWith(".fountain")) return "fountain";
   if (lower.endsWith(".md")) return "markdown";
