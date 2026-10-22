@@ -552,7 +552,14 @@ function Desk() {
     <div
       className={`app-shell view-${view}${scalesCollapsed === "closed" ? " scales-closed" : ""}${compact ? " compact" : ""}${narrow ? " narrow" : ""}${sidebarOpen ? " sidebar-open" : ""}${inspectorOpen ? " inspector-open" : ""}`}
     >
-      <a className="skip-link" href="#workspace">
+      <a
+        className="skip-link"
+        href="#workspace"
+        onClick={(event) => {
+          event.preventDefault();
+          window.document.getElementById("workspace")?.focus();
+        }}
+      >
         Skip to the page
       </a>
       <div className="sr-only live-region" role="status" aria-live="polite">
@@ -566,7 +573,10 @@ function Desk() {
             className={`shell-toggle binder-toggle${sidebarOpen ? " active" : ""}`}
             aria-label={sidebarOpen ? "Close the binder" : "Open the binder"}
             aria-expanded={sidebarOpen}
-            onClick={() => setSidebarOpen((value) => !value)}
+            onClick={() => {
+              setInspectorOpen(false);
+              setSidebarOpen((value) => !value);
+            }}
           >
             ≡
           </button>
@@ -624,7 +634,10 @@ function Desk() {
               inspectorOpen ? "Close the inspector" : "Open the inspector"
             }
             aria-expanded={inspectorOpen}
-            onClick={() => setInspectorOpen((value) => !value)}
+            onClick={() => {
+              setSidebarOpen(false);
+              setInspectorOpen((value) => !value);
+            }}
           >
             <Glyph name="eye" />
           </button>
@@ -662,9 +675,11 @@ function Desk() {
       <aside
         className="sidebar"
         ref={sidebarRef}
+        inert={narrow && !sidebarOpen}
         role={drawerOpen ? "dialog" : undefined}
         aria-modal={drawerOpen || undefined}
         aria-label="Projects and binder"
+        tabIndex={-1}
       >
         <div className="pane-heading">
           <span className="mono">Projects</span>
@@ -942,9 +957,11 @@ function Desk() {
       <aside
         className="inspector"
         ref={inspectorRef}
+        inert={compact && !inspectorOpen}
         role={sheetOpen ? "dialog" : undefined}
         aria-modal={sheetOpen || undefined}
         aria-label="Inspector"
+        tabIndex={-1}
       >
         {selectedProject && view === "world" ? (
           <Suspense fallback={viewFallback}>

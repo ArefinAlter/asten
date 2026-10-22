@@ -144,8 +144,9 @@ version.
 
 ## Still to do
 
-- Signed installers for Windows, macOS and Linux. The release workflow builds
-  every platform on a `v*` tag; signing turns on when the Windows and Apple
+- Signed installers for Windows, macOS and Linux. The release workflow targets
+  the configured desktop platforms on a `v*` tag; installer verification is
+  still pending; signing turns on when the Windows and Apple
   secrets exist (see `docs/PLATFORMS.md`). The download page still says to run
   from source until a signed build exists.
 - Mobile shells generated, built and tested on devices (`tauri android init`,
@@ -175,6 +176,7 @@ version.
 - `docs/ROADMAP.md`: shipped, in review, next, later, never.
 - `docs/PLATFORMS.md`: support matrix, build recipes, signing.
 - `docs/PARITY.md`: what each client can do and why.
+- `docs/PHONE_SETUP.md`: trusted HTTPS, pairing and phone acceptance checks.
 - `docs/SECURITY.md`: threat model and authentication.
 - `docs/architecture.md`: crates and transport. `docs/ENGINE_DESIGN.md`: the
   engine design.

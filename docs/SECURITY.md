@@ -237,6 +237,11 @@ nothing.
 
 ## Reporting
 
+Phone installation requires an HTTPS origin trusted by the phone. Use the
+same reverse proxy for the desk and `/api/`; see [Phone setup](PHONE_SETUP.md).
+The localhost secure-context exception does not apply to another computer's
+plain-HTTP LAN address. Do not disable browser security checks to install.
+
 Report a vulnerability by opening a private security advisory on the GitHub
 repository, or by writing to the address in the public site's `security.txt`.
 Do not include a manuscript in the report.

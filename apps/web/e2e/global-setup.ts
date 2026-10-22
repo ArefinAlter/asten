@@ -1,5 +1,5 @@
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -48,14 +48,10 @@ async function healthy(): Promise<boolean> {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default async function globalSetup(): Promise<() => Promise<void>> {
-  if (!existsSync(path.join(dist, "index.html"))) {
-    console.log("e2e: building the desk");
-    run("pnpm", ["--filter", "@asten/web", "build"]);
-  }
-  if (!existsSync(binary)) {
-    console.log("e2e: building asten-api");
-    run("cargo", ["build", "-p", "asten-api"], { CARGO_INCREMENTAL: "0" });
-  }
+  // Existing outputs may belong to another branch or an earlier edit. Let
+  // the build tools reuse their caches while checking the current sources.
+  run("pnpm", ["--filter", "@asten/web", "build"]);
+  run("cargo", ["build", "-p", "asten-api"], { CARGO_INCREMENTAL: "0" });
   if (await healthy()) {
     throw new Error(
       `Something already answers on ${E2E_ORIGIN}. Stop it before running the e2e suite.`,
