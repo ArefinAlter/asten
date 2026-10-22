@@ -6,6 +6,7 @@
 
 mod auth;
 mod extra;
+mod headers;
 mod history;
 mod story;
 
@@ -306,8 +307,14 @@ pub fn router(application: Application, config: ApiConfig) -> Router {
         .nest("/api/v1", api);
 
     if let Some(desk) = &config.serve_desk {
+        // The hashed assets get a directory service of their own, so a missing
+        // asset is a 404 rather than index.html: the browser and the service
+        // worker would otherwise keep that page under the asset's name for a
+        // year.
         let index = desk.join("index.html");
-        app = app.fallback_service(ServeDir::new(desk).not_found_service(ServeFile::new(index)));
+        app = app
+            .nest_service("/assets", ServeDir::new(desk.join("assets")))
+            .fallback_service(ServeDir::new(desk).not_found_service(ServeFile::new(index)));
     }
 
     app.with_state(state)
@@ -319,7 +326,7 @@ pub fn router(application: Application, config: ApiConfig) -> Router {
         .layer(CompressionLayer::new())
         .layer(cors)
         .layer(middleware::from_fn_with_state(
-            config.clone(),
+            Arc::new(headers::SecurityPolicy::for_config(config.clone())),
             security_headers,
         ))
         .layer(middleware::from_fn_with_state(
@@ -342,10 +349,11 @@ pub fn router(application: Application, config: ApiConfig) -> Router {
         .layer(CatchPanicLayer::new())
 }
 
-/// Security headers on every response. The private-network header is granted
-/// only to origins on the allowlist, so a random page cannot reach loopback.
+/// Security headers on every response: see [`headers::SecurityPolicy`]. The
+/// private-network header is granted only to origins on the allowlist, so a
+/// random page cannot reach loopback.
 async fn security_headers(
-    State(config): State<Arc<ApiConfig>>,
+    State(policy): State<Arc<headers::SecurityPolicy>>,
     request: Request<Body>,
     next: Next,
 ) -> Response {
@@ -354,34 +362,9 @@ async fn security_headers(
         .get(header::ORIGIN)
         .and_then(|value| value.to_str().ok())
         .map(str::to_owned);
-    let is_api = request.uri().path().starts_with("/api/") || request.uri().path() == "/health";
+    let path = request.uri().path().to_owned();
     let mut response = next.run(request).await;
-    let headers = response.headers_mut();
-    headers.insert(
-        header::X_CONTENT_TYPE_OPTIONS,
-        HeaderValue::from_static("nosniff"),
-    );
-    headers.insert(
-        header::REFERRER_POLICY,
-        HeaderValue::from_static("no-referrer"),
-    );
-    headers.insert(header::X_FRAME_OPTIONS, HeaderValue::from_static("DENY"));
-    headers.insert(
-        HeaderName::from_static("permissions-policy"),
-        HeaderValue::from_static("camera=(), microphone=(), geolocation=(), payment=()"),
-    );
-    if is_api {
-        headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
-    }
-    if origin
-        .as_deref()
-        .is_some_and(|origin| origin_allowed(&config, origin))
-    {
-        headers.insert(
-            HeaderName::from_static("access-control-allow-private-network"),
-            HeaderValue::from_static("true"),
-        );
-    }
+    policy.apply(&path, origin.as_deref(), &mut response);
     response
 }
 

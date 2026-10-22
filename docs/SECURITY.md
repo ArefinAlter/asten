@@ -51,6 +51,16 @@ The API refuses to start with `ASTEN_AUTH=off` on a non-loopback bind.
   response also sets an `asten_session` cookie (`HttpOnly`, `SameSite=Strict`,
   `Secure` when `ASTEN_COOKIE_SECURE=true`). A cross-origin desk gets no
   cookie, because browsers would send it to every other port on the host.
+- The cookie is also _honoured_ only on same-origin requests: when an `Origin`
+  header is present it must name the host the request reached (the `Host`
+  header, or the HTTP/2 authority), or the request is answered `401` as if it
+  carried nothing. `SameSite=Strict` keeps other sites out, but not other
+  ports of the same host or sibling subdomains, and a form posted from one of
+  those would otherwise ride the cookie into routes that take no body, such as
+  a snapshot restore. A bearer header is never attached by a browser on its
+  own, so it works from any origin the CORS allowlist admits.
+- A client label (the name shown in the Guests panel) is at most eighty
+  characters; a longer one is refused before the code is even checked.
 - Single use is enforced by the store: two racing redemptions cannot both
   succeed. Wrong guesses are counted atomically.
 
@@ -60,16 +70,22 @@ The API refuses to start with `ASTEN_AUTH=off` on a non-loopback bind.
 - Only the SHA-256 hash is stored. Verification is constant-time.
 - Each token has a kind (`desk`, `guest`, `owner`), a label, a creation time and
   a last-used time. The Guests panel lists and revokes them. Revocation is
-  immediate.
+  immediate for every request that follows, including the redemption of a
+  stream ticket minted before it; a change stream that was already open ends
+  when its connection does.
 - The desktop shell revokes its previous desk tokens at start-up and issues a
   fresh one for the webview.
 - Tokens travel in the `Authorization: Bearer` header or the session cookie.
-  Tokens never appear in a URL.
+  A bearer value must be the `ast_` prefix and base64url characters and
+  nothing else, or it is not consulted at all. The scheme is case-insensitive.
+  A cookie jar split over several `Cookie` fields, as HTTP/2 allows, is read
+  whole. Tokens never appear in a URL.
 - The Server-Sent Events stream cannot send headers from a browser, so an
   authenticated client first asks `POST …/stream-ticket` for a ticket: random,
   hashed at rest, bound to one project, valid for sixty seconds, spent on first
-  use. Only that ticket goes in the query string, so a reverse proxy's access
-  log holds nothing worth stealing.
+  use, and refused if the token that asked for it has been revoked since. Only
+  that ticket goes in the query string, so a reverse proxy's access log holds
+  nothing worth stealing.
 - Request tracing spans record the method and path only, never the query
   string.
 - `GET /desk` tells a paired client the API version and host. The database
@@ -103,8 +119,13 @@ forgotten first.
 
 Behind a reverse proxy every client arrives from the proxy's address. Name the
 proxy in `ASTEN_TRUSTED_PROXIES` (addresses or CIDR blocks, comma-separated)
-and the API keys clients by the first `X-Forwarded-For` hop instead. Never
-trust a proxy the client can bypass.
+and the API keys clients by `X-Forwarded-For` instead: the rightmost hop that
+is not itself a trusted proxy, which is the one the proxy appended. The
+leftmost hop is whatever the client chose to send and is ignored, so a client
+cannot give itself a fresh bucket per request. IPv4 clients of a dual-stack
+listener arrive as `::ffff:a.b.c.d` and are keyed, and matched against the
+proxy list, as the IPv4 addresses they are rather than as one shared /64.
+Never trust a proxy the client can bypass.
 
 ## Browser boundary
 
@@ -120,10 +141,28 @@ trust a proxy the client can bypass.
   loopback and nothing else can.
 - **Headers on every response.** `X-Content-Type-Options: nosniff`,
   `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, a restrictive
-  `Permissions-Policy`, and `Cache-Control: no-store` so manuscripts never land
-  in a disk cache. Each response carries an `x-request-id`.
+  `Permissions-Policy` and a `Content-Security-Policy`. Each response carries
+  an `x-request-id`. With `ASTEN_COOKIE_SECURE=true` every response also
+  carries `Strict-Transport-Security: max-age=31536000`.
+- **API responses** (`/api/…`, `/health`) are `Cache-Control: no-store`, so
+  manuscripts never land in a disk cache, and sit under
+  `default-src 'none'; frame-ancestors 'none'`: they are data, never a page.
+- **The served desk** (`ASTEN_SERVE_DESK`) gets a policy fitted to it. Scripts
+  come from its own origin plus the one inline bootstrap in `index.html` that
+  applies the saved theme before paint, which is allowed by its SHA-256 hash,
+  computed from the served file at start-up, never by `'unsafe-inline'`.
+  Styles come from its origin and inline, because the editor injects a
+  `<style>` element at start-up. Fonts come from its origin and `data:`;
+  images from its origin, `data:` and `blob:`; connections go to its origin
+  only; there are no frames, objects, base URIs or foreign form targets, and
+  `frame-ancestors 'none'`. The hashed files under `/assets/` are
+  content-addressed, so they are `public, max-age=31536000, immutable`; a
+  missing asset is a `404`, never the shell page, so nothing wrong is ever
+  cached under an asset's name. The shell itself (`index.html`, `sw.js`, the
+  manifest, the icons) is `no-cache`: kept, but revalidated on every load, so
+  a new build reaches the browser at once.
 - **Desktop CSP.** The Tauri webview allows connections to `127.0.0.1` and
-  `localhost` only.
+  `localhost` only, and no objects, base URIs or foreign form targets.
 
 ## Transport hardening
 
@@ -151,7 +190,8 @@ stderr, which never contains a token.
 If you bind beyond loopback (`ASTEN_BIND=0.0.0.0:4317`, or the Docker compose
 file):
 
-1. Put TLS in front of it and set `ASTEN_COOKIE_SECURE=true`.
+1. Put TLS in front of it and set `ASTEN_COOKIE_SECURE=true`. That also turns
+   on HSTS for a year, so do it on a host name that will keep its TLS.
 2. Use `ASTEN_AUTH=owner` once a passphrase is set, or stay in `pairing` and
    mint codes from a paired desk.
 3. Add your desk's origin to `ASTEN_ALLOWED_ORIGINS` if it is not served by
@@ -159,6 +199,41 @@ file):
 4. Keep the host port bound to an address only you can reach.
 5. Name the reverse proxy in `ASTEN_TRUSTED_PROXIES` so rate limits apply per
    client rather than to the proxy as a whole.
+
+## Dependencies
+
+Dependabot (`.github/dependabot.yml`) opens one grouped pull request a week
+per ecosystem (Cargo, npm, GitHub Actions) for minor and patch updates. Major
+versions of axum, Tauri, sqlx, React, Vite and Tiptap are held back there and
+taken deliberately, migration notes first. `cargo audit` and
+`pnpm audit --prod` were run for this pass; run both again before a release.
+
+### Known advisories
+
+What `cargo audit` reports that cannot be fixed from this repository, and why
+each is accepted:
+
+- **RUSTSEC-2023-0071** `rsa` 0.9 (Marvin timing side channel; no fixed
+  version exists). Present in `Cargo.lock` only through `sqlx-mysql`, an
+  optional driver that sqlx's macro crate lists and nothing here enables; it
+  is never compiled into an Asten binary. Asten speaks SQLite only.
+- **RUSTSEC-2025-0075, -0080, -0081, -0098, -0100** `unic-*` 0.9
+  (unmaintained). Pulled in by `urlpattern` through `tauri-utils`, at build
+  time only, for the desktop shell's configuration; it goes when Tauri drops
+  it.
+- **RUSTSEC-2024-0370** `proc-macro-error` and **RUSTSEC-2024-0429** `glib`
+  0.18 (unmaintained; an unsound iterator). Linux-only GTK bindings beneath
+  Tauri's window runtime; not compiled on Windows or macOS, and not reachable
+  from the API.
+- `yoke-derive` 0.8.3 is yanked. `yoke`, beneath the ICU crates that `url`
+  uses, pins it, and no replacement release exists yet; it is a procedural
+  macro that runs at build time only.
+
+`zip` moved from 2.4 to 9.0 for RUSTSEC-2026-0367, -0368 and -0369. Asten
+never extracts an archive to disk (it reads `word/document.xml` out of a
+`.docx` in memory and writes one back), so the advisories did not apply, but
+the fixed line is the one that receives updates. `pnpm audit --prod` reports
+nothing.
 
 ## Reporting
 

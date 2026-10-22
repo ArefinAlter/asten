@@ -580,6 +580,8 @@ async fn pairing_issues_tokens_and_rejects_bad_codes() {
     assert!(
         application
             .redeem_stream_ticket(&ticket.ticket, asten_domain::ProjectId::new())
+            .await
+            .unwrap()
             .is_none()
     );
     let ticket = application
@@ -589,11 +591,15 @@ async fn pairing_issues_tokens_and_rejects_bad_codes() {
     assert!(
         application
             .redeem_stream_ticket(&ticket.ticket, project.id)
+            .await
+            .unwrap()
             .is_some()
     );
     assert!(
         application
             .redeem_stream_ticket(&ticket.ticket, project.id)
+            .await
+            .unwrap()
             .is_none()
     );
     assert!(

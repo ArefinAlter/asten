@@ -205,7 +205,15 @@ pub fn bearer(header: &str) -> Option<&str> {
         return None;
     }
     let token = token.trim();
-    token.starts_with(TOKEN_PREFIX).then_some(token)
+    // The token must look like one of ours, the prefix and base64url
+    // characters and nothing else, so a value with trailing words or stray
+    // punctuation is rejected here rather than hashed and looked up.
+    let body = token.strip_prefix(TOKEN_PREFIX)?;
+    let well_formed = !body.is_empty()
+        && body
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'-' || byte == b'_');
+    well_formed.then_some(token)
 }
 
 /// Extract a named cookie's value from a `Cookie` header.
@@ -308,6 +316,19 @@ mod tests {
             Some(token.plaintext.as_str())
         );
         assert_eq!(bearer("Basic abc"), None);
+    }
+
+    #[test]
+    fn bearer_accepts_any_case_and_spacing_but_only_a_token() {
+        assert_eq!(bearer("BEARER ast_abc-DEF_123"), Some("ast_abc-DEF_123"));
+        assert_eq!(bearer("bearer   ast_abc "), Some("ast_abc"));
+        assert_eq!(bearer("Bearer ast_abc extra"), None);
+        assert_eq!(bearer("Bearer ast_abc;"), None);
+        assert_eq!(bearer("Bearer ast_ab=c"), None);
+        assert_eq!(bearer("Bearer ast_"), None);
+        assert_eq!(bearer("Bearer abc"), None);
+        assert_eq!(bearer("Bearerast_abc"), None);
+        assert_eq!(bearer("ast_abc"), None);
     }
 
     #[test]
