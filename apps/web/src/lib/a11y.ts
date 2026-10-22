@@ -19,6 +19,8 @@ const FOCUSABLE = [
 export function focusableIn(root: HTMLElement): HTMLElement[] {
   return Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
     (element) =>
+      !element.matches(":disabled") &&
+      (!element.hasAttribute("tabindex") || element.tabIndex >= 0) &&
       !element.closest("[inert]") &&
       !element.hasAttribute("hidden") &&
       element.getClientRects().length > 0,
@@ -26,7 +28,8 @@ export function focusableIn(root: HTMLElement): HTMLElement[] {
 }
 
 function tryFocus(element: HTMLElement | null | undefined): boolean {
-  if (!element || !element.isConnected) return false;
+  if (!element || !element.isConnected || element.getClientRects().length === 0)
+    return false;
   element.focus({ preventScroll: true });
   return document.activeElement === element;
 }

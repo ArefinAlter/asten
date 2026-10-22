@@ -32,19 +32,19 @@ No dates. Items move down the page as they ship.
 3. **Client parity** (#3): `GET /desk`, "This desk", installable web app.
 4. **Decisions and roadmap** (#4).
 5. **Efficiency**: document summaries, SQLite pragmas and indexes, engine hot
-   paths, lazy views (D19).
+   paths, lazy views (D20).
 6. **Security**: served-desk CSP and caching, cookie origin rule, forwarded-hop
-   keying, ticket revocation, dependency audit (D23).
+   keying, ticket revocation, dependency audit (D24).
 7. **Guests live and end-to-end tests**: Word and Docs panes follow the stream;
-   Playwright suite against the real API; the revision livelock fix (D17, D18).
-8. **Algorithms**: property suites and the bugs they found (D22).
+   Playwright suite against the real API; the revision livelock fix (D18, D19).
+8. **Algorithms**: property suites and the bugs they found (D23).
 9. **Accessibility and onboarding**: dialogs, skip link, keyboard binder, live
-   region, contrast audit, first-run steps (D25).
+   region, contrast audit, first-run steps (D26).
 10. **Formats**: EPUB 3 export, Final Draft export and import, binder-order
-    compile (D24).
-11. **OpenAPI**: generated document held to the router, `docs/API.md` (D21).
+    compile (D25).
+11. **OpenAPI**: generated document held to the router, `docs/API.md` (D22).
 12. **Desktop deployment**: signed user-initiated updates, single instance,
-    file logs, launch backups, the Android project and an unsigned APK (D20).
+    file logs, launch backups, the Android project and an unsigned APK (D21).
 
 ## Next
 
@@ -55,8 +55,9 @@ No dates. Items move down the page as they ship.
 - **Mobile shells tested.** The Android project is committed and builds an
   unsigned APK; it needs a keystore, a device run, and the share-sheet path for
   compile output. The iOS project needs a Mac with Xcode for `tauri ios init`.
-- **Device testing for ARM.** Windows on ARM and Linux aarch64 builds compile;
-  run them on hardware once and record the result in `docs/PLATFORMS.md`.
+- **Device testing for ARM.** Windows on ARM and Linux aarch64 have configured
+  release jobs; first verify their artifacts, then run them on hardware and record the result in `docs/PLATFORMS.md`.
+
 - **Linux aarch64 runner.** Enable an ARM runner for the private repository so
   the release job stops being optional.
 - **Docker images built and smoke-tested** on a machine with the daemon

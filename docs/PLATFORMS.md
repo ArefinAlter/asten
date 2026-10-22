@@ -5,14 +5,18 @@ API, a browser desk that talks to that API, and two guests (Word, Google Docs)
 that pair with it. This page is the support matrix and the build recipe for
 each platform and processor.
 
-## Support matrix
+## Platform targets
+
+These are configured build targets, not a list of published installers.
+Release builds and hardware testing must be recorded before a target is called
+verified. Adding a workflow does not demonstrate a successful build.
 
 | Platform                   | Processor         | Desktop shell                 | Browser desk                     | Status                                     |
 | -------------------------- | ----------------- | ----------------------------- | -------------------------------- | ------------------------------------------ |
-| Windows 10 1809+ / 11      | x64               | NSIS and MSI installers       | Edge, Chrome, Firefox            | Built and checked on CI                    |
-| Windows 11 on ARM          | ARM64             | NSIS installer                | Edge, Chrome                     | Built on CI (cross-compiled, untested on hardware) |
-| macOS 11 Big Sur and later | Apple silicon, Intel | Universal `.app` and `.dmg` | Safari, Chrome, Firefox          | Built and checked on CI (unsigned)         |
-| Linux (glibc 2.35+)        | x86_64            | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Built and checked on CI                    |
+| Windows 10 1809+ / 11      | x64               | NSIS and MSI installers       | Edge, Chrome, Firefox            | Release workflow configured; installer verification pending |
+| Windows 11 on ARM          | ARM64             | NSIS installer                | Edge, Chrome                     | Cross-build configured; installer and hardware verification pending |
+| macOS 11 Big Sur and later | Apple silicon, Intel | Universal `.app` and `.dmg` | Safari, Chrome, Firefox          | Universal build configured; installer verification pending |
+| Linux (glibc 2.35+)        | x86_64            | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Release workflow configured; installer verification pending |
 | Linux                      | aarch64           | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Release job present; needs an ARM runner   |
 | Android 8+                 | arm64, x86_64     | Tauri app (see below)         | Chrome, as an installed web app  | Project committed; an unsigned arm64 APK built, with Gradle run by hand on Windows (see below) |
 | iOS and iPadOS 15+         | arm64             | Tauri app (see below)         | Safari, as an installed web app  | Shell scaffold; project files generated on a Mac with Xcode |
@@ -116,8 +120,10 @@ Fedora: `webkit2gtk4.1-devel libappindicator-gtk3-devel librsvg2-devel openssl-d
 
 ### Release workflow
 
-`.github/workflows/release.yml` runs on a `v*` tag and builds every row of the
-matrix above, attaching the installers to a draft GitHub release. The Linux
+`.github/workflows/release.yml` runs on a `v*` tag or manual dispatch and is
+configured to build the desktop targets above and attach successful artifacts
+to a draft GitHub release. On manual dispatch, select an existing `v*` tag;
+do not use a branch name as a release tag. The Linux
 aarch64 job runs on `ubuntu-24.04-arm`, which private repositories must enable
 under larger runners; until then that job is allowed to fail.
 
@@ -227,15 +233,18 @@ phone's API is not reachable from another device; see `docs/PARITY.md`.
 ### Installed web app instead of a store app
 
 Writers who host the API on their own computer can open the browser desk from
-a phone on the same network and install it from the browser menu. The desk
-ships a web-app manifest and icons for this. Pairing works the same way: type
-the code from the desk's Guests panel once.
+a phone on the same network. Installation and the service worker require an
+HTTPS origin with a certificate trusted by the phone. Plain HTTP to another
+computer's LAN address supports browser access only; it is not the localhost
+development exception. Follow [Phone setup](PHONE_SETUP.md) to proxy the desk
+and API together and configure certificate trust before pairing and installing.
 
 ## Checks
 
-CI checks the Tauri shell on Windows and Ubuntu on every push, and on macOS
+CI is configured to check the Tauri shell on Windows and Ubuntu on every push, and on macOS
 weekly and on demand (Actions → CI → Run workflow), because macOS minutes bill
 at ten times the Linux rate (`.github/workflows/ci.yml`, job `desktop`). Release
-builds always include macOS. The Rust workspace and the desk are
-checked on Ubuntu. Hardware testing for Windows on ARM and Linux aarch64 has not
-been done; the builds compile and the code has no architecture-specific paths.
+builds target macOS as well. The Rust workspace and the desk are configured for
+checks on Ubuntu. Jobs that never obtain a runner are not successful checks.
+Hardware testing for Windows on ARM and Linux aarch64 remains pending;
+compile checks alone do not verify an installer or hardware behavior.

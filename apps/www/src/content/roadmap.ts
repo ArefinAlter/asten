@@ -29,9 +29,9 @@ export const roadmap: RoadmapLane[] = [
     title: "Next",
     note: "Being designed now. No dates until they’re real.",
     items: [
-      { title: "Every computer, every processor", text: "Windows on x64 and ARM, macOS on Apple silicon and Intel in one universal app, Linux on x86_64 and aarch64. The builds exist; signing and hardware testing come before the download page changes." },
+      { title: "Every computer, every processor", text: "Windows on x64 and ARM, macOS on Apple silicon and Intel in one universal app, Linux on x86_64 and aarch64. The release workflow targets these platforms; installer verification, signing and hardware testing come before the download page changes." },
       { title: "Signed installers", text: "A normal download-and-open install for Windows, macOS and Linux, instead of setup notes." },
-      { title: "The desk on phones and tablets", text: "One-column layout with the binder as a drawer and the Scales rising from the bottom. On a phone it installs from the browser against your own computer; Android and iOS apps follow from the same shell." },
+      { title: "The desk on phones and tablets", text: "One-column layout with the binder as a drawer and the Scales rising from the bottom. Phone browser installation requires trusted HTTPS to your own computer; Android and iOS apps follow from the same shell." },
       { title: "Trained perception, still local", text: "Small classifiers for mentions, attributes, time phrases, and who is speaking, trained through the same logic, for languages and sentences the rules miss. Always proposals, never silent canon, and never a generative model." },
       { title: "Generated contracts", text: "The TypeScript API contracts generated from the Rust types, with an OpenAPI document for tinkerers." },
     ],

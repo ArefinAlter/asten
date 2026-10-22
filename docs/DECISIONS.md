@@ -314,7 +314,29 @@ counterpart. The cost is site edits in feature PRs.
 
 **Status.** Accepted.
 
-## D17. The desk is verified in a real browser against the real API
+## D17. Platform availability requires evidence; phone installation requires trusted HTTPS
+
+*21 October 2026*
+
+**Context.** D12 and D13 described intended platform behavior before the
+installer targets and phone flows had been verified. A configured release
+workflow is not a completed build, and a phone opening another computer's
+plain-HTTP LAN address does not have a secure context for service workers.
+
+**Decision.** Platform tables and public copy distinguish configured targets,
+verified installers and tested devices. Do not claim a platform build exists
+until its artifact has been produced and recorded. Phone browser installation
+requires one phone-trusted HTTPS origin for the desk and API;
+`docs/PHONE_SETUP.md` records the proxy, certificate trust and acceptance steps.
+Plain HTTP over the LAN is browser-only.
+
+**Consequences.** Release and device acceptance remain pending until evidenced.
+A cached shell is not an offline copy of the manuscript database.
+
+**Status.** Accepted. Supersedes availability/verification claims in D12 and
+D13's consequences; their shared-shell and local-first design decisions stand.
+
+## D18. The desk is verified in a real browser against the real API
 
 *October 2026*
 
@@ -334,7 +356,7 @@ Chromium download and a serial, API-backed run.
 
 **Status.** Accepted.
 
-## D18. A read never announces a revision
+## D19. A read never announces a revision
 
 *October 2026*
 
@@ -349,7 +371,7 @@ Amends D6's stream description.
 
 **Status.** Accepted.
 
-## D19. Documents travel as summaries; one body at a time
+## D20. Documents travel as summaries; one body at a time
 
 *October 2026*
 
@@ -369,7 +391,7 @@ open page and a second shape for the same record.
 
 **Status.** Accepted.
 
-## D20. Updates are user-initiated and signed; the key never enters the repository
+## D21. Updates are user-initiated and signed; the key never enters the repository
 
 *October 2026*
 
@@ -390,7 +412,7 @@ release.
 
 **Status.** Accepted.
 
-## D21. The API document is generated from the handlers and held to the router
+## D22. The API document is generated from the handlers and held to the router
 
 *October 2026*
 
@@ -409,7 +431,7 @@ The cost is an attribute block per handler and a regeneration step.
 
 **Status.** Accepted.
 
-## D22. Properties, not only examples, for the algorithmic crates
+## D23. Properties, not only examples, for the algorithmic crates
 
 *October 2026*
 
@@ -431,7 +453,7 @@ seconds per crate suite.
 
 **Status.** Accepted.
 
-## D23. A session cookie counts only when the Origin matches
+## D24. A session cookie counts only when the Origin matches
 
 *October 2026*
 
@@ -449,7 +471,7 @@ unchanged. Amends D7.
 
 **Status.** Accepted.
 
-## D24. EPUB and Final Draft are deterministic writers on one screenplay classifier
+## D25. EPUB and Final Draft are deterministic writers on one screenplay classifier
 
 *October 2026*
 
@@ -469,7 +491,7 @@ offline (no epubcheck, no Final Draft).
 
 **Status.** Accepted.
 
-## D25. Accessibility is audited per component; the brand tokens stay
+## D26. Accessibility is audited per component; the brand tokens stay
 
 *October 2026*
 
@@ -487,3 +509,4 @@ opacity. Onboarding is three lines and one button, no tour.
 keyboard end to end. Screen-reader runs are still to be done by a person.
 
 **Status.** Accepted.
+

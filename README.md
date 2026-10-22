@@ -115,7 +115,7 @@ pnpm lint           # oxlint + clippy -D warnings
 pnpm test           # vitest + cargo test
 pnpm format:check   # prettier + rustfmt
 pnpm contracts:gen  # regenerate packages/contracts/src/generated from the Rust types
-pnpm e2e            # Playwright: builds the desk and asten-api if missing, starts the API on 127.0.0.1:4391 with a throwaway database, pairs, runs apps/web/e2e
+pnpm e2e            # Playwright: builds the current desk and asten-api, starts the API on 127.0.0.1:4391 with a throwaway database, pairs, runs apps/web/e2e
                     # first time only: pnpm --filter @asten/web exec playwright install chromium
 ```
 

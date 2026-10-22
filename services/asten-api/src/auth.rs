@@ -45,9 +45,13 @@ pub async fn client_key(
         .map(|info| info.0.ip());
     let forwarded = request
         .headers()
-        .get("x-forwarded-for")
-        .and_then(|value| value.to_str().ok());
-    let client = resolve_client(peer, forwarded, &config.trusted_proxies);
+        .get_all("x-forwarded-for")
+        .iter()
+        .map(|value| value.to_str())
+        .collect::<Result<Vec<_>, _>>()
+        .ok()
+        .map(|values| values.join(","));
+    let client = resolve_client(peer, forwarded.as_deref(), &config.trusted_proxies);
     let key = client.map_or_else(|| "local".to_owned(), bucket_key);
     request.extensions_mut().insert(ClientKey(key));
     next.run(request).await
@@ -68,18 +72,19 @@ fn resolve_client(
     if !is_proxy(peer) {
         return Some(peer);
     }
-    let hops: Vec<IpAddr> = forwarded
-        .into_iter()
-        .flat_map(|value| value.split(','))
-        .filter_map(parse_forwarded_hop)
-        .map(|hop| hop.to_canonical())
-        .collect();
-    hops.into_iter()
-        .rev()
-        .find(|hop| !is_proxy(*hop))
-        // Every hop was a proxy, or the header was missing: the proxy itself
-        // is the best key there is.
-        .or(Some(peer))
+    let hops = forwarded.into_iter().flat_map(|value| value.rsplit(','));
+    for hop in hops {
+        // An unknown hop is a trust boundary. Never skip it and accept a
+        // potentially client-supplied address farther to the left.
+        let Some(hop) = parse_forwarded_hop(hop) else {
+            return Some(peer);
+        };
+        let hop = hop.to_canonical();
+        if !is_proxy(hop) {
+            return Some(hop);
+        }
+    }
+    Some(peer)
 }
 
 /// One `X-Forwarded-For` entry: `203.0.113.9`, `203.0.113.9:4567`,
@@ -794,10 +799,10 @@ mod tests {
             resolve_client(proxy, Some("[2001:db8::1]:4567"), &trusted),
             Some(ip("2001:db8::1"))
         );
-        // An unparseable entry is skipped, not trusted.
+        // An unparseable entry stops the trusted walk.
         assert_eq!(
             resolve_client(proxy, Some("203.0.113.9, unknown"), &trusted),
-            Some(ip("203.0.113.9"))
+            proxy
         );
     }
 
