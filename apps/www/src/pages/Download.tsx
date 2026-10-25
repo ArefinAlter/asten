@@ -5,52 +5,18 @@ import { Arrow } from "../components/Icons";
 import { Inline } from "../components/Inline";
 import { Answer, PageHero, Related, SectionHead } from "../components/Page";
 import { accessSteps } from "../content/home";
-import { formatBytes, release, releaseAssets, type ReleaseAsset } from "../content/release";
+import { DownloadCards, HeroDownload, UiIcon } from "../components/DownloadCards";
+import { release } from "../content/release";
 import type { QA } from "../content/types";
 
 const faqs: QA[] = [
   { q: "What is the pre-alpha?", a: "Release 0.0.1a is the first public build of Asten. It is early software: the engine, the desk and compile work, but expect rough edges and changes between releases. Keep your own copies of anything you write in it." },
   { q: "What is the difference between the hosted copy and the desktop app?", a: "Both run the same engine. The desktop app runs it on your computer and keeps your projects in one file on your disk; it is the way to use Asten for real work. The hosted copy runs it on Verne’s server in a private sandbox per visitor, for trying Asten without installing anything. The sandbox and everything in it are deleted 24 hours after your first visit. Do not put your manuscript there." },
-  { q: "Why does my system warn me before it runs?", a: "The installers are not code-signed yet. On Windows, SmartScreen shows “Windows protected your PC”; choose More info, then Run anyway. Compare the file’s SHA-256 with the value on this page or in SHA256SUMS.txt first. Signed installers are next on the [roadmap](/roadmap)." },
+  { q: "Why does my system warn me before it runs?", a: "The installers are not code-signed yet. On Windows, SmartScreen shows “Windows protected your PC”; choose More info, then Run anyway. Compare the file’s SHA-256 with its line in SHA256SUMS.txt first (the “Verify downloads” link on this page). Signed installers are next on the [roadmap](/roadmap)." },
   { q: "Is there a macOS build?", a: "Not in 0.0.1a. macOS comes later. On a Mac you can use the hosted copy in the meantime." },
   { q: "How much does Asten cost?", a: "Nothing today. Pricing hasn’t been decided. Whatever happens, your projects will stay readable and exportable without a subscription or a server." },
   { q: "Does it update itself?", a: "No. Settings, This desk, Check for updates asks for a newer release only when you press it, and installs only after a second press. Nothing checks on its own." },
 ];
-
-function AssetRow({ asset }: { asset: ReleaseAsset }) {
-  const size = formatBytes(asset.bytes);
-  return (
-    <li className="release-asset">
-      <div className="release-asset-head">
-        <a className="link" href={asset.url}>
-          {asset.label}
-        </a>
-        {size && <span className="fine">{size}</span>}
-      </div>
-      <code className="release-file">{asset.file}</code>
-      {asset.sha256 && (
-        <code className="release-sha" aria-label={`SHA-256 of ${asset.file}`}>
-          SHA-256 {asset.sha256}
-        </code>
-      )}
-      <p className="fine">{asset.note}</p>
-    </li>
-  );
-}
-
-function Platform({ platform, title }: { platform: ReleaseAsset["platform"]; title: string }) {
-  const assets = releaseAssets.filter((asset) => asset.platform === platform);
-  return (
-    <div data-reveal>
-      <h3>{title}</h3>
-      <ul className="release-assets">
-        {assets.map((asset) => (
-          <AssetRow key={asset.file} asset={asset} />
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 export function Download() {
   return (
@@ -61,11 +27,10 @@ export function Download() {
         art={<PaletteMark className="hero-palette" />}
       >
         <div className="btn-row">
-          <a className="btn btn--primary" href={release.hostedUrl} data-magnetic>
+          <HeroDownload />
+          <a className="btn btn--ghost" href={release.hostedUrl}>
+            <UiIcon name="globe" />
             Open it in the browser
-          </a>
-          <a className="link-arrow" href="#downloads">
-            Download for Windows or Linux <Arrow />
           </a>
         </div>
         <p className="fine" style={{ marginTop: 16 }}>
@@ -110,22 +75,21 @@ export function Download() {
       <section className="register register--sunk" id="downloads" aria-labelledby="downloads-h">
         <div className="wrap">
           <SectionHead id="downloads-h" title={`Release ${release.version} downloads`} />
-          <div className="release-grid">
-            <Platform platform="windows" title="Windows 10 and 11 (x64)" />
-            <Platform platform="linux" title="Linux (x86_64)" />
-          </div>
-          <p className="fine" style={{ marginTop: 20 }}>
-            Unsigned: Windows SmartScreen warns before the first run; choose More info, then Run anyway. Check the
-            SHA-256 first, against this page or{" "}
-            <a className="link" href={release.checksumsUrl}>
-              SHA256SUMS.txt
-            </a>
-            . All files and the release notes are on the{" "}
-            <a className="link" href={release.releaseUrl}>
-              GitHub release page
-            </a>
-            . macOS comes later.
-          </p>
+          <DownloadCards />
+          <ul className="honest-list dl-after" data-reveal>
+            <li>
+              <span>Windows: run the installer (it installs for your user only), or unzip the portable build and run Asten.exe.</span>
+            </li>
+            <li>
+              <span>
+                Linux: make the AppImage executable with <code>chmod +x</code> and run it, or install the .deb with{" "}
+                <code>sudo apt install ./Asten_0.0.1-alpha_amd64.deb</code>.
+              </span>
+            </li>
+            <li>
+              <span>asten-api: run it, open 127.0.0.1:4317 and type the pairing code it prints.</span>
+            </li>
+          </ul>
         </div>
       </section>
 
