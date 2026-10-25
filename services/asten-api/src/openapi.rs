@@ -890,7 +890,7 @@ mod tests {
 
         // The auth mode enum from another crate.
         let desk = asten_application::DeskInfo {
-            version: "0.1.0".into(),
+            version: "0.0.1-alpha".into(),
             host: "test".into(),
             embedded: false,
             auth_mode: asten_application::AuthMode::Pairing,
