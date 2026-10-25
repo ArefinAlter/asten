@@ -1,3 +1,4 @@
+import { deskStore } from "../../lib/storage";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Severity } from "@asten/contracts";
@@ -262,13 +263,20 @@ function Output() {
   );
 }
 
-let history: string[] = [];
-let lastLines: ConsoleLine[] = [
-  {
-    kind: "dim",
-    text: "Asten console. Commands run against the in-app engine; this is not a system shell. Type `asten help`.",
-  },
-];
+const CONSOLE_KEY = "asten-workbench:console:v1";
+const kept = deskStore.getJson<{ history?: string[]; lines?: ConsoleLine[] }>(
+  CONSOLE_KEY,
+);
+let history: string[] = Array.isArray(kept?.history) ? kept.history : [];
+let lastLines: ConsoleLine[] =
+  Array.isArray(kept?.lines) && kept.lines.length
+    ? kept.lines
+    : [
+        {
+          kind: "dim",
+          text: "Asten console. Commands run against the in-app engine; this is not a system shell. Type `asten help`.",
+        },
+      ];
 
 function Console() {
   const api = useWorkbench();
@@ -280,6 +288,7 @@ function Console() {
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => {
     lastLines = lines;
+    deskStore.setJson(CONSOLE_KEY, { history, lines: lines.slice(-200) });
     end.current?.scrollIntoView({ block: "end" });
   }, [lines]);
 

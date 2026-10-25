@@ -16,6 +16,8 @@
     "preview": "vite preview",
     "dev:sample": "vite --mode sample",
     "build:site": "tsc -b && vite build --mode site",
+    "build:hosted": "tsc -b && vite build --mode hosted",
+    "dev:hosted": "vite --mode hosted",
     "preview:site": "vite preview --mode site --outDir dist-site --port 4175"
   },
   "dependencies": {

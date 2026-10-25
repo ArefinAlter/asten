@@ -76,14 +76,8 @@ import { log } from "./output";
 import { Palette, type PaletteItem } from "./Palette";
 import { ChecksPane, PacksPane, SearchPane } from "./panes";
 import { BottomPanel } from "./panel/BottomPanel";
-import {
-  applyPrefs,
-  getPrefs,
-  setPrefs,
-  storageAllowed,
-  usePrefs,
-  type Prefs,
-} from "./prefs";
+import { applyPrefs, getPrefs, setPrefs, usePrefs, type Prefs } from "./prefs";
+import { deskStore, hostedClaim, isHosted } from "../lib/storage";
 import { problemRows, stepMark } from "./problems";
 import { Backstage } from "./ribbon/Backstage";
 import { resolveCommand, runEditorCommand } from "./ribbon/commands";
@@ -200,16 +194,17 @@ const newMarksPhrase = (count: number) =>
 
 export function Workbench() {
   const sample = isLocalTransport();
+  const hosted = isHosted();
   const prefs = usePrefs();
   const initial = useMemo(() => {
     const fromHash = readHash();
-    if (fromHash.project || !storageAllowed()) return fromHash;
+    if (fromHash.project) return fromHash;
     if (getPrefs().openOn !== "last") return fromHash;
     try {
-      const last = JSON.parse(localStorage.getItem(LAST_KEY) ?? "null") as {
+      const last = deskStore.getJson<{
         project?: string;
         document?: string;
-      } | null;
+      }>(LAST_KEY);
       return last?.project
         ? {
             project: last.project,
@@ -312,18 +307,11 @@ export function Workbench() {
       window.history.replaceState(null, "", next);
   }, [selectedProjectId, view, selectedDocumentId]);
   useEffect(() => {
-    if (!storageAllowed() || !selectedProjectId) return;
-    try {
-      localStorage.setItem(
-        LAST_KEY,
-        JSON.stringify({
-          project: selectedProjectId,
-          document: selectedDocumentId,
-        }),
-      );
-    } catch {
-      // Fine without storage.
-    }
+    if (!selectedProjectId) return;
+    deskStore.setJson(LAST_KEY, {
+      project: selectedProjectId,
+      document: selectedDocumentId,
+    });
   }, [selectedProjectId, selectedDocumentId]);
   useEffect(() => {
     const onHashChange = () => {
@@ -341,11 +329,11 @@ export function Workbench() {
     queryKey: ["projects"],
     queryFn: () => client.listProjects(),
   });
-  // The hosted copy opens its one sample project straight away.
+  // The hosted copies open their one project straight away.
   useEffect(() => {
-    if (sample && !selectedProjectId && projects.data?.length === 1)
+    if ((sample || hosted) && !selectedProjectId && projects.data?.length === 1)
       setSelectedProjectId(projects.data[0].id);
-  }, [projects.data, selectedProjectId, sample]);
+  }, [projects.data, selectedProjectId, sample, hosted]);
   const documents = useQuery({
     queryKey: ["documents", selectedProjectId],
     queryFn: () => client.listDocumentSummaries(selectedProjectId!),
@@ -552,6 +540,17 @@ export function Workbench() {
     },
     onError: (error) => toast(error.message, "error"),
   });
+  // The hosted pre-alpha starts each new visitor on the sample novel, created
+  // through the real API in their own sandbox; the claim makes it once only,
+  // even with two tabs open.
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (!hosted || seededRef.current || projects.data?.length !== 0) return;
+    seededRef.current = true;
+    void hostedClaim("sample-novel").then((first) => {
+      if (first) seedSample.mutate();
+    });
+  }, [hosted, projects.data, seedSample]);
 
   const selectedProject = projects.data?.find(
     (p) => p.id === selectedProjectId,

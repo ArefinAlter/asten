@@ -2,7 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { type RefObject, useEffect, useRef, useState } from "react";
 import type { AstenDocument, ProjectId, StreamEvent } from "@asten/contracts";
 import { createAstenClient } from "./asten-client";
-import { storageAllowed } from "./storage";
+import { deskStore } from "./storage";
 
 /** The mutation key of the desk's own document saves (see `App.tsx`). */
 export const SAVE_DOCUMENT_KEY = ["save-document"] as const;
@@ -199,22 +199,12 @@ export function useStoredState<T extends string>(
   key: string,
   fallback: T,
 ): [T, (value: T) => void] {
-  const [value, setValue] = useState<T>(() => {
-    if (!storageAllowed()) return fallback;
-    try {
-      return (localStorage.getItem(key) as T | null) ?? fallback;
-    } catch {
-      return fallback;
-    }
-  });
+  const [value, setValue] = useState<T>(
+    () => (deskStore.get(key) as T | null) ?? fallback,
+  );
   const update = (next: T) => {
     setValue(next);
-    if (!storageAllowed()) return;
-    try {
-      localStorage.setItem(key, next);
-    } catch {
-      // Fine without storage.
-    }
+    deskStore.set(key, next);
   };
   return [value, update];
 }

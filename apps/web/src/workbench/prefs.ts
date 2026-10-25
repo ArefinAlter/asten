@@ -1,13 +1,13 @@
 /**
  * Workbench preferences: appearance, page display, keybindings, the Quick
- * Access Toolbar, the assistant and its providers. Device preferences, kept
- * in this webview's storage on the desktop and local builds, and in memory
- * only on the hosted copy (it promises no browser storage). Provider keys are
+ * Access Toolbar, the assistant and its providers. Kept by `deskStore`: this
+ * webview's storage on the desktop and local builds, the hosting service on
+ * the hosted pre-alpha (never the browser's storage there). Provider keys are
  * never part of these preferences: they live in `secrets.ts`, in memory.
  */
 import { useSyncExternalStore } from "react";
 import type { Access } from "./agent/tools";
-import { storageAllowed } from "../lib/storage";
+import { deskStore, storageAllowed } from "../lib/storage";
 
 export type Theme = "system" | "light" | "dark" | "sepia";
 
@@ -197,18 +197,18 @@ const KEY = "asten-workbench:prefs:v1";
 export { storageAllowed };
 
 function load(): Prefs {
-  if (!storageAllowed()) return DEFAULT_PREFS;
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return DEFAULT_PREFS;
-    const parsed = JSON.parse(raw) as Partial<Prefs>;
-    return { ...DEFAULT_PREFS, ...parsed };
-  } catch {
-    return DEFAULT_PREFS;
-  }
+  const parsed = deskStore.getJson<Partial<Prefs>>(KEY);
+  return parsed ? { ...DEFAULT_PREFS, ...parsed } : DEFAULT_PREFS;
 }
 
 let state: Prefs = load();
+
+/** Read the preferences again, after the hosted state has arrived. */
+export function reloadPrefs() {
+  state = load();
+  applyPrefs(state);
+  listeners.forEach((listener) => listener());
+}
 const listeners = new Set<() => void>();
 
 export function getPrefs(): Prefs {
@@ -220,13 +220,7 @@ export function setPrefs(
 ) {
   const next = typeof patch === "function" ? patch(state) : patch;
   state = { ...state, ...next };
-  if (storageAllowed()) {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(state));
-    } catch {
-      // Storage may be unavailable; preferences hold for this visit.
-    }
-  }
+  deskStore.setJson(KEY, state);
   applyPrefs(state);
   listeners.forEach((listener) => listener());
 }

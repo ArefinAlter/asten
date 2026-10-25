@@ -2,15 +2,23 @@ import react from "@vitejs/plugin-react";
 import { defineConfig, type Plugin } from "vite";
 
 /**
- * The hosted pre-alpha copy (`--mode site`): served by the public site under
- * /app/, on sample data, under the site's CSP (no inline script, no external
- * anything), marked noindex, with no manifest or service worker.
+ * The two hosted builds share one page shape: no inline script (strict CSP),
+ * no external anything, noindex, no manifest or service worker.
+ *
+ * - `--mode hosted`: the hosted pre-alpha at its own origin, against the real
+ *   API through the pre-alpha gateway (`services/asten-prealpha`).
+ * - `--mode site`: the offline copy on the in-page sample backend, kept as a
+ *   build option under /app/ (offline builds and tests).
  */
-function hostedCopy(): Plugin {
+function hostedCopy(mode: "site" | "hosted"): Plugin {
+  const description =
+    mode === "hosted"
+      ? "Asten, pre-alpha release: the writing workbench with its real engine, in a private sandbox that is deleted after 24 hours."
+      : "Asten, pre-alpha release: the writing workbench on a sample project. Runs in the browser with no backend.";
   return {
     name: "asten-hosted-copy",
     transformIndexHtml(html) {
-      return html
+      const page = html
         .replace(/<script>[\s\S]*?<\/script>\s*/, "")
         .replace(/\s*<link rel="manifest"[^>]*>/, "")
         .replace(
@@ -18,31 +26,48 @@ function hostedCopy(): Plugin {
           "",
         )
         .replace(/\s*<link rel="apple-touch-icon"[^>]*>/, "")
-        .replace(/href="\/icons\//g, 'href="/app/icons/')
         .replace(
           /<meta\s+name="description"[\s\S]*?\/>/,
-          '<meta name="robots" content="noindex, nofollow" />\n    <meta name="description" content="Asten, pre-alpha release: the writing workbench on a sample project. Runs in the browser with no backend." />',
+          `<meta name="robots" content="noindex, nofollow" />\n    <meta name="description" content="${description}" />`,
         )
         .replace("<title>Asten</title>", "<title>Asten Workbench</title>");
+      return mode === "site"
+        ? page.replace(/href="\/icons\//g, 'href="/app/icons/')
+        : page;
     },
   };
 }
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), ...(mode === "site" ? [hostedCopy()] : [])],
+  plugins: [
+    react(),
+    ...(mode === "site" || mode === "hosted" ? [hostedCopy(mode)] : []),
+  ],
   base: mode === "site" ? "/app/" : "/",
   clearScreen: false,
   build:
-    mode === "site"
-      ? { outDir: "dist-site", emptyOutDir: true, assetsInlineLimit: 0 }
+    mode === "site" || mode === "hosted"
+      ? {
+          outDir: mode === "site" ? "dist-site" : "dist-hosted",
+          emptyOutDir: true,
+          assetsInlineLimit: 0,
+        }
       : undefined,
   server: {
     port: 1420,
     strictPort: true,
-    proxy: {
-      "/api": "http://127.0.0.1:4317",
-      "/health": "http://127.0.0.1:4317",
-    },
+    // `dev:hosted` talks to a local asten-prealpha gateway (4318), which
+    // hosts the API per visitor; every other mode to the API itself.
+    proxy:
+      mode === "hosted"
+        ? {
+            "/api": "http://127.0.0.1:4318",
+            "/svc": "http://127.0.0.1:4318",
+          }
+        : {
+            "/api": "http://127.0.0.1:4317",
+            "/health": "http://127.0.0.1:4317",
+          },
   },
 }));

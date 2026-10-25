@@ -256,6 +256,10 @@ body {
 .wb-btn--block {
   width: 100%;
 }
+.wb-btn--danger {
+  border-color: var(--wb-error);
+  color: var(--wb-error);
+}
 .wb-icon-btn {
   display: inline-flex;
   align-items: center;
@@ -3406,6 +3410,16 @@ button.status-item:hover {
   margin: 0 0 8px;
   padding-left: 18px;
   line-height: 1.55;
+}
+.about-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 640px) {
+  .about-split {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ───────────────────────── smaller screens ───────────────────────── */

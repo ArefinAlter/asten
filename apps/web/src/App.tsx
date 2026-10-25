@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { PairScreen } from "./auth/PairScreen";
 import { PaletteMark } from "./brand/Palette";
 import { ApiError, createAstenClient } from "./lib/asten-client";
+import { isHosted } from "./lib/storage";
 import { Workbench } from "./workbench/Workbench";
 
 const client = createAstenClient();
@@ -56,6 +57,7 @@ function useAuthGate() {
     authenticated,
     needsPairing,
     unreachable: status.isError,
+    error: status.error,
     refresh: () => setTick((value) => value + 1),
   };
 }
@@ -68,13 +70,26 @@ function App() {
         <section className="pair-card register">
           <div className="pair-head">
             <PaletteMark />
-            <h1>The desk cannot reach its API</h1>
+            <h1>
+              {isHosted()
+                ? "The hosted pre-alpha is not available"
+                : "The desk cannot reach its API"}
+            </h1>
           </div>
-          <p className="lede">
-            Start the local API (<code>pnpm dev:api</code>) or open the desktop
-            app. Nothing of yours lives anywhere but this machine, so there is
-            no server to wait for.
-          </p>
+          {isHosted() ? (
+            <p className="lede">
+              {gate.error instanceof ApiError && gate.error.status !== 502
+                ? gate.error.message
+                : "The server did not answer."}{" "}
+              The desktop app runs the same workbench on your own machine.
+            </p>
+          ) : (
+            <p className="lede">
+              Start the local API (<code>pnpm dev:api</code>) or open the
+              desktop app. Nothing of yours lives anywhere but this machine, so
+              there is no server to wait for.
+            </p>
+          )}
           <button
             type="button"
             className="btn btn--primary"

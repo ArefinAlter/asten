@@ -5,6 +5,7 @@ import { useWorkbench } from "../context";
 import { Icon } from "../icons";
 import { buildVault } from "../knowledge/vault";
 import { log } from "../output";
+import { deskStore } from "../../lib/storage";
 import { setPrefs, usePrefs } from "../prefs";
 import { respond, type Card, type Chip, type Turn } from "./script";
 import { SKILLS } from "./skills";
@@ -26,6 +27,8 @@ interface Thread {
   messages: Message[];
 }
 
+const THREADS_KEY = "asten-workbench:threads:v1";
+
 let serial = 0;
 const id = () => `t${Date.now().toString(36)}${(serial += 1).toString(36)}`;
 
@@ -41,9 +44,29 @@ export function AgentPanel() {
   const api = useWorkbench();
   const prefs = usePrefs();
   const queryClient = useQueryClient();
-  const [threads, setThreads] = useState<Thread[]>(() => [
-    { id: id(), title: "New thread", access: prefs.agentAccess, messages: [] },
-  ]);
+  const [threads, setThreads] = useState<Thread[]>(() => {
+    const kept = deskStore.getJson<Thread[]>(THREADS_KEY);
+    return Array.isArray(kept) && kept.length
+      ? kept
+      : [
+          {
+            id: id(),
+            title: "New thread",
+            access: prefs.agentAccess,
+            messages: [],
+          },
+        ];
+  });
+  // Threads are kept like preferences (desk storage, or the hosting
+  // service): the newest twenty, eighty messages each.
+  useEffect(() => {
+    deskStore.setJson(
+      THREADS_KEY,
+      threads
+        .slice(-20)
+        .map((t) => ({ ...t, messages: t.messages.slice(-80) })),
+    );
+  }, [threads]);
   const [activeId, setActiveId] = useState(threads[0].id);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
