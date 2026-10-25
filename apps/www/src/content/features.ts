@@ -452,7 +452,7 @@ export const features: Feature[] = [
         heading: "How do the add-ins work?",
         blocks: [
           { kind: "p", text: "The add-ins are thin windows onto your own computer. They call the Asten API at `127.0.0.1:4317` (that address only exists on your machine) to list projects, show the Scales, and file a selected passage into a project. The API answers only to clients you have paired: the first time a pane opens, it asks for a six-digit code from the desk’s Guests panel, and you can revoke that pairing at any time. Microsoft and Google already have the document you opened; Asten doesn’t send your canon to them or to Verne." },
-          { kind: "callout", tone: "note", title: "Sideload only, for now", text: "The add-ins are installed by hand (“sideloaded”) and are not in the Microsoft or Google stores. Early-access writers get instructions." },
+          { kind: "callout", tone: "note", title: "Sideload only, for now", text: "The add-ins are installed by hand (“sideloaded”) and are not in the Microsoft or Google stores. Each add-in’s README in the source repository has the steps." },
         ],
       },
     ],

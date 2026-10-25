@@ -23,6 +23,7 @@ export const roadmap: RoadmapLane[] = [
       { title: "Guests", text: "Word task pane and Google Docs sidebar, sideloaded. They pair once with a six-digit code and hold a token you can revoke." },
       { title: "Local-first storage", text: "SQLite on your disk, a desktop shell that embeds the local API, no account, no sync, no telemetry. The API answers only to paired clients." },
       { title: "API contracts", text: "TypeScript contracts generated from the Rust types and checked for drift, and an OpenAPI 3.1 document served by the local API." },
+      { title: "Pre-alpha 0.0.1a", text: "The first public release: unsigned desktop builds for Windows x64 and Linux x64 that run the engine on your machine, and a hosted copy in the browser that gives each visitor a private sandbox for 24 hours." },
     ],
   },
   {
@@ -30,8 +31,8 @@ export const roadmap: RoadmapLane[] = [
     title: "Next",
     note: "Being worked on now. No dates.",
     items: [
-      { title: "Installers for each desktop platform", text: "Windows on x64 and ARM, macOS on Apple silicon and Intel in one universal app, Linux on x86_64 and aarch64. The release workflow targets these platforms; installer verification, signing and hardware testing come before the download page changes." },
-      { title: "Signed installers", text: "A normal download-and-open install for Windows, macOS and Linux, instead of setup notes." },
+      { title: "Installers for the other desktop platforms", text: "Release 0.0.1a ships Windows x64 and Linux x64. Windows on ARM, macOS on Apple silicon and Intel in one universal app, and Linux on aarch64 are configured; their installers still need building and testing on hardware. macOS comes later." },
+      { title: "Signed installers", text: "Code-signed installers for Windows, macOS and Linux, so the system no longer warns before the first run. The 0.0.1a builds are unsigned." },
       { title: "Phones and tablets", text: "The one-column layout, with the binder as a drawer and the Scales in a bottom sheet, is built. Installing it from a phone’s browser requires trusted HTTPS to your own computer. The Android and iOS apps from the same shell still need signing and device testing." },
     ],
   },

@@ -1,11 +1,11 @@
 {
   "name": "@asten/www",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1-alpha",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node scripts/prerender.mjs && node scripts/embed-app.mjs",
+    "build": "tsc -b && vite build && vite build --ssr src/entry-server.tsx --outDir dist-server && node scripts/prerender.mjs",
     "check": "tsc -b --pretty false",
     "preview": "node scripts/serve.mjs"
   },

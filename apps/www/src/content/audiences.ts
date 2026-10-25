@@ -57,7 +57,7 @@ export const audiences: Audience[] = [
     },
     honest: [
       "Asten reads only plain attributes from your prose (hair, eyes, age, location, alive or dead, relations), and only when a name is in the same sentence. Anything subtler, you settle yourself.",
-      "There is no public download yet. Early access is by invitation.",
+      "It is a pre-alpha: release 0.0.1a for Windows and Linux, unsigned, with macOS later.",
       "It won’t typeset your book. Compile to .docx for your editor or publisher.",
     ],
     faqs: [
@@ -193,7 +193,7 @@ export const audiences: Audience[] = [
     honest: [
       "Asten doesn’t import a franchise’s canon for you. You settle the facts that matter.",
       "There’s no posting integration; compile to HTML or Markdown and post as usual.",
-      "Early access is by invitation for now.",
+      "It is a pre-alpha (release 0.0.1a); expect rough edges.",
     ],
     faqs: [
       { q: "Is Asten good for writing fan fiction?", a: "Yes. Asten’s canon model fits fan fiction naturally: settle the facts of your version, keep changed source canon on file as contested, and get marks when your canon contradicts itself. Your writing stays on your computer." },
@@ -237,13 +237,13 @@ export const audiences: Audience[] = [
     },
     honest: [
       "No model ships today. The scenario above is planned work, described as a design commitment, not a feature.",
-      "The source repository is private; Asten is not open source.",
+      "The source can be read on GitHub, but it carries no open-source license; Asten is not open source.",
       "The local API binds to loopback by default and answers only to paired clients. Don’t expose it to a network without TLS and an owner passphrase.",
     ],
     faqs: [
       { q: "Does Asten run a local LLM?", a: "Not today. Asten’s checks are deterministic rules. Planned AI features will prefer local models, support bring-your-own provider keys with explicit consent, and can be switched off entirely." },
       { q: "Does Asten have an API?", a: "Asten runs a local HTTP API on 127.0.0.1:4317 that its desk and add-ins use. It is a loopback API on your own machine, not a public cloud API." },
-      { q: "Is Asten open source?", a: "No. Asten’s source repository is private today. Its rules and diagnostic codes are documented on this site." },
+      { q: "Is Asten open source?", a: "No. The source can be read on GitHub (ArefinAlter/asten), but it is published without an open-source license. Its rules and diagnostic codes are documented on this site." },
     ],
     art: "palette",
     related: ["/ai", "/ai-policy", "/features/compiler", "/journal/ai-editor-not-writer"],

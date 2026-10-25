@@ -131,14 +131,14 @@ const product: RouteMeta[] = [
   }),
   page({
     path: "/download",
-    title: "Get Asten: early access",
+    title: "Try the Asten pre-alpha",
     description:
-      "Asten is in early access. There’s no public download yet. Ask for an invitation, see what runs today, and what you need on your machine.",
+      "Asten 0.0.1a, a pre-alpha: open it in your browser in a private 24-hour sandbox, or download the unsigned desktop app for Windows x64 or Linux x64.",
     label: "Get Asten",
     kind: "product",
     schema: "howto",
     priority: 0.9,
-    og: { eyebrow: "Early access", headline: "Early access by invitation" },
+    og: { eyebrow: "Pre-alpha 0.0.1a", headline: "Try the pre-alpha" },
   }),
   page({
     path: "/roadmap",
@@ -253,7 +253,7 @@ const company: RouteMeta[] = [
     path: "/contact",
     title: "Contact Verne about Asten",
     description:
-      "Write to Verne about Asten: early access, press, partnerships, security reports, accessibility problems, or legal notices.",
+      "Write to Verne about Asten: pre-alpha feedback, press, partnerships, security reports, accessibility problems, or legal notices.",
     label: "Contact",
     kind: "company",
     schema: "contact",

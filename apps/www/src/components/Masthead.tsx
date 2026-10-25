@@ -180,7 +180,7 @@ export function Masthead() {
           <div className="masthead-actions">
             <ThemeToggle />
             <Link to="/download" className="btn btn--primary btn--small" data-magnetic>
-              Get early access
+              Try the pre-alpha
             </Link>
             <button
               type="button"
@@ -225,7 +225,7 @@ export function Masthead() {
           ))}
         </ul>
         <Link to="/download" className="btn btn--primary" tabIndex={mobile ? 0 : -1}>
-          Get early access
+          Try the pre-alpha
         </Link>
       </nav>
     </>

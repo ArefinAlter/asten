@@ -10,8 +10,9 @@ export const legalDocs: LegalDoc[] = [
   {
     ...legalIndex["/privacy"]!,
     summary: [
-      "Your manuscript stays in a SQLite file on your computer. Verne never receives it, and Asten has no account, no sync, and no telemetry.",
+      "In the desktop app, your manuscript stays in a SQLite file on your computer. Verne never receives it, and Asten has no account, no sync, and no telemetry.",
       "This website sets no cookies and runs no analytics or ads. Vercel, the host, processes ordinary request data to deliver pages and keep the site safe.",
+      "The hosted pre-alpha, if you open it, keeps what you type in a private sandbox on a server Verne runs, under one session cookie, and deletes it all 24 hours after your first visit.",
       "If you email Verne, your address and message are used to reply, then deleted within 24 months unless the conversation continues.",
       "Verne does not sell personal information, does not run a mailing list, and will tell you in the interface before any feature sends data anywhere.",
     ],
@@ -26,7 +27,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "For this website and for emails you send, Verne is the controller: the organization that decides why and how that information is used. For your manuscript, Verne is neither a controller nor a processor, because your manuscript never reaches Verne.",
+            text: "For this website and for emails you send, Verne is the controller: the organization that decides why and how that information is used. For a manuscript in the desktop app, Verne is neither a controller nor a processor, because it never reaches Verne. For what you type into the hosted pre-alpha, Verne is the controller for the 24 hours it is kept.",
           },
           {
             kind: "p",
@@ -44,7 +45,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "Asten has no account, no sync, and no telemetry. It does not upload your manuscript, your world notes, or your diagnostics to Verne or to anyone else. Verne never receives your manuscript, so Verne cannot read it, share it, or train anything on it.",
+            text: "Asten has no account, no sync, and no telemetry. The desktop app and the local API do not upload your manuscript, your world notes, or your diagnostics to Verne or to anyone else. Verne never receives a manuscript you keep there, so Verne cannot read it, share it, or train anything on it. The hosted pre-alpha is different: what you type there is kept on Verne’s server for up to 24 hours (see [the hosted pre-alpha](#hosted-pre-alpha)), and it is never used to train anything either.",
           },
           {
             kind: "p",
@@ -87,6 +88,31 @@ export const legalDocs: LegalDoc[] = [
         ],
       },
       {
+        id: "hosted-pre-alpha",
+        heading: "The hosted pre-alpha",
+        blocks: [
+          {
+            kind: "p",
+            text: "The hosted pre-alpha at [asten.103.191.50.32.sslip.io](https://asten.103.191.50.32.sslip.io/) lets you try the Asten workbench without installing anything. Unlike the desktop app, it runs on a server that Verne rents and operates, so what you type there does reach Verne’s server. Use it with the sample novel or with text you do not mind leaving your computer; keep your manuscript in the desktop app.",
+          },
+          {
+            kind: "list",
+            items: [
+              "**A private sandbox.** Your first visit creates a sandbox of your own: a separate project database that no other visitor can see. It holds the projects, documents, facts and settings you create there.",
+              "**One cookie.** The sandbox is tied to a strictly necessary session cookie, `asten_visitor`: a random value, `HttpOnly`, `Secure`, `SameSite=Strict`, lasting 24 hours. The server stores only a hash of it. See the [cookie notice](/cookies).",
+              "**Deleted after 24 hours.** The sandbox, its settings and the cookie’s hash are deleted 24 hours after your first visit, or sooner if you choose About, Start over. There are no backups of sandboxes.",
+              "**Provider keys stay in your tab.** If you type an AI provider key into Settings, it is held in that browser tab’s memory only. It is never sent to the server, and no provider is called in this release.",
+              "**Request data.** The server’s web logs record your IP address, the time, the path requested and your browser’s user agent, to keep the service working and to limit abuse. They are rotated and kept no longer than 14 days. Your IP address is also used, for one hour, to limit how many sandboxes one address can create.",
+              "**No analytics.** The hosted copy runs no analytics, advertising or tracking scripts, and loads nothing from other sites.",
+            ],
+          },
+          {
+            kind: "p",
+            text: "The host name ends in `sslip.io`, a public DNS service that turns the name into the server’s address. Your DNS resolver asks it for that address; it receives no cookies and nothing you type.",
+          },
+        ],
+      },
+      {
         id: "email",
         heading: "When you email Verne",
         blocks: [
@@ -96,7 +122,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "Verne uses this to read and answer your message. If you ask for early access, Verne also uses it to send you an invitation and the information you need to run Asten. Verne does not add you to a mailing list, does not send you marketing you did not ask for, and never sells or rents your address.",
+            text: "Verne uses this to read and answer your message. Verne does not add you to a mailing list, does not send you marketing you did not ask for, and never sells or rents your address.",
           },
           {
             kind: "p",
@@ -146,7 +172,12 @@ export const legalDocs: LegalDoc[] = [
               [
                 "Replying to your email",
                 "Your address, your message, and anything you include",
-                "Your consent; steps you ask Verne to take before an agreement, such as an early-access request; or Verne’s legitimate interest in answering correspondence",
+                "Your consent; steps you ask Verne to take before an agreement; or Verne’s legitimate interest in answering correspondence",
+              ],
+              [
+                "Running the hosted pre-alpha you open",
+                "The `asten_visitor` cookie’s hash, what you create in your sandbox, and web-server request data",
+                "Providing the service you asked for, and legitimate interests in keeping it secure",
               ],
               [
                 "Remembering your theme",
@@ -274,7 +305,7 @@ export const legalDocs: LegalDoc[] = [
     summary: [
       "You may use this website and run the Asten builds Verne gives you for your own writing.",
       "You own everything you write. Verne claims no rights in it, and Asten never trains on it.",
-      "Asten is early-access software, provided as is. Features can change, and a diagnostic is a notice, not a verdict.",
+      "Asten is pre-alpha software, provided as is. Features can change, the hosted copy deletes everything after 24 hours, and a diagnostic is a notice, not a verdict.",
       "These terms are governed by the laws of Bangladesh, but the consumer protections where you live still apply.",
     ],
     sections: [
@@ -306,23 +337,24 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "This website describes Asten. It is not an offer to host your work, and describing a planned feature is not a promise to build it. The [roadmap](/roadmap) says what is planned; only what ships is real.",
+            text: "This website describes Asten. The hosted pre-alpha keeps a sandbox for 24 hours so you can try Asten; it is not an offer to host your work. Describing a planned feature is not a promise to build it. The [roadmap](/roadmap) says what is planned; only what ships is real.",
           },
         ],
       },
       {
-        id: "early-access",
-        heading: "Early access",
+        id: "pre-alpha",
+        heading: "Pre-alpha",
         blocks: [
           {
             kind: "p",
-            text: "Asten is in early development. Builds are available by request, and Verne decides who receives them.",
+            text: "Asten is in early development. Release 0.0.1a is a public pre-alpha: anyone may download the desktop builds or open the hosted copy.",
           },
           {
             kind: "list",
             items: [
-              "Builds are provided as is and as available.",
-              "Features may be added, changed, or removed, and an early-access build may stop working after a set date.",
+              "Builds and the hosted copy are provided as is and as available.",
+              "Features may be added, changed, or removed, and a pre-alpha build may stop working or be withdrawn.",
+              "The hosted copy deletes each sandbox 24 hours after the first visit, keeps no backups, and may be reset or taken offline at any time. Do not keep work there.",
               "There is no service level, uptime promise, or support commitment.",
               "Keep your own backups. Asten keeps snapshots and a history, but a copy on another disk is still the best protection a manuscript can have.",
             ],
@@ -495,6 +527,7 @@ export const legalDocs: LegalDoc[] = [
     ...legalIndex["/cookies"]!,
     summary: [
       "This website sets no cookies and uses no analytics, advertising, or tracking technology.",
+      "The hosted pre-alpha, a separate site, sets one strictly necessary session cookie, `asten_visitor`, for 24 hours.",
       "If you switch between the light and dark themes, your browser remembers the choice in one local setting. It never leaves your browser.",
       "There is no consent banner, because nothing here needs your consent.",
     ],
@@ -509,7 +542,30 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "The Asten desk does not use cookies either. There is no sign-in. Your project is a SQLite file on your computer, which is not a cookie and is not sent to Verne.",
+            text: "The Asten desktop app does not use cookies either. There is no sign-in. Your project is a SQLite file on your computer, which is not a cookie and is not sent to Verne.",
+          },
+        ],
+      },
+      {
+        id: "hosted-pre-alpha",
+        heading: "The hosted pre-alpha’s one cookie",
+        blocks: [
+          {
+            kind: "p",
+            text: "The hosted pre-alpha at [asten.103.191.50.32.sslip.io](https://asten.103.191.50.32.sslip.io/) is a separate site from this one. It needs one cookie to know which private sandbox is yours. It stores nothing in your browser’s `localStorage`; your settings are kept with the sandbox on the server.",
+          },
+          {
+            kind: "table",
+            head: ["Name", "Purpose", "Set by", "How long", "Sent to anyone?"],
+            rows: [
+              [
+                "`asten_visitor`",
+                "Ties your browser to your private sandbox (strictly necessary)",
+                "The hosted pre-alpha, `HttpOnly`, `Secure`, `SameSite=Strict`",
+                "24 hours from your first visit",
+                "Only to that site. The server keeps a hash of it and deletes it with the sandbox.",
+              ],
+            ],
           },
         ],
       },
@@ -560,7 +616,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Consent banners exist to ask permission for cookies and trackers that are not strictly necessary. This site sets none, and any security mechanism used by the host is strictly necessary. The theme setting is stored only because you asked for it by pressing the toggle, and it never leaves your browser. There is nothing to consent to, so there is no banner to dismiss.",
+            text: "Consent banners exist to ask permission for cookies and trackers that are not strictly necessary. This site sets none, the hosted pre-alpha’s one cookie is strictly necessary for the sandbox you opened, and any security mechanism used by the host is strictly necessary. The theme setting is stored only because you asked for it by pressing the toggle, and it never leaves your browser. There is nothing to consent to, so there is no banner to dismiss.",
           },
         ],
       },
@@ -653,12 +709,12 @@ export const legalDocs: LegalDoc[] = [
         ],
       },
       {
-        id: "early-access-builds",
-        heading: "Early-access builds",
+        id: "pre-alpha-builds",
+        heading: "Pre-alpha builds",
         blocks: [
           {
             kind: "p",
-            text: "Asten is in early development. A build may stop running after a set date, may change between versions, and may be replaced or withdrawn. Verne has no obligation to provide updates, support, or any particular feature.",
+            text: "Asten is in early development, and release 0.0.1a is a pre-alpha. A build may stop running, may change between versions, and may be replaced or withdrawn. Verne has no obligation to provide updates, support, or any particular feature.",
           },
           {
             kind: "p",
@@ -672,7 +728,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Asten is not open source. Its source code is private, and neither this page nor receiving a build gives you any rights in it. Nothing here grants rights in Verne’s names or logos; for those, see the [trademark page](/trademark).",
+            text: "Asten is not open source. Its source code can be read on GitHub, but it is published without an open-source license, and neither reading it, this page, nor receiving a build gives you any rights in it beyond this license. Nothing here grants rights in Verne’s names or logos; for those, see the [trademark page](/trademark).",
           },
         ],
       },
@@ -692,7 +748,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "This license lasts until you stop using Asten or Verne ends it. Verne may end it if you break this license or the [terms of use](/terms), or when an early-access program ends. When it ends, stop running the builds and delete them.",
+            text: "This license lasts until you stop using Asten or Verne ends it. Verne may end it if you break this license or the [terms of use](/terms), or when the pre-alpha program ends. When it ends, stop running the builds and delete them.",
           },
           {
             kind: "p",
@@ -851,6 +907,10 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
+            text: "Release 0.0.1a lets you enter AI provider settings, off by default, but calls none of them. The assistant panel answers from Asten’s own tools and never writes prose.",
+          },
+          {
+            kind: "p",
             text: "Asten does not generate prose, and it never will. The tagline is a design rule: **let AI be your editor, not your writer.** Your words are black ink; Asten only ever writes in red.",
           },
         ],
@@ -940,7 +1000,7 @@ export const legalDocs: LegalDoc[] = [
             kind: "list",
             items: [
               "**Structure.** Each page has one main heading and real subheadings in order, so you can move through a page by heading. Pages declare English as their language.",
-              "**Keyboard.** Navigation, links, the theme toggle, and the interactive demos can be used with a keyboard alone.",
+              "**Keyboard.** Navigation, links, the theme toggle, and the interactive examples can be used with a keyboard alone.",
               "**Visible focus.** Whatever has keyboard focus is clearly outlined.",
               "**Reduced motion.** When your system asks for reduced motion, animations stop or are kept to a minimum.",
               "**Contrast.** Text and controls are designed to meet AA contrast in both the light and the dark theme.",
@@ -958,7 +1018,7 @@ export const legalDocs: LegalDoc[] = [
             kind: "list",
             items: [
               "**Decorative animation.** Some pages animate Egyptian motifs when reduced motion is not requested. The animations carry no information, but some visitors may find them distracting; turning on reduced motion in your system settings stops them.",
-              "**Demos are illustrations.** The interactive demos show how Asten behaves, in simplified form. They may not convey everything to a screen reader as well as plain text does. The same ideas are explained in prose on [How it works](/how-it-works) and the [feature pages](/features).",
+              "**Examples are illustrations.** The interactive examples show how Asten behaves, in simplified form. They may not convey everything to a screen reader as well as plain text does. The same ideas are explained in prose on [How it works](/how-it-works) and the [feature pages](/features).",
               "**No independent audit.** The site has been checked by Verne, not by an independent auditor, so this statement is a self-assessment.",
             ],
           },
@@ -1338,7 +1398,7 @@ export const legalDocs: LegalDoc[] = [
     ...legalIndex["/subprocessors"]!,
     summary: [
       "No third party processes your manuscript for Verne, because Verne never receives it.",
-      "Vercel hosts this website. Verne’s business email provider carries the messages you send to Verne.",
+      "Vercel hosts this website. A server Verne rents runs the hosted pre-alpha. Verne’s business email provider carries the messages you send to Verne.",
       "Microsoft and Google are involved only if you choose to use the Word or Google Docs add-ins.",
       "Verne uses no analytics, advertising, payment, or customer-relationship vendors.",
     ],
@@ -1366,6 +1426,12 @@ export const legalDocs: LegalDoc[] = [
                 "Hosting and edge delivery of this website, and protection against abuse",
                 "Request data: IP address, user agent, time, path, referrer",
                 "United States company with a global edge network",
+              ],
+              [
+                "The server provider for the hosted pre-alpha",
+                "A virtual server Verne rents and operates, which runs the hosted pre-alpha and its sandboxes",
+                "What you create in a sandbox (deleted after 24 hours), the `asten_visitor` cookie’s hash, web-server request data",
+                "May be outside your country; see [international transfers](/privacy#international-transfers)",
               ],
               [
                 "Verne’s business email provider",
@@ -1607,7 +1673,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "This website is hosted by Vercel Inc. Asten itself runs on your own computer; your manuscript is not stored on Verne’s servers or on Vercel’s.",
+            text: "This website is hosted by Vercel Inc. The Asten desktop app runs on your own computer; your manuscript is not stored on Verne’s servers or on Vercel’s. The hosted pre-alpha runs on a server Verne rents and deletes each visitor’s sandbox after 24 hours.",
           },
         ],
       },

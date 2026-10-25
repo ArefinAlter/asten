@@ -1,3 +1,4 @@
+import { release } from "../content/release";
 import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { Wedjat } from "../art/Figures";
@@ -39,7 +40,7 @@ export function Home() {
         <div className="wrap hero-grid">
           <div className="hero-intro">
             <span className="status-pill">
-              <span className="dot" /> Early access
+              <span className="dot" /> Pre-alpha {release.version}
             </span>
             <h1 id="hero-h">
               Let AI be your <em>editor</em>, not your writer.
@@ -51,7 +52,7 @@ export function Home() {
             </p>
             <div className="btn-row">
               <Link to="/download" className="btn btn--primary" data-magnetic>
-                Get early access
+                Try the pre-alpha
               </Link>
               <Link to="/how-it-works" className="link-arrow">
                 See how it works <Arrow />
@@ -387,7 +388,7 @@ export function Home() {
             <div className="status-col" style={{ "--status": "var(--gold)" } as CSSProperties}>
               <h3>Not yet</h3>
               <ul>
-                <li>A public download or signed installer</li>
+                <li>Signed installers, and a macOS build</li>
                 <li>Android and iOS apps tested on devices</li>
                 <li>Trained perception models (the reading is rule-based)</li>
                 <li>Collaboration</li>

@@ -14,7 +14,7 @@ export const legalIndex: Record<string, LegalMeta> = {
     title: "Privacy policy",
     metaTitle: "Privacy policy: your manuscript stays on your computer",
     description:
-      "How Verne handles personal data for Asten: your manuscript stays on your computer, this website sets no cookies, and email is used only to reply to you.",
+      "How Verne handles personal data for Asten: your manuscript stays on your computer, this website sets no cookies, the hosted pre-alpha deletes its sandboxes after 24 hours, and email is used only to reply to you.",
   },
   "/terms": {
     path: "/terms",
@@ -22,15 +22,15 @@ export const legalIndex: Record<string, LegalMeta> = {
     title: "Terms of use",
     metaTitle: "Terms of use for the Asten website and builds",
     description:
-      "The terms for this website and for Asten builds: you own your writing, a diagnostic is a notice rather than a verdict, and early access is provided as is.",
+      "The terms for this website and for Asten builds: you own your writing, a diagnostic is a notice rather than a verdict, and the pre-alpha is provided as is.",
   },
   "/cookies": {
     path: "/cookies",
     nav: "Cookies",
     title: "Cookie notice",
-    metaTitle: "Cookie notice: no cookies, one theme preference",
+    metaTitle: "Cookie notice: no cookies here, one session cookie in the hosted pre-alpha",
     description:
-      "The Asten website sets no cookies and runs no trackers. One optional localStorage key remembers your light or dark theme, and it never leaves your browser.",
+      "The Asten website sets no cookies and runs no trackers. One optional localStorage key remembers your theme. The hosted pre-alpha sets one strictly necessary session cookie for 24 hours.",
   },
   "/license": {
     path: "/license",

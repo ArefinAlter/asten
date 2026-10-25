@@ -177,7 +177,7 @@ export const article: Article = {
         {
           kind: "callout",
           tone: "note",
-          text: "There’s nothing to buy today and no public download. Asten is in early development, and access is by request. See [Download](/download).",
+          text: "There’s nothing to buy today. Asten is in early development; release 0.0.1a is a public pre-alpha you can try in the browser or download for Windows and Linux. See [Download](/download).",
         },
       ],
     },

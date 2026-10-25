@@ -3,7 +3,8 @@ import { IbisStandard, PapyrusPlant, Wedjat } from "../art/Figures";
 import { Glyph } from "../art/Glyphs";
 import { Arrow, External } from "../components/Icons";
 import { Answer, CtaBand, PageHero, Related, SectionHead } from "../components/Page";
-import { accessHref, site } from "../site";
+import { release } from "../content/release";
+import { site } from "../site";
 
 const pillars = [
   { title: "The pen stays yours", text: "Asten never generates prose. Anything AI touches in the future is a proposal you confirm." },
@@ -89,7 +90,7 @@ export function About() {
                 </tr>
                 <tr>
                   <th scope="row">Status</th>
-                  <td>Early access, by invitation</td>
+                  <td>Pre-alpha (release 0.0.1a, Windows and Linux)</td>
                 </tr>
                 <tr>
                   <th scope="row">Contact</th>
@@ -119,7 +120,7 @@ export function About() {
 }
 
 const channels = [
-  { glyph: "scroll" as const, title: "Early access", text: "Tell us what you write and which computer you use.", subject: "Asten early access" },
+  { glyph: "scroll" as const, title: "Pre-alpha feedback", text: "What worked, what broke, and which computer you use.", subject: "Asten pre-alpha" },
   { glyph: "mouth" as const, title: "Press", text: "Interviews, review builds, and brand assets beyond the press kit.", subject: "Asten press" },
   { glyph: "door" as const, title: "Partnerships", text: "Writing programs, schools, and publishers.", subject: "Asten partnership" },
   { glyph: "eye" as const, title: "Privacy", text: "Questions about your data, or a request under privacy law.", subject: "Asten privacy" },
@@ -198,15 +199,15 @@ export function Contact() {
           </div>
         </div>
       </section>
-      <section className="register register--sunk" aria-label="Early access">
+      <section className="register register--sunk" aria-label="Try the pre-alpha">
         <div className="wrap cta-band">
           <Wedjat />
           <div>
-            <h2>Early access</h2>
-            <p>Early access is by invitation. Email us to ask for one.</p>
+            <h2>Try the pre-alpha</h2>
+            <p>Open it in your browser, or download release 0.0.1a for Windows or Linux. No form to fill in.</p>
           </div>
-          <a className="btn btn--primary" href={accessHref} data-magnetic>
-            Ask for early access
+          <a className="btn btn--primary" href={release.hostedUrl} data-magnetic>
+            Try the pre-alpha
           </a>
         </div>
       </section>

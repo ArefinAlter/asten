@@ -33,7 +33,7 @@ export function AudiencePage({ audience }: { audience: Audience }) {
       <PageHero title={audience.h1} lede={audience.lede} art={<ArtFor art={audience.art} />}>
         <div className="btn-row">
           <Link to="/download" className="btn btn--primary" data-magnetic>
-            Get early access
+            Try the pre-alpha
           </Link>
           <Link to="/how-it-works" className="link-arrow">
             How it works <Arrow />

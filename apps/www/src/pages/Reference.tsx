@@ -146,7 +146,7 @@ export function Guide() {
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
-          <Answer text={`Asten is a local-first writing environment for long fiction and other long-form work, published by ${site.legalName} (Dhaka, Bangladesh). It combines a manuscript desk with a deterministic compiler that marks contradictions between the manuscript and facts the author has settled. It never generates prose, runs no AI model today, stores projects in a SQLite file on the author’s computer, and is available by invitation during early access.`} />
+          <Answer text={`Asten is a local-first writing environment for long fiction and other long-form work, published by ${site.legalName} (Dhaka, Bangladesh). It combines a manuscript desk with a deterministic compiler that marks contradictions between the manuscript and facts the author has settled. It never generates prose, runs no AI model today, stores projects in a SQLite file on the author’s computer, and is available as a public pre-alpha (release 0.0.1a) for Windows and Linux, with a hosted copy in the browser.`} />
         </div>
       </section>
       <div className="register">
