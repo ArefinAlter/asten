@@ -2,6 +2,7 @@
   "name": "asten",
   "version": "0.0.1-alpha",
   "private": true,
+  "license": "MIT",
   "packageManager": "pnpm@11.7.0",
   "scripts": {
     "dev": "pnpm --filter @asten/web dev",

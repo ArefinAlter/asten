@@ -35,10 +35,10 @@ export const legalIndex: Record<string, LegalMeta> = {
   "/license": {
     path: "/license",
     nav: "License",
-    title: "License to use Asten",
-    metaTitle: "License to use Asten builds",
+    title: "Asten’s license",
+    metaTitle: "Asten is released under the MIT License",
     description:
-      "Verne’s permission to run Asten builds for your own writing: personal, non-exclusive, and non-transferable. Your manuscripts are never licensed to Verne.",
+      "Asten is open source under the MIT License. Your manuscripts are never licensed to Verne, and the Asten and Verne names and logos are not part of the license.",
   },
   "/acceptable-use": {
     path: "/acceptable-use",

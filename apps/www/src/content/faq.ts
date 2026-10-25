@@ -171,7 +171,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Is Asten open source?",
-        a: "Asten isn’t open source: its source can be read on GitHub but carries no open-source license. Asten’s rules are deterministic, though, and the site describes what each one checks; see [the compiler](/features/compiler).",
+        a: "Yes. Asten is released under the MIT License, and the source is on [GitHub](https://github.com/ArefinAlter/asten). Asten’s rules are deterministic, and the site describes what each one checks; see [the compiler](/features/compiler).",
       },
       {
         q: "Does Asten work with Microsoft Word or Google Docs?",

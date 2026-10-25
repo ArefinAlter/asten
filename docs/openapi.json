@@ -4,7 +4,8 @@
     "title": "Asten API",
     "description": "The one transport of Asten, a local-first writing desk. The browser desk, the desktop shell's webview, the Word task pane and the Docs sidebar all speak this API, usually over loopback; nothing here reaches any other server.\n\nPair once with a six-digit code (`POST /api/v1/auth/pair`) and send the token as `Authorization: Bearer <token>`; a browser served by the API itself may rely on the `asten_session` cookie instead. The change stream takes a one-minute single-use ticket in the query string because an EventSource cannot set headers. Token kinds carry authority: `desk` and owner `session` tokens may manage pairing, tokens and the passphrase; `guest` tokens may read and write the story and revoke only themselves. `ASTEN_AUTH` selects the mode (`pairing`, `owner`, `off`); the `x-asten` extension below lists them.\n\nEvery error is JSON of the form `{ \"error\": { \"code\": \"404\", \"message\": \"…\" } }`. See `docs/API.md` for the curl walk-through and `docs/SECURITY.md` for the threat model.",
     "license": {
-      "name": ""
+      "name": "MIT",
+      "identifier": "MIT"
     },
     "version": "0.0.1-alpha",
     "x-asten": {

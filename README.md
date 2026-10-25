@@ -138,7 +138,10 @@ The TypeScript contracts are generated from the Rust types with `ts-rs`
 `packages/contracts/src/index.ts` are checked against them by `src/drift.ts`,
 so a field that changes on one side fails the type-check until both agree.
 
-## Licence note
+## Licence
+
+Asten is released under the MIT License; see [`LICENSE`](LICENSE). The
+names Asten and Verne and their logos are not covered by it.
 
 The engine design draws on the MIT-licensed `dynodoc-engine` reference. No
 code from the AGPL `dynodoc` application is used.

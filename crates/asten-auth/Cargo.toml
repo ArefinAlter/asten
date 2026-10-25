@@ -1,6 +1,7 @@
 [package]
 name = "asten-auth"
 version.workspace = true
+license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 description = "Local authentication for the Asten API: pairing codes, hashed bearer tokens, an optional owner passphrase, and a rate limiter."
