@@ -59,15 +59,14 @@ export default defineConfig(({ mode }) => ({
     strictPort: true,
     // `dev:hosted` talks to a local asten-prealpha gateway (4318), which
     // hosts the API per visitor; every other mode to the API itself.
-    proxy:
-      mode === "hosted"
-        ? {
-            "/api": "http://127.0.0.1:4318",
-            "/svc": "http://127.0.0.1:4318",
-          }
-        : {
-            "/api": "http://127.0.0.1:4317",
-            "/health": "http://127.0.0.1:4317",
-          },
+    proxy: (mode === "hosted"
+      ? {
+          "/api": "http://127.0.0.1:4318",
+          "/svc": "http://127.0.0.1:4318",
+        }
+      : {
+          "/api": "http://127.0.0.1:4317",
+          "/health": "http://127.0.0.1:4317",
+        }) as Record<string, string>,
   },
 }));
