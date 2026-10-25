@@ -551,3 +551,33 @@ registration number and address on the legal pages are unchanged and should be
 confirmed against Verne Ltd.'s records.
 
 **Status.** Accepted by the owner, 25 October 2026.
+
+## D29. The hosted pre-alpha hosts one real API per visitor
+
+*October 2026*
+
+**Context.** The workbench had a hosted copy on an in-page sample backend:
+every screen worked, but marks were prepared by hand, compile could not write
+DOCX, EPUB or FDX, and nothing outlived a reload. The owner asked for a hosted
+pre-alpha where every click is real, open to anyone without an account, while
+SECURITY.md's auth modes stay as they are (no `off` beyond loopback, tokens
+carry authority, no shared accounts).
+
+**Decision.** A separate host binary, `services/asten-prealpha`, outside the
+product crates, gives each anonymous visitor a sandbox: its own SQLite file
+behind its own `asten_api::router` in `pairing` mode. The host pairs itself
+the way the desktop shell does (revoke old desk tokens, issue a fresh one) and
+presents the token for the visitor, who holds only an opaque cookie. A small
+store at `/svc/v1` keeps what the API does not: preferences, assistant
+threads, console history, layout; never provider keys. Visitors expire 24
+hours after their first visit, with quotas on visitors, size and stored
+state. The offline sample backend stays as the `--mode site` build option for
+tests and offline use.
+
+**Consequences.** The hosted copy is the product: real engine, real compile,
+real history, isolated per visitor. The cost is a server to run, a cookie to
+explain in the privacy and cookie notices, and data that must be deleted on
+time. No new auth mode was needed; if a future host needs one, it gets its own
+decision.
+
+**Status.** Accepted for release 0.0.1a, following the owner's request of 25 October 2026.
