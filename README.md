@@ -9,8 +9,8 @@ comments, find, page view, and track changes. The engine reads the page, keeps a
 gradual canon of what is settled and what is only proposed, and weighs the two
 on the Scales: attribute clashes, life after death, two clocks, routes,
 knowledge, relations, author invariants. Every mark explains itself and offers
-repairs the author owns. Word and Docs remain guests. No account, no sync, no
-generative model.
+repairs the author owns. Word and Docs remain guests. No account, no sync. Asten never writes the
+prose; any AI feature follows the AI policy (D27).
 
 ## Platforms
 

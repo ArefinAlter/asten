@@ -146,7 +146,7 @@ export function Guide() {
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
-          <Answer text={`Asten is a local-first writing environment for long fiction and other long-form work, published by Verne (${site.legalName}, Dhaka, Bangladesh). It combines a manuscript desk with a deterministic compiler that marks contradictions between the manuscript and facts the author has settled. It never generates prose, runs no AI model today, stores projects in a SQLite file on the author’s computer, and is available by invitation during early access.`} />
+          <Answer text={`Asten is a local-first writing environment for long fiction and other long-form work, published by ${site.legalName} (Dhaka, Bangladesh). It combines a manuscript desk with a deterministic compiler that marks contradictions between the manuscript and facts the author has settled. It never generates prose, runs no AI model today, stores projects in a SQLite file on the author’s computer, and is available by invitation during early access.`} />
         </div>
       </section>
       <div className="register">
@@ -250,7 +250,7 @@ export function Guide() {
             <h2 id="g-pub">Who makes it</h2>
             <div className="prose">
               <p>
-                Asten is designed and built by Verne, the trading name of {site.legalName}, registered in Dhaka, Bangladesh.
+                Asten is designed and built by {site.legalName}, registered in Dhaka, Bangladesh.
                 Contact: <a href={`mailto:${site.email}`}>{site.email}</a>. Company details:{" "}
                 <a href={site.companyDetails} target="_blank" rel="noopener noreferrer">
                   vernesystems.com/legal/company

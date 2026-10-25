@@ -110,7 +110,7 @@ export const legalIndex: Record<string, LegalMeta> = {
     title: "Legal notice",
     metaTitle: "Legal notice (imprint) for Asten",
     description:
-      "Who publishes Asten and this website: Verne Systems, trading as Verne, registered in Dhaka, Bangladesh, with its registered address, registration, and contact.",
+      "Who publishes Asten and this website: Verne Ltd., registered in Dhaka, Bangladesh, with its registered address, registration, and contact.",
   },
 };
 

@@ -30,7 +30,8 @@ and no manuscript is used to train one.
 itself. The cost is coverage: a pronoun with no name in the sentence is not
 weighed, and languages beyond the lexicon's cues get Tier C checks only.
 
-**Status.** Accepted. Reaffirmed each time an "AI feature" is proposed.
+**Status.** Accepted; the clause "no generative model runs anywhere in the
+product" is withdrawn by D27. The rest stands.
 
 ## D2. The block model is Dynodoc's, carried into Rust
 
@@ -510,3 +511,43 @@ keyboard end to end. Screen-reader runs are still to be done by a person.
 
 **Status.** Accepted.
 
+## D27. Generative models follow the AI policy; "no generative model, ever" is withdrawn
+
+*October 2026*
+
+**Context.** D1 ruled out any generative model, local or hosted. The engine
+design already makes one exception (the optional bootstrap importer, ENGINE_DESIGN
+§8.5), and the public AI policy allows a cloud provider with the writer's own
+key and consent. The two documents disagreed.
+
+**Decision.** The owner withdraws D1's clause "no generative model runs
+anywhere in the product, local or hosted". Generative models may be offered
+under the AI policy: local models first, a cloud provider only with the
+writer's own key and explicit consent, a plain statement of what is sent, and a
+complete switch-off. What stays fixed: the logic that judges contradictions is
+rule-based (D1), Asten does not write, continue or rewrite the author's prose
+(ROADMAP, Never), and no manuscript is used to train a model.
+
+**Consequences.** The importer and an optional assistant in the desk are
+allowed without a new exception each time. Every such feature is off by
+default, and the site calls it planned until it ships.
+
+**Status.** Accepted by the owner, 25 October 2026.
+
+## D28. The publisher is Verne Ltd.
+
+*October 2026*
+
+**Context.** The site named the publisher "Verne Systems, trading as Verne"
+while the footer credit and the brand said "Verne Ltd.", and the roadmap held
+the question for the owner.
+
+**Decision.** The publisher's name is Verne Ltd. everywhere: legal pages, the
+site's structured data, the footer and the documents. "Verne" stays fine in
+running copy.
+
+**Consequences.** One name across Asten, Ogun, Zeus and Dynodoc material. The
+registration number and address on the legal pages are unchanged and should be
+confirmed against Verne Ltd.'s records.
+
+**Status.** Accepted by the owner, 25 October 2026.

@@ -32,7 +32,7 @@ export function LegalIndex() {
             ))}
           </div>
           <p className="fine" style={{ marginTop: 26 }}>
-            Updated {formatDate(legalUpdated)}. Publisher: {site.legalName}, trading as Verne, {site.address}.
+            Updated {formatDate(legalUpdated)}. Publisher: {site.legalName}, {site.address}.
           </p>
         </div>
       </section>
@@ -55,7 +55,7 @@ export function LegalPage({ path }: { path: string }) {
                 <span>
                   Updated <time dateTime={legalUpdated}>{formatDate(legalUpdated)}</time>
                 </span>
-                <span>{site.legalName}, trading as Verne</span>
+                <span>{site.legalName}</span>
               </p>
             </div>
             {art ? <div className="page-hero-art legal-art">{art}</div> : null}

@@ -23,7 +23,7 @@ export function About() {
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
-          <Answer text={`Asten is designed and built by Verne, the trading name of ${site.legalName}, a company registered in Dhaka, Bangladesh, that builds AI systems under human review. Asten applies the same principle to writing: software can remember, compare, and point at evidence, but the author writes and decides.`} />
+          <Answer text={`Asten is designed and built by ${site.legalName}, a company registered in Dhaka, Bangladesh, that builds AI systems under human review. Asten applies the same principle to writing: software can remember, compare, and point at evidence, but the author writes and decides.`} />
         </div>
       </section>
       <section className="register" aria-labelledby="why-built">
@@ -81,7 +81,7 @@ export function About() {
                 </tr>
                 <tr>
                   <th scope="row">Publisher</th>
-                  <td>Verne ({site.legalName}, trading as Verne)</td>
+                  <td>{site.legalName}</td>
                 </tr>
                 <tr>
                   <th scope="row">Based in</th>
@@ -173,7 +173,7 @@ export function Contact() {
           </div>
           <div className="prose">
             <p>
-              {site.legalName}, trading as Verne
+              {site.legalName}
               <br />
               {site.address}
             </p>

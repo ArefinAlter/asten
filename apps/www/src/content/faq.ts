@@ -15,7 +15,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Who makes Asten?",
-        a: "Asten is made by Verne (Verne Systems, trading as Verne), a company registered in Dhaka, Bangladesh. You can reach the team at info@vernesystems.com, and there’s more [about Verne](/about) on this site.",
+        a: "Asten is made by Verne Ltd., a company registered in Dhaka, Bangladesh. You can reach the team at info@vernesystems.com, and there’s more [about Verne](/about) on this site.",
       },
       {
         q: "Why is the app called Asten?",
@@ -193,7 +193,7 @@ export const faq: FaqGroup[] = [
     items: [
       {
         q: "Who is Verne?",
-        a: "Verne is the company that makes Asten: Verne Systems, trading as Verne, registered in Dhaka, Bangladesh. Verne’s website is [vernesystems.com](https://vernesystems.com).",
+        a: "Verne is the company that makes Asten: Verne Ltd., registered in Dhaka, Bangladesh. Verne’s website is [vernesystems.com](https://vernesystems.com).",
       },
       {
         q: "How do I contact the Asten team?",
@@ -209,7 +209,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Where can I find Verne’s company details?",
-        a: "Verne Systems, trading as Verne, is registered in Dhaka, Bangladesh (company registration C-201411-1), at 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209. The full details are on Verne’s [company page](https://vernesystems.com/legal/company) and this site’s [legal page](/legal).",
+        a: "Verne Ltd., is registered in Dhaka, Bangladesh (company registration C-201411-1), at 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209. The full details are on Verne’s [company page](https://vernesystems.com/legal/company) and this site’s [legal page](/legal).",
       },
     ],
   },

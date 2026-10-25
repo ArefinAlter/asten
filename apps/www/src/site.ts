@@ -2,7 +2,7 @@ export const site = {
   origin: "https://asten-writing.vercel.app",
   name: "Asten",
   publisher: "Verne",
-  legalName: "Verne Systems",
+  legalName: "Verne Ltd.",
   creditName: "Verne Ltd.",
   publisherUrl: "https://vernesystems.com",
   companyDetails: "https://vernesystems.com/legal/company",

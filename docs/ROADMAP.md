@@ -78,8 +78,6 @@ No dates. Items move down the page as they ship.
 
 ## Decisions pending the owner
 
-- Legal identity: "Verne Ltd." in the footer versus the entity on
-  vernesystems.com/legal/company. Counsel review before launch.
 - A real domain in place of `asten-writing.vercel.app` (`apps/www/src/site.ts`).
 - Rotate the Vercel token an earlier session printed, if not already done.
 
