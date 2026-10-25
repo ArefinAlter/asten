@@ -93,11 +93,12 @@ if (platform === "windows-x64") {
   const setup = only(nsis, (f) => f.endsWith("-setup.exe"));
   copy(setup, `Asten_${version}_x64-setup.exe`);
   if (existsSync(`${setup}.sig`)) copy(`${setup}.sig`, `Asten_${version}_x64-setup.exe.sig`);
-  const tar = "C:\Windows\System32\tar.exe";
+  // bsdtar, which writes zip archives with -a; Git's GNU tar does not.
+  const tar = "C:/Windows/System32/tar.exe";
   const portable = stage([[join(release, "asten-desktop.exe"), "Asten.exe"]]);
   writeFileSync(
     join(portable, "README.txt"),
-    `Asten ${version}, portable. Run Asten.exe. It needs the Microsoft Edge WebView2 runtime (part of Windows 10 and 11). Data lives in %APPDATA%\com.asten.app. This build is unsigned: SmartScreen warns before the first run.\n`,
+    `Asten ${version}, portable. Run Asten.exe. It needs the Microsoft Edge WebView2 runtime (part of Windows 10 and 11). Data lives in %APPDATA%\\com.asten.app. This build is unsigned: SmartScreen warns before the first run.\n`,
   );
   const portableZip = join(out, `Asten_${version}_windows_x64_portable.zip`);
   execFileSync(tar, ["-a", "-c", "-f", portableZip, "-C", portable, "Asten.exe", "README.txt"]);

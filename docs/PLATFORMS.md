@@ -133,7 +133,15 @@ export TAURI_SIGNING_PRIVATE_KEY="$(cat B:/margin-keys/asten-updater.key)" TAURI
 cargo build --locked --release -p asten-api
 node scripts/release-assets.mjs --platform windows-x64 --out release-assets
 
-# Linux x64, in Docker (Ubuntu 22.04; also builds the hosted gateway)
+# Linux x64 (what 0.0.1a used): a clean `git archive` of the commit in src/,
+# built in an ubuntu:22.04 container capped at 4 CPUs. No signing key goes in;
+# the AppImage is signed for the updater on the release machine afterwards.
+docker run --rm --cpus 4 --memory 8g -v "$PWD/src":/src -v "$PWD/out":/out \
+  -v "$PWD/linux-build.sh":/build.sh:ro -v asten-build-cache:/cache \
+  ubuntu:22.04 nice -n 10 bash /build.sh
+apps/desktop/node_modules/.bin/tauri signer sign \
+  -f B:/margin-keys/asten-updater.key -p "" out/release/Asten_0.0.1-alpha_amd64.AppImage
+# or the same in one BuildKit build, with the key as a build secret:
 docker build -f deploy/release/linux.Dockerfile \
   --secret id=tauri_key,src=B:/margin-keys/asten-updater.key \
   --output type=local,dest=deploy/release/out/linux .
