@@ -118,9 +118,8 @@ export function ArticlePage({ slug }: { slug: string }) {
       {article.faqs.length > 0 ? (
         <section className="register register--sunk" aria-labelledby="art-faq-h">
           <div className="wrap wrap-narrow">
-            <p className="eyebrow">Questions</p>
             <h2 id="art-faq-h" style={{ marginBottom: 28 }}>
-              Asked about this
+              Questions about this article
             </h2>
             <FaqList items={article.faqs} />
           </div>

@@ -12,7 +12,6 @@ export function Name() {
   return (
     <>
       <PageHero
-        eyebrow="The name"
         title="Asten is another name for Thoth."
         lede="Thoth was the Egyptian god of writing: inventor of hieroglyphs, keeper of the gods’ records, reckoner of time by the moon, and the scribe who wrote down the verdict at the weighing of the heart. He recorded. He didn’t decide."
         art={<Thoth />}
@@ -119,10 +118,10 @@ export function Name() {
       <section className="register register--sunk" aria-labelledby="n5">
         <div className="wrap split">
           <div className="prose">
-            <h2 id="n5">Put a name in a cartouche</h2>
+            <h2 id="n5">Names in cartouches</h2>
             <p>
               A cartouche is the oval ring Egyptians drew around royal names. The word is French for a cartridge; the story goes that
-              Napoleon’s soldiers thought the shape resembled one. Asten draws your characters’ names in cartouches. Try one.
+              Napoleon’s soldiers thought the shape resembled one. Asten draws your characters’ names in cartouches.
             </p>
           </div>
           <CartoucheName />

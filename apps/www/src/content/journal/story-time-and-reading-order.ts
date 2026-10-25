@@ -10,7 +10,7 @@ export const article: Article = {
     "Flashbacks, frames, and parallel timelines are deliberate gaps between the two clocks, not errors.",
     "Track both clocks side by side in one scene list, using one unit of time.",
     "A real contradiction is two statements about time that can’t both be true.",
-    "Asten’s CANON-E201 compares the two clocks, and it stays silent until both exist.",
+    "Asten’s CANON-E201 compares story time only inside a run of scenes you declared continuous, so a flashback raises no mark.",
   ],
   sections: [
     {
@@ -101,7 +101,7 @@ export const article: Article = {
     },
     {
       id: "tracking-two-clocks",
-      heading: "How do you track two clocks without losing your mind?",
+      heading: "How do you track both clocks?",
       blocks: [
         {
           kind: "p",
@@ -178,16 +178,16 @@ export const article: Article = {
       blocks: [
         {
           kind: "p",
-          text: "Asten’s [Time](/features/time) view keeps both clocks as separate things: story time, for when something happens, and reading order, for when the reader meets it. You don’t have to choose one view of your book. You state each, and the compiler compares them.",
+          text: "Asten’s [Time](/features/time) view keeps both clocks as separate things: story time, for when something happens, and reading order, for when the reader meets it. You don’t have to choose one view of your book. You state each, and the compiler compares them where you have said they should agree.",
         },
         {
           kind: "p",
-          text: "The rule that does the comparing is **CANON-E201**, part of the Clocks [method pack](/glossary#method-pack), which is on by default. It stays silent until both clocks exist. If you never state a story time, you never hear from it. When the clocks you’ve stated disagree, it marks the spot:",
+          text: "The rule that does the comparing is **CANON-E201**, part of the Clocks [method pack](/glossary#method-pack), which is on by default. It looks only inside a run of scenes you have declared continuous, so an ordinary flashback outside such a run raises nothing, and a scene marked as a memory or flashback is never weighed against the world. If you never state a story time, you never hear from it. When story time steps backward inside a run, it marks the spot:",
         },
         {
           kind: "diagnostic",
           code: "CANON-E201",
-          title: "Reading order and story time disagree.",
+          title: "Inside the run “The funeral”, story time steps backward.",
           lines: [
             "Chapter 10 · Oren’s funeral · story time: day 15",
             "Chapter 11 · The morning after · story time: day 14",
@@ -196,12 +196,12 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "As with every Asten [diagnostic](/glossary#diagnostic), the mark points and never rewrites. Maybe the scenes are in the wrong order. Maybe a date is off by one. Or maybe the jump is deliberate, and that’s fine too: flashbacks are allowed. You account for a deliberate jump by [suppressing](/glossary#suppression) the mark for that scene, with a reason, and the suppression is saved with the project so the same question doesn’t come back on every pass.",
+          text: "As with every Asten [diagnostic](/glossary#diagnostic), the mark points and never rewrites. Maybe the scenes are in the wrong order. Maybe a date is off by one. Or maybe the jump is deliberate: then you mark the scene a flashback, or take it out of the run, and the mark goes away. Two sibling rules cover the rest: **CANON-E202** marks dates that cannot all be true together, and **CANON-E203** marks an effect seen before its cause.",
         },
         {
           kind: "callout",
           tone: "note",
-          text: "Asten doesn’t read time out of your prose today; you state each scene’s story time yourself. Fact proposals drawn from your pages and custom calendars are both [planned](/roadmap). No AI model runs in Asten today.",
+          text: "Asten doesn’t read time phrases out of your prose; you state each scene’s story time yourself, as a day count, a date, a fictional calendar you define, or a placement such as “three days after the siege”. Reading time phrases is [planned](/roadmap) for the local perception models. No AI model runs in Asten today.",
         },
       ],
     },
@@ -223,7 +223,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "None of this flattens a structure. If anything, it frees you to be more ambitious with one, because you know the scaffolding will hold. Write the braided timeline. Open in the fire. Just keep both clocks where you can see them.",
+          text: "None of this limits the structure you choose. It only keeps both clocks where you can see them.",
         },
       ],
     },
@@ -243,7 +243,7 @@ export const article: Article = {
     },
     {
       q: "When does Asten’s CANON-E201 rule mark a scene?",
-      a: "CANON-E201 marks a scene when the reading order and story time you have stated contradict each other. It stays silent until both clocks exist, and any mark can be suppressed with a reason.",
+      a: "CANON-E201 marks a scene when story time steps backward inside a run of scenes you declared continuous. Scenes outside a run, and scenes marked as a memory or flashback, are not marked, and any mark can be suppressed with a reason.",
     },
   ],
   related: [

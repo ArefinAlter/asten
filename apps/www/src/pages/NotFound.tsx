@@ -8,10 +8,9 @@ export function NotFound() {
       <div className="wrap split">
         <IbisStandard />
         <div>
-          <p className="eyebrow">404</p>
-          <h1 id="nf-h">Lost to the sand.</h1>
+          <h1 id="nf-h">Page not found</h1>
           <p className="lede" style={{ margin: "18px 0 28px" }}>
-            This page isn’t in the record. It may have moved, or it may never have been written. The scribe has no note of it.
+            There is no page at this address. It may have moved.
           </p>
           <div className="btn-row">
             <Link to="/" className="btn btn--primary">

@@ -20,7 +20,7 @@ export const journalMeta: Record<string, ArticleMeta> = {
     title: "Let AI be your editor, not your writer",
     metaTitle: "Let AI be your editor, not your writer",
     description:
-      "Handing AI the pen flattens your voice. What a good editor actually does, why that job suits software, and how Asten keeps every word of your draft yours.",
+      "Why drafting with AI changes the voice of a book, what a good editor does, why that job suits software better, and how Asten leaves every word of your draft to you.",
     dek: "The tedious half of writing is remembering what you already decided; the half that makes a book yours is everything else.",
     published: "2026-10-06",
     updated: "2026-10-06",

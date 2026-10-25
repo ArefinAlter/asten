@@ -17,21 +17,19 @@ export function About() {
   return (
     <>
       <PageHero
-        eyebrow="About"
-        title="Made by Verne, for writers who keep the pen."
-        lede="Asten is built by Verne, an AI engineering company in Dhaka that works with models every day, and knows exactly where they help and where they shouldn’t be trusted with the pen."
+        title="About Asten and Verne"
+        lede="Asten is designed and built by Verne, an AI engineering company in Dhaka, Bangladesh."
         art={<PapyrusPlant />}
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
-          <Answer text={`Asten is designed and built by Verne, the trading name of ${site.legalName}, a company registered in Dhaka, Bangladesh, that builds AI systems under human review. Asten applies the same principle to writing: software can remember, compare, and point at evidence, but the author writes and decides.`} />
+          <Answer text={`Asten is designed and built by ${site.legalName}, a company registered in Dhaka, Bangladesh, that builds AI systems under human review. Asten applies the same principle to writing: software can remember, compare, and point at evidence, but the author writes and decides.`} />
         </div>
       </section>
       <section className="register" aria-labelledby="why-built">
         <div className="wrap split">
           <div>
-            <p className="eyebrow">Why Asten exists</p>
-            <h2 id="why-built">The tedious half, and the half that matters.</h2>
+            <h2 id="why-built">Why Asten exists</h2>
           </div>
           <div className="prose">
             <p>
@@ -45,15 +43,15 @@ export function About() {
               a sentence.
             </p>
             <p>
-              Verne builds production AI systems for organizations that need them to be auditable: evaluated, reviewed by people,
-              and honest about uncertainty. Asten brings that discipline to a smaller, more personal job.
+              Verne also builds AI systems for other organizations, with evaluation and human review. Asten applies the same
+              principle to writing software.
             </p>
           </div>
         </div>
       </section>
       <section className="register register--sunk" aria-labelledby="pillars-h">
         <div className="wrap">
-          <SectionHead id="pillars-h" eyebrow="Principles" title="Five things we hold to." />
+          <SectionHead id="pillars-h" title="Principles" />
           <ol className="rules">
             {pillars.map((pillar, i) => (
               <li key={pillar.title} data-reveal>
@@ -72,8 +70,7 @@ export function About() {
       <section className="register" aria-labelledby="facts-h">
         <div className="wrap split">
           <div>
-            <p className="eyebrow">The facts</p>
-            <h2 id="facts-h">Who we are, on the record.</h2>
+            <h2 id="facts-h">Company details</h2>
           </div>
           <div className="table-wrap">
             <table>
@@ -84,7 +81,7 @@ export function About() {
                 </tr>
                 <tr>
                   <th scope="row">Publisher</th>
-                  <td>Verne ({site.legalName}, trading as Verne)</td>
+                  <td>{site.legalName}</td>
                 </tr>
                 <tr>
                   <th scope="row">Based in</th>
@@ -134,9 +131,8 @@ export function Contact() {
   return (
     <>
       <PageHero
-        eyebrow="Contact"
-        title="Write to the scribes."
-        lede="One address reaches the people who build Asten. A person reads every message. Pick a subject below so it lands with the right person."
+        title="Contact"
+        lede="One address reaches the people who build Asten. Choosing a subject below helps route your message."
         art={<IbisStandard />}
       >
         <p>
@@ -147,7 +143,7 @@ export function Contact() {
       </PageHero>
       <section className="register register--sunk" aria-labelledby="ch-h">
         <div className="wrap">
-          <SectionHead id="ch-h" eyebrow="By subject" title="What’s it about?" />
+          <SectionHead id="ch-h" title="Subjects" />
           <div className="card-grid card-grid--3">
             {channels.map((channel) => (
               <a key={channel.title} className="card card--carved" href={`mailto:${site.email}?subject=${encodeURIComponent(channel.subject)}`}>
@@ -173,12 +169,11 @@ export function Contact() {
       <section className="register" aria-labelledby="post-h">
         <div className="wrap split">
           <div>
-            <p className="eyebrow">By post</p>
-            <h2 id="post-h">Verne Systems</h2>
+            <h2 id="post-h">Postal address</h2>
           </div>
           <div className="prose">
             <p>
-              {site.legalName}, trading as Verne
+              {site.legalName}
               <br />
               {site.address}
             </p>
@@ -207,8 +202,8 @@ export function Contact() {
         <div className="wrap cta-band">
           <Wedjat />
           <div>
-            <h2>Want to try Asten?</h2>
-            <p>Early access is by invitation. One email is all it takes.</p>
+            <h2>Early access</h2>
+            <p>Early access is by invitation. Email us to ask for one.</p>
           </div>
           <a className="btn btn--primary" href={accessHref} data-magnetic>
             Ask for early access

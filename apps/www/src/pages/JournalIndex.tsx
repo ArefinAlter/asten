@@ -12,8 +12,7 @@ export function JournalIndex() {
   return (
     <>
       <PageHero
-        eyebrow="The Journal"
-        title="Craft notes from the scribe’s desk."
+        title="Journal"
         lede="Essays and practical guides on keeping long stories consistent, handling time, building worlds without drowning in them, and using AI as an editor rather than a ghostwriter."
         art={<IbisStandard />}
       >

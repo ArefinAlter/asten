@@ -69,13 +69,11 @@ export function Breadcrumbs() {
 }
 
 export function PageHero({
-  eyebrow,
   title,
   lede,
   art,
   children,
 }: {
-  eyebrow: string;
   title: ReactNode;
   lede?: ReactNode;
   art?: ReactNode;
@@ -87,7 +85,6 @@ export function PageHero({
         <Breadcrumbs />
         <div className={art ? "page-hero-grid" : undefined}>
           <div>
-            <p className="eyebrow">{eyebrow}</p>
             <h1>{title}</h1>
             {lede ? <p className="lede">{lede}</p> : null}
             {children}
@@ -118,7 +115,6 @@ export function Related({ paths, title = "Keep reading" }: { paths: string[]; ti
     <section className="register" aria-labelledby="related-h">
       <div className="wrap">
         <div className="section-head">
-          <p className="eyebrow">Related</p>
           <h2 id="related-h">{title}</h2>
         </div>
         <div className="related">
@@ -138,8 +134,8 @@ export function Related({ paths, title = "Keep reading" }: { paths: string[]; ti
 }
 
 export function CtaBand({
-  title = "Keep the pen. Let Asten keep the record.",
-  text = "Asten is in early access. Ask for an invitation and tell us what you’re writing.",
+  title = "Asten is in early access",
+  text = "Ask for an invitation and tell us what you’re writing.",
 }: {
   title?: string;
   text?: string;
@@ -166,13 +162,11 @@ export function CtaBand({
 }
 
 export function SectionHead({
-  eyebrow,
   title,
   text,
   id,
   center = false,
 }: {
-  eyebrow: string;
   title: ReactNode;
   text?: ReactNode;
   id?: string;
@@ -180,7 +174,6 @@ export function SectionHead({
 }) {
   return (
     <div className={`section-head${center ? " center" : ""}`} data-reveal>
-      <p className="eyebrow">{eyebrow}</p>
       <h2 id={id}>{title}</h2>
       {text ? <p>{text}</p> : null}
     </div>

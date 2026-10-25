@@ -1,7 +1,7 @@
 import { legalIndex } from "./legal-index";
 import type { LegalDoc } from "./types";
 
-export const legalUpdated = "2026-10-06";
+export const legalUpdated = "2026-10-25";
 
 export const legalDocs: LegalDoc[] = [
   // ---------------------------------------------------------------------------
@@ -22,7 +22,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "This policy explains how personal information is handled when you use Asten, visit this website, or write to Verne. Asten and this website are published by Verne Systems, trading as Verne (“Verne”), registered in Bangladesh under company registration C-201411-1, at 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209, Bangladesh.",
+            text: "This policy explains how personal information is handled when you use Asten, visit this website, or write to Verne. Asten and this website are published by Verne Ltd. (“Verne”), registered in Bangladesh under company registration C-201411-1, at 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209, Bangladesh.",
           },
           {
             kind: "p",
@@ -259,7 +259,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Questions, requests, and complaints about privacy: [info@vernesystems.com](mailto:info@vernesystems.com). By post: Verne Systems, trading as Verne, 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209, Bangladesh. The [legal notice](/notice) has full company details.",
+            text: "Questions, requests, and complaints about privacy: [info@vernesystems.com](mailto:info@vernesystems.com). By post: Verne Ltd., 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209, Bangladesh. The [legal notice](/notice) has full company details.",
           },
         ],
       },
@@ -284,7 +284,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "These terms apply to this website and to any Asten build that Verne Systems, trading as Verne (“Verne”), gives you. By using the site or running a build, you agree to them. If you do not agree, please do not use the site or the builds.",
+            text: "These terms apply to this website and to any Asten build that Verne Ltd. (“Verne”), gives you. By using the site or running a build, you agree to them. If you do not agree, please do not use the site or the builds.",
           },
           {
             kind: "p",
@@ -609,7 +609,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Verne Systems, trading as Verne (“Verne”), grants you a personal, non-exclusive, non-transferable, revocable permission to install and run the Asten builds Verne gives you, for your own writing and research, on computers you own or control.",
+            text: "Verne Ltd. (“Verne”), grants you a personal, non-exclusive, non-transferable, revocable permission to install and run the Asten builds Verne gives you, for your own writing and research, on computers you own or control.",
           },
           {
             kind: "p",
@@ -1026,7 +1026,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "The text, design, illustrations, and logos on this website, and the Asten software, belong to Verne Systems, trading as Verne, except where the [credits](/credits) say otherwise. All rights are reserved.",
+            text: "The text, design, illustrations, and logos on this website, and the Asten software, belong to Verne Ltd., except where the [credits](/credits) say otherwise. All rights are reserved.",
           },
           {
             kind: "p",
@@ -1122,7 +1122,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "These are trademarks of Verne Systems, trading as Verne:",
+            text: "These are trademarks of Verne Ltd.:",
           },
           {
             kind: "list",
@@ -1554,7 +1554,7 @@ export const legalDocs: LegalDoc[] = [
   {
     ...legalIndex["/notice"]!,
     summary: [
-      "Asten and this website are published by Verne Systems, trading as Verne, registered in Dhaka, Bangladesh.",
+      "Asten and this website are published by Verne Ltd., registered in Dhaka, Bangladesh.",
       "The quickest way to reach Verne is info@vernesystems.com.",
     ],
     sections: [
@@ -1566,7 +1566,7 @@ export const legalDocs: LegalDoc[] = [
             kind: "list",
             items: [
               "**Product:** Asten, a local-first writing environment",
-              "**Publisher:** Verne Systems, trading as Verne",
+              "**Publisher:** Verne Ltd.",
               "**Registered address:** 8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209, Bangladesh",
               "**Company registration:** C-201411-1",
               "**Email:** [info@vernesystems.com](mailto:info@vernesystems.com)",
@@ -1583,17 +1583,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Verne Systems, trading as Verne, at the address above, is responsible for the content of this website. If you spot something inaccurate or out of date on any page, write to [info@vernesystems.com](mailto:info@vernesystems.com) and Verne will look into it.",
-          },
-        ],
-      },
-      {
-        id: "footer-credit",
-        heading: "About “Verne Ltd.”",
-        blocks: [
-          {
-            kind: "p",
-            text: "The footer credit “Designed and built by Verne Ltd.” refers to Verne, the publisher named above, whose legal name is Verne Systems, trading as Verne.",
+            text: "Verne Ltd., at the address above, is responsible for the content of this website. If you spot something inaccurate or out of date on any page, write to [info@vernesystems.com](mailto:info@vernesystems.com) and Verne will look into it.",
           },
         ],
       },

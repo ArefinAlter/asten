@@ -29,7 +29,7 @@ const details: Section[] = [
         { term: "Veld · east of · the reef", text: "Settled from the atlas." },
         { term: "The guild · founded · year 300", text: "Contested: three characters disagree, and that’s the point." },
       ] },
-      { kind: "p", text: "You can settle facts from the cast, from a world entry you mark *settled*, from a wiki page’s attributes, or with an inline note like `[[mira.hair_color=auburn]]`. Today Asten never pulls facts out of your prose on its own." },
+      { kind: "p", text: "You can settle facts from the cast, from a world entry you mark *settled*, from a wiki page’s attributes, or with an inline note like `[[mira.hair_color=auburn]]`. Asten also reads names and plain attributes from the page with fixed rules; what it reads arrives as a proposal and becomes canon only if you confirm it." },
     ],
   },
   {
@@ -56,7 +56,7 @@ const details: Section[] = [
 ];
 
 const faqs: QA[] = [
-  { q: "How does Asten find contradictions?", a: "Asten compares the facts you have settled with each other, with your timeline, and, for hair and eye colors, with the words near a character’s name in your prose. It uses deterministic rules with stable codes, not an AI model." },
+  { q: "How does Asten find contradictions?", a: "Asten compares the facts you have settled with each other, with your timeline, and with plain attributes it reads from your prose, such as hair color, age, or whether someone is alive, when a character’s name is in the same sentence. It uses deterministic rules with stable codes, not an AI model." },
   { q: "Does Asten change my text when it finds a problem?", a: "No. Asten only adds a red mark in the margin. Your text changes only if you edit it yourself." },
   { q: "What if I don’t want to settle any facts?", a: "Then Asten is simply a calm manuscript desk with a binder, comments, page view, and compile. The continuity checks only speak once there is canon to compare against." },
 ];
@@ -65,9 +65,8 @@ export function HowItWorks() {
   return (
     <>
       <PageHero
-        eyebrow="How it works"
-        title="Write. Settle. Notice. You decide."
-        lede="Asten builds a record of your story as you go, weighs each page against it, and marks what doesn’t balance. The verdict, like the pen, stays with you."
+        title="How Asten works"
+        lede="Asten keeps a record of the facts you settle, compares each page against it, and marks what disagrees. You decide what to do with each mark."
         art={<Scales tilt={-7} />}
       >
         <div className="btn-row">
@@ -75,7 +74,7 @@ export function HowItWorks() {
             Get early access
           </Link>
           <a href="#try" className="link-arrow">
-            Try the demo <Arrow />
+            See an example <Arrow />
           </a>
         </div>
       </PageHero>
@@ -116,7 +115,7 @@ export function HowItWorks() {
 
       <section className="register register--sunk" aria-labelledby="codes-h">
         <div className="wrap">
-          <SectionHead id="codes-h" eyebrow="What a mark looks like" title="Three rules ship today." text="Each mark has a stable code that means the same thing every time." />
+          <SectionHead id="codes-h" title="Three of the seventeen rules" text="Asten ships seventeen canon rules in seven families, each with a stable code that means the same thing every time. Three examples:" />
           <div className="card-grid card-grid--3">
             <div data-reveal>
               <Diagnostic code="CANON-E013" title="Mira’s hair was settled as auburn." lines={["Chapter 2: Mira · hair_color · auburn", "Chapter 19: “…her black hair…”", "Keep · Update canon · Add change"]} />
@@ -141,7 +140,7 @@ export function HowItWorks() {
 
       <section className="register register--raised" id="try" aria-labelledby="try-h">
         <div className="wrap">
-          <SectionHead id="try-h" eyebrow="Try it" title="Weigh a sentence yourself." />
+          <SectionHead id="try-h" title="Example: an attribute check" />
           <div className="demo-frame" data-reveal data-llms="skip">
             <WeighDemo />
           </div>
@@ -150,7 +149,7 @@ export function HowItWorks() {
 
       <section className="register register--sunk" aria-labelledby="hfaq-h">
         <div className="wrap wrap-narrow">
-          <SectionHead id="hfaq-h" eyebrow="Questions" title="About the process" />
+          <SectionHead id="hfaq-h" title="About the process" />
           <FaqList items={faqs} />
         </div>
       </section>

@@ -14,9 +14,8 @@ export function LegalIndex() {
   return (
     <>
       <PageHero
-        eyebrow="Legal"
-        title="Policies written to be read."
-        lede="Every Asten policy in one place. Each starts with a plain-language summary. If something you need is missing, write to us and we will publish it."
+        title="Legal"
+        lede="Every Asten policy in one place. Each starts with a plain-language summary. If something you need is missing, write to us."
         art={<Scales tilt={0} />}
       />
       <section className="register register--sunk" aria-label="Policies">
@@ -33,7 +32,7 @@ export function LegalIndex() {
             ))}
           </div>
           <p className="fine" style={{ marginTop: 26 }}>
-            Updated {formatDate(legalUpdated)}. Publisher: {site.legalName}, trading as Verne, {site.address}.
+            Updated {formatDate(legalUpdated)}. Publisher: {site.legalName}, {site.address}.
           </p>
         </div>
       </section>
@@ -51,13 +50,12 @@ export function LegalPage({ path }: { path: string }) {
           <Breadcrumbs />
           <div className={art ? "page-hero-grid" : undefined}>
             <div>
-              <p className="eyebrow">Legal · Asten by Verne</p>
               <h1>{doc.title}</h1>
               <p className="byline">
                 <span>
                   Updated <time dateTime={legalUpdated}>{formatDate(legalUpdated)}</time>
                 </span>
-                <span>{site.legalName}, trading as Verne</span>
+                <span>{site.legalName}</span>
               </p>
             </div>
             {art ? <div className="page-hero-art legal-art">{art}</div> : null}

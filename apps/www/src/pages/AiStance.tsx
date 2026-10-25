@@ -7,13 +7,13 @@ import { Answer, CtaBand, PageHero, Related, SectionHead } from "../components/P
 import type { QA } from "../content/types";
 
 const rules = [
-  { title: "Editor, never writer", text: "No feature will generate, continue, rewrite, or autocomplete your prose. Not as an option, not as an experiment." },
+  { title: "Editor, never writer", text: "No feature will generate, continue, rewrite, or autocomplete your prose. This applies to every feature, including experimental ones." },
   { title: "Proposals only", text: "AI may propose a fact, a link, or an explanation. Nothing it suggests becomes canon until you confirm it." },
-  { title: "Evidence attached", text: "Every proposal cites the sentence it came from, so you can check it in one glance." },
-  { title: "Local first", text: "Where a model is practical on your own machine, that is the default. Your manuscript stays home." },
-  { title: "Your key, your choice", text: "If you choose a cloud model, you choose the provider, you hold the key, and Asten tells you plainly what will be sent." },
-  { title: "One switch, all off", text: "AI features can be switched off completely. Asten remains a full desk and a full compiler without them." },
-  { title: "Never training data", text: "Your manuscript is never used to train any model, by Verne or anyone Verne works with." },
+  { title: "Evidence attached", text: "Every proposal cites the sentence it came from, so you can check it." },
+  { title: "Local first", text: "Where a model is practical on your own machine, that is the default." },
+  { title: "Your provider and key", text: "If you choose a cloud model, you choose the provider, you hold the key, and Asten tells you plainly what will be sent." },
+  { title: "A full switch-off", text: "AI features can be switched off completely. Asten remains a full desk and a full compiler without them." },
+  { title: "No training on manuscripts", text: "Your manuscript is never used to train any model, by Verne or anyone Verne works with." },
 ];
 
 const faqs: QA[] = [
@@ -27,13 +27,8 @@ export function AiStance() {
   return (
     <>
       <PageHero
-        eyebrow="Our AI stance"
-        title={
-          <>
-            The pen stays in <em>your</em> hand.
-          </>
-        }
-        lede="AI is remarkable at remembering, comparing, and pointing. It is a poor substitute for your voice. So Asten draws one line and keeps it: AI can be your editor. It can never be your writer."
+        title="Asten and AI"
+        lede="Asten does not write prose and runs no AI model. This page describes what Asten does today and the conditions any future AI feature has to meet."
         art={<Thoth flip />}
       />
 
@@ -48,7 +43,6 @@ export function AiStance() {
       <section className="register" aria-labelledby="why-h">
         <div className="wrap split">
           <div data-reveal>
-            <p className="eyebrow">Why the line</p>
             <h2 id="why-h">What an editor does, and what a writer does.</h2>
           </div>
           <div className="prose" data-reveal>
@@ -64,7 +58,7 @@ export function AiStance() {
             </p>
             <p>
               Ancient Egyptian scribes kept two inks: black for the text, red to mark it. Thoth, the god of writing for whom
-              Asten is named, recorded the verdict at the weighing of the heart. He didn’t decide it. Neither will we.
+              Asten is named, recorded the verdict at the weighing of the heart without deciding it. Asten takes the same role: it records and points, and the author decides.
             </p>
           </div>
         </div>
@@ -74,9 +68,8 @@ export function AiStance() {
         <div className="wrap">
           <SectionHead
             id="today-h"
-            eyebrow="Today"
             title="No model runs inside Asten."
-            text="Every red mark you see today comes from a deterministic rule with a stable code. Same project, same marks, every time, with no network involved."
+            text="Every mark comes from a deterministic rule with a stable code. The same project produces the same marks, and no network is involved."
           />
           <div className="card-grid card-grid--3">
             {[
@@ -97,8 +90,7 @@ export function AiStance() {
         <div className="wrap">
           <SectionHead
             id="rules-h"
-            eyebrow="Tomorrow"
-            title="Seven rules for any AI we add."
+            title="Conditions for any future AI feature"
             text="These are commitments, written down before the features exist, so they shape the features rather than the other way round."
           />
           <ol className="rules">
@@ -124,13 +116,13 @@ export function AiStance() {
 
       <section className="register register--sunk" aria-labelledby="aifaq-h">
         <div className="wrap wrap-narrow">
-          <SectionHead id="aifaq-h" eyebrow="Questions" title="About AI and Asten" />
+          <SectionHead id="aifaq-h" title="About AI and Asten" />
           <FaqList items={faqs} />
         </div>
       </section>
 
       <Related paths={["/journal/ai-editor-not-writer", "/ai-policy", "/for/ai-tinkerers", "/features/compiler"]} />
-      <CtaBand title="An editor that never takes the pen." />
+      <CtaBand />
     </>
   );
 }

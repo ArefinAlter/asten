@@ -4,7 +4,8 @@
 
 Local-first writing desk with a canon engine. The manuscript stays in SQLite on
 the machine. Asten may notice a contradiction and explain it. It does not write
-the prose. No account. No sync. No generative model.
+the prose. No account. No sync. Generative models only under the AI
+policy, optional and off by default (D27).
 
 ## Repos
 
@@ -183,8 +184,8 @@ version.
 
 ## Left out on purpose
 
-- Any generative model, local or hosted. The engine is deterministic and
-  explainable; models, when added, are classifiers that feed the same logic.
+- A generative model in the judging logic. The engine is deterministic and
+  explainable; optional generative features follow the AI policy (D27).
 - Adaptable writing-style workspace template. Not started.
 - InDesign, a pagination engine, and a PDF crate. Page view is a CSS letter
   sheet.

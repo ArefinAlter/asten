@@ -20,18 +20,21 @@ const MAX = 21;
 
 /**
  * Two registers, like two bands on a tomb wall: reading order above, story
- * time below. Where a scene steps backward in story time from the scene
- * before it, CANON-E201 marks the pair, unless you silence it as a flashback.
+ * time below. The scenes form one run declared continuous. Inside it, a scene
+ * that steps backward in story time from the last scene before it gets a
+ * CANON-E201 mark; scenes marked as flashbacks are never compared (D5).
  */
 export function ClocksDemo() {
   const [scenes, setScenes] = useState(initial);
-  const [silenced, setSilenced] = useState<Set<string>>(() => new Set());
+  const [flashbacks, setFlashbacks] = useState<Set<string>>(() => new Set(["d"]));
 
-  const marks = scenes
-    .map((scene, i) => ({ scene, prev: scenes[i - 1] }))
-    .filter(({ scene, prev }) => prev && scene.day < prev.day)
-    .map(({ scene, prev }) => ({ id: scene.id, prev: prev!, scene }));
-  const live = marks.filter((mark) => !silenced.has(mark.id));
+  const live: { id: string; prev: Scene; scene: Scene }[] = [];
+  let last: Scene | undefined;
+  for (const scene of scenes) {
+    if (flashbacks.has(scene.id)) continue;
+    if (last && scene.day < last.day) live.push({ id: scene.id, prev: last, scene });
+    last = scene;
+  }
 
   function step(id: string, delta: number) {
     setScenes((current) =>
@@ -47,14 +50,14 @@ export function ClocksDemo() {
   return (
     <div className="clocks">
       <div className="clocks-row clocks-reading">
-        <p className="clocks-label">Reading order</p>
+        <p className="clocks-label">Reading order · run “The siege”, continuous</p>
         <ol>
           {scenes.map((scene, i) => {
             const marked = live.some((mark) => mark.id === scene.id);
-            const quiet = silenced.has(scene.id) && marks.some((mark) => mark.id === scene.id);
+            const quiet = flashbacks.has(scene.id);
             return (
               <li key={scene.id} className={`clock-card${marked ? " is-marked" : ""}${quiet ? " is-quiet" : ""}`}>
-                <span className="clock-num">Ch. {i + 8}</span>
+                <span className="clock-num">Ch. {i + 8}{quiet ? " · flashback" : ""}</span>
                 <strong>{scene.title}</strong>
                 <span className="clock-day">
                   <button type="button" aria-label={`Move ${scene.title} one day earlier`} onClick={() => step(scene.id, -1)}>
@@ -102,19 +105,19 @@ export function ClocksDemo() {
       <div className="clocks-marks">
         {live.length === 0 ? (
           <p className="clocks-calm">
-            {marks.length > 0
-              ? "Every backward step is a flashback you meant. The clocks are quiet."
-              : "Story time only moves forward. Nothing to mark."}
+            {flashbacks.size > 0
+              ? "No scene in the run steps backward in story time. Scenes marked as flashbacks are not compared."
+              : "Story time only moves forward in this run. Nothing to mark."}
           </p>
         ) : (
           live.map((mark) => (
             <div key={mark.id} className="clocks-mark">
               <span className="chip chip--code">CANON-E201</span>
               <span>
-                Reading order places “{mark.prev.title}” (day {mark.prev.day}) before “{mark.scene.title}” (day {mark.scene.day}), but story time runs the other way.
+                Inside the continuous run, “{mark.scene.title}” (day {mark.scene.day}) comes after “{mark.prev.title}” (day {mark.prev.day}) in reading order but earlier in story time.
               </span>
-              <button type="button" onClick={() => setSilenced((s) => new Set(s).add(mark.id))}>
-                It’s a flashback: silence
+              <button type="button" onClick={() => setFlashbacks((s) => new Set(s).add(mark.id))}>
+                Mark it a flashback
               </button>
             </div>
           ))

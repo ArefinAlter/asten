@@ -201,13 +201,13 @@ export const article: Article = {
         {
           kind: "callout",
           tone: "rubric",
-          title: "A scene never waits on a wiki.",
-          text: "Write first. Settle what the pages decide. Asten keeps the record; you keep the pen.",
+          title: "The world is optional",
+          text: "You can write first and settle details once the pages decide them.",
         },
         {
           kind: "callout",
           tone: "note",
-          text: "Asten doesn’t pull facts out of your prose today; you settle them. The atlas has no travel-time checks, and there’s no graph view yet. Those are [planned](/roadmap), not shipped.",
+          text: "Asten reads only plain attributes from your prose, and only proposes them; you decide what is settled. The atlas checks travel only along routes you declare with a travel time, and there is no graph view yet; a graph is [planned](/roadmap).",
         },
       ],
     },

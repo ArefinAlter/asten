@@ -52,7 +52,7 @@ export const comparisons: Comparison[] = [
   {
     id: "spreadsheets",
     category: "Spreadsheets and style sheets",
-    examples: "The trusty story-bible spreadsheet.",
+    examples: "A story-bible spreadsheet.",
     theyDo: "Anything you can type, sorted any way you like. Free and flexible.",
     astenDoes: "Turns the style sheet into facts that check themselves against the manuscript, with sources and story time.",
     chooseThem: "A spreadsheet is fine until you stop updating it. Asten is for when you’d like the sheet to do some of the remembering.",

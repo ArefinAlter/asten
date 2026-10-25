@@ -9,7 +9,7 @@ export const article: Article = {
     "Local-first means your device holds the real copy; any cloud service is optional, not the owner.",
     "Cloud-only tools add risks you don’t control: lockouts, outages, shutdowns, and changing terms.",
     "Follow the 3-2-1 rule: three copies, on two kinds of storage, with one somewhere else.",
-    "Export regularly to open formats like Markdown, HTML, and .docx.",
+    "Export regularly to open formats such as Markdown, HTML, and .docx.",
     "Asten keeps your projects in a SQLite file on your computer, with no account, no sync, and no telemetry.",
   ],
   sections: [
@@ -68,7 +68,7 @@ export const article: Article = {
           kind: "list",
           items: [
             "**Lockouts.** A forgotten password, a lost phone holding your two-factor codes, a flagged account, or a lapsed payment can stand between you and your manuscript.",
-            "**Outages.** When the service is down, so is your writing session, and it always seems to happen the night before a deadline.",
+            "**Outages.** When the service is down, so is your writing session.",
             "**Shutdowns and redesigns.** Products get discontinued, sold, or rebuilt. Features you rely on can disappear, and export options aren’t guaranteed to stay.",
             "**Policy changes.** Terms of service change. Many writers now read them looking for one thing: whether their words can be used to train AI models.",
             "**Formats you can’t open anywhere else.** If the only way to read your work is through one company’s app, your book is only as durable as that company.",
@@ -121,7 +121,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "That last item deserves a note. A cloud *backup* is different from a cloud-*only* tool. A backup is a copy you control, in a format you can open, that you don’t need in order to keep writing. Use the cloud as a vault, not as the house.",
+          text: "That last item deserves a note. A cloud *backup* is different from a cloud-*only* tool. A backup is a copy you control, in a format you can open, that you don’t need in order to keep writing.",
         },
         {
           kind: "p",
@@ -132,7 +132,7 @@ export const article: Article = {
           ordered: true,
           items: [
             "**Automate it.** Most computers come with a backup tool that runs on a schedule. A backup that depends on remembering is a backup that stops.",
-            "**Test a restore.** Every so often, open a backup on a different machine. A backup you’ve never opened is a hope, not a plan.",
+            "**Test a restore.** Every so often, open a backup on a different machine. A backup you have never opened may not work.",
           ],
         },
       ],
@@ -177,7 +177,7 @@ export const article: Article = {
             "**Your project is a file on your disk.** Asten stores it in SQLite, a widely used database format, in a file called `asten.db` in your operating system’s application-data folder when you use the desktop app.",
             "**No account.** There’s nothing to sign in to.",
             "**No sync and no telemetry.** Asten doesn’t send your work, or reports about how you use it, anywhere. Verne, the company that makes Asten, never receives your manuscript.",
-            "**Open exports.** [Compile](/features/compiler) to Markdown, plain text, Fountain, HTML, or .docx. For a PDF, print the HTML page. Import reads the same family of formats.",
+            "**Open exports.** [Compile](/features/word-and-google-docs) to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, or Final Draft (.fdx). For a PDF, print the HTML page. Import reads the same formats except EPUB.",
             "**No training.** No manuscript is used to train any model, and no AI model runs in Asten today. The [AI policy](/ai-policy) and [privacy notice](/privacy) say so in full.",
           ],
         },
@@ -189,12 +189,12 @@ export const article: Article = {
           kind: "callout",
           tone: "rubric",
           title: "The house is yours.",
-          text: "Your words stay on your computer, in a file you can copy. Asten keeps the record; you keep the pen and the keys.",
+          text: "Your words stay on your computer, in a file you can copy.",
         },
         {
           kind: "callout",
           tone: "note",
-          text: "Local-first has trade-offs. Asten has no sync, no collaboration, and no mobile app today; collaboration is [planned](/roadmap) without giving up offline work. Asten is in early development, there’s no public download yet, and access is by request. See [Download](/download).",
+          text: "Local-first has trade-offs. Asten has no sync, no collaboration, and no app in the phone app stores today; collaboration is [planned](/roadmap) without giving up offline work. Asten is in early development, there’s no public download yet, and access is by request. See [Download](/download).",
         },
       ],
     },
@@ -215,7 +215,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "The book is the one thing in this whole process you can’t replace. Keep it somewhere you can see it, in a form you can open. Then go write the next chapter.",
+          text: "The manuscript is the one thing in this process you can’t replace, so keep it somewhere you can see it, in a form you can open.",
         },
       ],
     },
@@ -235,7 +235,7 @@ export const article: Article = {
     },
     {
       q: "Which formats can Asten export?",
-      a: "Asten compiles to Markdown, plain text, Fountain, HTML, and .docx. For a PDF, you print the HTML page.",
+      a: "Asten compiles to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx). For a PDF, you print the HTML page.",
     },
   ],
   related: [

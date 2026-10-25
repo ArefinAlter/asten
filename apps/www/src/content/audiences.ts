@@ -27,12 +27,12 @@ export const audiences: Audience[] = [
     path: "/for/novelists",
     name: "Novelists",
     glyph: "scroll",
-    short: "For the 100,000-word draft that has started to forget itself.",
+    short: "For long manuscripts where details drift between chapters.",
     title: "Asten for novelists: continuity without losing your voice",
     description:
       "For novelists with a long draft: Asten remembers hair colors, deaths, and dates, and marks contradictions in red. It never writes your prose or trains on it.",
-    h1: "For the novel that has started to forget itself.",
-    lede: "Around chapter twenty, every long book starts to contradict itself: an eye color drifts, a dead man pours tea, a flashback lands in the wrong week. Asten remembers what you settled, so you can keep writing forward.",
+    h1: "Asten for novelists",
+    lede: "In a long draft, details drift: an eye color changes, a dead man pours tea, a flashback lands in the wrong week. Asten keeps a record of what you settled and marks the pages that disagree with it.",
     answer:
       "Asten helps novelists keep a long manuscript consistent without handing their prose to an AI. You settle the facts that matter, and Asten marks later pages that disagree, such as a changed hair color, a character acting after their death, or scenes out of story order. It never writes or rewrites a sentence.",
     pains: [
@@ -56,7 +56,7 @@ export const audiences: Audience[] = [
       ],
     },
     honest: [
-      "Asten doesn’t read your prose for facts yet. You settle what matters.",
+      "Asten reads only plain attributes from your prose (hair, eyes, age, location, alive or dead, relations), and only when a name is in the same sentence. Anything subtler, you settle yourself.",
       "There is no public download yet. Early access is by invitation.",
       "It won’t typeset your book. Compile to .docx for your editor or publisher.",
     ],
@@ -76,8 +76,8 @@ export const audiences: Audience[] = [
     title: "Asten for worldbuilders: a world that keeps its own rules",
     description:
       "For fantasy and sci-fi writers: keep places, cultures, systems, and creatures in an optional wall, atlas, and dossier, and let Asten catch contradictions in your canon.",
-    h1: "For worlds bigger than the book.",
-    lede: "You know the succession law of a kingdom that appears in one paragraph. Good. Asten gives that knowledge a home, connects the parts you settle to the manuscript, and keeps the rest out of the way until you need it.",
+    h1: "Asten for worldbuilders",
+    lede: "Asten gives your notes on places, cultures, and rules a home, connects the parts you settle to the manuscript, and keeps the rest out of the way until you need it.",
     answer:
       "Asten gives fantasy and science-fiction writers optional worldbuilding tools (a wall for scraps, an atlas for places, and a dossier grouped by kind) connected to a canon of settled facts. When the manuscript contradicts a settled fact, Asten marks it. Nothing in the world is required before you write.",
     pains: [
@@ -88,7 +88,7 @@ export const audiences: Audience[] = [
     helps: [
       { title: "Wall, atlas, dossier", text: "Scraps, places, and entries by kind: places, cultures, systems, creatures, items, questions, fragments.", href: "/features/world" },
       { title: "Spark → sketched → settled", text: "Ideas grow at their own pace. Only settled entries become canon.", href: "/features/world" },
-      { title: "Canon that bites", text: "Settled facts are checked against the manuscript, with sources.", href: "/features/canon" },
+      { title: "Canon checked against the manuscript", text: "Settled facts are checked against the manuscript, with sources.", href: "/features/canon" },
       { title: "Two clocks", text: "Histories, prophecies, and flashbacks with story time and reading order kept apart.", href: "/features/time" },
     ],
     scenario: {
@@ -97,7 +97,7 @@ export const audiences: Audience[] = [
         "You pin a spark on the wall: “Veld: harbor town, eats the reef’s fish, distrusts the capital.”",
         "Two chapters later you sketch it in the atlas, east of the reef.",
         "When the siege chapter needs it, you settle it. Asten mints the facts.",
-        "Chapter 31 puts Veld west of the reef. The mark arrives before your beta readers do.",
+        "Chapter 31 has Mira sail from Veld to the capital in two days. You declared that route as five, so CANON-E301 marks the journey.",
       ],
     },
     honest: [
@@ -121,8 +121,8 @@ export const audiences: Audience[] = [
     title: "Asten for screenwriters: Fountain in, continuity checked",
     description:
       "For screenwriters: import and compile Fountain, keep story time and reading order apart for non-linear scripts, and catch continuity slips before the table read.",
-    h1: "For scripts that jump in time.",
-    lede: "Cold opens, flash-forwards, “three weeks earlier.” Asten keeps the order audiences see scenes separate from the order events happen, imports and compiles Fountain, and marks the slip before the table read does.",
+    h1: "Asten for screenwriters",
+    lede: "Cold opens, flash-forwards, “three weeks earlier.” Asten keeps the order audiences see scenes separate from the order events happen, imports and compiles Fountain and Final Draft, and marks story time that steps backward inside a run of scenes you declared continuous.",
     answer:
       "Asten supports screenwriters by importing and compiling Fountain, the plain-text screenplay format, and by tracking story time and reading order as two clocks for non-linear scripts. It marks continuity contradictions in your settled facts. It is not a full screenplay formatting suite.",
     pains: [
@@ -162,12 +162,12 @@ export const audiences: Audience[] = [
     path: "/for/fan-fiction",
     name: "Fan-fiction writers",
     glyph: "heart",
-    short: "For writers who know canon better than the canon does.",
+    short: "For writers keeping their own version of an existing canon.",
     title: "Asten for fan-fiction writers: keep your canon straight",
     description:
       "For fan-fiction writers: settle canon facts (and your own AU changes), get marks when a chapter drifts, and keep your writing on your own computer, never trained on.",
-    h1: "For writers who know canon by heart.",
-    lede: "You already speak the language: canon, AU, retcon, headcanon. Asten gives it a desk. Settle what’s true in your universe, mark what you’ve changed on purpose, and get a red note when chapter 40 forgets chapter 4.",
+    h1: "Asten for fan-fiction writers",
+    lede: "Asten uses canon the way fandom does. Settle what is true in your version, keep source canon you have changed on file as contested, and get a mark when chapter 40 contradicts chapter 4.",
     answer:
       "Asten lets fan-fiction writers record canon as settled facts, keep source canon they’ve changed on file as contested, and get notified when the story contradicts what they settled. Everything stays in a file on your own computer; Asten never generates prose and never trains on your writing.",
     pains: [
@@ -187,7 +187,7 @@ export const audiences: Audience[] = [
         "In source canon, Captain Oren dies. In your AU, he doesn’t.",
         "You keep the source fact “Oren · status · dead” on file as contested, so it never raises a mark, and settle “alive” for your story.",
         "Months later an old outline note settles him as dead again. Asten marks the clash (CANON-E013) before you post the chapter.",
-        "Your fic stays on your laptop. Nobody trained anything on it.",
+        "Throughout, the fic stays in a file on your laptop.",
       ],
     },
     honest: [
@@ -211,8 +211,8 @@ export const audiences: Audience[] = [
     title: "Asten for AI tinkerers: a clear line, a plain architecture",
     description:
       "For AI enthusiasts who write: Asten is a local-first, deterministic canon engine with stable diagnostic codes, a loopback API, and a clear rule that AI edits and never writes.",
-    h1: "For people who know exactly what AI is good at.",
-    lede: "You use models every day. You also know where they hallucinate, flatten voice, and claim confidence they haven’t earned. Asten is built on that knowledge: deterministic checks today, AI only as a proposer later, and your words never in a training set.",
+    h1: "Asten for AI tinkerers",
+    lede: "If you use models every day, you know where they are unreliable. Asten’s checks are deterministic rules. The planned models are small local classifiers that only propose facts, and your manuscript is never used for training.",
     answer:
       "Asten is a local-first writing environment with a deterministic canon engine: Rust, SQLite, a loopback HTTP API on 127.0.0.1:4317, and stable diagnostic codes. No model runs today: perception is deterministic. Planned perception models are small local classifiers that only propose; any generative AI, if ever, is optional and never trains on manuscripts.",
     pains: [

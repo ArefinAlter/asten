@@ -6,7 +6,6 @@ export function Compare() {
   return (
     <>
       <PageHero
-        eyebrow="Compare"
         title="Where Asten fits, and where it doesn’t."
         lede="Asten is one tool among many on a writer’s desk. Here is how it differs from the kinds of tools you may already use, and when one of those is the better choice."
         art={<Scales tilt={4} left="heart" />}

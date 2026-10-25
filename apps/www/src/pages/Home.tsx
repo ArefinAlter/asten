@@ -39,7 +39,7 @@ export function Home() {
         <div className="wrap hero-grid">
           <div className="hero-intro">
             <span className="status-pill">
-              <span className="dot" /> Early access · writing desk with a memory
+              <span className="dot" /> Early access
             </span>
             <h1 id="hero-h">
               Let AI be your <em>editor</em>, not your writer.
@@ -61,7 +61,7 @@ export function Home() {
               <li>No AI writes your prose</li>
               <li>No account</li>
               <li>No cloud</li>
-              <li>Never trained on</li>
+              <li>Not used for training</li>
             </ul>
           </div>
 
@@ -77,7 +77,6 @@ export function Home() {
                 <Frieze kind="blocks" />
               </div>
             </div>
-            <p className="stela-caption">Hover or tap the scales. Thoth records; you decide.</p>
           </div>
         </div>
       </section>
@@ -88,13 +87,8 @@ export function Home() {
         <div className="wrap">
           <SectionHead
             id="problem-h"
-            eyebrow="The problem"
-            title={
-              <>
-                Long stories <em>forget</em> themselves.
-              </>
-            }
-            text="Somewhere past chapter twenty, every long book starts to contradict itself. Not because you’re careless, but because nobody can hold 100,000 words in their head."
+            title="Continuity slips in a long manuscript"
+            text="A long manuscript is written over months, and a detail set down in chapter 2 is hard to keep in mind by chapter 19. Three common kinds of slip:"
           />
           <div className="card-grid card-grid--3">
             {[
@@ -113,7 +107,7 @@ export function Home() {
             ))}
           </div>
           <p className="problem-note" data-reveal>
-            Readers notice. Editors notice. Asten notices first, and tells only you.
+            Once the facts involved are settled, Asten marks each of these in the margin with the code shown. The marks stay on your computer.
           </p>
         </div>
       </section>
@@ -128,29 +122,26 @@ export function Home() {
             </p>
           </div>
           <div data-reveal>
-            <p className="eyebrow">The scribe’s palette</p>
-            <h2 id="inks-h">
-              Black ink is yours. <em>Red ink</em> is ours.
-            </h2>
+            <h2 id="inks-h">Black ink for your text, red for Asten’s marks</h2>
             <p className="lede" style={{ marginTop: 18 }}>
-              An Egyptian scribe’s palette held two inks: black for the text, red to mark it. Asten works the same way. Everything
-              you write stays in black and untouched. Asten only ever adds red: a mark in the margin, a code, both sides of the
-              disagreement, and a choice that is always yours.
+              An Egyptian scribe’s palette held two inks: black for the text, red to mark it. Asten follows the same split. It never
+              changes what you write. It adds marks in the margin, each with a code, both sides of the disagreement, and the actions
+              you can take.
             </p>
             <div className="contrast">
               <div className="them">
                 <h3>AI writing tools often</h3>
                 <ul>
                   <li>offer to write the scene</li>
-                  <li>smooth every voice into one</li>
+                  <li>suggest rewrites of your sentences</li>
                   <li>send your draft to a server</li>
                 </ul>
               </div>
               <div className="us">
                 <h3>Asten</h3>
                 <ul>
-                  <li>never writes a word</li>
-                  <li>points at evidence, then steps back</li>
+                  <li>does not generate or rewrite text</li>
+                  <li>shows the evidence for each mark</li>
                   <li>keeps your files on your machine</li>
                 </ul>
               </div>
@@ -163,9 +154,8 @@ export function Home() {
         <div className="wrap">
           <SectionHead
             id="weigh-h"
-            eyebrow="Try it"
-            title="Weigh a sentence."
-            text="Mira’s hair was settled as auburn in chapter 2. Change the word in chapter 19 and watch what Asten does. And what it doesn’t."
+            title="Example: an attribute check"
+            text="Mira’s hair was settled as auburn in chapter 2. The example shows the mark Asten raises when chapter 19 gives a different color, and the actions it offers. The sentence itself is never changed."
           />
           <div className="demo-frame" data-reveal data-llms="skip">
             <WeighDemo />
@@ -177,9 +167,8 @@ export function Home() {
         <div className="wrap">
           <SectionHead
             id="how-h"
-            eyebrow="How it works"
-            title="Write. Settle. Notice. You decide."
-            text="No setup ritual, no forms. Asten grows a record of your story as you write, and only speaks when the record and the page disagree."
+            title="How Asten works"
+            text="There is no setup step. Asten builds a record of your story from the facts you settle, and adds a mark only when a page disagrees with that record."
           />
           <ol className="steps" data-reveal>
             {howSteps.map((step, i) => (
@@ -198,7 +187,7 @@ export function Home() {
           </ol>
           <p style={{ marginTop: 28 }}>
             <Link to="/how-it-works" className="link-arrow">
-              The longer tour <Arrow />
+              How it works in detail <Arrow />
             </Link>
           </p>
         </div>
@@ -208,9 +197,8 @@ export function Home() {
         <div className="wrap">
           <SectionHead
             id="desk-h"
-            eyebrow="The desk"
-            title="A desk you’d want to sit at."
-            text="Binder on the left, a plain page in the middle, Asten’s red notes in the margin. Click a scene in the binder."
+            title="The writing desk"
+            text="The binder on the left, the page in the middle, and Asten’s marks in the margin."
           />
           <div data-reveal>
             <DeskMock />
@@ -222,8 +210,7 @@ export function Home() {
         <div className="wrap">
           <SectionHead
             id="features-h"
-            eyebrow="Features"
-            title="Everything a long story needs. Nothing that writes it."
+            title="What Asten includes"
           />
           <div className="card-grid card-grid--3">
             {features.map((feature, i) => (
@@ -251,11 +238,10 @@ export function Home() {
         <div className="wrap night-grid">
           <div data-reveal>
             <LunarEmblem />
-            <p className="eyebrow">Two clocks</p>
-            <h2 id="time-h">The order things happen, and the order you tell them.</h2>
+            <h2 id="time-h">Story time and reading order</h2>
             <p className="lede" style={{ marginTop: 18 }}>
-              Asten keeps story time and reading order apart, so a flashback is a choice and not an accident. Nudge the days and
-              watch the threads cross.
+              Asten records when each scene happens in the story separately from where it sits in the book. It compares the two
+              only inside a run of scenes you have declared continuous, so a flashback raises no mark.
             </p>
             <p className="myth">
               <strong>Thoth, keeper of time</strong>A story retold by Plutarch says Thoth won five extra days from the moon, so
@@ -272,13 +258,8 @@ export function Home() {
         <div className="wrap">
           <SectionHead
             id="world-h"
-            eyebrow="World, optional"
-            title={
-              <>
-                Most of the world stays <em>below the sand</em>.
-              </>
-            }
-            text="Readers see the pyramid. Your maps, histories, and rules live in the chambers underneath, as sparks, sketches, or settled canon. Build as much or as little as the book needs."
+            title="Optional world notes"
+            text="Places, histories, and rules can be kept as sparks, sketches, or settled entries. Only settled entries become canon, and none of it is required before you write."
           />
           <div data-reveal>
             <PyramidExplorer />
@@ -288,7 +269,7 @@ export function Home() {
 
       <section className="register register--sunk" aria-labelledby="who-h">
         <div className="wrap">
-          <SectionHead id="who-h" eyebrow="Who it’s for" title="Made for people who write long, and care how." />
+          <SectionHead id="who-h" title="Who Asten is for" />
           <div className="card-grid">
             {audiences.map((audience, i) => (
               <Link key={audience.slug} to={audience.path} className="card" data-reveal style={{ "--d": i } as CSSProperties}>
@@ -310,18 +291,17 @@ export function Home() {
             <Wedjat />
           </div>
           <div data-reveal>
-            <p className="eyebrow">Local-first</p>
-            <h2 id="privacy-h">Protected the oldest way: it never leaves home.</h2>
+            <h2 id="privacy-h">Your project stays on your computer</h2>
             <p className="lede" style={{ marginTop: 18 }}>
-              The wedjat eye was worn for protection. Asten’s protection is simpler: your whole project is one file on your own
-              disk, and nothing in Asten sends it anywhere.
+              Each project is one SQLite file on your own disk. Asten has no account, no sync, and no telemetry, so nothing in it
+              sends your manuscript anywhere.
             </p>
             <div className="promises">
               {[
                 { glyph: "house" as const, title: "One file, yours", text: "A SQLite file on your computer." },
                 { glyph: "door" as const, title: "No account", text: "Nothing to sign up for or lose." },
-                { glyph: "eye" as const, title: "No telemetry", text: "Asten doesn’t phone home. Neither does this site." },
-                { glyph: "feather" as const, title: "Never trained on", text: "Not by Verne, not by anyone." },
+                { glyph: "eye" as const, title: "No telemetry", text: "Asten sends no usage data. This site runs no analytics." },
+                { glyph: "feather" as const, title: "No training", text: "Your manuscript is not used to train any model." },
               ].map((item) => (
                 <div key={item.title} className="promise">
                   <Glyph name={item.glyph} />
@@ -342,11 +322,11 @@ export function Home() {
       <section className="register register--sunk" aria-labelledby="hood-h">
         <div className="wrap hood">
           <div data-reveal>
-            <p className="eyebrow">For the tinkerers</p>
-            <h2 id="hood-h">Deterministic, inspectable, and on your machine.</h2>
+            <h2 id="hood-h">Deterministic rules, run locally</h2>
             <p className="lede" style={{ marginTop: 18 }}>
-              No model runs inside Asten today. The checks are rules with stable codes that produce the same marks every time. When
-              AI arrives, it will only propose facts for you to confirm, locally first, with your own key if you choose.
+              No model runs inside Asten. The checks are rules with stable codes, and the same project always produces the same
+              marks. The planned perception models are small local classifiers that propose facts for you to confirm; they do not
+              generate text.
             </p>
             <ul className="stack" aria-label="Built with">
               {["Rust", "SQLite", "Axum on 127.0.0.1", "React", "TypeScript", "Tauri"].map((item) => (
@@ -381,9 +361,7 @@ export function Home() {
               <span className="t-dim">{"   source:  ch02-arrival, paragraph 7\n"}</span>
               {"\n"}
               <span className="t-gold">   actions</span>
-              {": keep · update canon · add change · silence\n\n"}
-              <span className="t-green">✓</span>
-              {" 0 words written by Asten"}
+              {": keep · update canon · add change · silence"}
             </pre>
           </figure>
         </div>
@@ -393,9 +371,8 @@ export function Home() {
         <div className="wrap">
           <SectionHead
             id="status-h"
-            eyebrow="Honest status"
-            title="Early, and honest about it."
-            text="Asten is young. Here is exactly where it stands, so nobody is surprised."
+            title="Current status"
+            text="What works in the current code, what does not exist yet, and what Asten will not do."
           />
           <div className="status-grid" data-reveal>
             <div className="status-col">
@@ -411,8 +388,8 @@ export function Home() {
               <h3>Not yet</h3>
               <ul>
                 <li>A public download or signed installer</li>
-                <li>Trained perception models (today the reading is rule-based)</li>
-                <li>Any AI model, local or cloud</li>
+                <li>Android and iOS apps tested on devices</li>
+                <li>Trained perception models (the reading is rule-based)</li>
                 <li>Collaboration</li>
               </ul>
             </div>
@@ -435,7 +412,7 @@ export function Home() {
 
       <section className="register register--sunk" aria-labelledby="journal-h">
         <div className="wrap">
-          <SectionHead id="journal-h" eyebrow="From the journal" title="Craft notes from the scribe’s desk." />
+          <SectionHead id="journal-h" title="From the journal" />
           <div className="card-grid card-grid--3">
             {articles.slice(0, 3).map((article, i) => (
               <Link
@@ -462,7 +439,7 @@ export function Home() {
 
       <section className="register" aria-labelledby="faq-h">
         <div className="wrap wrap-narrow">
-          <SectionHead id="faq-h" eyebrow="Questions" title="Asked, and answered plainly." />
+          <SectionHead id="faq-h" title="Common questions" />
           <div data-reveal>
             <FaqList items={homeFaqs} />
           </div>
