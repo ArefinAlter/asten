@@ -12,6 +12,10 @@ test("typing a sentence that contradicts a settled fact raises CANON-E013", asyn
   });
   await signIn(page);
   await page.goto(`/#/p/${project.id}/write/${chapter19.id}`);
+  // The workbench keeps the Scales as a tab of the bottom panel; the margin
+  // cards need the room the assistant panel would take.
+  await page.getByRole("button", { name: "Toggle assistant panel" }).click();
+  await page.getByRole("tab", { name: "Scales" }).click();
 
   const scales = page.getByRole("region", { name: "The Scales" });
   await expect(scales).toContainText("Nothing disagrees with your canon.");
@@ -50,6 +54,7 @@ test("applying a repair clears the mark", async ({ page, request }) => {
 
   await signIn(page);
   await page.goto(`/#/p/${project.id}/write/${chapter19.id}`);
+  await page.getByRole("tab", { name: "Scales" }).click();
 
   const scales = page.getByRole("region", { name: "The Scales" });
   const row = scales.getByRole("button", { name: new RegExp(MARK) });

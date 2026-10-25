@@ -5,6 +5,7 @@ test("Settings shows this desk with a version", async ({ page, request }) => {
   const project = await new Desk(request).createProject();
   await signIn(page);
   await page.goto(`/#/p/${project.id}/settings`);
+  await page.getByRole("button", { name: "Continuity checks" }).click();
 
   await expect(
     page.getByRole("heading", { name: "How the scales are set" }),

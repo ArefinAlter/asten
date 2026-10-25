@@ -1,5 +1,6 @@
-# Upload only what the public website build needs: the www app, the brand
-# tokens, and the workspace manifests pnpm uses to verify the lockfile.
+# Upload only what the public website build needs: the www app, the desk
+# (built on sample data for /app/), the brand tokens and contracts, and the
+# workspace manifests pnpm uses to verify the lockfile.
 /*
 !/package.json
 !/pnpm-lock.yaml
@@ -10,8 +11,8 @@
 /apps/*
 !/apps/www
 !/apps/web
-/apps/web/*
-!/apps/web/package.json
+/apps/web/dist
+/apps/web/dist-site
 !/apps/desktop
 /apps/desktop/*
 !/apps/desktop/package.json
@@ -20,9 +21,9 @@
 /packages/*
 !/packages/brand
 !/packages/contracts
-/packages/contracts/*
-!/packages/contracts/package.json
 
 **/node_modules
 /apps/www/dist
 /apps/www/dist-server
+/apps/web/test-results
+/apps/web/playwright-report

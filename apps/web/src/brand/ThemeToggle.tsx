@@ -1,3 +1,5 @@
+import { storageAllowed } from "../lib/storage";
+
 const KEY = "asten-theme";
 
 export function currentTheme(): "day" | "night" {
@@ -9,6 +11,7 @@ export function currentTheme(): "day" | "night" {
 }
 
 export function applyStoredTheme() {
+  if (!storageAllowed()) return;
   try {
     const stored = localStorage.getItem(KEY);
     if (stored === "day" || stored === "night")
@@ -23,6 +26,7 @@ export function ThemeToggle() {
   function toggle() {
     const next = currentTheme() === "night" ? "day" : "night";
     document.documentElement.setAttribute("data-theme", next);
+    if (!storageAllowed()) return;
     try {
       localStorage.setItem(KEY, next);
     } catch {

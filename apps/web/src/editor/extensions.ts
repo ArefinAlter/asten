@@ -355,3 +355,71 @@ export const EntityTokens = Extension.create({
 });
 
 export { buildEntityDecorations };
+
+// ───────────────────────── paragraph alignment ─────────────────────────
+
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    textAlign: {
+      /** Align the paragraphs and headings in the selection. */
+      setTextAlign: (
+        alignment: "left" | "center" | "right" | "justify",
+      ) => ReturnType;
+      unsetTextAlign: () => ReturnType;
+    };
+  }
+}
+
+const ALIGNMENTS = ["left", "center", "right", "justify"];
+
+/**
+ * Alignment as a block attribute (`textAlign`), so it rides in the block's
+ * fields and the history like any other attribute. Left is the default and
+ * is not stored.
+ */
+export const TextAlign = Extension.create({
+  name: "textAlign",
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["paragraph", "heading"],
+        attributes: {
+          textAlign: {
+            default: null,
+            parseHTML: (element: HTMLElement) => {
+              const value = element.style.textAlign;
+              return ALIGNMENTS.includes(value) && value !== "left"
+                ? value
+                : null;
+            },
+            renderHTML: (attributes: Record<string, unknown>) =>
+              attributes.textAlign
+                ? { style: `text-align: ${String(attributes.textAlign)}` }
+                : {},
+          },
+        },
+      },
+    ];
+  },
+  addCommands() {
+    return {
+      setTextAlign:
+        (alignment) =>
+        ({ commands }) => {
+          if (!ALIGNMENTS.includes(alignment)) return false;
+          const value = alignment === "left" ? null : alignment;
+          return ["paragraph", "heading"]
+            .map((type) =>
+              commands.updateAttributes(type, { textAlign: value }),
+            )
+            .some(Boolean);
+        },
+      unsetTextAlign:
+        () =>
+        ({ commands }) =>
+          ["paragraph", "heading"]
+            .map((type) => commands.resetAttributes(type, "textAlign"))
+            .some(Boolean),
+    };
+  },
+});

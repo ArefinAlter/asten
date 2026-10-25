@@ -205,6 +205,7 @@ write(
     "User-agent: *",
     "Allow: /",
     "Disallow: /404",
+    "Disallow: /app/",
     "",
     ...answerBots.flatMap((bot) => [`User-agent: ${bot}`, "Allow: /", ""]),
     `Sitemap: ${site.origin}/sitemap.xml`,

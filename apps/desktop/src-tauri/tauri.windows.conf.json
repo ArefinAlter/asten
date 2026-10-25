@@ -1,5 +1,19 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
+  "app": {
+    "windows": [
+      {
+        "title": "Asten",
+        "width": 1440,
+        "height": 900,
+        "minWidth": 360,
+        "minHeight": 480,
+        "resizable": true,
+        "decorations": false,
+        "shadow": true
+      }
+    ]
+  },
   "bundle": {
     "targets": ["nsis", "msi"],
     "windows": {

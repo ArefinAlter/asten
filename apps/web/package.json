@@ -13,7 +13,10 @@
     "e2e:ui": "playwright test --ui",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:sample": "vite --mode sample",
+    "build:site": "tsc -b && vite build --mode site",
+    "preview:site": "vite preview --mode site --outDir dist-site --port 4175"
   },
   "dependencies": {
     "@asten/brand": "workspace:*",

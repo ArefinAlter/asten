@@ -36,6 +36,9 @@ test("on a narrow screen the binder is a drawer and the Scales fold", async ({
   await expect(open).toBeVisible();
   await expect(binder).not.toBeInViewport();
 
+  // On a phone the bottom panel starts closed; open it on the Scales.
+  await page.getByRole("button", { name: "Toggle panel" }).click();
+  await page.getByRole("tab", { name: "Scales" }).click();
   const scales = page.getByRole("region", { name: "The Scales" });
   const toggle = scales.getByRole("button", { name: /^The Scales/ });
   const filters = scales.getByRole("tablist", { name: "Filter marks" });
