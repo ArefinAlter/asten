@@ -65,6 +65,8 @@ import type {
   Invariant,
 } from "@asten/contracts";
 
+import { storageAllowed } from "./storage";
+
 /**
  * One client for every surface. In the browser it talks to the loopback API
  * with a session cookie (or a bearer token for guests). Inside the desktop
@@ -79,6 +81,7 @@ export interface Session {
 const TOKEN_KEY = "asten-token";
 
 function readStoredToken(): string | null {
+  if (!storageAllowed()) return null;
   try {
     return localStorage.getItem(TOKEN_KEY);
   } catch {
@@ -87,6 +90,7 @@ function readStoredToken(): string | null {
 }
 
 export function storeToken(token: string | null) {
+  if (!storageAllowed()) return;
   try {
     if (token) localStorage.setItem(TOKEN_KEY, token);
     else localStorage.removeItem(TOKEN_KEY);
@@ -99,6 +103,32 @@ export function isTauri(): boolean {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 }
 
+/**
+ * An in-page stand-in for the API (the hosted pre-alpha copy's sample
+ * backend). When one is installed, every request and the change stream go to
+ * it instead of the network; nothing else in the desk changes.
+ */
+export interface LocalTransport {
+  handle(
+    method: string,
+    path: string,
+    body?: unknown,
+  ): Promise<{ status: number; body: unknown }>;
+  subscribe(onEvent: (event: StreamEvent) => void): () => void;
+}
+
+let localTransport: LocalTransport | undefined;
+
+/** Route the desk to an in-page backend. Called once, before the first render. */
+export function installLocalTransport(transport: LocalTransport) {
+  localTransport = transport;
+}
+
+/** Whether the desk runs on the in-page sample backend (no API, no network). */
+export function isLocalTransport(): boolean {
+  return localTransport !== undefined;
+}
+
 export class ApiError extends Error {
   readonly status: number;
   constructor(status: number, message: string) {
@@ -108,6 +138,7 @@ export class ApiError extends Error {
 }
 
 async function resolveSession(): Promise<Session> {
+  if (localTransport) return { origin: "", token: null };
   if (isTauri()) {
     const { invoke } = await import("@tauri-apps/api/core");
     const desk = await invoke<{ origin: string; token: string }>(
@@ -717,6 +748,11 @@ export class AstenClient {
     onEvent: (event: StreamEvent) => void,
     onState?: (open: boolean) => void,
   ): Promise<() => void> {
+    if (localTransport) {
+      const dispose = localTransport.subscribe(onEvent);
+      onState?.(true);
+      return dispose;
+    }
     const origin = await this.origin();
     let source: EventSource | undefined;
     let disposed = false;
@@ -785,6 +821,22 @@ export class AstenClient {
   }
 
   private async request<T>(path: string, init?: RequestInit): Promise<T> {
+    if (localTransport) {
+      const response = await localTransport.handle(
+        init?.method ?? "GET",
+        path,
+        typeof init?.body === "string" ? JSON.parse(init.body) : undefined,
+      );
+      if (response.status === 204) return undefined as T;
+      if (response.status >= 400) {
+        const body = response.body as ApiErrorBody | undefined;
+        throw new ApiError(
+          response.status,
+          body?.error?.message ?? `Request failed: ${response.status}`,
+        );
+      }
+      return response.body as T;
+    }
     const origin = await this.origin();
     const token = await this.token();
     const headers: Record<string, string> = { accept: "application/json" };

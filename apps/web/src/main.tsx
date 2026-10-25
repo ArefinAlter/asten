@@ -7,16 +7,23 @@ import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
 import "@asten/brand/tokens.css";
 import "./asten.css";
-import App from "./App.tsx";
+import "./workbench/workbench.css";
 import { applyStoredTheme } from "./brand/ThemeToggle";
+import { installLocalTransport } from "./lib/asten-client";
+import { applyPrefs, getPrefs } from "./workbench/prefs";
 
 applyStoredTheme();
+applyPrefs(getPrefs());
+
+/** The hosted pre-alpha copy runs on an in-page sample backend: no API, no network. */
+const SAMPLE = import.meta.env.VITE_ASTEN_SAMPLE === "1";
 
 // Installable web app: the shell is cached so a phone can reopen the desk
 // without the network; the API is never cached. The desktop and mobile shells
-// load from their bundle and need no worker.
+// load from their bundle and need no worker; the hosted copy registers none.
 if (
   import.meta.env.PROD &&
+  !SAMPLE &&
   window.isSecureContext &&
   "serviceWorker" in navigator &&
   !("__TAURI_INTERNALS__" in window)
@@ -36,10 +43,24 @@ const queryClient = new QueryClient({
   },
 });
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <App />
-    </QueryClientProvider>
-  </StrictMode>,
-);
+async function start() {
+  if (SAMPLE) {
+    const { SampleBackend } = await import("./sample/backend");
+    const backend = new SampleBackend();
+    installLocalTransport({
+      handle: (method, path, body) => backend.handle(method, path, body),
+      subscribe: (onEvent) => backend.subscribe(onEvent),
+    });
+  }
+  // The client is created when the desk's modules load, after the transport.
+  const { default: App } = await import("./App.tsx");
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <App />
+      </QueryClientProvider>
+    </StrictMode>,
+  );
+}
+
+void start();

@@ -1,4 +1,4 @@
-import { EditorContent, useEditor } from "@tiptap/react";
+import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
@@ -25,6 +25,7 @@ import {
   EntityTokens,
   Insertion,
   SceneBreak,
+  TextAlign,
   entityKey,
   marksKey,
   marksToSpans,
@@ -69,6 +70,16 @@ interface Props {
   onSelectEntity: (key: string) => void;
   saving?: boolean;
   readOnlyLabel?: string;
+  /** Hands the live editor to a host (the workbench ribbon) and null on unmount. */
+  onEditor?: (editor: Editor | null) => void;
+  /** The host draws its own formatting controls (the ribbon); keep only the status line. */
+  hideToolbar?: boolean;
+  /** Called when the save state or counts change, for a host's status bar. */
+  onStatus?: (status: {
+    words: number;
+    characters: number;
+    save: string;
+  }) => void;
 }
 
 interface MarginCard {
@@ -99,6 +110,9 @@ export function ManuscriptEditor({
   onSelectEntity,
   saving,
   readOnlyLabel,
+  onEditor,
+  hideToolbar,
+  onStatus,
 }: Props) {
   const [matches, setMatches] = useState(0);
   const [saveState, setSaveState] = useState<SaveState>("saved");
@@ -136,6 +150,7 @@ export function ManuscriptEditor({
       Insertion,
       Deletion,
       SceneBreak,
+      TextAlign,
       AstenMarks,
       EntityTokens,
     ],
@@ -157,6 +172,13 @@ export function ManuscriptEditor({
       void flushRef.current();
     },
   });
+
+  const onEditorRef = useRef(onEditor);
+  onEditorRef.current = onEditor;
+  useEffect(() => {
+    onEditorRef.current?.(editor ?? null);
+    return () => onEditorRef.current?.(null);
+  }, [editor]);
 
   /** Replace the editor's content with the server's, keeping the caret. */
   const adoptExternal = useCallback(() => {
@@ -462,46 +484,60 @@ export function ManuscriptEditor({
 
   return (
     <div className={`manuscript${pageView ? " page-view" : ""}`}>
+      <StatusReporter
+        words={words}
+        characters={chars}
+        save={status.replace(" · ", "")}
+        onStatus={onStatus}
+      />
       <SceneHeader projectId={projectId} document={document} />
-      <div className="editor-toolbar" role="toolbar" aria-label="Manuscript">
-        <button
-          type="button"
-          title="Bold"
-          onClick={() => editor.chain().focus().toggleBold().run()}
-        >
-          <b>B</b>
-        </button>
-        <button
-          type="button"
-          title="Italic"
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-        >
-          <i>I</i>
-        </button>
-        <button
-          type="button"
-          title="Underline"
-          onClick={() => editor.chain().focus().toggleUnderline().run()}
-        >
-          <u>U</u>
-        </button>
-        <button
-          type="button"
-          title="Heading"
-          onClick={() =>
-            editor.chain().focus().toggleHeading({ level: 2 }).run()
-          }
-        >
-          H
-        </button>
-        <button
-          type="button"
-          title="Scene break"
-          onClick={() => editor.chain().focus().setHorizontalRule().run()}
-        >
-          # # #
-        </button>
-        {trackChanges && (
+      <div
+        className={`editor-toolbar${hideToolbar ? " editor-toolbar--status" : ""}`}
+        role="toolbar"
+        aria-label="Manuscript"
+      >
+        {!hideToolbar && (
+          <>
+            <button
+              type="button"
+              title="Bold"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+            >
+              <b>B</b>
+            </button>
+            <button
+              type="button"
+              title="Italic"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+            >
+              <i>I</i>
+            </button>
+            <button
+              type="button"
+              title="Underline"
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+            >
+              <u>U</u>
+            </button>
+            <button
+              type="button"
+              title="Heading"
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 2 }).run()
+              }
+            >
+              H
+            </button>
+            <button
+              type="button"
+              title="Scene break"
+              onClick={() => editor.chain().focus().setHorizontalRule().run()}
+            >
+              # # #
+            </button>
+          </>
+        )}
+        {trackChanges && !hideToolbar && (
           <>
             <button
               type="button"
@@ -621,6 +657,28 @@ export function ManuscriptEditor({
       </div>
     </div>
   );
+}
+
+/** Reports counts and save state to a host after render, never during it. */
+function StatusReporter({
+  words,
+  characters,
+  save,
+  onStatus,
+}: {
+  words: number;
+  characters: number;
+  save: string;
+  onStatus?: (status: {
+    words: number;
+    characters: number;
+    save: string;
+  }) => void;
+}) {
+  useEffect(() => {
+    onStatus?.({ words, characters, save });
+  }, [words, characters, save, onStatus]);
+  return null;
 }
 
 export type { Location };
