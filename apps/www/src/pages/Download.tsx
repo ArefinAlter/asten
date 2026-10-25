@@ -44,9 +44,8 @@ export function Download() {
   return (
     <>
       <PageHero
-        eyebrow="Early access"
-        title="Get Asten on your own machine."
-        lede="Asten is in early access. There’s no public download yet. We’re inviting writers in small groups so we can listen properly. Ask for an invitation and tell us what you write."
+        title="Early access"
+        lede="There is no public download yet. Asten goes to invited writers in small groups. To ask for an invitation, email us and say what you write and which computer you use."
         art={<PaletteMark className="hero-palette" />}
       >
         <div className="btn-row">
@@ -67,14 +66,14 @@ export function Download() {
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
           <div data-reveal>
-            <Answer text="Asten is available by invitation during early access. Email info@vernesystems.com with the subject “Asten early access”. Invited writers receive a build and setup notes; Asten then runs entirely on their own computer, with no account." />
+            <Answer text="Asten is available by invitation during early access. Email info@vernesystems.com with the subject “Asten early access”. Invited writers receive setup notes; Asten then runs entirely on their own computer, with no account." />
           </div>
         </div>
       </section>
 
       <section className="register" aria-labelledby="steps-h">
         <div className="wrap">
-          <SectionHead id="steps-h" eyebrow="What happens" title="From invitation to first scene." />
+          <SectionHead id="steps-h" title="How early access works" />
           <ol className="steps" data-reveal>
             {accessSteps.map((step, i) => (
               <li key={step.title} className="step" id={`step-${i + 1}`}>
@@ -96,13 +95,12 @@ export function Download() {
       <section className="register register--sunk" aria-labelledby="include-h">
         <div className="wrap split">
           <div data-reveal>
-            <p className="eyebrow">In the build</p>
             <h2 id="include-h">What early access includes.</h2>
           </div>
           <ul className="honest-list" data-reveal>
             <li>The desk, canon, cast, two clocks, and optional world tools</li>
-            <li>Three continuity rules and four method packs</li>
-            <li>Compile and import for Markdown, plain text, Fountain, HTML, and .docx</li>
+            <li>Seventeen canon rules in seven families, plus name hygiene and setup ledgers, in eight method packs</li>
+            <li>Compile to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx), and import of all but EPUB</li>
             <li>The Word task pane and Google Docs sidebar, for sideloading</li>
             <li>No account, no sync, no telemetry, and no AI model</li>
           </ul>
@@ -111,7 +109,7 @@ export function Download() {
 
       <section className="register" aria-labelledby="dfaq-h">
         <div className="wrap wrap-narrow">
-          <SectionHead id="dfaq-h" eyebrow="Questions" title="About early access" />
+          <SectionHead id="dfaq-h" title="About early access" />
           <FaqList items={faqs} />
           <p style={{ marginTop: 24 }}>
             <Link to="/roadmap" className="link-arrow">

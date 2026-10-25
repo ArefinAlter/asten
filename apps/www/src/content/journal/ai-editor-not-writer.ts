@@ -19,11 +19,11 @@ export const article: Article = {
       blocks: [
         {
           kind: "p",
-          text: "You’ve probably tried it. You paste a scene into a chatbot, ask it to “make this better,” and get back something smoother, tidier, and somehow no longer yours. The adjectives are fine. The rhythm is fine. Everything is fine, which is the problem.",
+          text: "You’ve probably tried it. You paste a scene into a chatbot, ask it to “make this better,” and get back something smoother, tidier, and somehow no longer yours. Nothing in it is wrong, but it no longer sounds like you.",
         },
         {
           kind: "p",
-          text: "Language models are built to produce a likely next word. That’s a remarkable trick, and it’s also why model prose drifts toward the middle: the familiar image, the expected beat, the sentence a thousand other writers might have written. Your voice is mostly the set of unlikely choices you keep making on purpose. The odd comparison. The clipped line. The joke the scene doesn’t strictly need. Smooth those out and you get competent pages that could belong to anyone.",
+          text: "Language models are built to produce a likely next word. That is useful, and it is also why model prose drifts toward the middle: the familiar image, the expected beat, the sentence a thousand other writers might have written. Your voice is mostly the set of unlikely choices you keep making on purpose. The odd comparison. The clipped line. The joke the scene doesn’t strictly need. Smooth those out and you get competent pages that could belong to anyone.",
         },
         {
           kind: "p",
@@ -42,7 +42,7 @@ export const article: Article = {
       blocks: [
         {
           kind: "p",
-          text: "Strip away the red-pencil cliché and an editor’s most useful work is surprisingly unglamorous. A good editor:",
+          text: "Much of an editor’s most useful work is routine. A good editor:",
         },
         {
           kind: "list",
@@ -84,7 +84,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "Asten takes its [name](/name) from that tradition. It’s another name for Thoth, the scribe of the Egyptian gods, who stood beside the scales at the weighing of the heart and recorded the verdict without deciding it. That’s the posture we want from software: **your words are black ink; Asten only ever writes in red.**",
+          text: "Asten takes its [name](/name) from that tradition. It’s another name for Thoth, the scribe of the Egyptian gods, who stood beside the scales at the weighing of the heart and recorded the verdict without deciding it. Asten takes the same role: your text is the black ink, and Asten’s marks are the red.",
         },
         {
           kind: "p",
@@ -145,7 +145,7 @@ export const article: Article = {
         {
           kind: "callout",
           tone: "rubric",
-          title: "It weighs. You decide.",
+          title: "The author decides",
           text: "Asten keeps the record; you keep the pen. Every mark names the rule, the sentence, and the settled fact it disagrees with, and any rule can be silenced with a reason.",
         },
       ],
@@ -156,23 +156,23 @@ export const article: Article = {
       blocks: [
         {
           kind: "p",
-          text: "Asten is a local-first writing desk with a memory, in early development. Here is the honest picture.",
+          text: "Asten is a local-first writing desk in early development. Here is what it does now.",
         },
         {
           kind: "p",
-          text: "You write in the [desk](/features/desk): a binder of chapters and scenes, a rich-text editor, comments, and named snapshots. As you go, you settle the details that matter as [canon](/glossary#canon). A [fact](/glossary#fact) is just an entity, a property, and a value, like *Mira · hair · auburn*. The [compiler](/features/compiler) then weighs the draft against that record with a short list of rules:",
+          text: "You write in the [desk](/features/desk): a binder of chapters and scenes, a rich-text editor, comments, and named snapshots. As you go, you settle the details that matter as [canon](/glossary#canon). A [fact](/glossary#fact) is just an entity, a property, and a value, like *Mira · hair · auburn*. The [compiler](/features/compiler) then weighs the draft against that record with seventeen rules in seven families. Three examples:",
         },
         {
           kind: "list",
           items: [
-            "**CANON-E013** marks an attribute with two confirmed values, like auburn and black.",
+            "**CANON-E013** marks an attribute with two values at the same point in story time, like auburn and black.",
             "**CANON-E101** marks a character who acts after a settled death.",
-            "**CANON-E201** marks the place where reading order and story time disagree.",
+            "**CANON-E201** marks story time stepping backward inside a run of scenes you declared continuous.",
           ],
         },
         {
           kind: "p",
-          text: "Those rules are deterministic. **No AI model runs in Asten today**, local or cloud. The checks compare facts you’ve confirmed. They don’t guess, and they don’t claim to understand your story. Asten also doesn’t pull facts out of your prose on its own yet; you settle them. Optional craft hints (a note when you lean on “very” or “really”) live in a [method pack](/glossary#method-pack) that is off by default, and they’re labeled as notes, not errors.",
+          text: "Those rules are deterministic. **No AI model runs in Asten today**, local or cloud. The checks compare facts you’ve confirmed with each other and with plain attributes that fixed rules read from the page. They don’t claim to understand your story, and anything they read from the page arrives as a proposal for you to confirm. Optional craft hints (a note when you lean on “very” or “really”) live in a [method pack](/glossary#method-pack) that is off by default, and they’re labeled as notes, not errors.",
         },
         {
           kind: "callout",
@@ -187,7 +187,7 @@ export const article: Article = {
       blocks: [
         {
           kind: "p",
-          text: "The [roadmap](/roadmap) has AI on it, in a narrow role. The plan is optional fact *proposals*: Asten reads a passage and asks something like “This looks like Mira’s hair is auburn. Settle it?” The order is deliberate: deterministic extraction first, then local machine learning, then optional AI. Every proposal waits for you to confirm it. Nothing becomes canon silently.",
+          text: "The [roadmap](/roadmap) has AI on it, in a narrow role. Asten already makes fact *proposals* from what fixed rules read on the page, along the lines of “This looks like Mira’s hair is auburn. Settle it?” The next step on the roadmap is small local classifiers that read more of the page and likewise only propose. Every proposal waits for you to confirm it. Nothing becomes canon silently.",
         },
         {
           kind: "list",
@@ -200,7 +200,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "All of that is planned, not shipped, and there are no dates. The [AI page](/ai) and the [AI policy](/ai-policy) say the same thing at more length.",
+          text: "The models are planned, not shipped, and there are no dates. The [AI page](/ai) and the [AI policy](/ai-policy) say the same thing at more length.",
         },
       ],
     },
@@ -225,7 +225,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "The point isn’t purity. It’s that the book should come out sounding like you, and that you should be able to say, without hedging, that you wrote it. Let the machine keep the ledger. Keep the pen.",
+          text: "The point isn’t purity. It’s that the book should come out sounding like you, and that you should be able to say, without hedging, that you wrote it.",
         },
       ],
     },

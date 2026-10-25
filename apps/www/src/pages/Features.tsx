@@ -12,16 +12,15 @@ export function Features() {
   return (
     <>
       <PageHero
-        eyebrow="Features"
-        title="Everything a long story needs. Nothing that writes it."
-        lede="A manuscript desk, a canon that checks itself, two clocks, an optional world, and doors open to Word and Google Docs. All of it on your own computer."
+        title="Features"
+        lede="A manuscript desk, canon checks, two clocks for story time, optional world tools, and add-ins for Word and Google Docs. Everything runs on your own computer."
         art={<PapyrusPlant />}
       />
       <Frieze kind="lotus" />
       <section className="register register--sunk" aria-label="All features">
         <div className="wrap">
           <div data-reveal style={{ marginBottom: 36 }}>
-            <Answer text="Asten’s features are the desk (binder, comments, find, page view, track changes, snapshots), canon checks with stable codes, a cast of entities, two clocks for story time and reading order, optional world tools, method packs, compile and import for Markdown, Fountain, HTML, and .docx with Word and Google Docs add-ins, and local-first storage." />
+            <Answer text="Asten’s features are the desk (binder, comments, find, page view, track changes, snapshots), canon checks with stable codes, a cast of entities, two clocks for story time and reading order, optional world tools, method packs, compile and import for Markdown, Fountain, HTML, .docx, EPUB (compile only), and Final Draft, Word and Google Docs add-ins, and local-first storage." />
           </div>
           <div className="card-grid">
             {features.map((feature, i) => (
@@ -39,7 +38,7 @@ export function Features() {
       </section>
       <section className="register" aria-labelledby="fa-h">
         <div className="wrap">
-          <SectionHead id="fa-h" eyebrow="By writer" title="Start from the way you write." />
+          <SectionHead id="fa-h" title="Features by kind of writer" />
           <div className="card-grid">
             {audiences.map((audience, i) => (
               <Link key={audience.slug} to={audience.path} className="card" data-reveal style={{ "--d": i } as CSSProperties}>

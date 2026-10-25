@@ -34,15 +34,15 @@ export const features: Feature[] = [
     title: "The desk: a manuscript editor built for long stories",
     description:
       "Asten’s desk is a calm manuscript editor: a binder for chapters and scenes, comments, find, word counts, a letter-sized page view, track changes, and snapshots.",
-    h1: "A quiet desk for a long manuscript.",
-    lede: "Chapters and scenes in a binder, a clean page in the middle, and Asten’s red marks in the margin. The page itself stays yours, with no ornament, no pop-ups, and no ghostwriter.",
+    h1: "A manuscript editor for long projects",
+    lede: "Chapters and scenes in a binder, a clean page in the middle, and Asten’s red marks in the margin. Asten adds marks beside the text and never changes it.",
     answer:
       "The Asten desk is a manuscript editor for long-form writing. It has a binder of chapters, scenes, notes, and sources; a rich-text page; comments; find; word counts; a letter-sized page view; track-change marks; and named snapshots. Diagnostics sit in the margin and never rewrite your text.",
     points: [
-      { title: "A binder, not a folder maze", text: "Manuscript, chapters, scenes, notes, and sources in one tree. Exclude a scene from compile without deleting it." },
-      { title: "A page that stays out of the way", text: "Headings, emphasis, and the formatting a manuscript needs. Literata on warm paper. Nothing animated near your words." },
+      { title: "A binder", text: "Manuscript, chapters, scenes, notes, and sources in one tree. Exclude a scene from compile without deleting it." },
+      { title: "The page", text: "Headings, emphasis, and the formatting a manuscript needs. Literata on warm paper. Nothing animated near your words." },
       { title: "Comments and track changes", text: "Leave notes to yourself or an editor. Insertions and deletions show as marks you can read back." },
-      { title: "Page view for the feel of length", text: "A letter-sized sheet with a running header, so you can feel how long the chapter is. It is not a typesetter." },
+      { title: "Page view", text: "A letter-sized sheet with a running header, so you can feel how long the chapter is. It is not a typesetter." },
       { title: "Find, counts, snapshots", text: "Find next and previous, live word counts, and named snapshots you can restore without any cloud." },
       { title: "Red in the margin", text: "When a page disagrees with your canon, the mark appears beside the sentence, with the evidence one click away." },
     ],
@@ -90,7 +90,7 @@ export const features: Feature[] = [
     title: "Canon checks: continuity without the spreadsheet",
     description:
       "Settle a fact once, like Mira’s auburn hair, and Asten marks any later page that disagrees, with the code, the evidence, and your options. You always decide.",
-    h1: "Settle it once. Asten remembers.",
+    h1: "Check the manuscript against settled facts",
     lede: "Canon is what your story says is true. Settle a fact (*Mira · hair · auburn*) and Asten weighs every later page against it. If chapter 19 says black, you get a red mark with both sides, never a rewrite.",
     answer:
       "Canon checks in Asten compare your manuscript against facts you have settled. A fact is an entity, a predicate, and a value, with a status, a modality, an optional span of story time, and a source. When two confirmed facts disagree, or the page says something different from what you settled, Asten marks it in red with code CANON-E013 and shows both sides. Asten reads plain attributes from your prose with fixed rules, not a model, and treats dialogue, belief, memory, and dreams as separate contexts.",
@@ -151,7 +151,7 @@ export const features: Feature[] = [
       },
     ],
     faqs: [
-      { q: "How does Asten know a sentence contradicts my canon?", a: "Asten compares facts you have settled, and for hair and eye colors it also looks for a different color word within a short window of the character’s name in your prose. It uses deterministic rules, not an AI model." },
+      { q: "How does Asten know a sentence contradicts my canon?", a: "Asten compares the facts you have settled with each other, and compares them with plain attributes it reads from your prose (hair and eye color, height, age, location, alive or dead, relations), each attributed to a name in the same sentence. It uses deterministic rules, not an AI model." },
       { q: "Can Asten handle a character who changes over the story?", a: "Yes. Give a fact a valid-from and valid-to in story time, and Asten only compares facts whose spans overlap, so auburn hair before the dye and black hair after it are not a contradiction." },
       { q: "Can I turn off a canon check in Asten?", a: "Yes. You can suppress a single mark or a whole rule, and the suppression is stored with the project. The attribute check belongs to the Scribe pack, which is always available, but any individual mark can be silenced." },
     ],
@@ -165,10 +165,10 @@ export const features: Feature[] = [
     name: "Cast",
     glyph: "seated",
     short: "Characters and other entities with aliases, notes, and the facts you’ve confirmed.",
-    title: "Cast: characters without the character-sheet homework",
+    title: "Cast: characters, places, and other entities",
     description:
       "The Asten cast keeps characters, places, items, and events as entities with aliases and confirmed facts. Name someone when the draft needs them, not before.",
-    h1: "Name someone when the draft needs them.",
+    h1: "Characters and other entities, added when you need them",
     lede: "The cast is a view of your book, not a form to fill in before chapter one. Characters, places, items, and events appear when you give them a fact worth keeping.",
     answer:
       "The Asten cast lists the entities in your story (characters, places, events, items, rules, sources, and others) with their aliases, notes, and confirmed facts. It is optional and grows as you write; nothing in it is required before you draft a scene.",
@@ -190,7 +190,7 @@ export const features: Feature[] = [
         id: "names-in-cartouches",
         heading: "Why are names drawn in cartouches?",
         blocks: [
-          { kind: "p", text: "Egyptian scribes enclosed royal names in a *cartouche*, an oval ring that marks a name as important. Asten borrows the idea: an entity’s name appears in a cartouche wherever it is referenced. Try writing a character’s name in one below. It’s a toy, but it is how the cast looks." },
+          { kind: "p", text: "Egyptian scribes enclosed royal names in a *cartouche*, an oval ring that marks a name as important. Asten borrows the idea: an entity’s name appears in a cartouche wherever it is referenced. The example below draws a name in one, using a playful alphabet rather than real hieroglyphic spelling." },
         ],
       },
     ],
@@ -210,8 +210,8 @@ export const features: Feature[] = [
     short: "Story time and reading order, kept separately, so flashbacks are a choice and not a mistake.",
     title: "Two clocks: story time and reading order",
     description:
-      "Asten keeps two clocks: when events happen (story time) and when readers meet them (reading order). It marks scenes whose story time runs backward, so you can decide.",
-    h1: "Two clocks, kept honest.",
+      "Asten keeps two clocks: when events happen (story time) and when readers meet them (reading order). It marks story time that steps backward inside a run of scenes you declared continuous.",
+    h1: "Story time and reading order, kept apart",
     lede: "Every story has two timelines: the order things happen, and the order readers find out. Asten keeps both, and marks the moments they cross so you can tell a flashback from a slip.",
     answer:
       "Asten tracks story time (when an event happens in the world) and reading order (when the reader meets it) as two separate clocks. A flashback is not a mistake: Asten argues only inside a run of scenes you declared continuous (CANON-E201), when the dates you gave cannot all be true (CANON-E202), or when an effect is seen before its cause (CANON-E203). Story time can be a day count, a Gregorian date, or a calendar you define.",
@@ -267,8 +267,8 @@ export const features: Feature[] = [
     title: "World: optional worldbuilding that never blocks the draft",
     description:
       "Asten’s world tools are optional: a wall for scraps, an atlas for places, and a dossier by kind. Ideas move from spark to sketched to settled, and settled ones can become canon.",
-    h1: "Most of the world stays below the sand.",
-    lede: "A novel shows readers the pyramid. The maps, factions, histories, and rules sit in the chambers underneath. Asten gives them a place to live without making you dig before you write.",
+    h1: "Optional world notes, connected to canon",
+    lede: "Maps, factions, histories, and rules get a place in Asten, and none of them has to exist before you write.",
     answer:
       "Asten’s world tools are an optional wall (loose cards for scraps), an atlas (a rough map for pinning places), and a dossier (entries grouped by kind). Entries can be places, cultures, systems, creatures, items, questions, or fragments, and move from spark to sketched to settled. Settling an entry can mint a confirmed fact.",
     points: [
@@ -311,7 +311,7 @@ export const features: Feature[] = [
     title: "The compiler: deterministic checks you can read",
     description:
       "Under Asten’s red marks is a deterministic engine with stable codes, four severities, explanation chains, repairs you own, suppressions, and a verifiable history of your edits.",
-    h1: "A compiler for your canon.",
+    h1: "Deterministic checks with stable codes",
     lede: "Programmers have compilers that read code and point at the line that breaks. Asten does the same for a story’s facts, with deterministic rules, stable codes, and evidence for every mark.",
     answer:
       "Asten’s compiler is a deterministic rule engine written in Rust. It reads your settled facts, your timeline, and the page itself, and emits diagnostics with stable codes (CANON-E013 to E602, NAME-W001 to W004, PLOT-I001 and I002, and optional CRAFT hints) at four severities: error, warning, information, and hint. Each mark explains itself in a numbered chain and offers repairs. It runs entirely on your machine and never changes your text.",
@@ -375,7 +375,7 @@ export const features: Feature[] = [
     title: "Method packs: rules you can decline",
     description:
       "Asten’s checks come in packs: Scribe (always on), Lifecycle, Clocks, Relations, Knowledge, Atlas, Invariants, and the optional Diction watch. Enable what helps you. No craft doctrine is ever a default.",
-    h1: "A pack is a set of rules you can decline.",
+    h1: "Optional groups of rules",
     lede: "Asten doesn’t believe in one right way to write. Its checks come in packs you turn on and off, and craft advice stays switched off until you ask for it.",
     answer:
       "Method packs are optional groups of rules in Asten. Eight ship today: Scribe (the core canon check and name hygiene, always on), Lifecycle, Clocks, Relations, Knowledge, Atlas, Invariants (your own world rules), and Diction watch (optional filter-word hints, off by default). Packs add marks; they never change your manuscript.",
@@ -418,10 +418,10 @@ export const features: Feature[] = [
     name: "Word & Google Docs",
     glyph: "door",
     short: "Compile to Markdown, Fountain, HTML, .docx, EPUB, and Final Draft. Optional Word and Docs add-ins talk to your own machine.",
-    title: "Word and Google Docs: welcome guests",
+    title: "Word and Google Docs: export, import, and add-ins",
     description:
       "Asten compiles to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx), and imports all but EPUB back. Optional Word and Google Docs add-ins show marks from your local Asten.",
-    h1: "Word and Google Docs are welcome guests.",
+    h1: "Export, import, and add-ins for Word and Google Docs",
     lede: "Your editor wants a .docx. Your co-writer lives in Google Docs. Asten sends the manuscript out and takes it back, and two small add-ins let those apps show Asten’s marks without your canon leaving your machine.",
     answer:
       "Asten compiles a manuscript to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, or Final Draft (.fdx), and imports every one of those except EPUB. PDF comes from printing the HTML. Optional Word and Google Docs add-ins pair once with a six-digit code shown in the desk, then list your local projects, show the Scales, and can file a selected passage into Asten; they talk only to the Asten API on 127.0.0.1:4317 and hold a token you can revoke.",
@@ -471,11 +471,11 @@ export const features: Feature[] = [
     name: "Local-first",
     glyph: "house",
     short: "One file on your computer. No account, no sync, no telemetry, no training.",
-    title: "Local-first: your manuscript never leaves home",
+    title: "Local-first: your manuscript stays on your computer",
     description:
       "Asten keeps your whole project in one SQLite file on your computer. No account, no sync, no telemetry, and no training on your words. Export anytime.",
-    h1: "Your manuscript never leaves home.",
-    lede: "No account. No cloud. No telemetry. No training. Your project is a single file on your own disk, and if Asten disappeared tomorrow your words would still be yours, in formats anything can open.",
+    h1: "Your manuscript stays on your computer",
+    lede: "Asten has no account, no cloud storage, and no telemetry, and your manuscript is not used for training. Your project is a single file on your own disk, and you can export it to open formats at any time.",
     answer:
       "Asten is local-first: every project lives in a SQLite database file on your computer (asten.db, in the operating system’s app-data folder). There is no account, no sync service, and no telemetry, and Verne never receives your manuscript. You can export to Markdown, plain text, Fountain, HTML, .docx, EPUB, or Final Draft (.fdx) at any time.",
     points: [
@@ -484,7 +484,7 @@ export const features: Feature[] = [
       { title: "No sync, no telemetry", text: "Asten doesn’t phone home. Verne can’t see your book because Verne never receives it." },
       { title: "Never trained on", text: "Your manuscript will never be used to train a model, by Verne or anyone Verne works with." },
       { title: "Open exits", text: "Export to open formats any time. Copy the database file to back it up." },
-      { title: "Works offline", text: "On a plane, in a cabin, during an outage. Your desk is always open." },
+      { title: "Works offline", text: "The desktop app needs no network connection. The Word and Docs add-ins depend on those apps." },
     ],
     sections: [
       {
@@ -510,7 +510,7 @@ export const features: Feature[] = [
         id: "the-website-too",
         heading: "And this website?",
         blocks: [
-          { kind: "p", text: "The same principle applies here. This site sets no cookies, runs no analytics, loads no third-party fonts or scripts, and shows no ads. The only thing it stores is your light or dark theme choice, in your own browser, if you press the moon. See the [privacy policy](/privacy)." },
+          { kind: "p", text: "The same principle applies here. This site sets no cookies, runs no analytics, loads no third-party fonts or scripts, and shows no ads. The only thing it stores is your light or dark theme choice, in your own browser, if you change it. See the [privacy policy](/privacy)." },
         ],
       },
     ],

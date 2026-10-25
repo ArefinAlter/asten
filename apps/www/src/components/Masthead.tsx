@@ -132,7 +132,7 @@ export function Masthead() {
                   ))}
                 </div>
                 <div className="menu-foot">
-                  <span>Everything a long story needs. Nothing that writes it.</span>
+                  <span>Every feature runs on your own computer.</span>
                   <Link to="/features" className="link-arrow">
                     All features <Arrow />
                   </Link>
@@ -161,7 +161,7 @@ export function Masthead() {
                   ))}
                 </div>
                 <div className="menu-foot">
-                  <span>Not sure it fits?</span>
+                  <span>Comparisons with other kinds of tools</span>
                   <Link to="/compare" className="link-arrow">
                     Compare <Arrow />
                   </Link>

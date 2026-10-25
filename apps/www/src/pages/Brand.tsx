@@ -76,12 +76,7 @@ export function Brand() {
   return (
     <>
       <PageHero
-        eyebrow="Brand & press"
-        title={
-          <>
-            Black ink for the writer. <em>Red</em> for the editor.
-          </>
-        }
+        title="Brand guidelines and press kit"
         lede="The Asten brand in one page: the idea, the mark, the scribe’s pigments, the type, the registers, the art, the motion, and the voice. Press can download the logo files at the bottom."
         art={<CartoucheWordmark className="brand-hero-cartouche" />}
       >
@@ -103,8 +98,7 @@ export function Brand() {
         <div className="wrap">
           <SectionHead
             id="b-logo"
-            eyebrow="01 · Logo"
-            title="The Palette mark."
+            title="Logo: the Palette mark"
             text="A scribe’s palette seen from above, after the hieroglyph for scribe and writing (Y3): one black well for the writer, one red well for the editor, and a reed pen at rest in its slot."
           />
           <div className="logo-sheet">
@@ -157,8 +151,7 @@ export function Brand() {
         <div className="wrap">
           <SectionHead
             id="b-color"
-            eyebrow="02 · Colour"
-            title="The scribe’s pigments."
+            title="Colour"
             text="Egyptian painters used a small mineral palette: carbon, red and yellow ochre, Egyptian blue, malachite, gypsum white, and gold. So do we, always flat. Red is reserved: it means Asten is speaking."
           />
           <div className="swatches">
@@ -193,8 +186,7 @@ export function Brand() {
         <div className="wrap">
           <SectionHead
             id="b-type"
-            eyebrow="03 · Typography"
-            title="Three voices."
+            title="Typography"
             text="All self-hosted, all under the SIL Open Font License."
           />
           <div className="type-specimens">
@@ -220,8 +212,7 @@ export function Brand() {
         <div className="wrap">
           <SectionHead
             id="b-layout"
-            eyebrow="04 · Layout and ornament"
-            title="Registers, ground lines, friezes."
+            title="Layout and ornament"
             text="Egyptian walls are organised in horizontal registers, each standing on a ground line. Our pages are too. Ornament frames content and never sits behind running text."
           />
           <div className="frieze-sheet">
@@ -239,8 +230,7 @@ export function Brand() {
         <div className="wrap">
           <SectionHead
             id="b-art"
-            eyebrow="05 · Illustration"
-            title="The flat canon."
+            title="Illustration"
             text="Original SVG drawings in the Egyptian composite view: head and legs in profile, shoulders and eye frontal, flat pigment fills, carbon outlines, ground lines, no gradients and no perspective."
           />
           <div className="art-sheet">
@@ -284,8 +274,7 @@ export function Brand() {
         <div className="wrap">
           <SectionHead
             id="b-icons"
-            eyebrow="06 · Iconography"
-            title="Icons that were already words."
+            title="Icons"
             text="Each icon is drawn from a hieroglyph that already meant the thing: the papyrus roll for writing, the feather for truth, the house plan for home. 32-unit grid, round joins, one optional flat fill."
           />
           <div className="glyph-sheet">
@@ -304,8 +293,7 @@ export function Brand() {
           <div>
             <SectionHead
               id="b-motion"
-              eyebrow="07 · Motion"
-              title="The reed draws."
+              title="Motion"
               text="Motion should feel like ink going down: deliberate, then still. Black first, red after a beat, because Asten never interrupts."
             />
           </div>
@@ -336,7 +324,7 @@ export function Brand() {
 
       <section className="register register--sunk" aria-labelledby="b-voice">
         <div className="wrap">
-          <SectionHead id="b-voice" eyebrow="08 · Voice" title="A good scribe: calm, precise, warm, slightly wry." />
+          <SectionHead id="b-voice" title="Voice" text="Calm, precise, and plain. Asten speaks like a careful reader, not a salesperson." />
           <div className="table-wrap">
             <table>
               <thead>
@@ -367,7 +355,9 @@ export function Brand() {
           </div>
           <p className="fine" style={{ marginTop: 18 }}>
             Words we use: notice, mark, weigh, record, settle, canon, your call. Words we avoid: generate, supercharge, unleash,
-            magic, seamless, effortless, game-changing.
+            magic, seamless, effortless, game-changing. Headings describe what follows, in plain words: no kicker labels or
+            numbering above them, no slogan or punchline headings, and no copy that tells the reader to hover, click, or try
+            something.
           </p>
         </div>
       </section>
@@ -376,8 +366,7 @@ export function Brand() {
         <div className="wrap">
           <SectionHead
             id="b-product"
-            eyebrow="09 · In the product"
-            title="The page is sacred."
+            title="In the product"
             text="Inside the desk, ornament steps back. The page is plain papyrus and carbon ink. Asten’s voice is red, in the margin. Settled canon is green. Names sit in cartouches. Art lives at the edges: empty states, onboarding, the splash."
           />
           <DeskMock />
@@ -386,8 +375,7 @@ export function Brand() {
 
       <section className="register register--sunk" aria-labelledby="b-respect">
         <div className="wrap wrap-narrow prose">
-          <p className="eyebrow">10 · Respect the source</p>
-          <h2 id="b-respect">Egyptian art is heritage, not a costume.</h2>
+          <h2 id="b-respect">Using Egyptian art with care</h2>
           <p>
             No mummy jokes, curses, or pharaoh kitsch. No invented hieroglyphic “text”: when we show real signs, we name them, and
             the cartouche name toy is labeled as a playful alphabet. Thoth is drawn with dignity, with his ibis head, lunar disk,
@@ -400,8 +388,7 @@ export function Brand() {
         <div className="wrap">
           <SectionHead
             id="b-dl"
-            eyebrow="Press kit"
-            title="Downloads."
+            title="Press kit downloads"
             text="Use these files unaltered when writing about Asten. For anything else, see the trademark policy or write to us."
           />
           <div className="related">

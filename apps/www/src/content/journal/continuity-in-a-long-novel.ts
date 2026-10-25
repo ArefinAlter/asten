@@ -9,7 +9,7 @@ export const article: Article = {
     "Most continuity slips fall into six families: attributes, lifecycles, timeline, names, objects, and places.",
     "A style sheet, a scene list, and targeted search passes catch most of them by hand.",
     "Check at the seams: after a draft, after moving scenes, and before the book goes out.",
-    "The real trick is settling a detail once, in one place, so later pages have something to be checked against.",
+    "The most useful step is settling a detail once, in one place, so later pages have something to be checked against.",
     "Asten marks contradictions against facts you’ve confirmed; deciding which side is right stays with you.",
   ],
   sections: [
@@ -23,7 +23,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "Revision makes it worse, not better. You cut the scene where Oren loses his ship and forget that chapter 14 still mentions the loss. You rename a city and miss three of the forty mentions. Each fix is local; the damage is global.",
+          text: "Revision makes it worse, not better. You cut the scene where Oren loses his ship and forget that chapter 14 still mentions the loss. You rename a city and miss three of the forty mentions.",
         },
         {
           kind: "p",
@@ -247,7 +247,7 @@ export const article: Article = {
       blocks: [
         {
           kind: "p",
-          text: "Be wary of any tool that promises to catch everything. Asten doesn’t. Today it doesn’t pull facts out of your prose on its own; you settle them. Fact proposals drawn from your pages are [planned](/roadmap), and they’ll always wait for you to confirm them. There are no travel-time checks yet, and no check for a character who knows something they shouldn’t; both are planned too. Name drift is still a job for your search passes, though giving an entity its aliases means “the Captain” and Oren are recorded as the same person.",
+          text: "Be wary of any tool that promises to catch everything. Asten doesn’t. It reads only plain attributes from your prose, such as hair color, age, or whether someone is alive, and only when a name is in the same sentence; a pronoun on its own is not weighed, and what it reads arrives as a proposal for you to confirm. Travel checks work only along routes you declare with a travel time. Name drift is still partly a job for your search passes, though Asten flags names that aren’t in the cast and names that are easy to confuse, and giving an entity its aliases means “the Captain” and Oren are recorded as the same person.",
         },
         {
           kind: "p",
@@ -256,7 +256,7 @@ export const article: Article = {
         {
           kind: "callout",
           tone: "rubric",
-          title: "Asten keeps the record. You keep the pen.",
+          title: "What a mark does",
           text: "Marks point at a sentence and the settled fact it disagrees with. They never rewrite it. No AI model runs in Asten today; the checks are deterministic rules over facts you confirm.",
         },
       ],
@@ -273,7 +273,7 @@ export const article: Article = {
     },
     {
       q: "Can software find continuity errors automatically?",
-      a: "Software can compare new pages against details you have settled. Asten marks contradictions against confirmed facts, but today it does not pull facts out of prose on its own; you settle them.",
+      a: "Software can compare new pages against details you have settled. Asten marks contradictions against confirmed facts. It also reads plain attributes from the page with fixed rules, but only proposes them; you decide what is settled.",
     },
     {
       q: "How does Asten handle a character who changes, like dyed hair?",

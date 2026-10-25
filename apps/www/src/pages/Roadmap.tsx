@@ -7,15 +7,14 @@ export function Roadmap() {
   return (
     <>
       <PageHero
-        eyebrow="Roadmap"
         title="Shipped, next, later, and never."
-        lede="What Asten does today, what we’re building, and the lines we won’t cross. No dates until they’re real."
+        lede="What Asten does today, what is being built next, what comes later, and what Asten will not do. There are no dates."
         art={<LunarEmblem />}
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
           <div data-reveal>
-            <Answer text="Asten’s early-access builds include the desk, canon with three continuity rules, method packs, cast, two clocks, optional world tools, compile and import, the Word and Docs add-ins, and local-first storage. Next: a signed installer, flashback-aware clocks, fact proposals, and custom calendars. Never: writing your prose or training on it." />
+            <Answer text="The current code includes the desk, canon with seventeen rules in seven families, rule-based reading of the page, method packs, cast, two clocks with calendars, optional world tools, compile and import, the Word and Docs add-ins, generated API contracts, and local-first storage. Next: verified and signed installers, tested Android and iOS shells, and verified ARM builds. Never: writing your prose or training on it." />
           </div>
         </div>
       </section>

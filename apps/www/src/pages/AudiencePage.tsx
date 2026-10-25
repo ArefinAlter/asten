@@ -30,7 +30,7 @@ export function AudiencePage({ audience }: { audience: Audience }) {
   const others = audiences.filter((item) => item.slug !== audience.slug);
   return (
     <>
-      <PageHero eyebrow={`For ${audience.name.toLowerCase()}`} title={audience.h1} lede={audience.lede} art={<ArtFor art={audience.art} />}>
+      <PageHero title={audience.h1} lede={audience.lede} art={<ArtFor art={audience.art} />}>
         <div className="btn-row">
           <Link to="/download" className="btn btn--primary" data-magnetic>
             Get early access
@@ -46,7 +46,7 @@ export function AudiencePage({ audience }: { audience: Audience }) {
           <div data-reveal style={{ marginBottom: 40 }}>
             <Answer text={audience.answer} />
           </div>
-          <SectionHead id="pain-h" eyebrow="Sound familiar?" title="The trouble with long stories." />
+          <SectionHead id="pain-h" title="Common problems" />
           <div className="card-grid card-grid--3">
             {audience.pains.map((pain, i) => (
               <div key={pain.title} className="card pain" data-reveal style={{ "--d": i } as CSSProperties}>
@@ -60,7 +60,7 @@ export function AudiencePage({ audience }: { audience: Audience }) {
 
       <section className="register" aria-labelledby="help-h">
         <div className="wrap">
-          <SectionHead id="help-h" eyebrow="How Asten helps" title="What changes on your desk." />
+          <SectionHead id="help-h" title="How Asten helps" />
           <div className="card-grid card-grid--2">
             {audience.helps.map((help, i) => (
               <Link key={help.title} to={help.href} className="card card--carved" data-reveal style={{ "--d": i % 2 } as CSSProperties}>
@@ -78,7 +78,6 @@ export function AudiencePage({ audience }: { audience: Audience }) {
       <section className="register register--raised" aria-labelledby="scene-h">
         <div className="wrap scenario-grid">
           <div data-reveal>
-            <p className="eyebrow">A scene from the desk</p>
             <h2 id="scene-h">{audience.scenario.title}</h2>
             <ol className="scenario">
               {audience.scenario.lines.map((line, i) => (
@@ -94,7 +93,7 @@ export function AudiencePage({ audience }: { audience: Audience }) {
 
       <section className="register register--sunk" aria-labelledby="honest-h">
         <div className="wrap wrap-narrow">
-          <SectionHead id="honest-h" eyebrow="Honest limits" title="What Asten doesn’t do (yet)." />
+          <SectionHead id="honest-h" title="Limits" />
           <ul className="honest-list" data-reveal>
             {audience.honest.map((line) => (
               <li key={line}>{line}</li>
@@ -105,14 +104,14 @@ export function AudiencePage({ audience }: { audience: Audience }) {
 
       <section className="register" aria-labelledby="afaq-h">
         <div className="wrap wrap-narrow">
-          <SectionHead id="afaq-h" eyebrow="Questions" title={`Asten for ${audience.name.toLowerCase()}`} />
+          <SectionHead id="afaq-h" title={`Asten for ${audience.name.toLowerCase()}`} />
           <FaqList items={audience.faqs} />
         </div>
       </section>
 
       <section className="register register--sunk" aria-labelledby="others-h">
         <div className="wrap">
-          <SectionHead id="others-h" eyebrow="Also for" title="Other writers at the desk." />
+          <SectionHead id="others-h" title="Asten for other writers" />
           <div className="feature-strip">
             {others.map((item) => (
               <Link key={item.slug} to={item.path} className="feature-chip">

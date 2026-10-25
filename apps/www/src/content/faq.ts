@@ -11,7 +11,7 @@ export const faq: FaqGroup[] = [
     items: [
       {
         q: "What is Asten?",
-        a: "Asten is a local-first writing app for creative writers: a writing desk plus a rule engine that remembers the facts of your story and marks the moment a draft contradicts them. Asten never writes prose. Your words are black ink, and Asten only ever writes in red. See [how it works](/how-it-works).",
+        a: "Asten is a local-first writing app for creative writers: a writing desk plus a rule engine that remembers the facts of your story and marks the moment a draft contradicts them. Asten never writes prose; it only adds marks beside your text. See [how it works](/how-it-works).",
       },
       {
         q: "Who makes Asten?",
@@ -35,7 +35,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Can I use Asten for non-fiction?",
-        a: "Asten is built for stories: its checks compare facts about characters, places, events, and time. You can still use the desk, binder, snapshots, and compile for any long document, and entities can include sources, but research and citation tools are only planned so far.",
+        a: "Asten is built for stories: its checks compare facts about characters, places, events, and time. You can still use the desk, binder, snapshots, and compile for any long document, and entities can include sources, but Asten has no research or citation tools.",
       },
     ],
   },
@@ -53,7 +53,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Will Asten add AI features in the future?",
-        a: "Asten plans optional fact proposals drawn from your prose: deterministic first, then local machine learning, then optional AI, always as proposals you confirm and never as silent canon. The plan puts local models first, allows a cloud model only with your own provider key and your explicit consent, and includes a complete AI switch-off. None of this has a date; see [the roadmap](/roadmap).",
+        a: "Asten already proposes facts it reads from the page, using fixed rules rather than a model. The roadmap’s later step is small local classifiers that read mentions, attributes, time phrases, and speakers, and that likewise only propose: nothing becomes canon until you confirm it. The [AI policy](/ai-policy) sets the conditions for any AI feature: local models first, a cloud provider only with your own key and explicit consent, and a complete switch-off. None of this has a date; see [the roadmap](/roadmap).",
       },
       {
         q: "Will my writing be used to train an AI model?",
@@ -61,7 +61,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "How is Asten different from AI writing tools?",
-        a: "AI story generators are designed to produce prose; Asten is designed never to. Asten remembers what you’ve decided about your story, like Mira’s auburn hair or Captain Oren’s death in chapter 9, and points at the place where a draft disagrees. Your words stay black ink, and Asten only ever writes in red. See [the comparison](/compare).",
+        a: "AI story generators are designed to produce prose; Asten is designed never to. Asten remembers what you’ve decided about your story, like Mira’s auburn hair or Captain Oren’s death in chapter 9, and points at the place where a draft disagrees. See [the comparison](/compare).",
       },
       {
         q: "Can I use ChatGPT or Claude alongside Asten?",
@@ -179,7 +179,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What’s on the Asten roadmap?",
-        a: "Asten’s roadmap includes a signed desktop installer; small local perception models that propose, never generate; generated API contracts; a graph, maps, boards, research, and citations; a runtime for plugins and packs; and, later, collaboration that keeps offline work. Everything on it is planned, with no promised dates. See [the roadmap](/roadmap).",
+        a: "Next on Asten’s roadmap are verified and signed desktop installers, tested Android and iOS shells, and verified ARM builds. Later items include small local perception models that propose facts and never generate text, a graph, maps, and boards, a runtime for third-party packs, and collaboration that keeps offline work. None of it has a date. See [the roadmap](/roadmap).",
       },
       {
         q: "How do I report a bug or security issue in Asten?",

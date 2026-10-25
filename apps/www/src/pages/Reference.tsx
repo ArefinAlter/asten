@@ -26,8 +26,7 @@ export function Glossary() {
   return (
     <>
       <PageHero
-        eyebrow="Glossary"
-        title="The words of the scribe’s trade."
+        title="Glossary"
         lede="Plain definitions of the terms used in Asten and in conversations about continuity, story structure, and local-first software."
         art={<Lotus />}
       />
@@ -110,8 +109,7 @@ export function Faq() {
   return (
     <>
       <PageHero
-        eyebrow="Questions"
-        title="Asked, and answered plainly."
+        title="Questions and answers"
         lede="Everything people ask about Asten: what it is, whether it uses AI, where your files live, what it checks, how to get it, and who makes it."
         art={<IbisStandard />}
       >
@@ -126,7 +124,6 @@ export function Faq() {
       {faq.map((group, i) => (
         <section key={group.id} id={group.id} className={`register ${i % 2 === 0 ? "register--sunk" : ""}`} aria-labelledby={`${group.id}-h`}>
           <div className="wrap wrap-narrow">
-            <p className="eyebrow">{String(i + 1).padStart(2, "0")}</p>
             <h2 id={`${group.id}-h`} style={{ marginBottom: 26 }}>
               {group.title}
             </h2>
@@ -134,7 +131,7 @@ export function Faq() {
           </div>
         </section>
       ))}
-      <CtaBand title="Still wondering?" text={`Write to ${site.email}. A person reads every message.`} />
+      <CtaBand title="Other questions" text={`Write to ${site.email}.`} />
     </>
   );
 }
@@ -143,8 +140,7 @@ export function Guide() {
   return (
     <>
       <PageHero
-        eyebrow="The record"
-        title="Everything Asten is, on one page."
+        title="The complete guide to Asten"
         lede="A complete description of Asten for readers, reviewers, and answer engines: what it does, what it refuses, how it works, where it stands, and who makes it."
         art={<PaletteMark className="hero-palette" />}
       />

@@ -5,7 +5,7 @@ export interface Step {
   text: string;
 }
 
-/** The three-step story told on the home page and /how-it-works. */
+/** The four steps shown on the home page and /how-it-works. */
 export const howSteps: Step[] = [
   {
     title: "Write",
@@ -33,7 +33,7 @@ export const accessSteps: Step[] = [
   },
   {
     title: "Install the desk",
-    text: "Invited writers receive a build and setup notes. Asten runs as a desktop shell, or in your browser against a small server on your own machine.",
+    text: "Invited writers receive setup notes. Asten runs as a desktop shell, or in your browser against a small server on your own machine. There is no verified or signed installer yet.",
   },
   {
     title: "Start a project",
@@ -41,7 +41,7 @@ export const accessSteps: Step[] = [
   },
   {
     title: "Keep a copy",
-    text: "Your project is one file on your disk. Take snapshots as you go, and export to Markdown, Fountain, HTML, or .docx whenever you like.",
+    text: "Your project is one file on your disk. Take snapshots as you go, and export to Markdown, Fountain, HTML, .docx, EPUB, or Final Draft whenever you like.",
   },
 ];
 
@@ -52,7 +52,7 @@ export const homeFaqs: QA[] = [
   },
   {
     q: "Does Asten use AI?",
-    a: "No model runs, local or remote. Asten reads names and plain attributes from the page with fixed rules and weighs them against facts you confirm. Planned perception models are small local classifiers that only propose, and any generative AI, if it ever comes, will be optional, local first, and switchable off entirely.",
+    a: "No model runs, local or remote. Asten reads names and plain attributes from the page with fixed rules and weighs them against facts you confirm. Planned perception models are small local classifiers that only propose facts for you to confirm; they do not write text.",
   },
   {
     q: "Will my writing be used to train AI?",

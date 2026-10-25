@@ -59,7 +59,7 @@ const product: RouteMeta[] = [
     kind: "home",
     schema: "web",
     priority: 1,
-    og: { eyebrow: "A writing desk with a memory", headline: "Let AI be your editor, not your writer." },
+    og: { eyebrow: "Asten", headline: "Let AI be your editor, not your writer." },
   }),
   page({
     path: "/how-it-works",
@@ -70,18 +70,18 @@ const product: RouteMeta[] = [
     kind: "product",
     schema: "howto",
     priority: 0.9,
-    og: { eyebrow: "How it works", headline: "Write. Settle. Notice. You decide." },
+    og: { eyebrow: "How it works", headline: "How Asten works" },
   }),
   page({
     path: "/features",
-    title: "Features: everything a long story needs",
+    title: "Features",
     description:
-      "The desk, canon checks, cast, two clocks, an optional world, method packs, Word and Google Docs guests, and local-first files. Everything except a ghostwriter.",
+      "The desk, canon checks, cast, two clocks, an optional world, method packs, Word and Google Docs guests, and local-first files.",
     label: "Features",
     kind: "product",
     schema: "collection",
     priority: 0.9,
-    og: { eyebrow: "Features", headline: "Everything a long story needs. Nothing that writes it." },
+    og: { eyebrow: "Features", headline: "What Asten includes" },
   }),
   ...features.map((feature) =>
     page({
@@ -104,7 +104,7 @@ const product: RouteMeta[] = [
     kind: "product",
     schema: "article",
     priority: 0.9,
-    og: { eyebrow: "Our AI stance", headline: "The pen stays in your hand." },
+    og: { eyebrow: "Our AI stance", headline: "Asten and AI" },
   }),
   ...audiences.map((audience) =>
     page({
@@ -138,13 +138,13 @@ const product: RouteMeta[] = [
     kind: "product",
     schema: "howto",
     priority: 0.9,
-    og: { eyebrow: "Early access", headline: "Get Asten on your own machine." },
+    og: { eyebrow: "Early access", headline: "Early access by invitation" },
   }),
   page({
     path: "/roadmap",
     title: "Roadmap: shipped, next, later, never",
     description:
-      "What Asten does today, what is planned next, what comes later, and the things it will never do. Honest status, no dates we can’t keep.",
+      "What Asten does today, what is planned next, what comes later, and the things it will never do. No dates are given.",
     label: "Roadmap",
     kind: "product",
     schema: "article",
@@ -163,7 +163,7 @@ const learn: RouteMeta[] = [
     kind: "journal",
     schema: "collection",
     priority: 0.8,
-    og: { eyebrow: "The Journal", headline: "Craft notes from the scribe’s desk." },
+    og: { eyebrow: "The Journal", headline: "Journal" },
   }),
   ...articles.map((article) =>
     page({
@@ -189,18 +189,18 @@ const learn: RouteMeta[] = [
     kind: "learn",
     schema: "glossary",
     priority: 0.7,
-    og: { eyebrow: "Glossary", headline: "The words of the scribe’s trade." },
+    og: { eyebrow: "Glossary", headline: "Writing and continuity terms" },
   }),
   page({
     path: "/faq",
     title: "Questions and answers",
     description:
-      "Straight answers about Asten: what it is, whether it uses AI, where your files live, what it checks, how to get it, and who makes it.",
+      "Answers about Asten: what it is, whether it uses AI, where your files live, what it checks, how to get it, and who makes it.",
     label: "FAQ",
     kind: "learn",
     schema: "faq",
     priority: 0.8,
-    og: { eyebrow: "Questions", headline: "Asked, and answered plainly." },
+    og: { eyebrow: "Questions", headline: "Questions and answers" },
   }),
   page({
     path: "/guide",
@@ -211,7 +211,7 @@ const learn: RouteMeta[] = [
     kind: "learn",
     schema: "article",
     priority: 0.8,
-    og: { eyebrow: "The record", headline: "Everything Asten is, on one page." },
+    og: { eyebrow: "Guide", headline: "The complete guide to Asten" },
   }),
   page({
     path: "/name",
@@ -236,7 +236,7 @@ const company: RouteMeta[] = [
     kind: "company",
     schema: "about",
     priority: 0.6,
-    og: { eyebrow: "About", headline: "Made by Verne, for writers who keep the pen." },
+    og: { eyebrow: "About", headline: "About Asten and Verne" },
   }),
   page({
     path: "/brand",
@@ -247,7 +247,7 @@ const company: RouteMeta[] = [
     kind: "company",
     schema: "web",
     priority: 0.5,
-    og: { eyebrow: "Brand & press", headline: "Black ink for the writer. Red for the editor." },
+    og: { eyebrow: "Brand & press", headline: "Brand guidelines and press kit" },
   }),
   page({
     path: "/contact",
@@ -258,7 +258,7 @@ const company: RouteMeta[] = [
     kind: "company",
     schema: "contact",
     priority: 0.6,
-    og: { eyebrow: "Contact", headline: "Write to the scribes." },
+    og: { eyebrow: "Contact", headline: "Contact Verne about Asten" },
   }),
   page({
     path: "/legal",
@@ -269,7 +269,7 @@ const company: RouteMeta[] = [
     kind: "legal",
     schema: "collection",
     priority: 0.4,
-    og: { eyebrow: "Legal", headline: "Policies written to be read." },
+    og: { eyebrow: "Legal", headline: "Policies and notices" },
   }),
   ...legalDocs.map((doc) =>
     page({
@@ -289,11 +289,11 @@ const company: RouteMeta[] = [
 export const notFound: RouteMeta = page({
   path: "/404",
   title: "Page not found",
-  description: "This page was lost to the sand. The rest of the Asten site is still standing.",
+  description: "There is no page at this address.",
   label: "Not found",
   kind: "error",
   noindex: true,
-  og: { eyebrow: "404", headline: "Lost to the sand." },
+  og: { eyebrow: "404", headline: "Page not found" },
 });
 
 export const routes: RouteMeta[] = [...product, ...learn, ...company, notFound];

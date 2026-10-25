@@ -53,7 +53,7 @@ export function Footer() {
         <div className="footer-brand">
           <BrandLink />
           <p className="footer-tagline">{site.tagline}</p>
-          <p>A writing desk with a memory. Your words stay in black, our marks stay in red, and your files stay on your machine.</p>
+          <p>A local-first writing desk that marks where a draft contradicts the facts you have settled. It never changes your text.</p>
           <div className="footer-cartouche">
             <CartoucheWordmark />
           </div>
