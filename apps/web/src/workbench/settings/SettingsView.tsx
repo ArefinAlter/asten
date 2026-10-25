@@ -25,6 +25,8 @@ import { FIXED_RULES } from "../agent/AgentPanel";
 import { SKILLS } from "../agent/skills";
 import { TOOLS } from "../agent/tools";
 import { CONNECTORS, type Connector } from "./connectors";
+import { hostedSession, hostedStartOver, isHosted } from "../../lib/storage";
+import { RELEASE } from "../../version";
 
 const ProjectSettings = lazy(() =>
   import("../../settings/Settings").then((m) => ({ default: m.Settings })),
@@ -880,7 +882,11 @@ function Providers() {
         />
         <Fixed
           title="This release"
-          note="Providers are configured here but not called: the assistant answers from Asten's own tools. The hosted copy makes no network request at all."
+          note={
+            isHosted()
+              ? "Providers are configured here but not called: the assistant answers from Asten's own tools. These settings are kept with your sandbox; keys never leave this tab's memory."
+              : "Providers are configured here but not called: the assistant answers from Asten's own tools. No request goes to any provider."
+          }
         />
       </Card>
       <section className={`wb-card${prefs.aiEnabled ? "" : " is-off"}`}>
@@ -1323,11 +1329,14 @@ function About() {
         <div>
           <h1>Asten</h1>
           <p className="muted">
-            Pre-alpha release 0.1.0 · a writing desk with a memory · Verne Ltd.
+            Pre-alpha release {RELEASE} · a writing desk with a memory · Verne
+            Ltd.
           </p>
         </div>
       </div>
-      {api.sample ? (
+      {isHosted() ? (
+        <HostedAbout />
+      ) : api.sample ? (
         <Card title="This release">
           <p className="about-text">
             It runs on sample data with no backend: a short sample novel written
@@ -1386,6 +1395,103 @@ function About() {
         <p className="about-text">
           Verne Ltd. Your words in black. Our marks in red.
         </p>
+      </Card>
+    </>
+  );
+}
+
+/** About, on the hosted pre-alpha: what runs where, and this visit's limits. */
+function HostedAbout() {
+  const session = useQuery({
+    queryKey: ["hosted-session"],
+    queryFn: hostedSession,
+  });
+  const [confirming, setConfirming] = useState(false);
+  const data = session.data;
+  const expires = data ? new Date(data.expires_at) : undefined;
+  return (
+    <>
+      <Card title="This release">
+        <p className="about-text">
+          This is the real workbench with the real engine, running on Verne's
+          server in a sandbox of your own. Other visitors cannot see it. It
+          started on a short sample novel written for Asten; change anything.
+          Everything here is deleted{" "}
+          {expires
+            ? `on ${expires.toLocaleString(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}`
+            : "24 hours after your first visit"}
+          . For your own manuscripts, use the desktop app: it keeps everything
+          on your machine.
+        </p>
+        <div className="about-split">
+          <div>
+            <h3>The Asten API (the product server)</h3>
+            <ul>
+              {(data?.served_by.api ?? []).map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3>The pre-alpha service</h3>
+            <ul>
+              {(data?.served_by.service ?? []).map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+            <h3>This tab's memory only</h3>
+            <ul>
+              {(data?.served_by.browser_memory ?? []).map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <p className="about-text muted">
+          The assistant answers from Asten's own tools; no model is called and
+          it never writes prose. Word and Docs guests pair with the desktop app,
+          not with this sandbox.
+          {data
+            ? ` Sandbox size: ${Math.ceil(data.sandbox_bytes / 1024)} KB of ${Math.round(
+                data.limits.max_sandbox_bytes / 1024 / 1024,
+              )} MB.`
+            : ""}
+        </p>
+      </Card>
+      <Card title="Start over">
+        <p className="about-text">
+          Delete this sandbox and its settings now and begin again on the sample
+          novel.
+        </p>
+        {confirming ? (
+          <div className="about-actions">
+            <button
+              type="button"
+              className="wb-btn wb-btn--danger"
+              onClick={() => void hostedStartOver()}
+            >
+              Delete and start over
+            </button>
+            <button
+              type="button"
+              className="wb-btn"
+              onClick={() => setConfirming(false)}
+            >
+              Keep it
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="wb-btn"
+            onClick={() => setConfirming(true)}
+          >
+            Start over…
+          </button>
+        )}
       </Card>
     </>
   );

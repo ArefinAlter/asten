@@ -8,7 +8,7 @@ import { PyramidSection } from "../art/Pyramid";
 import { Scales } from "../art/Scales";
 import type { ArtKey } from "../content/types";
 import { breadcrumbsFor, metaFor } from "../routes";
-import { accessHref } from "../site";
+import { release } from "../content/release";
 import { Arrow } from "./Icons";
 import { Inline } from "./Inline";
 
@@ -134,8 +134,8 @@ export function Related({ paths, title = "Keep reading" }: { paths: string[]; ti
 }
 
 export function CtaBand({
-  title = "Asten is in early access",
-  text = "Ask for an invitation and tell us what you’re writing.",
+  title = "Try the pre-alpha",
+  text = "Open the workbench in your browser on a sample novel, or download release 0.0.1a for Windows or Linux.",
 }: {
   title?: string;
   text?: string;
@@ -149,11 +149,11 @@ export function CtaBand({
           <p>{text}</p>
         </div>
         <div className="btn-row">
-          <a className="btn btn--primary" href={accessHref} data-magnetic>
-            Ask for early access
+          <a className="btn btn--primary" href={release.hostedUrl} data-magnetic>
+            Try the pre-alpha
           </a>
-          <Link className="link-arrow" to="/how-it-works">
-            How it works <Arrow />
+          <Link className="link-arrow" to="/download">
+            Download for Windows or Linux <Arrow />
           </Link>
         </div>
       </div>

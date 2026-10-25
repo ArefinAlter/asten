@@ -1,3 +1,4 @@
+import { RELEASE } from "../../version";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import type { CompileFormat, ProjectKind } from "@asten/contracts";
@@ -493,7 +494,7 @@ export function Backstage({
               </div>
             </div>
             <div className="wb-card wb-rows">
-              <Row label="Release" value="Pre-alpha release 0.1.0" />
+              <Row label="Release" value={`Pre-alpha release ${RELEASE}`} />
               <Row
                 label="Data"
                 value={

@@ -1139,3 +1139,47 @@
   background: none;
   box-shadow: none;
 }
+
+/* ───────── Download: release assets ───────── */
+
+.release-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 28px;
+}
+
+.release-assets {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.release-asset {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 14px 18px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--papyrus-raised);
+}
+
+.release-asset-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.release-file,
+.release-sha {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.release-asset .fine {
+  margin: 0;
+}

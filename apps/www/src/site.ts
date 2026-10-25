@@ -7,7 +7,7 @@ export const site = {
   publisherUrl: "https://vernesystems.com",
   companyDetails: "https://vernesystems.com/legal/company",
   email: "info@vernesystems.com",
-  accessSubject: "Asten early access",
+  accessSubject: "Asten pre-alpha",
   address: "8/A, Sher-e-Bangla Road, Zighatola, Dhaka-1209, Bangladesh",
   registration: "C-201411-1",
   social: {
@@ -23,7 +23,6 @@ export const site = {
   themeColor: { day: "#f5eedf", night: "#0f1a2e" },
 } as const;
 
-export const accessHref = `mailto:${site.email}?subject=${encodeURIComponent(site.accessSubject)}`;
 
 export function absoluteUrl(path: string): string {
   return path === "/" ? `${site.origin}/` : `${site.origin}${path}`;

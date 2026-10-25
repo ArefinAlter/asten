@@ -1,0 +1,32 @@
+[package]
+name = "asten-prealpha"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Hosting for the public pre-alpha: one real Asten API per anonymous visitor, plus a small store for the workbench state the API does not keep."
+publish = false
+
+[dependencies]
+anyhow.workspace = true
+asten-api = { path = "../asten-api" }
+asten-application = { path = "../../crates/asten-application" }
+asten-domain = { path = "../../crates/asten-domain" }
+asten-storage = { path = "../../crates/asten-storage" }
+axum = { workspace = true, features = ["json", "query"] }
+base64.workspace = true
+chrono.workspace = true
+hex.workspace = true
+http.workspace = true
+rand.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+sqlx.workspace = true
+tokio.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+http-body-util = "0.1"

@@ -23,6 +23,9 @@ No dates. Items move down the page as they ship.
   `docs/openapi.json`, held to the router by a test; `docs/API.md` walks
   through pairing, calling and the stream ticket.
 - Public site in the brand, honest about the above.
+- Pre-alpha 0.0.1a: unsigned desktop builds for Windows x64 and Linux x64 with
+  the `asten-api` runtime, and the hosted pre-alpha (one real API per visitor,
+  deleted after 24 hours; D29).
 
 ## In review (stacked pull requests, merge in order)
 
@@ -48,10 +51,9 @@ No dates. Items move down the page as they ship.
 
 ## Next
 
-- **Signed installers and updates.** Add the Windows and Apple signing
-  secrets and the updater signing key (`TAURI_SIGNING_PRIVATE_KEY`); notarise
-  the macOS build; publish the first tagged release. The download page then
-  stops saying "run from source".
+- **Signed installers and more platforms.** Add the Windows and Apple
+  signing secrets; notarise the macOS build; ship macOS, Windows ARM64 and
+  Linux aarch64 builds alongside the 0.0.1a targets.
 - **Mobile shells tested.** The Android project is committed and builds an
   unsigned APK; it needs a keystore, a device run, and the share-sheet path for
   compile output. The iOS project needs a Mac with Xcode for `tauri ios init`.

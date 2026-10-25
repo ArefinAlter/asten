@@ -1,0 +1,79 @@
+# The hosted pre-alpha of the Asten workbench, as run on the shared VPS under
+# /opt/asten-prealpha. See README.md beside this file.
+#
+#   gateway  asten-prealpha: one real Asten API per visitor, plus /svc/v1.
+#            On an internal network: it has no route to the internet.
+#   edge     a plain nginx that forwards 127.0.0.1:18640 to the gateway. It is
+#            the only container on a network with a published port.
+name: asten-prealpha
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  gateway:
+    image: asten-prealpha:0.0.1a
+    container_name: asten-prealpha-gateway
+    restart: unless-stopped
+    environment:
+      PREALPHA_BIND: 0.0.0.0:8080
+      PREALPHA_DATA: /data
+      PREALPHA_DESK: /desk
+      PREALPHA_COOKIE_SECURE: "true"
+      PREALPHA_TTL_HOURS: "24"
+      PREALPHA_MAX_VISITORS: "400"
+      PREALPHA_MAX_LOADED: "48"
+      PREALPHA_NEW_PER_CLIENT_PER_HOUR: "20"
+      PREALPHA_MAX_SANDBOX_MB: "48"
+      # The edge container and the host's nginx; their forwarded hop is believed.
+      PREALPHA_TRUSTED_PROXIES: 127.0.0.1,172.16.0.0/12,192.168.0.0/16,10.0.0.0/8
+      RUST_LOG: asten_prealpha=info,asten_api=warn
+    volumes:
+      - asten-prealpha-data:/data
+    networks:
+      - inner
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 1536m
+    cpus: 2
+    pids_limit: 256
+    logging: *logging
+
+  edge:
+    image: nginx:1.27-alpine
+    container_name: asten-prealpha-edge
+    restart: unless-stopped
+    depends_on:
+      - gateway
+    volumes:
+      - ./nginx/edge.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "127.0.0.1:18640:8080"
+    networks:
+      - inner
+      - outer
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    cpus: 0.5
+    pids_limit: 64
+    logging: *logging
+
+networks:
+  inner:
+    name: asten-prealpha-inner
+    internal: true
+  outer:
+    name: asten-prealpha-outer
+
+volumes:
+  asten-prealpha-data:
+    name: asten-prealpha-data

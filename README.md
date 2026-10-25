@@ -12,6 +12,16 @@ knowledge, relations, author invariants. Every mark explains itself and offers
 repairs the author owns. Word and Docs remain guests. No account, no sync. Asten never writes the
 prose; any AI feature follows the AI policy (D27).
 
+## Try the pre-alpha
+
+Release [0.0.1a](https://github.com/ArefinAlter/asten/releases/tag/v0.0.1a)
+(pre-alpha) has unsigned desktop builds for Windows x64 and Linux x64. The
+desktop app runs the engine on your machine and can open a sample novel. The
+same workbench runs at <https://asten.103.191.50.32.sslip.io/> with the real
+engine in a private sandbox per visitor, deleted 24 hours after the first
+visit; it is for trying Asten, not for manuscripts. How it is hosted:
+`deploy/pre-alpha/README.md` and `docs/SECURITY.md`.
+
 ## Platforms
 
 Windows (x64, ARM64), macOS 11+ (Apple silicon and Intel, one universal
@@ -94,6 +104,10 @@ packages/
   brand/                  Ink and paper tokens
 services/
   asten-api/              Axum HTTP transport and SSE
+  asten-prealpha/         Hosts one API per visitor for the hosted pre-alpha (D29)
+deploy/
+  pre-alpha/              Compose, nginx and README for the hosted pre-alpha
+  release/                Local Linux release build (Docker)
 docs/
   ENGINE_DESIGN.md        The engine design
   architecture.md         Crate layering and transport

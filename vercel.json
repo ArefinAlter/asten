@@ -1,8 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "pnpm install --frozen-lockfile --filter @asten/www... --filter @asten/web...",
-  "buildCommand": "pnpm --filter @asten/web build:site && pnpm --filter @asten/www build",
+  "installCommand": "pnpm install --frozen-lockfile --filter @asten/www...",
+  "buildCommand": "pnpm --filter @asten/www build",
   "outputDirectory": "apps/www/dist",
   "cleanUrls": true,
   "trailingSlash": false,
@@ -19,7 +19,9 @@
     { "source": "/home", "destination": "/", "permanent": true },
     { "source": "/pricing", "destination": "/download", "permanent": false },
     { "source": "/blog", "destination": "/journal", "permanent": true },
-    { "source": "/blog/:slug", "destination": "/journal/:slug", "permanent": true }
+    { "source": "/blog/:slug", "destination": "/journal/:slug", "permanent": true },
+    { "source": "/app", "destination": "https://asten.103.191.50.32.sslip.io/", "permanent": false },
+    { "source": "/app/:path*", "destination": "https://asten.103.191.50.32.sslip.io/", "permanent": false }
   ],
   "headers": [
     {
@@ -41,12 +43,11 @@
       ]
     },
     {
-      "source": "/app/:path*",
-      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]
-    },
-    {
-      "source": "/app/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "source": "/updates/(.*)",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json; charset=utf-8" },
+        { "key": "Cache-Control", "value": "no-cache" }
+      ]
     },
     {
       "source": "/assets/(.*)",

@@ -1,0 +1,101 @@
+name: Release (pre-alpha)
+
+# Pre-alpha desktop builds: Windows x64 and Linux x64 only, unsigned, as a
+# GitHub pre-release. Started by hand only (Actions minutes are rationed; the
+# 0.0.1a assets were built on the release machine with the same commands, see
+# docs/PLATFORMS.md "Pre-alpha releases").
+#
+# Optional secrets:
+#   TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+#     sign the updater artifacts. Without them the job turns
+#     bundle.createUpdaterArtifacts off and the release carries no .sig files.
+# No code-signing secrets are used: Windows SmartScreen warns before the first
+# run, and the release notes say so.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build and publish, e.g. v0.0.1a"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            os: windows-latest
+            bundles: nsis
+          - name: linux-x64
+            os: ubuntu-22.04
+            bundles: deb,appimage
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+          key: prealpha-${{ matrix.name }}
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
+            librsvg2-dev patchelf libxdo-dev libssl-dev build-essential curl wget file
+      - run: pnpm install --frozen-lockfile
+      - name: Build the installers
+        shell: bash
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          extra=""
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            extra='--config {"bundle":{"createUpdaterArtifacts":false}}'
+          fi
+          (cd apps/desktop/src-tauri && ../node_modules/.bin/tauri build --bundles ${{ matrix.bundles }} $extra)
+          cargo build --locked --release -p asten-api
+      - name: Collect the assets
+        shell: bash
+        run: node scripts/release-assets.mjs --platform ${{ matrix.name }} --out release-assets
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}
+          path: release-assets/*
+
+  publish:
+    needs: desktop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Checksums and the pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ inputs.tag }}"
+          cd release-assets
+          sha256sum -- * > SHA256SUMS.txt
+          gh release create "$tag" --prerelease --verify-tag \
+            --title "Asten ${tag#v} (pre-alpha)" \
+            --notes-file "../docs/releases/$tag.md" -- *

@@ -200,6 +200,53 @@ file):
 5. Name the reverse proxy in `ASTEN_TRUSTED_PROXIES` so rate limits apply per
    client rather than to the proxy as a whole.
 
+## Hosted pre-alpha (visitor sandboxes)
+
+The public pre-alpha at `https://asten.103.191.50.32.sslip.io` is not a mode of
+the API; it is a host for it, `services/asten-prealpha`, built the way the
+desktop shell hosts the API in-process (D6, D29). Nothing in the API's rules
+changes.
+
+- **One API per visitor.** The first request without a live `asten_visitor`
+  cookie creates a visitor. Each visitor gets a separate SQLite file and a
+  separate `asten_api::router` over it, in `pairing` mode. No two visitors
+  share a database, a token table or a change stream.
+- **The gateway is the paired client.** When it opens a sandbox it revokes
+  that sandbox's earlier `desk` tokens and issues a fresh one, exactly as the
+  desktop shell does at launch, and presents it as a bearer header on the
+  visitor's requests. The token never reaches the browser; the visitor holds
+  only the cookie. If the desk signs out (which revokes that token), the
+  gateway issues a fresh one and retries once.
+- **The visitor cookie** is 32 random bytes, `HttpOnly`, `Secure`,
+  `SameSite=Strict`, `Path=/`, `Max-Age` 24 hours. Only its SHA-256 is stored.
+  It is removed from the request before the API sees it.
+- **Origin rule.** As for the session cookie (D24), the visitor cookie counts
+  only on same-origin requests: a request whose `Origin` is not the host it
+  reached, or that the browser labels `Sec-Fetch-Site: same-site` or
+  `cross-site`, is answered `403` before any sandbox is touched. Sibling
+  `sslip.io` names are "same-site" to a browser, so `SameSite` alone is not
+  enough.
+- **Expiry and quotas.** A visitor and everything they made are deleted 24
+  hours after the first visit; there are no backups. New visitors are capped
+  per client address per hour and in total; a sandbox stops accepting writes
+  at 48 MB; the state store caps value size, total size and key count.
+- **What the gateway stores beside the sandboxes** (`/svc/v1/state`): the
+  desk's own preferences, assistant threads, console history and layout.
+  Provider keys are never sent to it; on every build they stay in the page's
+  memory (`apps/web/src/workbench/secrets.ts`).
+- **No egress.** The gateway container sits on a Docker network with no route
+  out; only a forwarding nginx container is reachable, on loopback, behind the
+  host's TLS nginx with request-rate and body-size limits. Compile, import and
+  every check run inside the sandbox's API; nothing a visitor types makes the
+  server fetch anything.
+- **Not for manuscripts.** The hosted copy is for trying the workbench. The
+  site and the About page say so: real work belongs in the desktop app, where
+  the file stays on the writer's machine.
+
+The gateway's own tests (`services/asten-prealpha/tests/gateway.rs`) cover
+isolation between visitors, the origin rule, the quotas, the state limits,
+sign-out recovery and expiry.
+
 ## Dependencies
 
 Dependabot (`.github/dependabot.yml`) opens one grouped pull request a week

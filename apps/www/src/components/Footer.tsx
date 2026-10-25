@@ -14,7 +14,7 @@ const columns: { title: string; links: { to: string; label: string }[] }[] = [
       { to: "/ai", label: "Our AI stance" },
       { to: "/roadmap", label: "Roadmap" },
       { to: "/compare", label: "Compare" },
-      { to: "/download", label: "Get early access" },
+      { to: "/download", label: "Try the pre-alpha" },
     ],
   },
   {

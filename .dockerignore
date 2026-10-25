@@ -9,3 +9,12 @@ apps/web/dist
 *.db
 *.db-shm
 *.db-wal
+**/node_modules
+**/target
+**/dist
+**/dist-site
+**/dist-hosted
+**/dist-server
+apps/www/public/app
+deploy/pre-alpha/artifacts
+deploy/release/out

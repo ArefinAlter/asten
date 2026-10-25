@@ -443,7 +443,7 @@ export class SampleBackend {
     if (parts[0] === "auth") return this.auth(method, parts.slice(1));
     if (parts[0] === "desk")
       return ok({
-        version: "0.1.0",
+        version: "0.0.1-alpha",
         host: "this browser (pre-alpha, sample data)",
         embedded: false,
         auth_mode: "off",

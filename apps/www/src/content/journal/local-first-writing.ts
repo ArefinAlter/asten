@@ -194,7 +194,7 @@ export const article: Article = {
         {
           kind: "callout",
           tone: "note",
-          text: "Local-first has trade-offs. Asten has no sync, no collaboration, and no app in the phone app stores today; collaboration is [planned](/roadmap) without giving up offline work. Asten is in early development, there’s no public download yet, and access is by request. See [Download](/download).",
+          text: "Local-first has trade-offs. Asten has no sync, no collaboration, and no app in the phone app stores today; collaboration is [planned](/roadmap) without giving up offline work. Asten is in early development; release 0.0.1a is a public pre-alpha for Windows and Linux. See [Download](/download).",
         },
       ],
     },

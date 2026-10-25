@@ -1,4 +1,4 @@
-import { storageAllowed } from "../lib/storage";
+import { deskStore } from "../lib/storage";
 
 const KEY = "asten-theme";
 
@@ -11,14 +11,9 @@ export function currentTheme(): "day" | "night" {
 }
 
 export function applyStoredTheme() {
-  if (!storageAllowed()) return;
-  try {
-    const stored = localStorage.getItem(KEY);
-    if (stored === "day" || stored === "night")
-      document.documentElement.setAttribute("data-theme", stored);
-  } catch {
-    // Fine without storage.
-  }
+  const stored = deskStore.get(KEY);
+  if (stored === "day" || stored === "night")
+    document.documentElement.setAttribute("data-theme", stored);
 }
 
 /** A sun by day, a crescent moon by night. Thoth is also a moon god. */
@@ -26,12 +21,7 @@ export function ThemeToggle() {
   function toggle() {
     const next = currentTheme() === "night" ? "day" : "night";
     document.documentElement.setAttribute("data-theme", next);
-    if (!storageAllowed()) return;
-    try {
-      localStorage.setItem(KEY, next);
-    } catch {
-      // The choice still applies to this page.
-    }
+    deskStore.set(KEY, next);
   }
 
   return (

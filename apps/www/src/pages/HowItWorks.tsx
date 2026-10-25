@@ -71,7 +71,7 @@ export function HowItWorks() {
       >
         <div className="btn-row">
           <Link to="/download" className="btn btn--primary" data-magnetic>
-            Get early access
+            Try the pre-alpha
           </Link>
           <a href="#try" className="link-arrow">
             See an example <Arrow />

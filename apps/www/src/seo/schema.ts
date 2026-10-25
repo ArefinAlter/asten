@@ -3,6 +3,7 @@ import { faq } from "../content/faq";
 import { features } from "../content/features";
 import { glossary } from "../content/glossary";
 import { accessSteps, homeFaqs, howSteps } from "../content/home";
+import { release } from "../content/release";
 import { articles } from "../content/journal";
 import type { QA } from "../content/types";
 import type { RouteMeta } from "../routes";
@@ -46,8 +47,10 @@ function application(): Node {
     url: absoluteUrl("/"),
     applicationCategory: "UtilitiesApplication",
     applicationSubCategory: "Creative writing software",
-    operatingSystem: "Desktop (Tauri shell) and web browser with a local server",
-    softwareVersion: "0.1.0 (early access)",
+    operatingSystem: "Windows 10 and 11 (x64), Linux (x86_64); a hosted copy in the browser",
+    softwareVersion: "0.0.1a (pre-alpha)",
+    downloadUrl: release.releaseUrl,
+    releaseNotes: release.releaseUrl,
     image: `${site.origin}/og/home.png`,
     publisher: { "@id": ORG },
     author: { "@id": ORG },

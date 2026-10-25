@@ -10,7 +10,8 @@ import "./asten.css";
 import "./workbench/workbench.css";
 import { applyStoredTheme } from "./brand/ThemeToggle";
 import { installLocalTransport } from "./lib/asten-client";
-import { applyPrefs, getPrefs } from "./workbench/prefs";
+import { hydrateHostedState, isHosted } from "./lib/storage";
+import { applyPrefs, getPrefs, reloadPrefs } from "./workbench/prefs";
 
 applyStoredTheme();
 applyPrefs(getPrefs());
@@ -24,6 +25,7 @@ const SAMPLE = import.meta.env.VITE_ASTEN_SAMPLE === "1";
 if (
   import.meta.env.PROD &&
   !SAMPLE &&
+  !isHosted() &&
   window.isSecureContext &&
   "serviceWorker" in navigator &&
   !("__TAURI_INTERNALS__" in window)
@@ -44,6 +46,13 @@ const queryClient = new QueryClient({
 });
 
 async function start() {
+  // The hosted pre-alpha keeps the desk's own state with the visitor's
+  // sandbox; read it before the first render so nothing flickers back.
+  if (isHosted()) {
+    await hydrateHostedState();
+    reloadPrefs();
+    applyStoredTheme();
+  }
   if (SAMPLE) {
     const { SampleBackend } = await import("./sample/backend");
     const backend = new SampleBackend();

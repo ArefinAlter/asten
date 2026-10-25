@@ -1,3 +1,4 @@
+import { deskStore } from "../lib/storage";
 import {
   type FocusEvent,
   type FormEvent,
@@ -302,7 +303,7 @@ function byPosition(a: DocumentSummary, b: DocumentSummary): number {
 
 function readCollapsed(key: string): Set<string> {
   try {
-    const parsed: unknown = JSON.parse(localStorage.getItem(key) ?? "[]");
+    const parsed: unknown = JSON.parse(deskStore.get(key) ?? "[]");
     return new Set(
       Array.isArray(parsed)
         ? parsed.filter((id): id is string => typeof id === "string")
@@ -328,11 +329,7 @@ function useCollapsed(
     const next = new Set(ids);
     if (collapsed) next.add(id);
     else next.delete(id);
-    try {
-      localStorage.setItem(key, JSON.stringify([...next]));
-    } catch {
-      // Fine without storage; the fold still applies to this session.
-    }
+    deskStore.set(key, JSON.stringify([...next]));
     setStored({ key, ids: next });
   };
   return [ids, update];

@@ -7,6 +7,39 @@ major version is 0, a minor version may change behaviour.
 
 ## [Unreleased]
 
+## [0.0.1-alpha] - 2026-10-25
+
+Tagged `v0.0.1a`, the first public pre-release (pre-alpha).
+
+### Added
+
+- The hosted pre-alpha (`services/asten-prealpha`, D29): one real Asten API
+  per anonymous visitor, each on its own SQLite file, deleted 24 hours after
+  the first visit, with quotas; a `/svc/v1` store for the workbench state the
+  API does not keep (preferences, assistant threads, console history, layout;
+  never provider keys); a strict origin rule for the visitor cookie. The
+  desk's `--mode hosted` build talks to it and creates the sample novel
+  through the API on the first visit. Deployment files in `deploy/pre-alpha/`.
+- Desktop release 0.0.1a for Windows x64 (NSIS installer, portable zip) and
+  Linux x64 (AppImage, .deb), unsigned, plus the `asten-api` runtime for both.
+  Built on the release machine (`deploy/release/linux.Dockerfile`,
+  `scripts/release-assets.mjs`); `release-prealpha.yml` runs the same on
+  demand.
+
+### Changed
+
+- The updater reads `latest.json` from the public site
+  (`/updates/latest.json`), which a pre-release can update; GitHub's
+  "latest release" link skips pre-releases.
+- Windows bundles are NSIS only (MSI cannot carry a pre-release version).
+- `release.yml` builds on full version tags only (`v1.2.3`).
+- The desk's own state (preferences, threads, console, layout) goes through
+  one store: the webview's storage on desktop and local builds, the hosting
+  service on the hosted pre-alpha.
+- The publisher in the installer metadata is Verne Ltd. (D28).
+- The public site's call to action is "Try the pre-alpha"; `/app` redirects to
+  the hosted pre-alpha.
+
 ### Added
 
 - Desktop installers for Windows (x64 and ARM64), macOS (one universal build
@@ -69,5 +102,6 @@ prose.
   guidelines, and the design documents: engine design, security model,
   handoff, and deployment configuration.
 
-[Unreleased]: https://github.com/ArefinAlter/asten/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ArefinAlter/asten/compare/v0.0.1a...HEAD
+[0.0.1-alpha]: https://github.com/ArefinAlter/asten/releases/tag/v0.0.1a
 [0.1.0]: https://github.com/ArefinAlter/asten/releases/tag/v0.1.0

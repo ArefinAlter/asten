@@ -29,3 +29,8 @@ dist-server/
 # Vercel CLI link and pulled environment
 .vercel
 .env*.local
+
+# Release builds made on the release machine
+/deploy/release/out/
+/deploy/pre-alpha/artifacts/
+/release-assets/

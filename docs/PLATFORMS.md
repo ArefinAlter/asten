@@ -82,11 +82,15 @@ Updater artifacts are signed with a minisign key pair:
   Without them a release build fails, because `bundle.createUpdaterArtifacts`
   is on.
 
-The endpoint is `releases/latest/download/latest.json`, which GitHub resolves
-to the newest release that is neither a draft nor a prerelease. The release
-workflow creates drafts marked prerelease, so a build reaches the updater only
-once it is published as a full release. On Linux only the AppImage can update
-itself; `.deb` and `.rpm` installs update through the package manager.
+The endpoint is `https://asten-writing.vercel.app/updates/latest.json`, a file
+in the public site (`apps/www/public/updates/latest.json`). GitHub's
+`releases/latest/download/…` link skips pre-releases, so it could not serve
+the pre-alpha. Publishing a release means writing that file with the new
+version, the asset URLs and the contents of their `.sig` files, and deploying
+the site; until then the desk keeps reporting the version it has. On Linux
+only the AppImage can update itself; `.deb` installs update through the
+package manager. Windows ships NSIS only: MSI cannot carry a pre-release
+version such as `0.0.1-alpha`.
 
 ## Building
 
@@ -118,9 +122,39 @@ sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
 
 Fedora: `webkit2gtk4.1-devel libappindicator-gtk3-devel librsvg2-devel openssl-devel`.
 
+### Pre-alpha releases
+
+`v0.0.1a` (`0.0.1-alpha`) was built on the release machine, not in Actions:
+
+```sh
+# Windows x64, on Windows (updater key from outside the repository)
+export TAURI_SIGNING_PRIVATE_KEY="$(cat B:/margin-keys/asten-updater.key)" TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
+(cd apps/desktop/src-tauri && ../node_modules/.bin/tauri build --bundles nsis)
+cargo build --locked --release -p asten-api
+node scripts/release-assets.mjs --platform windows-x64 --out release-assets
+
+# Linux x64 (what 0.0.1a used): a clean `git archive` of the commit in src/,
+# built in an ubuntu:22.04 container capped at 4 CPUs. No signing key goes in;
+# the AppImage is signed for the updater on the release machine afterwards.
+docker run --rm --cpus 4 --memory 8g -v "$PWD/src":/src -v "$PWD/out":/out \
+  -v "$PWD/linux-build.sh":/build.sh:ro -v asten-build-cache:/cache \
+  ubuntu:22.04 nice -n 10 bash /build.sh
+apps/desktop/node_modules/.bin/tauri signer sign \
+  -f B:/margin-keys/asten-updater.key -p "" out/release/Asten_0.0.1-alpha_amd64.AppImage
+# or the same in one BuildKit build, with the key as a build secret:
+docker build -f deploy/release/linux.Dockerfile \
+  --secret id=tauri_key,src=B:/margin-keys/asten-updater.key \
+  --output type=local,dest=deploy/release/out/linux .
+```
+
+Then `sha256sum` the assets into `SHA256SUMS.txt`, create the pre-release with
+`gh release create v0.0.1a --prerelease`, and update the site's
+`updates/latest.json`. `.github/workflows/release-prealpha.yml` does the same
+on manual dispatch when Actions minutes allow. The builds are unsigned.
+
 ### Release workflow
 
-`.github/workflows/release.yml` runs on a `v*` tag or manual dispatch and is
+`.github/workflows/release.yml` runs on a full version tag (`v1.2.3`) or manual dispatch and is
 configured to build the desktop targets above and attach successful artifacts
 to a draft GitHub release. On manual dispatch, select an existing `v*` tag;
 do not use a branch name as a release tag. The Linux

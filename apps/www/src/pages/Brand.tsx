@@ -347,7 +347,7 @@ export function Brand() {
                   <td>“AI-powered continuity magic.”</td>
                 </tr>
                 <tr>
-                  <td>“There’s no public download yet.”</td>
+                  <td>“It’s a pre-alpha, and the installers are unsigned.”</td>
                   <td>“Coming soon to revolutionize your writing!”</td>
                 </tr>
               </tbody>

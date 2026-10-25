@@ -28,12 +28,12 @@ export const howSteps: Step[] = [
 /** How to get Asten today, used on /download and in HowTo structured data. */
 export const accessSteps: Step[] = [
   {
-    title: "Ask for an invitation",
-    text: "Email info@vernesystems.com with the subject “Asten early access”. Tell us what you write and which computer you use.",
+    title: "Try it in the browser",
+    text: "Open the hosted pre-alpha. It runs the real engine in a private sandbox of your own, starts on a short sample novel, and is deleted 24 hours after your first visit. Do not put your manuscript there.",
   },
   {
-    title: "Install the desk",
-    text: "Invited writers receive setup notes. Asten runs as a desktop shell, or in your browser against a small server on your own machine. There is no verified or signed installer yet.",
+    title: "Install the desktop app",
+    text: "Download release 0.0.1a for Windows x64 or Linux x64. It runs the engine on your own computer, with your projects in one file on your disk, and offers “Open the sample novel”. The installers are not signed yet, so your system warns before the first run.",
   },
   {
     title: "Start a project",
@@ -68,6 +68,6 @@ export const homeFaqs: QA[] = [
   },
   {
     q: "How do I get Asten?",
-    a: "Asten is in early access and there is no public download yet. Ask for an invitation at info@vernesystems.com with the subject “Asten early access”.",
+    a: "Try the pre-alpha: open the hosted copy in your browser, or download release 0.0.1a for Windows x64 or Linux x64 from the [download page](/download). macOS comes later. The builds are unsigned, so your system warns before the first run.",
   },
 ];
