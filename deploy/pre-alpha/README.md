@@ -33,7 +33,7 @@ Limits: gateway 1.5 GB and 2 CPUs, edge 128 MB and half a CPU; logs rotate at
 - **Expiry:** a visitor, their sandbox and their stored state are deleted 24
   hours after the first visit. The sweep runs every five minutes; there is no
   separate nightly reset and no backup. About -> Start over deletes them at once.
-- **Quotas:** 400 live visitors; 8 new visitors per client address per hour;
+- **Quotas:** 400 live visitors; 20 new visitors per client address per hour (offices share one);
   48 MB per sandbox (writes beyond answer 507); 512 KB per state value, 4 MB
   and 64 keys per visitor; 48 sandboxes open in memory, idle ones closed after
   15 minutes.

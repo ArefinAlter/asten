@@ -386,3 +386,46 @@ async fn client_addresses_are_forgotten_after_an_hour() {
         .expect("count");
     assert_eq!(addresses, 0, "no client address outlives the hour");
 }
+
+#[tokio::test]
+async fn routes_with_path_parameters_reach_the_sandbox() {
+    let h = harness(|_| {}).await;
+    let first = send(&h.app, request("GET", "/api/v1/projects", None, None)).await;
+    let cookie = cookie_of(&first);
+    let created = json_of(
+        send(
+            &h.app,
+            request(
+                "POST",
+                "/api/v1/projects",
+                Some(&cookie),
+                Some(json!({ "name": "Paths", "kind": "novel", "description": "" })),
+            ),
+        )
+        .await,
+    )
+    .await;
+    let id = created["id"].as_str().expect("project id");
+    let documents = send(
+        &h.app,
+        request(
+            "GET",
+            &format!("/api/v1/projects/{id}/documents"),
+            Some(&cookie),
+            None,
+        ),
+    )
+    .await;
+    assert_eq!(documents.status(), StatusCode::OK);
+    let marks = send(
+        &h.app,
+        request(
+            "GET",
+            &format!("/api/v1/projects/{id}/story/diagnostics"),
+            Some(&cookie),
+            None,
+        ),
+    )
+    .await;
+    assert_eq!(marks.status(), StatusCode::OK);
+}

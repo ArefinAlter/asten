@@ -103,7 +103,7 @@ impl Config {
             ttl_seconds: 24 * 60 * 60,
             max_visitors: 400,
             max_loaded: 48,
-            new_per_client_per_hour: 8,
+            new_per_client_per_hour: 20,
             max_sandbox_bytes: 48 * 1024 * 1024,
             max_state_value_bytes: 512 * 1024,
             max_state_total_bytes: 4 * 1024 * 1024,
@@ -674,6 +674,9 @@ async fn api(State(gateway): State<Arc<Gateway>>, request: Request<Body>) -> Res
         );
     }
     let (mut parts, body) = request.into_parts();
+    // The gateway's own router left its matched path parameters (`rest`) in
+    // the extensions; the sandbox's router must route the path afresh.
+    parts.extensions = http::Extensions::new();
     let Ok(body) = axum::body::to_bytes(body, BODY_LIMIT).await else {
         return with_cookie(
             &gateway,

@@ -26,7 +26,7 @@ services:
       PREALPHA_TTL_HOURS: "24"
       PREALPHA_MAX_VISITORS: "400"
       PREALPHA_MAX_LOADED: "48"
-      PREALPHA_NEW_PER_CLIENT_PER_HOUR: "8"
+      PREALPHA_NEW_PER_CLIENT_PER_HOUR: "20"
       PREALPHA_MAX_SANDBOX_MB: "48"
       # The edge container and the host's nginx; their forwarded hop is believed.
       PREALPHA_TRUSTED_PROXIES: 127.0.0.1,172.16.0.0/12,192.168.0.0/16,10.0.0.0/8
