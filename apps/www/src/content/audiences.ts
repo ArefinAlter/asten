@@ -237,13 +237,13 @@ export const audiences: Audience[] = [
     },
     honest: [
       "No model ships today. The scenario above is planned work, described as a design commitment, not a feature.",
-      "The source can be read on GitHub, but it carries no open-source license; Asten is not open source.",
+      "Asten is open source under the MIT License; the source is on GitHub.",
       "The local API binds to loopback by default and answers only to paired clients. Don’t expose it to a network without TLS and an owner passphrase.",
     ],
     faqs: [
       { q: "Does Asten run a local LLM?", a: "Not today. Asten’s checks are deterministic rules. Planned AI features will prefer local models, support bring-your-own provider keys with explicit consent, and can be switched off entirely." },
       { q: "Does Asten have an API?", a: "Asten runs a local HTTP API on 127.0.0.1:4317 that its desk and add-ins use. It is a loopback API on your own machine, not a public cloud API." },
-      { q: "Is Asten open source?", a: "No. The source can be read on GitHub (ArefinAlter/asten), but it is published without an open-source license. Its rules and diagnostic codes are documented on this site." },
+      { q: "Is Asten open source?", a: "Yes. Asten is released under the MIT License, and the source is on GitHub (ArefinAlter/asten). Its rules and diagnostic codes are documented on this site." },
     ],
     art: "palette",
     related: ["/ai", "/ai-policy", "/features/compiler", "/journal/ai-editor-not-writer"],

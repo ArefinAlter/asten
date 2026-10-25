@@ -1,6 +1,7 @@
 [package]
 name = "asten-logic"
 version.workspace = true
+license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 description = "The exact analyses of the Asten canon engine: event calculus, typestate lifecycles, clocks, symbols, relations, knowledge flow, travel and LTLf invariants."

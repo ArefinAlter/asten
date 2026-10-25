@@ -319,7 +319,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "Three other pages form part of these terms: the [license](/license), which says what you may do with an Asten build; the [acceptable use policy](/acceptable-use), which says what you may not do; and the [privacy policy](/privacy), which explains how personal information is handled.",
+            text: "Two other pages form part of these terms: the [acceptable use policy](/acceptable-use), which says what you may not do on this website and the hosted pre-alpha, and the [privacy policy](/privacy), which explains how personal information is handled. The Asten software itself is released under the MIT License; the [license page](/license) has its text.",
           },
           {
             kind: "p",
@@ -413,7 +413,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "The [license](/license) gives you permission to run builds. The [trademark page](/trademark) explains how you may refer to the names and use the logo. The [credits](/credits) list the third-party fonts and software, which keep their own licenses.",
+            text: "The Asten software is released under the [MIT License](/license). The [trademark page](/trademark) explains how you may refer to the names and use the logo. The [credits](/credits) list the third-party fonts and software, which keep their own licenses.",
           },
         ],
       },
@@ -653,23 +653,35 @@ export const legalDocs: LegalDoc[] = [
   {
     ...legalIndex["/license"]!,
     summary: [
-      "You may run the Asten builds Verne gives you, for your own writing, on computers you control.",
-      "Your manuscripts are yours. This license runs one way and gives Verne no rights in them.",
-      "Asten is not open source. Do not host it as a service, rebrand it, or pass it on.",
-      "If the license ends, your files stay yours and stay readable.",
+      "Asten is open source under the MIT License: you may use, copy, change, and redistribute it, including commercially.",
+      "Keep the copyright and license notice with any copy you pass on.",
+      "Your manuscripts are yours. The license gives Verne no rights in them.",
+      "The MIT License does not cover the Asten and Verne names or logos.",
     ],
     sections: [
       {
-        id: "what-you-may-do",
-        heading: "What you may do",
+        id: "mit-license",
+        heading: "The MIT License",
         blocks: [
           {
             kind: "p",
-            text: "Verne Ltd. (“Verne”), grants you a personal, non-exclusive, non-transferable, revocable permission to install and run the Asten builds Verne gives you, for your own writing and research, on computers you own or control.",
+            text: "The Asten source code on [GitHub](https://github.com/ArefinAlter/asten) and the builds Verne publishes, including the desk, the desktop app, the local API, and the Word and Google Docs add-ins, are released under the MIT License. Its full text, which is also the LICENSE file in the repository, follows.",
           },
           {
             kind: "p",
-            text: "That covers every part of a build: the desk, the desktop app, the local API, and the Word and Google Docs add-ins. You may keep backup copies of a build for your own use.",
+            text: "Copyright (c) 2026 Verne Ltd.",
+          },
+          {
+            kind: "p",
+            text: "Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:",
+          },
+          {
+            kind: "p",
+            text: "The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.",
+          },
+          {
+            kind: "p",
+            text: "THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.",
           },
         ],
       },
@@ -679,7 +691,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Your manuscripts, notes, facts, comments, snapshots, exports, and the local database are yours. This license runs one way, from Verne to you. You grant Verne nothing in your writing, and Asten never trains on it.",
+            text: "Your manuscripts, notes, facts, comments, snapshots, exports, and the local database are yours. The license runs one way, from Verne to you. You grant Verne nothing in your writing, and Asten never trains on it.",
           },
           {
             kind: "p",
@@ -688,23 +700,12 @@ export const legalDocs: LegalDoc[] = [
         ],
       },
       {
-        id: "restrictions",
-        heading: "What you may not do",
+        id: "names-and-logos",
+        heading: "Names and logos",
         blocks: [
           {
             kind: "p",
-            text: "Unless Verne agrees in writing, or the law gives you the right regardless of this license, you may not:",
-          },
-          {
-            kind: "list",
-            items: [
-              "offer Asten, or any part of it, as a hosted or online service to other people;",
-              "share, sell, rent, lend, sublicense, or redistribute a build, or the access you were given to one;",
-              "remove the Asten or Verne names, rebrand Asten, or ship it as part of another product;",
-              "reverse engineer, decompile, or disassemble a build, except to the extent applicable law expressly permits it;",
-              "remove or change copyright, trademark, license, or other notices, including those of third parties; or",
-              "use Asten in breach of the [acceptable use policy](/acceptable-use).",
-            ],
+            text: "The MIT License covers the software, not Verne’s trademarks. You may say that your work is based on Asten, but a modified version or a hosted service must not present itself as Asten or as a Verne product. See the [trademark page](/trademark).",
           },
         ],
       },
@@ -723,16 +724,6 @@ export const legalDocs: LegalDoc[] = [
         ],
       },
       {
-        id: "source-code",
-        heading: "Source code",
-        blocks: [
-          {
-            kind: "p",
-            text: "Asten is not open source. Its source code can be read on GitHub, but it is published without an open-source license, and neither reading it, this page, nor receiving a build gives you any rights in it beyond this license. Nothing here grants rights in Verne’s names or logos; for those, see the [trademark page](/trademark).",
-          },
-        ],
-      },
-      {
         id: "third-party-components",
         heading: "Third-party components",
         blocks: [
@@ -743,30 +734,12 @@ export const legalDocs: LegalDoc[] = [
         ],
       },
       {
-        id: "termination",
-        heading: "When the license ends",
-        blocks: [
-          {
-            kind: "p",
-            text: "This license lasts until you stop using Asten or Verne ends it. Verne may end it if you break this license or the [terms of use](/terms), or when the pre-alpha program ends. When it ends, stop running the builds and delete them.",
-          },
-          {
-            kind: "p",
-            text: "Your files remain yours and remain readable. The project is a standard SQLite database, and Asten exports to open formats: Markdown, plain text, Fountain, HTML, and .docx. No subscription or server is needed to read your own work.",
-          },
-          {
-            kind: "p",
-            text: "The sections on your work and on restrictions continue to apply after the license ends.",
-          },
-        ],
-      },
-      {
         id: "relationship-to-terms",
         heading: "How this fits with the terms",
         blocks: [
           {
             kind: "p",
-            text: "This license is part of the [terms of use](/terms). The disclaimers, the limitation of liability, and the governing law set out there apply to builds as well. Questions: [info@vernesystems.com](mailto:info@vernesystems.com).",
+            text: "The MIT License governs the software. The [terms of use](/terms) and the [acceptable use policy](/acceptable-use) govern this website and the hosted pre-alpha that Verne runs. Questions: [info@vernesystems.com](mailto:info@vernesystems.com).",
           },
         ],
       },
@@ -790,7 +763,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "This policy applies to anyone who uses this website or an Asten build. It is part of the [terms of use](/terms) and the [license](/license), and breaking it can end your permission to use Asten.",
+            text: "This policy applies to anyone who uses this website or the hosted pre-alpha that Verne runs. It is part of the [terms of use](/terms), and breaking it can end your access to the hosted pre-alpha. Copies of Asten you run yourself are governed by the [MIT License](/license).",
           },
         ],
       },

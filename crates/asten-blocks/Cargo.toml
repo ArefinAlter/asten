@@ -1,6 +1,7 @@
 [package]
 name = "asten-blocks"
 version.workspace = true
+license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 description = "Asten's block model: stable block ids, rich-text patches, a hash-chained event log, snapshots, three-way merge, anchor mapping and blame. Shaped after the MIT dynodoc-engine."

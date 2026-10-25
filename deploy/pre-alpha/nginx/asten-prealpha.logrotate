@@ -1,0 +1,18 @@
+# Installed as /etc/logrotate.d/asten-prealpha.
+# The privacy policy promises web logs are kept no longer than 14 days: today's file plus 13 rotated days, and
+# maxage removes anything older even if rotation was skipped. The directory is outside the shared
+# /var/log/nginx/*.log rule, so this is the only rule that applies to these files.
+/var/log/nginx/asten-prealpha/*.log {
+	daily
+	missingok
+	rotate 13
+	maxage 14
+	compress
+	delaycompress
+	notifempty
+	create 0640 www-data adm
+	sharedscripts
+	postrotate
+		invoke-rc.d nginx rotate >/dev/null 2>&1
+	endscript
+}

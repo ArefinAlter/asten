@@ -15,7 +15,11 @@ this file sits at `/opt/asten-prealpha/README` on the host.
 
 Ports: 18640 (edge, loopback only). 18641 to 18649 are reserved and unused.
 Limits: gateway 1.5 GB and 2 CPUs, edge 128 MB and half a CPU; logs rotate at
-10 MB x 3.
+10 MB x 3 (container logs, which hold no request log).
+
+Web logs: the host nginx writes /var/log/nginx/asten-prealpha/{access,error}.log, rotated daily and
+kept no longer than 14 days by nginx/asten-prealpha.logrotate (installed as
+/etc/logrotate.d/asten-prealpha). The privacy policy promises this.
 
 ## Visitors
 

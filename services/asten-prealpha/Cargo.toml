@@ -1,6 +1,7 @@
 [package]
 name = "asten-prealpha"
 version.workspace = true
+license.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 description = "Hosting for the public pre-alpha: one real Asten API per anonymous visitor, plus a small store for the workbench state the API does not keep."
