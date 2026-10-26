@@ -246,13 +246,13 @@
 
 @media (max-width: 900px) {
   .card-grid--3 {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 720px) {
   .card-grid--2 {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -565,7 +565,7 @@ a.card--carved:hover::before {
 
 @media (max-width: 560px) {
   .terms {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2px;
   }
 
@@ -834,7 +834,7 @@ a.card--carved:hover::before {
 
 @media (max-width: 820px) {
   .cta-band {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -970,4 +970,12 @@ a.card--carved:hover::before {
   border-radius: 1px;
   background: var(--malachite);
   transform: rotate(45deg);
+}
+
+/* On the narrowest phones a long chip wraps inside its pill rather than leaving the column. */
+@media (max-width: 480px) {
+  .chip {
+    max-width: 100%;
+    white-space: normal;
+  }
 }

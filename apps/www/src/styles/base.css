@@ -110,6 +110,15 @@ p {
   text-wrap: pretty;
 }
 
+/* A long address or file name breaks rather than leaving the column on a phone. */
+p,
+li,
+dd,
+td,
+blockquote {
+  overflow-wrap: break-word;
+}
+
 a {
   color: inherit;
 }
