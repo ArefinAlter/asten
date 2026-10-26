@@ -350,6 +350,17 @@
   color: #fffaf2;
 }
 
+/* On the lapis night page the rubric is a light coral, which needs dark text to read. */
+:root[data-theme="night"] .pyramid-buttons button.is-on {
+  color: #1c0f0a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="day"]) .pyramid-buttons button.is-on {
+    color: #1c0f0a;
+  }
+}
+
 .pyramid-note {
   padding: 18px 20px;
   border: 1px solid var(--rule);
@@ -500,14 +511,17 @@
   padding: 12px 14px;
   border: 1px solid var(--rule);
   border-radius: var(--radius);
-  background: var(--papyrus-raised);
-  opacity: 0.72;
-  transition: opacity 240ms ease, border-color 240ms ease;
+  background: var(--papyrus-sunk);
+  transition: background 240ms ease, border-color 240ms ease;
 }
 
 .packs-list li.is-on {
-  opacity: 1;
+  background: var(--papyrus-raised);
   border-color: var(--rule-strong);
+}
+
+.packs-list .chip--code {
+  color: var(--rubric-deep);
 }
 
 .packs-list strong {

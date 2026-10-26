@@ -394,7 +394,7 @@
       "src": "/art/plate-scribes.webp",
       "width": 1200,
       "height": 583,
-      "bytes": 90328,
+      "bytes": 73160,
       "shape": "torn",
       "works": [
         "menna"
@@ -405,7 +405,7 @@
       "src": "/art/plate-palette.webp",
       "width": 1100,
       "height": 589,
-      "bytes": 72834,
+      "bytes": 62852,
       "shape": "cut",
       "works": [
         "palette"
@@ -414,9 +414,9 @@
     },
     "weighing": {
       "src": "/art/plate-weighing.webp",
-      "width": 960,
-      "height": 592,
-      "bytes": 125662,
+      "width": 900,
+      "height": 555,
+      "bytes": 87110,
       "shape": "torn",
       "works": [
         "hunefer"
@@ -460,7 +460,7 @@
       "src": "/art/plate-scribe.webp",
       "width": 560,
       "height": 827,
-      "bytes": 90774,
+      "bytes": 65520,
       "shape": "cut",
       "works": [
         "statue"
@@ -723,9 +723,9 @@
     },
     "bookworm": {
       "src": "/art/plate-bookworm.webp",
-      "width": 520,
-      "height": 968,
-      "bytes": 109284,
+      "width": 440,
+      "height": 819,
+      "bytes": 70868,
       "shape": "torn",
       "works": [
         "spitzweg"
@@ -735,9 +735,9 @@
     },
     "boulevard": {
       "src": "/art/plate-boulevard.webp",
-      "width": 840,
-      "height": 678,
-      "bytes": 111136,
+      "width": 780,
+      "height": 630,
+      "bytes": 88348,
       "shape": "torn",
       "works": [
         "pissarro_boulevard"

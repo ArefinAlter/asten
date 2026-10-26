@@ -12,7 +12,7 @@
         0.49
       ],
       "width": 1200,
-      "quality": 78,
+      "quality": 72,
       "kuwahara": {
         "r": 1,
         "mix": 0.5
@@ -36,7 +36,7 @@
       "work": "palette",
       "shape": "cut",
       "width": 1100,
-      "quality": 84,
+      "quality": 78,
       "cut": {
         "soft": [
           2.0,
@@ -71,8 +71,8 @@
         0.675,
         0.985
       ],
-      "width": 960,
-      "quality": 80,
+      "width": 900,
+      "quality": 72,
       "kuwahara": {
         "r": 1,
         "mix": 0.5
@@ -189,7 +189,7 @@
       "work": "statue",
       "shape": "cut",
       "width": 560,
-      "quality": 84,
+      "quality": 76,
       "cut": {
         "largest": 9,
         "trim_bottom": 0.935,
@@ -873,8 +873,8 @@
         1.0,
         1.0
       ],
-      "width": 520,
-      "quality": 72,
+      "width": 440,
+      "quality": 68,
       "grade": {
         "sat": 0.95,
         "light": 0.5,
@@ -900,8 +900,8 @@
         0.975,
         0.975
       ],
-      "width": 840,
-      "quality": 72,
+      "width": 780,
+      "quality": 68,
       "grade": {
         "sat": 0.95,
         "light": 0.5,

@@ -109,13 +109,13 @@ Four assets are made by hand-written builders because they need hand-placed cuts
 
 | File | Work | Shape | Crop | Width | Shown on |
 | --- | --- | --- | --- | --- | --- |
-| `plate-scribes.webp` (88 KB) | `menna` | torn | 0.07, 0.04, 0.46, 0.49 | 1200 | Home |
-| `plate-palette.webp` (71 KB) | `palette` | cut | none | 1100 | Home |
-| `plate-weighing.webp` (123 KB) | `hunefer` | torn | 0.12, 0.23, 0.68, 0.98 | 960 | Home |
+| `plate-scribes.webp` (71 KB) | `menna` | torn | 0.07, 0.04, 0.46, 0.49 | 1200 | Home |
+| `plate-palette.webp` (61 KB) | `palette` | cut | none | 1100 | Home |
+| `plate-weighing.webp` (85 KB) | `hunefer` | torn | 0.12, 0.23, 0.68, 0.98 | 900 | Home |
 | `plate-dusk.webp` (47 KB) | `denis` | torn | 0.03, 0.04, 0.97, 0.95 | 960 | Home |
 | `plate-cliffs.webp` (46 KB) | `sargent` | torn | 0.02, 0.04, 0.98, 0.96 | 1000 | Home |
 | `plate-lamp.webp` (39 KB) | `lamp` | cut | none | 760 | Home |
-| `plate-scribe.webp` (89 KB) | `statue` | cut | none | 560 | Home |
+| `plate-scribe.webp` (64 KB) | `statue` | cut | none | 560 | Home |
 | `plate-ibis.webp` (66 KB) | `ibis` | torn | none |  | Home |
 | `plate-astrolabe.webp` (113 KB) | `astrolabe` | cut | none | 620 | `/how-it-works` |
 | `plate-ceiling.webp` (82 KB) | `ceiling` | band | 0.00, 0.00, 1.00, 0.36 | 1600 | `/features` |
@@ -139,8 +139,8 @@ Four assets are made by hand-written builders because they need hand-placed cuts
 | `plate-tuileries.webp` (60 KB) | `pissarro_tuileries` | torn | 0.03, 0.03, 0.97, 0.97 | 840 | `/download` |
 | `plate-road.webp` (81 KB) | `sisley_road` | torn | 0.03, 0.03, 0.97, 0.97 | 840 | `/roadmap` |
 | `plate-papyrus.webp` (74 KB) | `papyrus` | torn | 0.03, 0.02, 0.97, 0.98 | 620 | `/journal` |
-| `plate-bookworm.webp` (107 KB) | `spitzweg` | torn | 0.00, 0.00, 1.00, 1.00 | 520 | `/journal/ai-editor-not-writer` |
-| `plate-boulevard.webp` (109 KB) | `pissarro_boulevard` | torn | 0.03, 0.03, 0.97, 0.97 | 840 | `/journal/continuity-in-a-long-novel` |
+| `plate-bookworm.webp` (69 KB) | `spitzweg` | torn | 0.00, 0.00, 1.00, 1.00 | 440 | `/journal/ai-editor-not-writer` |
+| `plate-boulevard.webp` (86 KB) | `pissarro_boulevard` | torn | 0.03, 0.03, 0.97, 0.97 | 780 | `/journal/continuity-in-a-long-novel` |
 | `plate-sundial.webp` (59 KB) | `sundial` | cut | none | 640 | `/journal/story-time-and-reading-order` |
 | `plate-relief.webp` (113 KB) | `luke_relief` | cut | none | 520 | `/journal/do-you-need-a-story-bible` |
 | `plate-bedroom.webp` (93 KB) | `vangogh` | torn | 0.00, 0.00, 1.00, 1.00 | 840 | `/journal/local-first-writing` |
