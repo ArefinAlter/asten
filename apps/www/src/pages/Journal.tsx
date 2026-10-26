@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaqList, Sections } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
-import { Answer, ArtFor, Breadcrumbs, CtaBand, Related } from "../components/Page";
+import { PagePlate } from "../personality/Plate";
+import { Answer, Breadcrumbs, CtaBand, Related } from "../components/Page";
 import { articles } from "../content/journal";
 import { absoluteUrl } from "../site";
 import { formatDate } from "./format";
@@ -74,8 +75,8 @@ export function ArticlePage({ slug }: { slug: string }) {
                 <CopyLink path={path} />
               </p>
             </div>
-            <div className="page-hero-art">
-              <ArtFor art={article.art} />
+            <div className="page-hero-art page-hero-art--plate">
+              <PagePlate path={path} eager />
             </div>
           </div>
         </div>

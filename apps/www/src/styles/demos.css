@@ -30,195 +30,6 @@
   color: var(--ink-3);
 }
 
-/* ───────── Weigh a sentence ───────── */
-
-.weigh {
-  display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(220px, 0.75fr);
-  grid-template-areas:
-    "page scales"
-    "mark mark";
-  gap: 22px clamp(20px, 3vw, 40px);
-  align-items: center;
-}
-
-.weigh-page {
-  grid-area: page;
-  position: relative;
-  padding: 26px 28px 22px;
-  border-radius: var(--radius);
-  background: var(--papyrus);
-  border: 1px solid var(--rule);
-  /* papyrus edges: a deckled torn look on the left and right */
-  box-shadow: inset 6px 0 0 -3px var(--papyrus-sunk), inset -6px 0 0 -3px var(--papyrus-sunk);
-}
-
-.weigh-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.weigh-hint {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.08em;
-  color: var(--ink-3);
-  animation: hint-nudge 2.8s ease-in-out infinite;
-}
-
-@keyframes hint-nudge {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(3px); }
-}
-
-.weigh-prose {
-  font-size: clamp(1.15rem, 0.5vw + 1.05rem, 1.35rem);
-  line-height: 2.1;
-  color: var(--ink);
-}
-
-.weigh-word {
-  position: relative;
-  display: inline-block;
-}
-
-.weigh-choices {
-  display: inline-flex;
-  gap: 2px;
-  padding: 2px;
-  border-radius: 999px;
-  background: var(--papyrus-sunk);
-  border: 1px dashed var(--rule-strong);
-  vertical-align: 2px;
-}
-
-.weigh-choices button {
-  padding: 2px 12px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--ink-3);
-  font-family: var(--font-text);
-  font-size: 1rem;
-  line-height: 1.6;
-  cursor: pointer;
-  transition: background 200ms ease, color 200ms ease;
-}
-
-.weigh-choices button:hover {
-  color: var(--ink);
-}
-
-.weigh-choices button.is-on {
-  background: var(--papyrus-raised);
-  color: var(--ink);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgb(30 26 21 / 18%);
-}
-
-.weigh-stroke {
-  position: absolute;
-  left: 6px;
-  right: 6px;
-  bottom: -6px;
-  width: calc(100% - 12px);
-  height: 10px;
-  overflow: visible;
-  fill: none;
-  stroke: var(--rubric);
-  stroke-width: 2.4;
-  stroke-linecap: round;
-}
-
-.weigh-stroke path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  opacity: 0;
-  transition: stroke-dashoffset 600ms var(--ease-ink), opacity 120ms ease;
-}
-
-.weigh-word.is-marked .weigh-stroke path {
-  stroke-dashoffset: 0;
-  opacity: 1;
-}
-
-.weigh-canon {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 12px;
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px dashed var(--rule);
-}
-
-.weigh-canon-label,
-.weigh-canon-src {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  color: var(--ink-3);
-}
-
-.weigh-canon-label {
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-}
-
-.weigh-scales {
-  grid-area: scales;
-  text-align: center;
-}
-
-.weigh-scales .scales {
-  width: 100%;
-  max-width: 300px;
-  margin-inline: auto;
-  padding: 14px 10px 6px;
-  border-radius: 50% 50% 12px 12px / 30% 30% 12px 12px;
-  background: var(--art-ground);
-}
-
-.weigh-legend {
-  display: flex;
-  justify-content: space-between;
-  max-width: min(300px, 100%);
-  margin: 6px auto 0;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.weigh-mark-slot {
-  grid-area: mark;
-  min-height: 132px;
-}
-
-.weigh-mark {
-  position: relative;
-  padding: 18px 22px 18px 26px;
-  border: 1px solid color-mix(in srgb, var(--rubric) 40%, var(--rule));
-  border-radius: var(--radius);
-  background: var(--papyrus);
-  animation: mark-in 520ms var(--ease-settle);
-}
-
-.weigh-mark::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 12px;
-  bottom: 12px;
-  width: 4px;
-  border-radius: 0 3px 3px 0;
-  background: var(--rubric);
-}
-
 @keyframes mark-in {
   from {
     opacity: 0;
@@ -226,19 +37,6 @@
   }
 }
 
-.weigh-mark-body {
-  margin: 4px 0 14px;
-  color: var(--ink-2);
-}
-
-.weigh-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.weigh-actions button,
-.weigh-reset,
 .clocks-mark button {
   padding: 7px 14px;
   border: 1px solid var(--rule-strong);
@@ -250,44 +48,9 @@
   transition: border-color 200ms ease, background 200ms ease, transform 200ms var(--ease-settle);
 }
 
-.weigh-actions button:hover,
-.weigh-reset:hover,
 .clocks-mark button:hover {
   border-color: var(--rubric);
   transform: translateY(-1px);
-}
-
-.weigh-calm {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 18px 22px;
-  border: 1px dashed var(--rule-strong);
-  border-radius: var(--radius);
-  color: var(--ink-2);
-  animation: mark-in 420ms var(--ease-rise);
-}
-
-.weigh-calm.is-resolved {
-  border-style: solid;
-  border-color: color-mix(in srgb, var(--malachite) 45%, var(--rule));
-  background: var(--malachite-wash);
-}
-
-@media (max-width: 760px) {
-  .weigh {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "page"
-      "scales"
-      "mark";
-  }
-
-  .weigh-scales .scales {
-    max-width: 220px;
-  }
 }
 
 /* ───────── Two clocks ───────── */
@@ -587,6 +350,17 @@
   color: #fffaf2;
 }
 
+/* On the lapis night page the rubric is a light coral, which needs dark text to read. */
+:root[data-theme="night"] .pyramid-buttons button.is-on {
+  color: #1c0f0a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="day"]) .pyramid-buttons button.is-on {
+    color: #1c0f0a;
+  }
+}
+
 .pyramid-note {
   padding: 18px 20px;
   border: 1px solid var(--rule);
@@ -737,14 +511,17 @@
   padding: 12px 14px;
   border: 1px solid var(--rule);
   border-radius: var(--radius);
-  background: var(--papyrus-raised);
-  opacity: 0.72;
-  transition: opacity 240ms ease, border-color 240ms ease;
+  background: var(--papyrus-sunk);
+  transition: background 240ms ease, border-color 240ms ease;
 }
 
 .packs-list li.is-on {
-  opacity: 1;
+  background: var(--papyrus-raised);
   border-color: var(--rule-strong);
+}
+
+.packs-list .chip--code {
+  color: var(--rubric-deep);
 }
 
 .packs-list strong {

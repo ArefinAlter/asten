@@ -4,7 +4,7 @@ import { Glyph } from "../art/Glyphs";
 import { FaqList, Sections } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
 import { Inline } from "../components/Inline";
-import { Answer, ArtFor, CtaBand, PageHero, Related, SectionHead } from "../components/Page";
+import { Answer, CtaBand, PageHero, Related, SectionHead } from "../components/Page";
 import { features, type DemoKey, type Feature } from "../content/features";
 import { CartoucheName } from "../demos/CartoucheName";
 import { ClocksDemo } from "../demos/ClocksDemo";
@@ -52,7 +52,6 @@ export function FeaturePage({ feature }: { feature: Feature }) {
       <PageHero
         title={feature.h1}
         lede={<Inline text={feature.lede} />}
-        art={<ArtFor art={feature.art} />}
       >
         <div className="btn-row">
           <Link to="/download" className="btn btn--primary" data-magnetic>

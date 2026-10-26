@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import { LunarEmblem } from "../art/Night";
 import { Answer, CtaBand, PageHero, Related } from "../components/Page";
 import { roadmap } from "../content/roadmap";
 
@@ -9,7 +8,6 @@ export function Roadmap() {
       <PageHero
         title="Shipped, next, later, and never."
         lede="What Asten does today, what is being built next, what comes later, and what Asten will not do. There are no dates."
-        art={<LunarEmblem />}
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">

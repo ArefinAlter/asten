@@ -1,6 +1,6 @@
 # Asten brand guidelines
 
-Version 1.0 · 6 October 2026 · Owner: Verne Ltd.
+Version 1.1 · 26 October 2026 · Owner: Verne Ltd.
 
 This file is the source of truth for how Asten looks, sounds, and moves. It covers
 the public website (`apps/www`), the product (`apps/web`, `apps/desktop`), and
@@ -222,7 +222,10 @@ gypsum white, and gold. Asten uses the same set, as flat colour.
 
 Night is the moon's palette: Thoth is also a moon god. It is used for the dark
 theme and for "ceiling" sections on the website (deep blue with gold stars, as
-in New Kingdom tomb ceilings).
+in New Kingdom tomb ceilings). On the website the dark theme is **lamplight**:
+the page is lapis and ink black, painted plates are dimmed a little and each
+sits in a pool of warm light, and the lamp flickers by a small amount of noise,
+never on a timer.
 
 | Token | Hex | Role |
 | --- | --- | --- |
@@ -313,7 +316,64 @@ Egyptian art belongs to Egypt's heritage and is still studied and loved. Rules:
 
 ## 9. Illustration
 
-All illustration is original SVG in the Egyptian **flat canon**:
+Two kinds of picture sit together on the site. They are never mixed in one frame.
+
+### Painted plates
+
+Public-domain and CC0 works from museum and library collections, cropped, cut,
+graded to one light and set on the paper. The scribe's desk is where they live.
+
+- **Only works that need no permission.** Public domain, or released by the
+  holder under CC0 (the Met's Open Access programme, the National Gallery of
+  Art, the Cleveland Museum of Art, the Yale Center for British Art, the British
+  Library). Nothing is generated, redrawn or painted over beyond the listed
+  treatments. Never AI-made art.
+- **One light.** The build gains the highlights toward warm paper, eases the
+  saturation, lifts the blacks a little and lays a fine grain over everything,
+  so a Hudson River sky, a New Kingdom papyrus, a faience water clock and a
+  Dutch still life can share a page.
+- **Four shapes.** A *torn sheet* for paintings and prints; an *arch* (a round
+  top over a torn foot) for a window; a *band* for a strip across the page;
+  a *cut-out* for an object or a portrait panel, cut from its studio backdrop
+  and standing on the paper alone. Cut edges are shrunk and feathered so no
+  backdrop colour rims them. Scale and crop vary from page to page.
+- **Every page has its own plate.** Every page, every feature, every audience
+  and every journal post has a plate, and the same plate is not used on two
+  pages. A work may supply two different crops.
+- **The work matches the subject.** Weighing is a balance (Hunefer, Vermeer,
+  Metsys); time is a water clock, a sundial, or the same street painted at
+  different hours; the cast are portraits painted for mummies; a map for the
+  worldbuilders; threshing for the compiler; a cloud study for a page that is
+  not there.
+- **No captions, no credit lines beside a picture.** Not under the hero window,
+  not on a journal card, not in a margin, not in the footer text. The credit for
+  every work (title, maker, date, holder, object number, licence, link) is on
+  `/credits`, which is generated from the same data as the pictures, and the
+  footer carries one small plain link, "Art credits". Every picture has `alt`
+  text that says what it shows. (Asten's own marginalia, the handwritten notes
+  beside the manuscript text in the product and on the home page, are part of the
+  design and stay: they are not credits.)
+- **The paintings are present, not thumbnails.** A plate at the head of a page
+  takes half the width of the head. Pages that open with a band get a strip laid
+  across the whole page, edge to edge. A journal card is a painting cropped to
+  fill its slot, with the object kept in view (`focus`). Do not shrink a painting
+  into a vignette.
+- **No text in a plate, and nothing behind running text.** Plates sit beside or
+  above the words. The one at the head of a page loads eagerly and is preloaded;
+  every other loads lazily and has its width and height in the markup.
+- **Budgets.** The hero window is at most 300 KB and a plate at most about
+  150 KB; the home page, with all its plates, stays near 1.5 MB.
+- **Reproducible.** `art/build.py` makes every file from `art/works.json` (the
+  works) and `art/plates.json` (the crops and the pages). It also writes
+  `apps/www/src/personality/art-manifest.json`, `art/SOURCES.md` and the SHA-256
+  lock `art/sources.lock.json`; the table on `/credits` is made from the same
+  manifest. To add a plate, add the work, add the spec, run the
+  build.
+- **At night** plates are dimmed (brightness 0.82) and lit by a pool of lamplight.
+
+### Drawn ornaments
+
+Original SVG in the Egyptian **flat canon**:
 
 - Composite view: head and legs in profile, shoulders and eye frontal.
 - Flat pigment fills, carbon outlines (1.5–2.5 px at 1×), no gradients, no
@@ -327,6 +387,13 @@ All illustration is original SVG in the Egyptian **flat canon**:
 - In SVG, colour comes from CSS classes bound to tokens (`.f-blue`,
   `.s-ink`, and so on) so art follows day and night themes. Standalone files
   (favicon, OG, press kit) inline hex values.
+
+### The margin hand
+
+Asten's notes in the margin are set in **Caveat** (SIL OFL 1.1, self-hosted),
+in the rubric red, a little smaller than the text beside them. It is used only
+for a note Asten writes beside a page, never for headings or buttons. The red
+pencil marks beside it are drawn, not set: see section 11.
 
 ---
 
@@ -352,22 +419,35 @@ single pigment.
 
 ---
 
-## 11. Motion: the reed draws
+## 11. Motion: the hand and the lamp
 
-Motion should feel like ink going down: deliberate, then still.
+Motion should feel like a hand: deliberate, a little uneven, then still.
 
-- **Draw**: strokes draw on with `stroke-dashoffset`, 600–1200 ms,
-  `cubic-bezier(.65, 0, .35, 1)`.
-- **Rise**: registers enter with 14 px rise and fade, 700 ms,
-  `cubic-bezier(.2, .7, .2, 1)`, staggered 70 ms.
-- **Black, then red**: in any demo the author's text appears first and Asten's
+- **Draw.** The red pencil is a filled brush outline revealed by a mask whose
+  centre line is drawn with `stroke-dashoffset`. The line wobbles (an SVG
+  turbulence displacement), its width swells and thins, it overshoots a little,
+  and no two strokes take the same time: the pace comes from seeded noise and
+  eases out like a spring. Strokes are drawn again, erased and redrawn, when the
+  words under them change or when the reader hovers. Elsewhere strokes draw on
+  with `stroke-dashoffset` over 600–1200 ms.
+- **Black, then red.** In any demo the author's text appears first and Asten's
   red mark appears after a beat (≥ 300 ms). Asten never interrupts.
-- **Weigh**: the scales tip with a damped settle (overshoot ≤ 4°).
-- **Ambient**: stars twinkle, the moon glows, the reed pen moves. Ambient
-  motion is slow (≥ 4 s loops) and small.
-- `prefers-reduced-motion: reduce` removes all movement except opacity, and
-  every animated state has a still equivalent.
-- Interactions answer within 100 ms. Nothing loops faster than 2 s.
+- **Weigh.** The scales are a damped spring (stiffness 90, damping 6.5) with the
+  pans on softer springs. A heavier claim tips the beam, it overshoots by up to
+  4° and settles. The tilt is driven by what the example says.
+- **Rise and turn.** Registers enter with a 14 px rise and fade, 700 ms,
+  staggered 70 ms. Sheets lift over one another at the seam between sections, as
+  pages turn (scroll-driven where the browser supports it).
+- **Lamp.** At night the page is lit by a lamp whose flicker is smoothed noise
+  on a CSS variable, small enough not to be noticed as motion.
+- **Nothing loops on a timer.** Motion comes from a spring, from noise or from a
+  hand. It runs only while on screen and while the tab is visible, and animation
+  frames are requested only while something is moving.
+- `prefers-reduced-motion: reduce` removes all movement: every drawing arrives
+  complete (the pencil circle, the margin note, the beam at its resting tilt) and
+  every animated state has a still equivalent. Without JavaScript the red marks
+  are a plain red underline.
+- Interactions answer within 100 ms.
 
 ### Signature microinteractions
 
@@ -419,7 +499,9 @@ brand applies there, with less ornament.
 - Every decorative SVG is `aria-hidden`. Every meaningful SVG has a title.
 - Interactive demos are keyboard operable and announce results in a polite live
   region.
-- Reduced motion is honoured everywhere.
+- Reduced motion is honoured everywhere, and the page works without JavaScript.
+- Painted plates have alt text that says what they show. A plate never carries
+  text of its own, and there are no captions; credits are on `/credits`.
 - Diagnostics are never colour-only.
 
 ---

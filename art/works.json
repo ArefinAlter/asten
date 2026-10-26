@@ -1,0 +1,535 @@
+{
+  "_note": "Source of truth for art/build.py (what to download), apps/www (museum labels, credits page) and art/SOURCES.md. Every work is public domain or CC0.",
+  "works": {
+    "kensett": {
+      "title": "Sunset Sky",
+      "by": "John Frederick Kensett",
+      "date": "1872",
+      "medium": "oil on canvas",
+      "where": "The Metropolitan Museum of Art, 74.30",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/11326",
+      "source": {
+        "met": 11326
+      }
+    },
+    "sargent": {
+      "title": "Cliffs at Deir el Bahri, Egypt",
+      "by": "John Singer Sargent",
+      "date": "1890–91",
+      "medium": "oil on canvas",
+      "where": "The Metropolitan Museum of Art, 50.130.24",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/12061",
+      "source": {
+        "met": 12061
+      }
+    },
+    "denis": {
+      "title": "Cloud Study (Early Evening)",
+      "by": "Simon Denis",
+      "date": "about 1786–1806",
+      "medium": "oil on paper",
+      "where": "The Metropolitan Museum of Art, 2003.42.18",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/438642",
+      "source": {
+        "met": 438642
+      }
+    },
+    "menna": {
+      "title": "Harvest Scenes, Tomb of Menna",
+      "by": "facsimile by Charles K. Wilkinson, after a tomb painting of about 1396–1347 BCE",
+      "date": "1930",
+      "medium": "tempera on paper",
+      "where": "The Metropolitan Museum of Art, 30.4.44",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/548574",
+      "source": {
+        "met": 548574
+      }
+    },
+    "palette": {
+      "title": "Scribe’s Palette and Brushes",
+      "by": "Egyptian, Late Period",
+      "date": "664–332 BCE",
+      "medium": "wood, ink, reed",
+      "where": "The Metropolitan Museum of Art, 14.1.393a–d",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/544302",
+      "source": {
+        "met": 544302
+      }
+    },
+    "statue": {
+      "title": "Haremhab as a Scribe of the King",
+      "by": "Egyptian, New Kingdom",
+      "date": "about 1328–1314 BCE",
+      "medium": "granodiorite",
+      "where": "The Metropolitan Museum of Art, 23.10.1",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/544692",
+      "source": {
+        "met": 544692
+      }
+    },
+    "lamp": {
+      "title": "Bronze lamp",
+      "by": "Roman",
+      "date": "about 4th century CE",
+      "medium": "bronze",
+      "where": "The Metropolitan Museum of Art, 01.17.1",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/246975",
+      "source": {
+        "met": 246975
+      }
+    },
+    "fayum_red": {
+      "title": "Portrait of a young woman in red",
+      "by": "Egyptian, Roman Period",
+      "date": "90–120 CE",
+      "medium": "encaustic on limewood with gold leaf",
+      "where": "The Metropolitan Museum of Art, 09.181.6",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/547860",
+      "source": {
+        "met": 547860
+      }
+    },
+    "fayum_elder": {
+      "title": "Portrait of an elderly lady with a gold wreath",
+      "by": "Egyptian, Roman Period",
+      "date": "100–125 CE",
+      "medium": "encaustic on limewood",
+      "where": "The Metropolitan Museum of Art, 09.181.5",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/547859",
+      "source": {
+        "met": 547859
+      }
+    },
+    "fayum_man": {
+      "title": "Portrait of a man with a mole on his nose",
+      "by": "Egyptian, Roman Period",
+      "date": "130–150 CE",
+      "medium": "encaustic on limewood",
+      "where": "The Metropolitan Museum of Art, 09.181.2",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/547857",
+      "source": {
+        "met": 547857
+      }
+    },
+    "fayum_boy": {
+      "title": "Portrait of the Boy Eutyches",
+      "by": "Egyptian, Roman Period",
+      "date": "100–150 CE",
+      "medium": "encaustic on wood",
+      "where": "The Metropolitan Museum of Art, 18.9.2",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/547951",
+      "source": {
+        "met": 547951
+      }
+    },
+    "claesz": {
+      "title": "Still Life with a Skull and a Writing Quill",
+      "by": "Pieter Claesz",
+      "date": "1628",
+      "medium": "oil on wood",
+      "where": "The Metropolitan Museum of Art, 49.107",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/435904",
+      "source": {
+        "met": 435904
+      }
+    },
+    "luke": {
+      "title": "Manuscript Illumination with the Evangelist Luke",
+      "by": "Byzantine",
+      "date": "late 13th–early 14th century",
+      "medium": "tempera and gold on parchment",
+      "where": "The Metropolitan Museum of Art, 2001.633",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/473633",
+      "source": {
+        "met": 473633
+      }
+    },
+    "luke_relief": {
+      "title": "Miniature Relief of a Saint Luke at His Writing Table",
+      "by": "German",
+      "date": "1200–1225",
+      "medium": "wood, polychromy, gilding",
+      "where": "The Metropolitan Museum of Art, 41.190.237",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/467970",
+      "source": {
+        "met": 467970
+      }
+    },
+    "durer": {
+      "title": "Melencolia I",
+      "by": "Albrecht Dürer",
+      "date": "1514",
+      "medium": "engraving",
+      "where": "The Metropolitan Museum of Art, 19.73.85",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/360018",
+      "source": {
+        "met": 360018
+      }
+    },
+    "degas": {
+      "title": "The Dance Class",
+      "by": "Edgar Degas",
+      "date": "1874",
+      "medium": "oil on canvas",
+      "where": "The Metropolitan Museum of Art, 1987.47.1",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/438817",
+      "source": {
+        "met": 438817
+      }
+    },
+    "pissarro_rouen": {
+      "title": "Morning, An Overcast Day, Rouen",
+      "by": "Camille Pissarro",
+      "date": "1896",
+      "medium": "oil on canvas",
+      "where": "The Metropolitan Museum of Art, 1980.21.1",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/437308",
+      "source": {
+        "met": 437308
+      }
+    },
+    "pissarro_tuileries": {
+      "title": "The Garden of the Tuileries on a Spring Morning",
+      "by": "Camille Pissarro",
+      "date": "1899",
+      "medium": "oil on canvas",
+      "where": "The Metropolitan Museum of Art, 1992.103.3",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/437313",
+      "source": {
+        "met": 437313
+      }
+    },
+    "pissarro_boulevard": {
+      "title": "The Boulevard Montmartre on a Winter Morning",
+      "by": "Camille Pissarro",
+      "date": "1897",
+      "medium": "oil on canvas",
+      "where": "The Metropolitan Museum of Art, 60.174",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/437310",
+      "source": {
+        "met": 437310
+      }
+    },
+    "pissarro_barges": {
+      "title": "Barges at Pontoise",
+      "by": "Camille Pissarro",
+      "date": "1876",
+      "medium": "oil on canvas",
+      "where": "The Metropolitan Museum of Art, 1979.135.16",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/437302",
+      "source": {
+        "met": 437302
+      }
+    },
+    "sisley_road": {
+      "title": "The Road from Versailles to Louveciennes",
+      "by": "Alfred Sisley",
+      "date": "probably 1879",
+      "medium": "oil on canvas",
+      "where": "The Metropolitan Museum of Art, 64.154.2",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/437685",
+      "source": {
+        "met": 437685
+      }
+    },
+    "constable": {
+      "title": "Cloud study",
+      "by": "John Constable",
+      "date": "1830–35",
+      "medium": "watercolor over graphite",
+      "where": "The Metropolitan Museum of Art, 2016.589",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/727706",
+      "source": {
+        "met": 727706
+      }
+    },
+    "ducamp": {
+      "title": "Thot Ibiocéphale (Dieu des Lettres) à Philae",
+      "by": "Maxime Du Camp",
+      "date": "April 1850",
+      "medium": "salted paper print from a paper negative",
+      "where": "The Metropolitan Museum of Art, 2005.100.376.117",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/287180",
+      "source": {
+        "met": 287180
+      }
+    },
+    "ceiling": {
+      "title": "Ceiling Decoration",
+      "by": "facsimile by Charles K. Wilkinson, after a tomb ceiling of about 1550–1525 BCE",
+      "date": "1924",
+      "medium": "tempera on paper",
+      "where": "The Metropolitan Museum of Art, 30.4.4",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/544554",
+      "source": {
+        "met": 544554
+      }
+    },
+    "waterclock": {
+      "title": "Water Clock Decorated with a Baboon",
+      "by": "Egyptian, Late Period–Ptolemaic Period",
+      "date": "664–30 BCE",
+      "medium": "faience",
+      "where": "The Metropolitan Museum of Art, 17.194.2341",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/572126",
+      "source": {
+        "met": 572126
+      }
+    },
+    "inkwell": {
+      "title": "Inkwell",
+      "by": "Egyptian, Middle Kingdom",
+      "date": "about 2051–1981 BCE",
+      "medium": "wood",
+      "where": "The Metropolitan Museum of Art, 31.3.59",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/556693",
+      "source": {
+        "met": 556693
+      }
+    },
+    "sundial": {
+      "title": "Portable diptych sundial",
+      "by": "Hans Tröschel the Elder",
+      "date": "about 1598",
+      "medium": "ivory, brass",
+      "where": "The Metropolitan Museum of Art, 03.21.38",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/188849",
+      "source": {
+        "met": 188849
+      }
+    },
+    "instruments": {
+      "title": "Pocket set of drawing instruments",
+      "by": "Peter Dollond",
+      "date": "about 1755–60",
+      "medium": "shagreen case with silver mounts; brass, steel and ivory instruments",
+      "where": "The Metropolitan Museum of Art, 41.160.67a–l",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/198857",
+      "source": {
+        "met": 198857
+      }
+    },
+    "astrolabe": {
+      "title": "Astrolabe",
+      "by": "Regiomontanus",
+      "date": "1462",
+      "medium": "copper alloy",
+      "where": "The Metropolitan Museum of Art, 2025.347a–j",
+      "licence": "Open Access, CC0",
+      "href": "https://www.metmuseum.org/art/collection/search/923639",
+      "source": {
+        "met": 923639
+      }
+    },
+    "hunefer": {
+      "title": "The judgement of the dead in the presence of Osiris, from the Book of the Dead of Hunefer",
+      "by": "Hunefer, scribe",
+      "date": "about 1275 BCE",
+      "medium": "painted papyrus",
+      "where": "The British Museum, EA 9901 (photograph via Wikimedia Commons)",
+      "licence": "Public domain",
+      "href": "https://commons.wikimedia.org/wiki/File:The_judgement_of_the_dead_in_the_presence_of_Osiris.jpg",
+      "source": {
+        "commons": "The judgement of the dead in the presence of Osiris.jpg",
+        "width": 2446
+      }
+    },
+    "ibis": {
+      "title": "Ibis blanc ou sacré (Ibis religiosa), plate 7 of Histoire naturelle, Oiseaux",
+      "by": "after Jules-César Savigny, in the Description de l’Égypte",
+      "date": "1809",
+      "medium": "engraving",
+      "where": "Imprimerie impériale, Paris (scan: New York Public Library, via Wikimedia Commons)",
+      "licence": "Public domain",
+      "href": "https://digitalcollections.nypl.org/items/510d47e0-bda9-a3d9-e040-e00a18064a99",
+      "source": {
+        "commons": "Zoologie. Oiseau. 1. Ibis blanc ou sacré (Ibis religiosa); 2. Ibis noir (Ibis falcinellus) (NYPL b14212718-1268479).jpg",
+        "width": 3840
+      }
+    },
+    "vermeer_writing": {
+      "title": "A Lady Writing",
+      "by": "Johannes Vermeer",
+      "date": "about 1665",
+      "medium": "oil on canvas",
+      "where": "National Gallery of Art, Washington, 1962.10.1",
+      "licence": "Open Access, CC0",
+      "href": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer,_A_Lady_Writing,_c._1665,_NGA_46437.jpg",
+      "source": {
+        "commons": "Johannes Vermeer, A Lady Writing, c. 1665, NGA 46437.jpg",
+        "width": 1500
+      }
+    },
+    "vermeer_balance": {
+      "title": "Woman Holding a Balance",
+      "by": "Johannes Vermeer",
+      "date": "about 1664",
+      "medium": "oil on canvas",
+      "where": "National Gallery of Art, Washington, 1942.9.97",
+      "licence": "Open Access, CC0",
+      "href": "https://commons.wikimedia.org/wiki/File:Johannes_Vermeer,_Woman_Holding_a_Balance,_c._1664,_NGA_1236.jpg",
+      "source": {
+        "commons": "Johannes Vermeer, Woman Holding a Balance, c. 1664, NGA 1236.jpg",
+        "width": 1500
+      }
+    },
+    "spitzweg": {
+      "title": "The Bookworm",
+      "by": "Carl Spitzweg",
+      "date": "about 1850",
+      "medium": "oil on canvas",
+      "where": "Museum Georg Schäfer, Schweinfurt (photograph via Wikimedia Commons)",
+      "licence": "Public domain",
+      "href": "https://commons.wikimedia.org/wiki/File:Carl_Spitzweg_-_%22The_Bookworm%22.jpg",
+      "source": {
+        "commons": "Carl Spitzweg - \"The Bookworm\".jpg",
+        "width": 1500
+      }
+    },
+    "vangogh": {
+      "title": "The Bedroom",
+      "by": "Vincent van Gogh",
+      "date": "1889",
+      "medium": "oil on canvas",
+      "where": "The Art Institute of Chicago, 1926.417",
+      "licence": "Public domain",
+      "href": "https://commons.wikimedia.org/wiki/File:Vincent_van_Gogh_-_The_Bedroom_-_1926.417_-_Art_Institute_of_Chicago.jpg",
+      "source": {
+        "commons": "Vincent van Gogh - The Bedroom - 1926.417 - Art Institute of Chicago.jpg",
+        "width": 2000
+      }
+    },
+    "hammershoi": {
+      "title": "Interior with Young Woman from Behind",
+      "by": "Vilhelm Hammershøi",
+      "date": "1904",
+      "medium": "oil on canvas",
+      "where": "Randers Kunstmuseum (photograph via Wikimedia Commons)",
+      "licence": "Public domain",
+      "href": "https://commons.wikimedia.org/wiki/File:Vilhelm_Hammershoi_-_Interieur_mit_Rueckenansicht_einer_Frau_-_1903-1904_-_Randers_Kunstmuseum.jpg",
+      "source": {
+        "commons": "Vilhelm Hammershoi - Interieur mit Rueckenansicht einer Frau - 1903-1904 - Randers Kunstmuseum.jpg",
+        "width": 1500
+      }
+    },
+    "larsson": {
+      "title": "Lisbeth Reading",
+      "by": "Carl Larsson",
+      "date": "1904",
+      "medium": "watercolour, charcoal and tempera on paper mounted on canvas",
+      "where": "Nationalmuseum, Stockholm, NMB 2342",
+      "licence": "Public domain",
+      "href": "https://commons.wikimedia.org/wiki/File:Lisbeth_Reading_(Carl_Larsson)_-_Nationalmuseum_-_26295.tif",
+      "source": {
+        "commons": "Lisbeth Reading (Carl Larsson) - Nationalmuseum - 26295.tif",
+        "width": 1800
+      }
+    },
+    "metsys": {
+      "title": "The Moneylender and His Wife (detail)",
+      "by": "Quinten Metsys",
+      "date": "1514",
+      "medium": "oil on wood",
+      "where": "Musée du Louvre (reproduction: Web Gallery of Art, via Wikimedia Commons)",
+      "licence": "Public domain",
+      "href": "https://commons.wikimedia.org/wiki/File:Quinten_Massijs_(I)_-_The_Moneylender_and_his_Wife_(detail)_-_WGA14282.jpg",
+      "source": {
+        "commons": "Quinten Massijs (I) - The Moneylender and his Wife (detail) - WGA14282.jpg",
+        "width": 1420
+      }
+    },
+    "philae": {
+      "title": "General View of the Island of Philae, Nubia, from Egypt and Nubia, volume I",
+      "by": "Louis Haghe, after David Roberts",
+      "date": "1846",
+      "medium": "tinted lithograph",
+      "where": "The Cleveland Museum of Art, 2012.259",
+      "licence": "Open Access, CC0",
+      "href": "https://commons.wikimedia.org/wiki/File:Louis_Haghe_-_Egypt_and_Nubia,_Volume_I-_General_View_of_the_Island_of_Philae,_Nubia_-_2012.259_-_Cleveland_Museum_of_Art.tif",
+      "source": {
+        "commons": "Louis Haghe - Egypt and Nubia, Volume I- General View of the Island of Philae, Nubia - 2012.259 - Cleveland Museum of Art.tif",
+        "width": 2200
+      }
+    },
+    "atlas": {
+      "title": "Atlas sheet from the Description de l’Égypte",
+      "by": "after Pierre Jacotin and the Commission des sciences et des arts d’Égypte",
+      "date": "about 1800",
+      "medium": "engraved map",
+      "where": "scan: Heidelberg University Library, via Wikimedia Commons",
+      "licence": "Public domain",
+      "href": "https://commons.wikimedia.org/wiki/File:Description_de_l%27Egypte_-_Atlas_-Flle_4.jpg",
+      "source": {
+        "commons": "Description de l'Egypte - Atlas -Flle 4.jpg",
+        "width": 2282
+      }
+    },
+    "papyrus": {
+      "title": "Cyperus papyrus L. (Papyrus Sedge): finished drawing of inflorescence",
+      "by": "James Bruce",
+      "date": "18th century",
+      "medium": "watercolour and gouache over graphite on paper",
+      "where": "Yale Center for British Art, B1977.14.9119",
+      "licence": "Open Access, CC0",
+      "href": "https://collections.britishart.yale.edu/catalog/tms:15547",
+      "source": {
+        "commons": "James Bruce - Cyperus papyrus L (Papyrus Sedge), finished drawing of inflorescence - B1977.14.9119 - Yale Center for British Art.jpg",
+        "width": 1323
+      }
+    },
+    "audubon": {
+      "title": "Glossy Ibis, plate 387 of The Birds of America",
+      "by": "John James Audubon",
+      "date": "1827–38",
+      "medium": "hand-coloured aquatint and engraving",
+      "where": "scan: University of Pittsburgh, via Wikimedia Commons",
+      "licence": "Public domain",
+      "href": "https://commons.wikimedia.org/wiki/File:387_Glossy_Ibis.jpg",
+      "source": {
+        "commons": "387 Glossy Ibis.jpg",
+        "width": 2400
+      }
+    },
+    "luttrell": {
+      "title": "Two men threshing a sheaf, margin of the Luttrell Psalter, folio 74 verso",
+      "by": "English illuminator",
+      "date": "about 1325–35",
+      "medium": "tempera and gold on parchment",
+      "where": "The British Library, Add MS 42130",
+      "licence": "Open Access, CC0",
+      "href": "https://commons.wikimedia.org/wiki/File:Two_men_threshing_sheaf_-_Luttrell_Psalter_(c.1325-1335),_f.74v_-_BL_Add_MS_42130.jpg",
+      "source": {
+        "commons": "Two men threshing sheaf - Luttrell Psalter (c.1325-1335), f.74v - BL Add MS 42130.jpg",
+        "width": 1679
+      }
+    }
+  }
+}

@@ -1,16 +1,11 @@
 import { release } from "../content/release";
 import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
-import { Wedjat } from "../art/Figures";
-import { Frieze } from "../art/Friezes";
 import { Glyph } from "../art/Glyphs";
-import { LunarEmblem, StarField } from "../art/Night";
-import { PaletteMark } from "../art/Palette";
-import { Scales } from "../art/Scales";
-import { Thoth } from "../art/Thoth";
+import { StarField } from "../art/Night";
 import { FaqList } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
-import { ArtFor, CtaBand, SectionHead } from "../components/Page";
+import { CtaBand, SectionHead } from "../components/Page";
 import { audiences } from "../content/audiences";
 import { features } from "../content/features";
 import { homeFaqs, howSteps } from "../content/home";
@@ -20,23 +15,14 @@ import { DeskMock } from "../demos/DeskMock";
 import { PyramidExplorer } from "../demos/PyramidExplorer";
 import { WeighDemo } from "../demos/WeighDemo";
 import { Inline } from "../components/Inline";
-
-const column = ["\u{1315D}", "\u{133DE}", "\u{13000}", "\u{1315D}", "\u{133DE}", "\u{13000}", "\u{1315D}", "\u{133DE}", "\u{13000}", "\u{1315D}", "\u{133DE}"];
+import { HeroDesk } from "../personality/HeroDesk";
+import { PageTurn } from "../personality/PageTurn";
+import { PagePlate, Plate } from "../personality/Plate";
 
 export function Home() {
   return (
     <>
       <section className="hero" aria-labelledby="hero-h">
-        <div className="hero-column hero-column--left" aria-hidden="true">
-          {column.map((sign, i) => (
-            <span key={i}>{sign}</span>
-          ))}
-        </div>
-        <div className="hero-column hero-column--right" aria-hidden="true">
-          {column.map((sign, i) => (
-            <span key={i}>{sign}</span>
-          ))}
-        </div>
         <div className="wrap hero-grid">
           <div className="hero-intro">
             <span className="status-pill">
@@ -46,9 +32,9 @@ export function Home() {
               Let AI be your <em>editor</em>, not your writer.
             </h1>
             <p className="lede">
-              Asten remembers the facts you settle about your story, like a hair color, a death, or the day the harbor burned,
-              and marks any page that disagrees, in red, in the margin. It never writes a word for you. Your manuscript never
-              leaves your computer.
+              Asten keeps the record a good editor keeps: the facts you settle about your story, like a hair color, a death, or
+              the day the harbor burned. When a page disagrees, it takes a red pencil to the margin. It never writes a word for
+              you, and your manuscript never leaves your computer.
             </p>
             <div className="btn-row">
               <Link to="/download" className="btn btn--primary" data-magnetic>
@@ -66,31 +52,24 @@ export function Home() {
             </ul>
           </div>
 
-          <div>
-            <div className="stela" tabIndex={0} role="img" aria-label="Thoth, the ibis-headed scribe, records a weighing: your page in one pan of the scales, the feather of canon in the other.">
-              <div className="stela-sky">
-                <StarField rows={3} cols={9} seed={11} />
-              </div>
-              <Scales className="stela-scales" />
-              <Thoth className="stela-thoth" flip />
-              <span className="chip chip--code stela-mark">CANON-E013</span>
-              <div className="stela-ground">
-                <Frieze kind="blocks" />
-              </div>
-            </div>
-          </div>
+          <HeroDesk />
         </div>
       </section>
 
-      <Frieze kind="khekher" />
+      <PageTurn to="sunk" seed={1} />
 
       <section className="register register--sunk" aria-labelledby="problem-h">
         <div className="wrap">
-          <SectionHead
-            id="problem-h"
-            title="Continuity slips in a long manuscript"
-            text="A long manuscript is written over months, and a detail set down in chapter 2 is hard to keep in mind by chapter 19. Three common kinds of slip:"
-          />
+          <div className="with-plate with-plate--head">
+            <SectionHead
+              id="problem-h"
+              title="Continuity slips in a long manuscript"
+              text="A long manuscript is written over months, and a detail set down in chapter 2 is hard to keep in mind by chapter 19. Three common kinds of slip:"
+            />
+            <div className="plate-slot" data-reveal>
+              <Plate name="scribes" tilt={1.4} />
+            </div>
+          </div>
           <div className="card-grid card-grid--3">
             {[
               { glyph: "feather" as const, code: "CANON-E013", quote: <>Chapter 2: Mira’s hair is auburn. Chapter 19: she pushes back her <mark>black</mark> hair.</>, text: "An attribute you settled, quietly drifting." },
@@ -113,10 +92,12 @@ export function Home() {
         </div>
       </section>
 
+      <PageTurn to="papyrus" seed={2} />
+
       <section className="register" aria-labelledby="inks-h">
         <div className="wrap inks">
           <div className="inks-art" data-reveal>
-            <PaletteMark />
+            <Plate name="palette" tilt={-5} />
             <p className="inks-legend" aria-hidden="true">
               <span className="l-black">your ink</span>
               <span className="l-red">Asten’s ink</span>
@@ -151,18 +132,27 @@ export function Home() {
         </div>
       </section>
 
+      <PageTurn to="raised" seed={3} />
+
       <section className="register register--raised" aria-labelledby="weigh-h">
         <div className="wrap">
-          <SectionHead
-            id="weigh-h"
-            title="Example: an attribute check"
-            text="Mira’s hair was settled as auburn in chapter 2. The example shows the mark Asten raises when chapter 19 gives a different color, and the actions it offers. The sentence itself is never changed."
-          />
+          <div className="with-plate with-plate--head">
+            <SectionHead
+              id="weigh-h"
+              title="Weighing a page against the canon"
+              text="Three examples, with the wording Asten’s engine gives each mark. Pick a word on the page and the balance settles. The sentence itself is never changed."
+            />
+            <div className="plate-slot" data-reveal>
+              <Plate name="weighing" tilt={-1} />
+            </div>
+          </div>
           <div className="demo-frame" data-reveal data-llms="skip">
             <WeighDemo />
           </div>
         </div>
       </section>
+
+      <PageTurn to="papyrus" seed={4} />
 
       <section className="register" aria-labelledby="how-h">
         <div className="wrap">
@@ -194,18 +184,27 @@ export function Home() {
         </div>
       </section>
 
+      <PageTurn to="sunk" seed={5} />
+
       <section className="register register--sunk" aria-labelledby="desk-h">
         <div className="wrap">
-          <SectionHead
-            id="desk-h"
-            title="The writing desk"
-            text="The binder on the left, the page in the middle, and Asten’s marks in the margin."
-          />
+          <div className="with-plate with-plate--head with-plate--small">
+            <SectionHead
+              id="desk-h"
+              title="The writing desk"
+              text="The binder on the left, the page in the middle, and Asten’s marks in the margin."
+            />
+            <div className="plate-slot" data-reveal>
+              <Plate name="lamp" tilt={-2} />
+            </div>
+          </div>
           <div data-reveal>
             <DeskMock />
           </div>
         </div>
       </section>
+
+      <PageTurn to="papyrus" seed={6} />
 
       <section className="register" aria-labelledby="features-h">
         <div className="wrap">
@@ -234,11 +233,12 @@ export function Home() {
         </div>
       </section>
 
+      <PageTurn to="night" seed={7} />
+
       <section className="register register--night" aria-labelledby="time-h">
         <StarField rows={7} cols={16} seed={3} />
         <div className="wrap night-grid">
           <div data-reveal>
-            <LunarEmblem />
             <h2 id="time-h">Story time and reading order</h2>
             <p className="lede" style={{ marginTop: 18 }}>
               Asten records when each scene happens in the story separately from where it sits in the book. It compares the two
@@ -248,6 +248,9 @@ export function Home() {
               <strong>Thoth, keeper of time</strong>A story retold by Plutarch says Thoth won five extra days from the moon, so
               that a birth forbidden on every day of the year could happen on days that belonged to no month.
             </p>
+            <div className="plate-slot plate-slot--night">
+              <Plate name="dusk" tilt={-1.4} />
+            </div>
           </div>
           <div className="demo-frame" data-reveal data-llms="skip">
             <ClocksDemo />
@@ -255,18 +258,27 @@ export function Home() {
         </div>
       </section>
 
+      <PageTurn to="papyrus" seed={8} />
+
       <section className="register" aria-labelledby="world-h">
         <div className="wrap">
-          <SectionHead
-            id="world-h"
-            title="Optional world notes"
-            text="Places, histories, and rules can be kept as sparks, sketches, or settled entries. Only settled entries become canon, and none of it is required before you write."
-          />
+          <div className="with-plate with-plate--head">
+            <SectionHead
+              id="world-h"
+              title="Optional world notes"
+              text="Places, histories, and rules can be kept as sparks, sketches, or settled entries. Only settled entries become canon, and none of it is required before you write."
+            />
+            <div className="plate-slot" data-reveal>
+              <Plate name="cliffs" tilt={1.2} />
+            </div>
+          </div>
           <div data-reveal>
             <PyramidExplorer />
           </div>
         </div>
       </section>
+
+      <PageTurn to="sunk" seed={9} />
 
       <section className="register register--sunk" aria-labelledby="who-h">
         <div className="wrap">
@@ -286,10 +298,12 @@ export function Home() {
         </div>
       </section>
 
+      <PageTurn to="papyrus" seed={10} />
+
       <section className="register" aria-labelledby="privacy-h">
         <div className="wrap privacy-grid">
-          <div data-reveal>
-            <Wedjat />
+          <div className="plate-slot" data-reveal style={{ "--plate-w": "420px" } as CSSProperties}>
+            <Plate name="scribe" tilt={-1.2} />
           </div>
           <div data-reveal>
             <h2 id="privacy-h">Your project stays on your computer</h2>
@@ -320,6 +334,8 @@ export function Home() {
         </div>
       </section>
 
+      <PageTurn to="sunk" seed={11} />
+
       <section className="register register--sunk" aria-labelledby="hood-h">
         <div className="wrap hood">
           <div data-reveal>
@@ -343,6 +359,9 @@ export function Home() {
               <Link to="/ai" className="link-arrow">
                 Our AI stance <Arrow />
               </Link>
+            </div>
+            <div className="plate-slot" style={{ "--plate-w": "460px" } as CSSProperties}>
+              <Plate name="ibis" tilt={1.4} />
             </div>
           </div>
           <figure className="terminal" data-reveal aria-label="A diagnostic returned by Asten’s local API">
@@ -369,6 +388,8 @@ export function Home() {
           </figure>
         </div>
       </section>
+
+      <PageTurn to="papyrus" seed={12} />
 
       <section className="register" aria-labelledby="status-h">
         <div className="wrap">
@@ -413,6 +434,8 @@ export function Home() {
         </div>
       </section>
 
+      <PageTurn to="sunk" seed={13} />
+
       <section className="register register--sunk" aria-labelledby="journal-h">
         <div className="wrap">
           <SectionHead id="journal-h" title="From the journal" />
@@ -426,7 +449,7 @@ export function Home() {
                 style={{ "--d": i } as CSSProperties}
               >
                 <div className="art-slot">
-                  <ArtFor art={article.art} />
+                  <PagePlate path={`/journal/${article.slug}`} bare />
                 </div>
                 <span className="article-meta">{article.minutes} min read</span>
                 <h3>{article.title}</h3>
@@ -439,6 +462,8 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      <PageTurn to="papyrus" seed={14} />
 
       <section className="register" aria-labelledby="faq-h">
         <div className="wrap wrap-narrow">

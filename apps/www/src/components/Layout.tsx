@@ -2,6 +2,8 @@ import { Suspense, useEffect, useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { loaderFor } from "../pages/loaders";
 import { Seo } from "../seo/Seo";
+import { PencilFilters } from "../personality/Pencil";
+import { useLamplight } from "../personality/lamplight";
 import { Footer } from "./Footer";
 import { Masthead } from "./Masthead";
 
@@ -41,12 +43,14 @@ export function Layout() {
   useReveal();
   usePrefetch();
   useMagnetic();
+  useLamplight();
 
   return (
     <>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
+      <PencilFilters />
       <Seo pathname={pathname} />
       <Masthead />
       <main id="main" ref={main} tabIndex={-1} key={pathname} className={moved.current ? "page-enter" : undefined}>

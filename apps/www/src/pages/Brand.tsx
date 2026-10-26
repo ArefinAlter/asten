@@ -12,6 +12,7 @@ import { CartoucheWordmark } from "../components/Brand";
 import { Arrow } from "../components/Icons";
 import { Answer, PageHero, SectionHead } from "../components/Page";
 import { DeskMock } from "../demos/DeskMock";
+import { Plate } from "../personality/Plate";
 
 const day = [
   { name: "Papyrus", token: "--papyrus", hex: "#F5EEDF", role: "Page background" },
@@ -79,6 +80,7 @@ export function Brand() {
         title="Brand guidelines and press kit"
         lede="The Asten brand in one page: the idea, the mark, the scribe’s pigments, the type, the registers, the art, the motion, and the voice. Press can download the logo files at the bottom."
         art={<CartoucheWordmark className="brand-hero-cartouche" />}
+        plate={false}
       >
         <a href="#downloads" className="link-arrow">
           Jump to downloads <Arrow />
@@ -231,8 +233,21 @@ export function Brand() {
           <SectionHead
             id="b-art"
             title="Illustration"
-            text="Original SVG drawings in the Egyptian composite view: head and legs in profile, shoulders and eye frontal, flat pigment fills, carbon outlines, ground lines, no gradients and no perspective."
+            text="Two kinds of picture. The painted plates are public-domain works from museum collections, cut and graded to one warm light and laid on the paper, credited on the credits page. The ornaments, icons and diagrams below are original SVG drawings in the Egyptian composite view: head and legs in profile, shoulders and eye frontal, flat pigment fills, carbon outlines, ground lines."
           />
+          <h3 className="sub-h">Painted plates</h3>
+          <p className="fine brand-plates-note">
+            One light for all of them: highlights gained toward warm paper, saturation eased, the blacks lifted a little, a fine
+            grain over everything. A painting or a print is a torn sheet; a window is a round arch with a torn foot; an object is
+            cut from its studio backdrop and stands on the paper alone; a frieze runs as a band across the page. No picture
+            carries a caption: every work is credited, with its holder, its licence and a link, on the <Link to="/credits">credits page</Link>.
+          </p>
+          <div className="brand-plates">
+            <Plate name="balance" />
+            <Plate name="philae" />
+            <Plate name="inkwell" />
+          </div>
+          <h3 className="sub-h">Drawn ornaments</h3>
           <div className="art-sheet">
             <figure>
               <Thoth />
@@ -294,29 +309,36 @@ export function Brand() {
             <SectionHead
               id="b-motion"
               title="Motion"
-              text="Motion should feel like ink going down: deliberate, then still. Black first, red after a beat, because Asten never interrupts."
+              text="Motion should feel like a hand: deliberate, a little uneven, then still. Black first, red after a beat, because Asten never interrupts."
             />
           </div>
           <ul className="motion-list">
             <li>
               <strong>Draw</strong>
-              <span>Strokes ink on in 600–1200 ms with an ink easing.</span>
+              <span>
+                The red pencil goes down with a hand’s unevenness: a wobble, a pressure that swells and thins, a small overshoot, no
+                two strokes at the same pace. It is drawn once, and drawn again when the words under it change.
+              </span>
             </li>
             <li>
               <strong>Rise</strong>
-              <span>Registers rise 16 px and fade in as you reach them.</span>
+              <span>Registers rise 16 px and fade in as you reach them. Sheets lift over one another the way pages turn.</span>
             </li>
             <li>
               <strong>Weigh</strong>
-              <span>The scales tip with a damped settle when a page disagrees.</span>
+              <span>The scales are a spring. A heavier claim tips the beam, it overshoots, and it settles.</span>
             </li>
             <li>
-              <strong>Ambient</strong>
-              <span>Stars twinkle, the moon glows, the pen writes: slow loops, never faster than two seconds.</span>
+              <strong>Lamp</strong>
+              <span>At night the page is lit by a lamp that flickers a little. The flicker is noise, not a timer.</span>
             </li>
             <li>
               <strong>Still</strong>
-              <span>Reduced-motion settings remove all of it. Every animated state has a still twin.</span>
+              <span>
+                Nothing loops on a clock. Motion comes from a spring, from noise or from a hand, and it stops when it is off screen or
+                the tab is hidden. Reduced-motion settings remove all of it: every drawing arrives complete and every state has a still
+                twin.
+              </span>
             </li>
           </ul>
         </div>
@@ -379,7 +401,7 @@ export function Brand() {
           <p>
             No mummy jokes, curses, or pharaoh kitsch. No invented hieroglyphic “text”: when we show real signs, we name them, and
             the cartouche name toy is labeled as a playful alphabet. Thoth is drawn with dignity, with his ibis head, lunar disk,
-            palette, and pen. Our art is original, made for Asten, in the spirit of the tradition. See <Link to="/name">the name</Link>.
+            palette, and pen. The painted plates are credited on the <Link to="/credits">credits page</Link>; the drawings are original, made for Asten, in the spirit of the tradition. See <Link to="/name">the name</Link>.
           </p>
         </div>
       </section>

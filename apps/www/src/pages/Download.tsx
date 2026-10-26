@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { PaletteMark } from "../art/Palette";
 import { FaqList } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
 import { Inline } from "../components/Inline";
@@ -24,7 +23,6 @@ export function Download() {
       <PageHero
         title="Try the pre-alpha"
         lede="Asten 0.0.1a is out as a pre-alpha. Open it in your browser on a sample novel, or install the desktop app for Windows or Linux and write on your own machine."
-        art={<PaletteMark className="hero-palette" />}
       >
         <div className="btn-row">
           <HeroDownload />

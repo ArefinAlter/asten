@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
-import { Thoth } from "../art/Thoth";
 import { FaqList } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
 import { Answer, CtaBand, PageHero, Related, SectionHead } from "../components/Page";
@@ -29,7 +28,6 @@ export function AiStance() {
       <PageHero
         title="Asten and AI"
         lede="Asten does not write prose and runs no AI model. This page describes what Asten does today and the conditions any future AI feature has to meet."
-        art={<Thoth flip />}
       />
 
       <section className="register register--sunk" aria-label="Summary">

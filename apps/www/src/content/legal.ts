@@ -1,5 +1,21 @@
+import { creditedWorks } from "../personality/plates";
 import { legalIndex } from "./legal-index";
 import type { LegalDoc } from "./types";
+
+/** "Home", or the paths a work appears on; a long list is shortened. */
+function appearsOn(pages: string[]): string {
+  const names = pages.map((p) => (p === "/" ? "Home" : `\`${p}\``));
+  return names.length <= 4 ? names.join(", ") : `${names.slice(0, 3).join(", ")} and ${names.length - 3} more pages`;
+}
+
+/** The table of painted works on /credits, made from the same manifest that makes the pictures. */
+function artworkRows(): string[][] {
+  return creditedWorks().map(({ work, pages }) => {
+    const href = work.href.replace(/\(/g, "%28").replace(/\)/g, "%29");
+    const medium = work.medium ? `, ${work.medium}` : "";
+    return [`[*${work.title}*](${href}), ${work.by}, ${work.date}${medium}`, work.where, work.licence, appearsOn(pages)];
+  });
+}
 
 export const legalUpdated = "2026-10-25";
 
@@ -1073,7 +1089,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "The Egyptian motifs on this site, such as the scales, the ibis, the moon, and the scribe’s palette, are original drawings made by Verne. They are inspired by Egyptian art of the Old, Middle, and New Kingdoms, which is public-domain heritage.",
+            text: "The ornaments, icons and diagrams on this site are original drawings made by Verne, inspired by Egyptian art of the Old, Middle, and New Kingdoms, which is public-domain heritage. The painted plates are public-domain works and CC0 Open Access images from museum collections; Verne cut, graded and arranged them, and claims no rights in the works themselves.",
           },
           {
             kind: "p",
@@ -1477,9 +1493,9 @@ export const legalDocs: LegalDoc[] = [
   {
     ...legalIndex["/credits"]!,
     summary: [
-      "This website is set in Fraunces, Literata, IBM Plex Mono, and Noto Sans Egyptian Hieroglyphs, all under the SIL Open Font License 1.1.",
+      "This website is set in Fraunces, Literata, IBM Plex Mono, Caveat, and Noto Sans Egyptian Hieroglyphs, all under the SIL Open Font License 1.1.",
       "It is built with React, React Router, Vite, and TypeScript. Its social images are rendered at build time with Satori and resvg-js.",
-      "The Egyptian illustrations are original drawings by Verne, inspired by public-domain heritage.",
+      "The painted plates are public-domain or CC0 works from museum and library collections, credited in the table below. The ornaments and icons are original drawings by Verne.",
     ],
     sections: [
       {
@@ -1503,6 +1519,11 @@ export const legalDocs: LegalDoc[] = [
               [
                 "IBM Plex Mono",
                 "IBM. © 2017 IBM Corp.",
+                "SIL Open Font License 1.1",
+              ],
+              [
+                "Caveat",
+                "Impallari Type, for Google Fonts. © 2014 The Caveat Project Authors",
                 "SIL Open Font License 1.1",
               ],
               [
@@ -1564,7 +1585,16 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "The illustrations on this site are original SVG drawings by Verne. They are inspired by Egyptian art of the Old, Middle, and New Kingdoms, which is public-domain heritage. See [copyright](/copyright) for how they may be used.",
+            text: "The painted plates on this site are works in the public domain, or images that their holders release under Creative Commons Zero: the Metropolitan Museum of Art (Open Access), the National Gallery of Art, the Cleveland Museum of Art, the Yale Center for British Art and the British Library. The others are old enough that no right remains in them, and the libraries and museums that scanned them make no claim over a faithful photograph. Each is cropped, cut from its backdrop where it is an object, graded to one warm light and set on the paper by Verne; nothing is redrawn or generated. The table gives the holder’s own title, date and object number, and the build that makes the files (art/build.py, with art/works.json and art/plates.json) is in the source repository.",
+          },
+          {
+            kind: "table",
+            head: ["Work", "Holding institution", "Licence", "Appears on"],
+            rows: artworkRows(),
+          },
+          {
+            kind: "p",
+            text: "The ornaments, icons, friezes and diagrams are original SVG drawings by Verne. See [copyright](/copyright) for how everything on this site may be used.",
           },
         ],
       },

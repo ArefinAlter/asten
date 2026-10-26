@@ -1,37 +1,13 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Wedjat, IbisStandard, Lotus } from "../art/Figures";
+import { IbisStandard } from "../art/Figures";
 import { Glyph } from "../art/Glyphs";
-import { LunarEmblem } from "../art/Night";
-import { PaletteMark } from "../art/Palette";
-import { PyramidSection } from "../art/Pyramid";
-import { Scales } from "../art/Scales";
-import type { ArtKey } from "../content/types";
+import { Plate } from "../personality/Plate";
+import { plateForPath, plates } from "../personality/plates";
 import { breadcrumbsFor, metaFor } from "../routes";
 import { release } from "../content/release";
 import { Arrow } from "./Icons";
 import { Inline } from "./Inline";
-
-export function ArtFor({ art, className }: { art: ArtKey; className?: string }) {
-  switch (art) {
-    case "scales":
-      return <Scales className={className} tilt={-6} />;
-    case "moon":
-      return <LunarEmblem className={className} />;
-    case "pyramid":
-      return <PyramidSection className={className} />;
-    case "eye":
-      return <Wedjat className={className} />;
-    case "palette":
-      return <PaletteMark className={`hero-palette ${className ?? ""}`} />;
-    case "ibis":
-      return <IbisStandard className={className} />;
-    case "lotus":
-      return <Lotus className={className} />;
-    case "scroll":
-      return <ScrollArt className={className} />;
-  }
-}
 
 /** A rolled papyrus, tied, with a red rubric seal. */
 export function ScrollArt({ className }: { className?: string }) {
@@ -72,26 +48,45 @@ export function PageHero({
   title,
   lede,
   art,
+  plate = true,
   children,
 }: {
   title: ReactNode;
   lede?: ReactNode;
+  /** A flat drawing in the old frame. Without it the page's painted plate (art-manifest.json) takes the place. */
   art?: ReactNode;
+  /** false: no painted plate in the hero (the page places one itself). */
+  plate?: boolean;
   children?: ReactNode;
 }) {
+  const { pathname } = useLocation();
+  const pp = plate && !art ? plateForPath(pathname) : undefined;
+  const band = pp ? plates[pp.plate]?.shape === "band" : false;
+  const media = art ? (
+    <div className="page-hero-art">{art}</div>
+  ) : pp && !band ? (
+    <div className="page-hero-art page-hero-art--plate">
+      <Plate name={pp.plate} eager />
+    </div>
+  ) : null;
   return (
     <header className="page-hero">
       <div className="wrap">
         <Breadcrumbs />
-        <div className={art ? "page-hero-grid" : undefined}>
+        <div className={media ? `page-hero-grid${pp?.side === "left" ? " page-hero-grid--flip" : ""}` : undefined}>
           <div>
             <h1>{title}</h1>
             {lede ? <p className="lede">{lede}</p> : null}
             {children}
           </div>
-          {art ? <div className="page-hero-art">{art}</div> : null}
+          {media}
         </div>
       </div>
+      {pp && band ? (
+        <div className="page-hero-band">
+          <Plate name={pp.plate} eager />
+        </div>
+      ) : null}
     </header>
   );
 }

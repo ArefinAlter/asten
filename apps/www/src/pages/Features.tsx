@@ -2,7 +2,6 @@ import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import { Frieze } from "../art/Friezes";
 import { Glyph } from "../art/Glyphs";
-import { PapyrusPlant } from "../art/Figures";
 import { Arrow } from "../components/Icons";
 import { Answer, CtaBand, PageHero, SectionHead } from "../components/Page";
 import { audiences } from "../content/audiences";
@@ -14,7 +13,6 @@ export function Features() {
       <PageHero
         title="Features"
         lede="A manuscript desk, canon checks, two clocks for story time, optional world tools, and add-ins for Word and Google Docs. Everything runs on your own computer."
-        art={<PapyrusPlant />}
       />
       <Frieze kind="lotus" />
       <section className="register register--sunk" aria-label="All features">

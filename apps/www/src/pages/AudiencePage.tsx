@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Glyph } from "../art/Glyphs";
 import { FaqList } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
-import { Answer, ArtFor, CtaBand, PageHero, Related, SectionHead } from "../components/Page";
+import { Answer, CtaBand, PageHero, Related, SectionHead } from "../components/Page";
 import { audiences, type Audience } from "../content/audiences";
 import { CartoucheName } from "../demos/CartoucheName";
 import { ClocksDemo } from "../demos/ClocksDemo";
@@ -30,7 +30,7 @@ export function AudiencePage({ audience }: { audience: Audience }) {
   const others = audiences.filter((item) => item.slug !== audience.slug);
   return (
     <>
-      <PageHero title={audience.h1} lede={audience.lede} art={<ArtFor art={audience.art} />}>
+      <PageHero title={audience.h1} lede={audience.lede}>
         <div className="btn-row">
           <Link to="/download" className="btn btn--primary" data-magnetic>
             Try the pre-alpha

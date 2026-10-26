@@ -3,7 +3,6 @@ import { Frieze } from "../art/Friezes";
 import { LunarEmblem } from "../art/Night";
 import { PaletteMark } from "../art/Palette";
 import { Scales } from "../art/Scales";
-import { Thoth } from "../art/Thoth";
 import { Arrow } from "../components/Icons";
 import { Answer, CtaBand, PageHero, Related } from "../components/Page";
 import { CartoucheName } from "../demos/CartoucheName";
@@ -14,7 +13,6 @@ export function Name() {
       <PageHero
         title="Asten is another name for Thoth."
         lede="Thoth was the Egyptian god of writing: inventor of hieroglyphs, keeper of the gods’ records, reckoner of time by the moon, and the scribe who wrote down the verdict at the weighing of the heart. He recorded. He didn’t decide."
-        art={<Thoth />}
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
@@ -132,9 +130,10 @@ export function Name() {
         <div className="wrap wrap-narrow prose">
           <h2 id="n6">How we use Egyptian art</h2>
           <p>
-            Egyptian art is the heritage of Egypt and of everyone who has learned from it. We try to use it with care. Every
-            illustration on this site is an original drawing in the flat, outlined style of tomb painting and papyrus, made for
-            Asten. We don’t invent fake hieroglyphic “text”: where real signs appear, we say what they are, and the name toy above is
+            Egyptian art is the heritage of Egypt and of everyone who has learned from it. We try to use it with care. The
+            painted plates are public-domain works from museum collections, credited on the{" "}
+            <Link to="/credits">credits page</Link>; the ornaments and icons are original drawings in the flat, outlined style of
+            tomb painting and papyrus, made for Asten. We don’t invent fake hieroglyphic “text”: where real signs appear, we say what they are, and the name toy above is
             labeled as a playful alphabet. And no mummy jokes.
           </p>
           <p>
