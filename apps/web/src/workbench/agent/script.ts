@@ -44,6 +44,20 @@ export interface Chip {
   kind: "mark" | "scene" | "note" | "selection";
   id: string;
   label: string;
+  /** For a picked passage: the words themselves and where they came from. */
+  text?: string;
+  documentId?: string;
+}
+
+/** A fact the model proposed, as the card shows it. */
+export interface ProposedFact {
+  entity: string;
+  entity_key: string;
+  entity_id: string | null;
+  predicate: string;
+  value: string;
+  reason: string | null;
+  exists: boolean;
 }
 
 export interface ToolCall {
@@ -77,6 +91,7 @@ export type Card =
       events: TimelineEvent[];
       titles: Record<string, string>;
     }
+  | { type: "proposed"; items: ProposedFact[] }
   | { type: "rules" };
 
 export interface Turn {

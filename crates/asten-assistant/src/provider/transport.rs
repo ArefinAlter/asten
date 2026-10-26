@@ -329,6 +329,40 @@ impl Transport {
         }
     }
 
+    /// A plain GET of JSON from a server on this machine (used to list local
+    /// models). Anything else is refused.
+    pub async fn get_local_json(&self, url: &url::Url) -> Result<Value> {
+        if !crate::config::host_is_loopback(url.host_str().unwrap_or_default()) {
+            return Err(AssistantError::Invalid(
+                "Only a server on this machine can be listed".into(),
+            ));
+        }
+        let response = self
+            .client
+            .get(url.clone())
+            .timeout(Duration::from_secs(5))
+            .send()
+            .await
+            .map_err(|error| {
+                AssistantError::Network(format!(
+                    "Nothing answered on this machine: {}",
+                    error.without_url()
+                ))
+            })?;
+        if !response.status().is_success() {
+            return Err(AssistantError::Network(format!(
+                "The local server answered {}",
+                response.status().as_u16()
+            )));
+        }
+        let bytes = self
+            .read_all(response, &CancellationToken::new(), 1024 * 1024)
+            .await?;
+        serde_json::from_slice(&bytes).map_err(|_| {
+            AssistantError::Network("The local server sent something unexpected".into())
+        })
+    }
+
     fn delay(&self, attempt: u32) -> Duration {
         let base = self.backoff.saturating_mul(1 << attempt.min(6));
         let jitter = rand::random::<u64>() % (self.backoff.as_millis() as u64 / 2 + 1);

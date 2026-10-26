@@ -57,6 +57,8 @@ export interface Prefs {
   /** The assistant panel. */
   agentEnabled: boolean;
   agentAccess: Access;
+  /** `rules` (Asten's own tools), `auto` (the first ready provider) or a provider id. */
+  agentModel: string;
   disabledTools: string[];
   skills: Record<string, SkillState>;
   /** AI providers: the master switch is off by default; local first. */
@@ -184,6 +186,7 @@ export const DEFAULT_PREFS: Prefs = {
   hiddenTabs: [],
   agentEnabled: true,
   agentAccess: "read",
+  agentModel: "rules",
   disabledTools: [],
   skills: {},
   aiEnabled: false,

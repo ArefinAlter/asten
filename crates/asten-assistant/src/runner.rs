@@ -359,6 +359,38 @@ impl Assistant {
         Ok(())
     }
 
+    /// Why a provider cannot be used right now, for the settings screen;
+    /// `None` means it is ready. A cloud provider counts as having a key when
+    /// one was stored.
+    #[must_use]
+    pub fn not_ready_reason(config: &AssistantConfig, provider: &ProviderConfig) -> Option<String> {
+        Self::check_ready(config, provider, provider.key_last4.is_some())
+            .err()
+            .map(|error| error.to_string())
+    }
+
+    /// The models an Ollama-style server on this machine has installed.
+    pub async fn local_models(&self, provider_id: &str) -> Result<Vec<String>> {
+        let config = self.config.snapshot();
+        let provider = config
+            .provider(provider_id)
+            .ok_or_else(|| AssistantError::NotReady(format!("No provider called {provider_id}")))?;
+        let base = crate::config::validate_endpoint(&provider.endpoint)?;
+        let mut tags = base.clone();
+        tags.set_path("/api/tags");
+        let json = self.transport.get_local_json(&tags).await?;
+        Ok(json
+            .get("models")
+            .and_then(Value::as_array)
+            .map(|models| {
+                models
+                    .iter()
+                    .filter_map(|m| m.get("name").and_then(Value::as_str).map(str::to_owned))
+                    .collect()
+            })
+            .unwrap_or_default())
+    }
+
     /// The providers a request may use, in order.
     async fn candidates(&self, wanted: Option<&str>) -> Result<Vec<Chosen>> {
         let config = self.config.snapshot();

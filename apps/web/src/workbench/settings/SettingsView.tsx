@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Suspense, lazy, useEffect, useState, type ReactNode } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Packs } from "../../packs/Packs";
 import { PaletteMark } from "../../brand/Palette";
 import { useWorkbench } from "../context";
@@ -21,12 +21,15 @@ import {
   type Theme,
 } from "../prefs";
 import { forgetKey, keyHint, storeKey, useKeyVersion } from "../secrets";
+import { aiAvailable } from "../ai/bridge";
+import { ProvidersDesktop } from "../ai/ProvidersPanel";
 import { FIXED_RULES } from "../agent/AgentPanel";
 import { SKILLS } from "../agent/skills";
 import { TOOLS } from "../agent/tools";
 import { CONNECTORS, type Connector } from "./connectors";
 import { hostedSession, hostedStartOver, isHosted } from "../../lib/storage";
 import { RELEASE } from "../../version";
+import { Card, Fixed, Head, SettingRow, Switch } from "./parts";
 
 const ProjectSettings = lazy(() =>
   import("../../settings/Settings").then((m) => ({ default: m.Settings })),
@@ -102,7 +105,8 @@ export function SettingsView({
         {section === "packs" && <Packs />}
         {section === "assistant" && <Assistant />}
         {section === "skills" && <Skills />}
-        {section === "providers" && <Providers />}
+        {section === "providers" &&
+          (aiAvailable() ? <ProvidersDesktop /> : <Providers />)}
         {section === "connectors" && <Connectors />}
         {section === "guests" && (
           <Suspense fallback={<p className="status">Opening…</p>}>
@@ -114,80 +118,6 @@ export function SettingsView({
         {section === "about" && <About />}
       </div>
     </div>
-  );
-}
-
-function Head({ title, children }: { title: string; children?: ReactNode }) {
-  return (
-    <header className="settings-head">
-      <h1>{title}</h1>
-      {children && <p className="muted">{children}</p>}
-    </header>
-  );
-}
-
-function Card({ title, children }: { title?: string; children: ReactNode }) {
-  return (
-    <section className="wb-card settings-card">
-      {title && <h2>{title}</h2>}
-      <div className="wb-rows">{children}</div>
-    </section>
-  );
-}
-
-function SettingRow({
-  title,
-  note,
-  children,
-}: {
-  title: string;
-  note?: ReactNode;
-  children?: ReactNode;
-}) {
-  return (
-    <div className="setting-row">
-      <div className="setting-text">
-        <strong>{title}</strong>
-        {note && <small>{note}</small>}
-      </div>
-      <div className="setting-control">{children}</div>
-    </div>
-  );
-}
-
-function Fixed({ title, note }: { title: string; note: string }) {
-  return (
-    <SettingRow title={title} note={note}>
-      <span className="wb-pill">
-        <Icon name="lock" size={12} /> fixed
-      </span>
-    </SettingRow>
-  );
-}
-
-function Switch({
-  value,
-  onChange,
-  label,
-  disabled,
-}: {
-  value: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={value}
-      aria-label={label}
-      disabled={disabled}
-      className={`wb-switch${value ? " on" : ""}`}
-      onClick={() => onChange(!value)}
-    >
-      <span />
-    </button>
   );
 }
 
@@ -675,9 +605,17 @@ function Assistant() {
         </SettingRow>
         <SettingRow
           title="Model"
-          note="No model is called in this release: the assistant runs Asten's own tools and writes its answers from what they return."
+          note={
+            aiAvailable()
+              ? "Pick who answers in the assistant panel: Asten's own tools (no model), or a provider you switched on under AI providers. Providers are off until you allow them."
+              : "No model is called in this copy: the assistant runs Asten's own tools and writes its answers from what they return. The desktop app can use a provider with your own key."
+          }
         >
-          <span className="wb-pill">Asten rules</span>
+          <span className="wb-pill">
+            {aiAvailable() && prefs.agentModel !== "rules"
+              ? prefs.agentModel
+              : "Asten rules"}
+          </span>
         </SettingRow>
       </Card>
       <Card title="Rules that no setting changes">
@@ -1305,7 +1243,19 @@ function Privacy() {
         />
         <Fixed
           title="Provider keys"
-          note="Held in memory only, shown as the last four characters, never written to disk in this release."
+          note={
+            aiAvailable()
+              ? "Kept in your operating system's credential store (or an encrypted file you unlock with a passphrase), by the desktop app itself. The page never holds a key after you paste it; it shows the last four characters and nothing more."
+              : "Held in this page's memory only, shown as the last four characters, never written to disk."
+          }
+        />
+        <Fixed
+          title="What leaves this machine"
+          note={
+            aiAvailable()
+              ? "Nothing, unless you switch on an AI provider and consent to it. Then each request goes straight from this computer to that provider, and you can read it first. Update checks happen only when you press the button."
+              : "Nothing. This copy calls no provider."
+          }
         />
         <Fixed
           title="Guests cannot edit"
@@ -1386,8 +1336,10 @@ function About() {
         <Card title="This build">
           <p className="about-text">
             Connected to the Asten API on this machine: marks, history and
-            compile come from the engine. The assistant runs Asten's own tools;
-            no model is called.
+            compile come from the engine.{" "}
+            {aiAvailable()
+              ? "The assistant runs Asten's own tools unless you switch on a model provider with your own key (Settings, AI providers)."
+              : "The assistant runs Asten's own tools; no model is called."}
           </p>
         </Card>
       )}

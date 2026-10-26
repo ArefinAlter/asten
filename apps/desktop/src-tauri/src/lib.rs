@@ -7,6 +7,8 @@
 //! of the database at launch, a log file, one running copy at a time, and an
 //! update check that runs only when asked.
 
+#[cfg(desktop)]
+mod assistant;
 mod backup;
 mod logging;
 
@@ -110,6 +112,40 @@ fn focus_main_window(app: &tauri::AppHandle) {
     }
 }
 
+/// The commands the page may call. The assistant's belong to desktop builds.
+#[cfg(desktop)]
+macro_rules! handlers {
+    () => {
+        tauri::generate_handler![
+            desk_session,
+            start_pairing,
+            assistant::ai_status,
+            assistant::ai_update,
+            assistant::ai_add_provider,
+            assistant::ai_remove_provider,
+            assistant::ai_set_key,
+            assistant::ai_forget_key,
+            assistant::ai_unlock,
+            assistant::ai_consent,
+            assistant::ai_withdraw_all,
+            assistant::ai_preview,
+            assistant::ai_run,
+            assistant::ai_cancel,
+            assistant::ai_test,
+            assistant::ai_local_models,
+            assistant::ai_ledger,
+            assistant::ai_clear_ledger,
+        ]
+    };
+}
+
+#[cfg(mobile)]
+macro_rules! handlers {
+    () => {
+        tauri::generate_handler![desk_session, start_pairing]
+    };
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let builder = tauri::Builder::default();
@@ -201,13 +237,23 @@ pub fn run() {
                 Ok::<_, Box<dyn std::error::Error>>((application, session))
             })?;
             tracing::info!(origin = %session.origin, "embedded API ready");
+            // The assistant (providers, keys, spend) lives in this process, not
+            // in the page. Phones keep the offline assistant only.
+            #[cfg(desktop)]
+            {
+                let state = tauri::async_runtime::block_on(assistant::open(
+                    application.clone(),
+                    &data_directory,
+                ))?;
+                app.manage(state);
+            }
             app.manage(DesktopState {
                 application,
                 session,
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![desk_session, start_pairing])
+        .invoke_handler(handlers!())
         .run(tauri::generate_context!())
         .expect("error while running Asten");
 }

@@ -6,7 +6,7 @@
 // here reads or writes the real %APPDATA%\com.asten.app.
 //
 //   node tools/acceptance/<script>.mjs [--exe <path to asten-desktop.exe>] [--profile <dir>]
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { mkdirSync, rmSync, existsSync, writeFileSync, appendFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
@@ -39,8 +39,8 @@ export function logTo(file) {
 }
 
 /** Start the app with a scratch profile; resolves with handles. */
-export async function launchApp({ exe, profile, port = 9333, env = {} }) {
-  if (existsSync(profile)) rmSync(profile, { recursive: true, force: true });
+export async function launchApp({ exe, profile, port = 9333, env = {}, fresh = true }) {
+  if (fresh && existsSync(profile)) rmSync(profile, { recursive: true, force: true });
   const data = join(profile, "data");
   const webview = join(profile, "webview");
   const roaming = join(profile, "AppData", "Roaming");
@@ -93,8 +93,13 @@ export async function launchApp({ exe, profile, port = 9333, env = {} }) {
       try {
         await browser.close();
       } catch {}
-      child.kill();
+      // The window and its WebView2 helpers: end the whole tree, then let the
+      // operating system release the profile's files.
+      try {
+        spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+      } catch {}
       await Promise.race([exited, sleep(5000)]);
+      await sleep(1500);
     },
   };
 }

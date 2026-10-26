@@ -36,3 +36,4 @@ pub mod tools;
 
 pub use error::{AssistantError, Result};
 pub use secret::Secret;
+pub use tokio_util::sync::CancellationToken;

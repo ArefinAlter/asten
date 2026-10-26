@@ -237,6 +237,7 @@ version = "0.0.1-alpha"
 dependencies = [
  "asten-api",
  "asten-application",
+ "asten-assistant",
  "asten-domain",
  "asten-storage",
  "chrono",
