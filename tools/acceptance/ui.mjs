@@ -192,6 +192,8 @@ try {
   if (existsSync(asten)) {
     const file = JSON.parse(readFileSync(asten, "utf8"));
     check("the project file is asten-project v1 with the manuscript", file.format === "asten-project" && file.version === 1 && JSON.stringify(file).includes("autosaves"), `${file.format} v${file.version}`);
+    // Two projects will share a name; give the original another so a row can be picked by name.
+    await api.put(`/projects/${sampleId}`, { name: "Salt and Lantern (original)" });
     await page.locator(".backstage-nav button", { hasText: /^Open$/ }).click();
     await page.locator('input[type="file"][accept*=".asten"]').setInputFiles(asten);
     const three = await until(async () => {
@@ -204,9 +206,7 @@ try {
       const copy = three.find((p) => !projects.some((q) => q.id === p.id));
       if (!(await page.locator(".backstage").count())) await page.locator(".ribbon-file").click();
       await page.locator(".backstage-nav button", { hasText: /^Open$/ }).click().catch(() => undefined);
-      // The copy has its original's name until it is renamed: pick its row by position.
-      const same = three.filter((p) => p.name === copy.name);
-      await page.getByRole("button", { name: `Rename ${copy.name}` }).nth(same.findIndex((p) => p.id === copy.id)).click();
+      await page.getByRole("button", { name: `Rename ${copy.name}`, exact: true }).click();
       await page.locator('[role="dialog"] input').last().fill("Salt and Lantern, a copy");
       await page.locator('[role="dialog"] button', { hasText: /^Rename$/ }).click();
       const renamed = await until(async () => (await api.get("/projects")).some((p) => p.name === "Salt and Lantern, a copy"), { timeout: 15000, label: "the rename" }).catch(() => false);

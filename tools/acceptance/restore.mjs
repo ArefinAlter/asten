@@ -63,10 +63,25 @@ try {
   check("the app asks before it replaces the library; Escape cancels and nothing changes", /"found":true/.test(no) && (await api.get("/projects")).length === 2, no.slice(0, 160));
   // Then answer yes (Enter on the default button, "Restore and restart").
   const click = row.getByRole("button", { name: "Restore" }).click();
-  const said = await dialog("Restore the library", "{ENTER}");
+  let said = await dialog("Restore the library", "{ENTER}");
+  // The window can still be the first dialog closing; press again while the dialog is open and the page still answers.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await sleep(4000);
+    if (!(await page.evaluate(() => 1).then(() => true, () => false))) break;
+    said = await dialog("Restore the library", "{ENTER}");
+  }
   log({ confirmDialog: said });
   check("confirming restores and restarts", /"found":true/.test(said), said.slice(0, 200));
   await click.catch(() => undefined);
+  await sleep(6000);
+  const listing = (await execFileAsync("powershell.exe", ["-NoProfile", "-File", "D:/verne-build/asten/scratch/list-windows.ps1"], { encoding: "utf8" }).catch(() => ({ stdout: "" }))).stdout
+    .split(String.fromCharCode(10))
+    .filter((l) => /Restore|32770|Asten|Tauri/.test(l))
+    .join(" // ");
+  log({ windowsAfterConfirm: listing.slice(0, 600) });
+  const card = await page.locator('[role="status"]').allInnerTexts().catch(() => []);
+  const alive = await page.evaluate(() => 1).then(() => true, () => false);
+  log({ afterConfirm: { statusText: card, pageStillAnswers: alive } });
 } catch (error) {
   log({ error: String(error).slice(0, 300) });
 }

@@ -29,7 +29,7 @@ const check = (name, ok, detail = "") => {
 };
 const oldInstaller = args.old;
 const newInstaller = args.new;
-const sigFile = args.sig ?? `${newInstaller}.sig`;
+const sigFile = args.tamper ?? args.sig ?? `${newInstaller}.sig`; // --tamper <another file's .sig>: the update must be refused
 const installDir = args.dir ?? "D:\\verne-build\\asten\\install-old";
 const profile = args.profile ?? "D:/verne-build/asten/scratch/profile-updater";
 const port = 18765;
@@ -81,7 +81,8 @@ try {
   const session = await deskSession(page);
   const api = apiClient(session.origin, session.token);
   const desk = await fetch(`${session.origin}/api/v1/desk`, { headers: { authorization: `Bearer ${session.token}` } }).then((r) => r.json());
-  check("the running app reports the older version", /0\.0\.1-alpha/.test(desk.version), desk.version);
+  // The API reports the crate version (the same code in both builds); the version the updater compares is the one in the app config and the installer.
+  log({ apiReportsCrateVersion: desk.version });
   const project = await api.post("/projects", { name: "Made before the update", kind: "novel", description: null });
 
   // Settings, Continuity checks, "This desk", Check for updates.
@@ -101,6 +102,15 @@ try {
   const install = page.getByRole("button", { name: "Install and relaunch" });
   const finished = app.exited;
   await install.click();
+  if (args.tamper) {
+    // A signature that does not belong to the installer: the update must fail and change nothing.
+    const refused = await page.getByText(/Could not check/).waitFor({ timeout: 120000 }).then(() => true, () => false);
+    const message = refused ? await page.getByText(/Could not check/).first().innerText() : "";
+    await page.screenshot({ path: join(out, "updater-refused.png") });
+    check("an installer whose signature does not match is refused", refused, message.slice(0, 200));
+    check("and the installed program is still the older build", /0\.0\.1-alpha/.test(await version(installed)), await version(installed));
+    throw Object.assign(new Error("tamper test finished"), { finished: true });
+  }
   await page.screenshot({ path: join(out, "updater-2-installing.png") }).catch(() => undefined);
   // The app hands over to the installer and exits; wait for the installed program to change.
   const upgraded = await until(async () => {
@@ -141,6 +151,8 @@ try {
   const names = (await apiClient(session2.origin, session2.token).get("/projects")).map((p) => p.name);
   check("the project made before the update is still there", names.includes("Made before the update"), names.join(", "));
   await page2.screenshot({ path: join(out, "updater-3-after.png") });
+} catch (error) {
+  if (!error.finished) throw error;
 } finally {
   try { await cdp?.close(); } catch {}
   await execFileAsync("powershell.exe", ["-NoProfile", "-Command", `Get-CimInstance Win32_Process | Where-Object { $_.ExecutablePath -like '${installDir.replace(/\\/g, "\\\\")}*' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }`]).catch(() => undefined);

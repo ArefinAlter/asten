@@ -38,9 +38,39 @@ export function logTo(file) {
   };
 }
 
+/**
+ * End any program still holding a scratch profile from an earlier run (an app
+ * that restarted itself, its WebView2 helpers), found by the profile's path in
+ * the helpers' command lines and the apps that started them.
+ */
+export function releaseProfile(profile) {
+  const needle = profile.replace(/\//g, "\\").replace(/'/g, "''");
+  const script = `
+    $all = Get-CimInstance Win32_Process
+    $helpers = $all | Where-Object { $_.CommandLine -and $_.CommandLine.IndexOf('${needle}', [System.StringComparison]::OrdinalIgnoreCase) -ge 0 }
+    $parents = $helpers | ForEach-Object { $_.ParentProcessId } | Sort-Object -Unique
+    foreach ($id in $parents) { $p = $all | Where-Object { $_.ProcessId -eq $id -and $_.Name -eq 'asten-desktop.exe' }; if ($p) { Stop-Process -Id $id -Force -ErrorAction SilentlyContinue } }
+    foreach ($h in $helpers) { Stop-Process -Id $h.ProcessId -Force -ErrorAction SilentlyContinue }`;
+  try {
+    spawnSync("powershell.exe", ["-NoProfile", "-Command", script], { stdio: "ignore" });
+  } catch {}
+}
+
 /** Start the app with a scratch profile; resolves with handles. */
 export async function launchApp({ exe, profile, port = 9333, env = {}, fresh = true }) {
-  if (fresh && existsSync(profile)) rmSync(profile, { recursive: true, force: true });
+  releaseProfile(profile);
+  if (fresh && existsSync(profile)) {
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        rmSync(profile, { recursive: true, force: true });
+        break;
+      } catch (error) {
+        if (attempt === 4) throw error;
+        releaseProfile(profile);
+        await sleep(1500);
+      }
+    }
+  }
   const data = join(profile, "data");
   const webview = join(profile, "webview");
   const roaming = join(profile, "AppData", "Roaming");
