@@ -1073,6 +1073,12 @@
   }
 }
 
+@media (max-width: 480px) {
+  .glyph-sheet {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .motion-list {
   margin: 0;
   padding: 0;

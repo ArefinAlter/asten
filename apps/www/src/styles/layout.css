@@ -1,17 +1,17 @@
 /*
  * Laptop-first gutters. One fluid gutter for the header, hero, every section, the footer and cards: it grows
- * with the screen (about 90 px a side at 1280, 96 at 1366, 101 at 1440) up to 128 px, and the column stops at
- * 1200 px, so wider screens keep growing margins. Phones keep 20 px. Full-bleed backgrounds and paintings may
+ * with the screen (about 102 px a side at 1280, 109 at 1366, 115 at 1440) up to 128 px, and the column stops at
+ * 1200 px, so wider screens keep growing margins. Phones keep 24 px. Full-bleed backgrounds and paintings may
  * run to the edge on purpose; text, buttons, cards, navigation and the footer sit inside the column.
  */
 :root {
-  --gutter: clamp(24px, 7vw, 128px);
+  --gutter: clamp(24px, 8vw, 128px);
   --column: 1200px;
 }
 
 @media (max-width: 600px) {
   :root {
-    --gutter: 20px;
+    --gutter: 24px;
   }
 }
 
