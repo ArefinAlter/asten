@@ -1,8 +1,24 @@
+/*
+ * Laptop-first gutters. One fluid gutter for the header, hero, every section, the footer and cards: it grows
+ * with the screen (about 102 px a side at 1280, 109 at 1366, 115 at 1440) up to 128 px, and the column stops at
+ * 1200 px, so wider screens keep growing margins. Phones keep 24 px. Full-bleed backgrounds and paintings may
+ * run to the edge on purpose; text, buttons, cards, navigation and the footer sit inside the column.
+ */
+:root {
+  --gutter: clamp(24px, 8vw, 128px);
+  --column: 1200px;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --gutter: 24px;
+  }
+}
+
 .wrap {
-  width: 100%;
-  max-width: 1240px;
+  width: min(100% - 2 * var(--gutter), var(--column));
   margin-inline: auto;
-  padding-inline: clamp(16px, 4.5vw, 48px);
+  padding-inline: 0;
 }
 
 .wrap-narrow {
@@ -348,7 +364,7 @@
 }
 
 .nav-menu--narrow .menu-grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .menu-link {
@@ -659,7 +675,7 @@
 
 @media (max-width: 860px) {
   .page-hero-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .page-hero-art {
@@ -854,7 +870,7 @@
 
 @media (max-width: 960px) {
   .footer-inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .footer-cols {
