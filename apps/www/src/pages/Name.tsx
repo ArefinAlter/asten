@@ -3,7 +3,6 @@ import { Frieze } from "../art/Friezes";
 import { LunarEmblem } from "../art/Night";
 import { PaletteMark } from "../art/Palette";
 import { Scales } from "../art/Scales";
-import { Thoth } from "../art/Thoth";
 import { Arrow } from "../components/Icons";
 import { Answer, CtaBand, PageHero, Related } from "../components/Page";
 import { CartoucheName } from "../demos/CartoucheName";
@@ -14,7 +13,6 @@ export function Name() {
       <PageHero
         title="Asten is another name for Thoth."
         lede="Thoth was the Egyptian god of writing: inventor of hieroglyphs, keeper of the gods’ records, reckoner of time by the moon, and the scribe who wrote down the verdict at the weighing of the heart. He recorded. He didn’t decide."
-        art={<Thoth />}
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">

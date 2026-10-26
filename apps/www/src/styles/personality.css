@@ -201,8 +201,8 @@ h2 {
 }
 
 .hero-label {
-  margin: 38px 0 0 auto;
-  max-width: 300px;
+  margin: 30px 0 0 auto;
+  max-width: min(100%, 440px);
 }
 
 /* ───────── The page on the desk ───────── */
@@ -365,7 +365,7 @@ h2 {
 .plate::before {
   content: "";
   position: absolute;
-  inset: -12% -10%;
+  inset: -12% 0;
   z-index: -1;
   opacity: 0;
   background: radial-gradient(closest-side, rgb(255 190 110 / calc(0.2 * var(--lamp))), transparent 72%);
@@ -892,15 +892,29 @@ h2 {
 
 /* Thumbnails on journal cards: the whole plate, on the sunk paper, with no label. */
 .art-slot .plate--thumb {
+  display: grid;
+  place-items: center;
   width: 100%;
   height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .art-slot .plate--thumb img {
-  height: 100%;
-  object-fit: contain;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: var(--slot-h, 120px);
   transform: none;
   filter: drop-shadow(0 6px 8px var(--plate-shadow));
+}
+
+.article-card .art-slot {
+  --slot-h: 118px;
+}
+
+.article-lead .art-slot {
+  --slot-h: 236px;
 }
 
 .article-card .art-slot,
@@ -911,4 +925,128 @@ h2 {
 
 .page-hero-art .plate-label {
   margin-inline: auto;
+}
+
+/* ───────── Plates on inner pages: the shape of the paper decides the room it takes ───────── */
+
+.plate img {
+  max-width: 100%;
+}
+
+/* A cut-out stands on the page alone; a tall one is held to the height of a laptop screen. */
+.plate--cut img {
+  width: auto;
+  max-height: min(64vh, 540px);
+  margin-inline: auto;
+}
+
+.plate--cut .plate-label,
+.plate--arch .plate-label {
+  margin-inline: auto;
+}
+
+.page-hero-grid--flip {
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+}
+
+.page-hero-grid--flip > .page-hero-art {
+  order: -1;
+}
+
+.page-hero-art--plate .plate {
+  width: min(100%, 440px);
+}
+
+.page-hero-art--plate .plate--cut {
+  width: auto;
+  max-width: 100%;
+}
+
+.page-hero-art--plate .plate--cut .plate-label {
+  max-width: min(100%, 34ch);
+}
+
+.legal-hero .page-hero-art--plate .plate {
+  width: min(100%, 340px);
+}
+
+/* A band plate runs under the heading, as a banner. Its height, not its width, is what is held. */
+.page-hero-band {
+  margin-top: clamp(30px, 4vw, 52px);
+}
+
+.page-hero-band .plate {
+  --band-h: 280px;
+  width: min(100%, calc(var(--band-h) * var(--ar, 3)));
+  margin-inline: auto;
+}
+
+.page-hero-band .plate-label {
+  margin-inline: auto;
+  max-width: min(100%, 52ch);
+}
+
+.not-found .plate {
+  width: min(100%, 420px);
+}
+
+@media (max-width: 860px) {
+  .page-hero-grid--flip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* On a phone the words come first and the plate follows, held to the height of a short screen. */
+  .page-hero-art--plate,
+  .page-hero-grid--flip > .page-hero-art--plate {
+    order: 2;
+    justify-items: center;
+  }
+
+  .page-hero-art--plate .plate {
+    width: min(100%, 380px);
+  }
+
+  .plate--cut img {
+    max-height: min(52vh, 420px);
+  }
+}
+
+/* Whatever its shape, the plate at the head of a page is held so its label stays on the first screen. */
+.page-hero-art--plate .plate img {
+  width: auto;
+  max-width: 100%;
+  max-height: min(54vh, 500px);
+  margin-inline: auto;
+}
+
+.page-hero-art--plate .plate-label {
+  margin-inline: auto;
+}
+
+/* Brand page: the three shapes of plate side by side. */
+.brand-plates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 44px);
+  align-items: end;
+  margin-bottom: clamp(32px, 4vw, 56px);
+}
+
+.brand-plates .plate {
+  width: 100%;
+}
+
+.brand-plates .plate--cut img {
+  max-height: 300px;
+}
+
+.brand-plates-note {
+  max-width: 68ch;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 760px) {
+  .brand-plates {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

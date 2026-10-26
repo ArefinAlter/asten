@@ -5,7 +5,7 @@ import { Glyph } from "../art/Glyphs";
 import { StarField } from "../art/Night";
 import { FaqList } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
-import { ArtFor, CtaBand, SectionHead } from "../components/Page";
+import { CtaBand, SectionHead } from "../components/Page";
 import { audiences } from "../content/audiences";
 import { features } from "../content/features";
 import { homeFaqs, howSteps } from "../content/home";
@@ -17,7 +17,7 @@ import { WeighDemo } from "../demos/WeighDemo";
 import { Inline } from "../components/Inline";
 import { HeroDesk } from "../personality/HeroDesk";
 import { PageTurn } from "../personality/PageTurn";
-import { Plate } from "../personality/Plate";
+import { PagePlate, Plate } from "../personality/Plate";
 
 export function Home() {
   return (
@@ -449,7 +449,7 @@ export function Home() {
                 style={{ "--d": i } as CSSProperties}
               >
                 <div className="art-slot">
-                  <ArtFor art={article.art} bare />
+                  <PagePlate path={`/journal/${article.slug}`} bare />
                 </div>
                 <span className="article-meta">{article.minutes} min read</span>
                 <h3>{article.title}</h3>

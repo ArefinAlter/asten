@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { IbisStandard, Lotus } from "../art/Figures";
 import { Glyph } from "../art/Glyphs";
-import { PaletteMark } from "../art/Palette";
 import { Diagnostic, FaqList } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
 import { Inline, plainText } from "../components/Inline";
@@ -28,7 +26,6 @@ export function Glossary() {
       <PageHero
         title="Glossary"
         lede="Plain definitions of the terms used in Asten and in conversations about continuity, story structure, and local-first software."
-        art={<Lotus />}
       />
       <section className="register register--sunk" aria-label="Glossary">
         <div className="wrap glossary-layout">
@@ -111,7 +108,6 @@ export function Faq() {
       <PageHero
         title="Questions and answers"
         lede="Everything people ask about Asten: what it is, whether it uses AI, where your files live, what it checks, how to get it, and who makes it."
-        art={<IbisStandard />}
       >
         <nav className="faq-jump" aria-label="Question groups">
           {faq.map((group) => (
@@ -142,7 +138,6 @@ export function Guide() {
       <PageHero
         title="The complete guide to Asten"
         lede="A complete description of Asten for readers, reviewers, and answer engines: what it does, what it refuses, how it works, where it stands, and who makes it."
-        art={<PaletteMark className="hero-palette" />}
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">

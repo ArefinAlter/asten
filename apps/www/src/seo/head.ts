@@ -1,4 +1,5 @@
 import type { RouteMeta } from "../routes";
+import { plateForPath, plates } from "../personality/plates";
 import { absoluteUrl, site } from "../site";
 
 export interface HeadTag {
@@ -55,6 +56,11 @@ export function headTags(meta: RouteMeta, jsonLd?: unknown): HeadTag[] {
   // The hero painting is the largest thing above the fold: fetch it first.
   if (meta.path === "/") {
     tags.push({ tag: "link", attrs: { rel: "preload", as: "image", href: "/art/hero-window.webp", type: "image/webp", fetchpriority: "high" } });
+  } else {
+    // Every other page opens with its own painted plate, which is its largest image.
+    const pp = plateForPath(meta.path);
+    const spec = pp ? plates[pp.plate] : undefined;
+    if (spec) tags.push({ tag: "link", attrs: { rel: "preload", as: "image", href: spec.src, type: "image/webp", fetchpriority: "high" } });
   }
   if (isArticle && meta.published) {
     tags.push(

@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
-import { Scales } from "../art/Scales";
-import { IbisStandard, Wedjat } from "../art/Figures";
 import { Sections } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
 import { Breadcrumbs, PageHero } from "../components/Page";
+import { PagePlate } from "../personality/Plate";
 import { legalDocs, legalUpdated } from "../content/legal";
 import { legalList } from "../content/legal-index";
 import { site } from "../site";
@@ -16,7 +15,6 @@ export function LegalIndex() {
       <PageHero
         title="Legal"
         lede="Every Asten policy in one place. Each starts with a plain-language summary. If something you need is missing, write to us."
-        art={<Scales tilt={0} />}
       />
       <section className="register register--sunk" aria-label="Policies">
         <div className="wrap">
@@ -42,13 +40,12 @@ export function LegalIndex() {
 
 export function LegalPage({ path }: { path: string }) {
   const doc = legalDocs.find((item) => item.path === path)!;
-  const art = doc.path === "/privacy" || doc.path === "/cookies" ? <Wedjat /> : doc.path === "/notice" ? <IbisStandard /> : null;
   return (
     <>
       <header className="page-hero legal-hero">
         <div className="wrap">
           <Breadcrumbs />
-          <div className={art ? "page-hero-grid" : undefined}>
+          <div className="page-hero-grid">
             <div>
               <h1>{doc.title}</h1>
               <p className="byline">
@@ -58,7 +55,9 @@ export function LegalPage({ path }: { path: string }) {
                 <span>{site.legalName}</span>
               </p>
             </div>
-            {art ? <div className="page-hero-art legal-art">{art}</div> : null}
+            <div className="page-hero-art page-hero-art--plate">
+              <PagePlate path={doc.path} eager />
+            </div>
           </div>
         </div>
       </header>

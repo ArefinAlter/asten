@@ -3,28 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { IbisStandard } from "../art/Figures";
 import { Glyph } from "../art/Glyphs";
 import { Plate } from "../personality/Plate";
-import type { PlateKey } from "../personality/plates";
-import type { ArtKey } from "../content/types";
+import { plateForPath, plates } from "../personality/plates";
 import { breadcrumbsFor, metaFor } from "../routes";
 import { release } from "../content/release";
 import { Arrow } from "./Icons";
 import { Inline } from "./Inline";
-
-const plateFor: Record<ArtKey, PlateKey> = {
-  scroll: "scribes",
-  scales: "weighing",
-  ibis: "scribe",
-  moon: "dusk",
-  pyramid: "cliffs",
-  palette: "palette",
-  lotus: "ibis",
-  eye: "lamp",
-};
-
-/** The painted plate for a page: a museum label under it, or none (`bare`) when it sits as a thumbnail on a card. */
-export function ArtFor({ art, className, bare = false }: { art: ArtKey; className?: string; bare?: boolean }) {
-  return <Plate name={plateFor[art]} className={`${bare ? "plate--thumb " : ""}${className ?? ""}`.trim()} label={!bare} />;
-}
 
 /** A rolled papyrus, tied, with a red rubric seal. */
 export function ScrollArt({ className }: { className?: string }) {
@@ -65,25 +48,44 @@ export function PageHero({
   title,
   lede,
   art,
+  plate = true,
   children,
 }: {
   title: ReactNode;
   lede?: ReactNode;
+  /** A flat drawing in the old frame. Without it the page's painted plate (art-manifest.json) takes the place. */
   art?: ReactNode;
+  /** false: no painted plate in the hero (the page places one itself). */
+  plate?: boolean;
   children?: ReactNode;
 }) {
+  const { pathname } = useLocation();
+  const pp = plate && !art ? plateForPath(pathname) : undefined;
+  const band = pp ? plates[pp.plate]?.shape === "band" : false;
+  const media = art ? (
+    <div className="page-hero-art">{art}</div>
+  ) : pp && !band ? (
+    <div className="page-hero-art page-hero-art--plate">
+      <Plate name={pp.plate} eager />
+    </div>
+  ) : null;
   return (
     <header className="page-hero">
       <div className="wrap">
         <Breadcrumbs />
-        <div className={art ? "page-hero-grid" : undefined}>
+        <div className={media ? `page-hero-grid${pp?.side === "left" ? " page-hero-grid--flip" : ""}` : undefined}>
           <div>
             <h1>{title}</h1>
             {lede ? <p className="lede">{lede}</p> : null}
             {children}
           </div>
-          {art ? <div className="page-hero-art">{art}</div> : null}
+          {media}
         </div>
+        {pp && band ? (
+          <div className="page-hero-band">
+            <Plate name={pp.plate} eager />
+          </div>
+        ) : null}
       </div>
     </header>
   );

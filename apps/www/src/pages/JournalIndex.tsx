@@ -1,9 +1,9 @@
 import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
-import { IbisStandard } from "../art/Figures";
 import { Frieze } from "../art/Friezes";
 import { Arrow } from "../components/Icons";
-import { ArtFor, CtaBand, PageHero } from "../components/Page";
+import { PagePlate } from "../personality/Plate";
+import { CtaBand, PageHero } from "../components/Page";
 import { articleList as articles } from "../content/journal/meta";
 import { formatDate } from "./format";
 
@@ -14,7 +14,6 @@ export function JournalIndex() {
       <PageHero
         title="Journal"
         lede="Essays and practical guides on keeping long stories consistent, handling time, building worlds without drowning in them, and using AI as an editor rather than a ghostwriter."
-        art={<IbisStandard />}
       >
         <a href="/journal/rss.xml" className="link-arrow">
           Subscribe by RSS <Arrow />
@@ -26,7 +25,7 @@ export function JournalIndex() {
           {lead ? (
             <Link to={`/journal/${lead.slug}`} className="card article-lead" data-reveal>
               <div className="art-slot">
-                <ArtFor art={lead.art} bare />
+                <PagePlate path={`/journal/${lead.slug}`} bare />
               </div>
               <div>
                 <span className="article-meta">
@@ -50,7 +49,7 @@ export function JournalIndex() {
                 style={{ "--d": i % 2 } as CSSProperties}
               >
                 <div className="art-slot">
-                  <ArtFor art={article.art} bare />
+                  <PagePlate path={`/journal/${article.slug}`} bare />
                 </div>
                 <span className="article-meta">
                   {formatDate(article.published)} · {article.minutes} min read

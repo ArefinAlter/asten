@@ -1,4 +1,3 @@
-import { Scales } from "../art/Scales";
 import { Answer, CtaBand, PageHero, Related } from "../components/Page";
 import { comparisons } from "../content/compare";
 
@@ -8,7 +7,6 @@ export function Compare() {
       <PageHero
         title="Where Asten fits, and where it doesn’t."
         lede="Asten is one tool among many on a writer’s desk. Here is how it differs from the kinds of tools you may already use, and when one of those is the better choice."
-        art={<Scales tilt={4} left="heart" />}
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">

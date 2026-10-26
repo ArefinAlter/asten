@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { IbisStandard, PapyrusPlant, Wedjat } from "../art/Figures";
+import { Wedjat } from "../art/Figures";
 import { Glyph } from "../art/Glyphs";
 import { Arrow, External } from "../components/Icons";
 import { Answer, CtaBand, PageHero, Related, SectionHead } from "../components/Page";
@@ -20,7 +20,6 @@ export function About() {
       <PageHero
         title="About Asten and Verne"
         lede="Asten is designed and built by Verne, an AI engineering company in Dhaka, Bangladesh."
-        art={<PapyrusPlant />}
       />
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
@@ -134,7 +133,6 @@ export function Contact() {
       <PageHero
         title="Contact"
         lede="One address reaches the people who build Asten. Choosing a subject below helps route your message."
-        art={<IbisStandard />}
       >
         <p>
           <a className="btn btn--primary" href={`mailto:${site.email}`} data-magnetic>

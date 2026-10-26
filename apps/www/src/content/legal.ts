@@ -1,5 +1,23 @@
+import { creditedWorks, plates } from "../personality/plates";
 import { legalIndex } from "./legal-index";
 import type { LegalDoc } from "./types";
+
+/** Where a work is used that is not a plate of its own: the arched window and the cut-out Thoth on the home page. */
+const windowUse: Record<string, string> = {
+  kensett: "The dusk window",
+  sargent: "The dusk window",
+  hunefer: "Thoth in the window",
+};
+
+/** The table of painted works on /credits, made from the same manifest that makes the labels under the plates. */
+function artworkRows(): string[][] {
+  return creditedWorks().map(({ key, work, plates: used }) => {
+    const uses = [...new Set([...(windowUse[key] ? [windowUse[key]!] : []), ...used.map((name) => plates[name]!.label)])];
+    const href = work.href.replace(/\(/g, "%28").replace(/\)/g, "%29");
+    const medium = work.medium ? `, ${work.medium}` : "";
+    return [uses.join("; "), `[*${work.title}*](${href}), ${work.by}, ${work.date}${medium}`, work.where, work.licence];
+  });
+}
 
 export const legalUpdated = "2026-10-25";
 
@@ -1479,7 +1497,7 @@ export const legalDocs: LegalDoc[] = [
     summary: [
       "This website is set in Fraunces, Literata, IBM Plex Mono, Caveat, and Noto Sans Egyptian Hieroglyphs, all under the SIL Open Font License 1.1.",
       "It is built with React, React Router, Vite, and TypeScript. Its social images are rendered at build time with Satori and resvg-js.",
-      "The painted plates are public-domain works from museum collections, named under each picture and in the table below. The ornaments and icons are original drawings by Verne.",
+      "The painted plates are public-domain or CC0 works from museum and library collections, named under each picture and in the table below. The ornaments and icons are original drawings by Verne.",
     ],
     sections: [
       {
@@ -1569,22 +1587,12 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "The painted plates on this site are works in the public domain, or images their museums release under CC0 (the Metropolitan Museum of Art’s Open Access programme) or as public domain (the British Museum’s papyrus, the New York Public Library’s scan). Each is cut from its source, graded to one warm light and set on the paper by Verne; nothing is redrawn. The table gives the museum’s own title, date and object number, and the build that makes the files (art/build.py) is in the source repository.",
+            text: "The painted plates on this site are works in the public domain, or images that their holders release under Creative Commons Zero: the Metropolitan Museum of Art (Open Access), the National Gallery of Art, the Cleveland Museum of Art, the Yale Center for British Art and the British Library. The others are old enough that no right remains in them, and the libraries and museums that scanned them make no claim over a faithful photograph. Each is cropped, cut from its backdrop where it is an object, graded to one warm light and set on the paper by Verne; nothing is redrawn or generated. The table gives the holder’s own title, date and object number, and the build that makes the files (art/build.py, with art/works.json and art/plates.json) is in the source repository.",
           },
           {
             kind: "table",
-            head: ["Plate", "Work", "Holding institution", "Licence"],
-            rows: [
-              ["The dusk window", "[*Sunset Sky*](https://www.metmuseum.org/art/collection/search/11326), John Frederick Kensett, 1872, oil on canvas", "The Metropolitan Museum of Art, 74.30", "CC0, Open Access"],
-              ["The dusk window", "[*Cliffs at Deir el Bahri, Egypt*](https://www.metmuseum.org/art/collection/search/12061), John Singer Sargent, 1890–91, oil on canvas", "The Metropolitan Museum of Art, 50.130.24", "CC0, Open Access"],
-              ["Thoth, the weighing", "[*The judgement of the dead in the presence of Osiris*](https://commons.wikimedia.org/wiki/File:The_judgement_of_the_dead_in_the_presence_of_Osiris.jpg), from the Book of the Dead of Hunefer, about 1275 BCE, painted papyrus", "The British Museum, EA 9901 (photograph via Wikimedia Commons)", "Public domain"],
-              ["The surveyors and their scribes", "[*Harvest Scenes, Tomb of Menna*](https://www.metmuseum.org/art/collection/search/548574), facsimile by Charles K. Wilkinson, 1930, after a tomb painting of about 1396–1347 BCE", "The Metropolitan Museum of Art, 30.4.44", "CC0, Open Access"],
-              ["The scribe’s palette", "[*Scribe’s Palette and Brushes*](https://www.metmuseum.org/art/collection/search/544302), Late Period, 664–332 BCE, wood, ink, reed", "The Metropolitan Museum of Art, 14.1.393a–d", "CC0, Open Access"],
-              ["The scribe", "[*Haremhab as a Scribe of the King*](https://www.metmuseum.org/art/collection/search/544692), New Kingdom, about 1328–1314 BCE, granodiorite", "The Metropolitan Museum of Art, 23.10.1", "CC0, Open Access"],
-              ["The lamp", "[*Bronze lamp*](https://www.metmuseum.org/art/collection/search/246975), Roman, about 4th century CE", "The Metropolitan Museum of Art, 01.17.1", "CC0, Open Access"],
-              ["Evening cloud", "[*Cloud Study (Early Evening)*](https://www.metmuseum.org/art/collection/search/438642), Simon Denis, about 1786–1806, oil on paper", "The Metropolitan Museum of Art, 2003.42.18", "CC0, Open Access"],
-              ["The sacred ibis", "[*Ibis blanc ou sacré (Ibis religiosa)*](https://digitalcollections.nypl.org/items/510d47e0-bda9-a3d9-e040-e00a18064a99), plate 7, Histoire naturelle, Oiseaux, after Jules-César Savigny, in the Description de l’Égypte, Imprimerie impériale, 1809, engraving", "Scan: New York Public Library, via Wikimedia Commons", "Public domain"],
-            ],
+            head: ["Shown as", "Work", "Holding institution", "Licence"],
+            rows: artworkRows(),
           },
           {
             kind: "p",

@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { Scales } from "../art/Scales";
 import { Diagnostic, FaqList, Sections } from "../components/Blocks";
 import { Arrow } from "../components/Icons";
 import { Inline } from "../components/Inline";
@@ -68,7 +67,6 @@ export function HowItWorks() {
       <PageHero
         title="How Asten works"
         lede="Asten keeps a record of the facts you settle, compares each page against it, and marks what disagrees. You decide what to do with each mark."
-        art={<Scales tilt={-7} />}
       >
         <div className="btn-row">
           <Link to="/download" className="btn btn--primary" data-magnetic>
