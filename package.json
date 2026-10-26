@@ -1,6 +1,6 @@
 {
   "name": "asten",
-  "version": "0.0.1-alpha",
+  "version": "0.0.1-beta",
   "private": true,
   "license": "MIT",
   "packageManager": "pnpm@11.7.0",

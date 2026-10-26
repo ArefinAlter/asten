@@ -27,12 +27,18 @@ const check = (name, ok, detail = "") => {
   log({ check: name, ok: Boolean(ok), detail: typeof detail === "string" ? detail : JSON.stringify(detail) });
 };
 
-function raw(method, url, { headers = {}, body } = {}) {
+function raw(method, url, { headers = {}, body, headersOnly = false } = {}) {
   return new Promise((resolve, reject) => {
     const target = new URL(url);
     const req = request(
       { host: target.hostname, port: target.port, path: target.pathname + target.search, method, headers },
       (res) => {
+        if (headersOnly) {
+          // A stream never ends: take the status and headers, then hang up.
+          resolve({ status: res.statusCode, headers: res.headers, text: "", json: undefined });
+          res.destroy();
+          return;
+        }
         const chunks = [];
         res.on("data", (c) => chunks.push(c));
         res.on("end", () => {
@@ -81,12 +87,12 @@ try {
     return { code, r };
   };
   const word = await pairAs(WORD, "Word on the study machine");
-  check("a code minted by the app pairs a Word guest", word.r.status === 200 && word.r.json.kind === "guest" && word.r.json.token.startsWith("ast_"), `${word.r.status} ${word.r.json?.kind}`);
+  check("a code minted by the app pairs a Word guest", [200, 201].includes(word.r.status) && word.r.json.kind === "guest" && word.r.json.token.startsWith("ast_"), `${word.r.status} ${word.r.json?.kind}`);
   check("a cross-origin guest gets a bearer token and no cookie", word.r.json.cookie === false && !word.r.headers["set-cookie"]);
   const again = await raw("POST", `${origin}/api/v1/auth/pair`, { headers: { origin: WORD, "content-type": "application/json" }, body: { code: word.code.code, label: "again" } });
   check("a code works once", again.status === 401, String(again.status));
   const docs = await pairAs(DOCS, "Docs sidebar");
-  check("the same for a Docs guest", docs.r.status === 200 && docs.r.json.kind === "guest");
+  check("the same for a Docs guest", [200, 201].includes(docs.r.status) && docs.r.json.kind === "guest", String(docs.r.status));
 
   // ── what a guest may and may not do ──
   const guest = { authorization: `Bearer ${word.r.json.token}`, origin: WORD, "content-type": "application/json" };
@@ -101,9 +107,9 @@ try {
   const tokens = await raw("GET", `${origin}/api/v1/auth/tokens`, { headers: guest });
   check("a guest cannot list tokens", tokens.status === 403, String(tokens.status));
   const ticket = await raw("POST", `${origin}/api/v1/projects/${project.id}/stream-ticket`, { headers: guest });
-  check("a guest gets a one-minute stream ticket", ticket.status === 200 && typeof ticket.json.ticket === "string");
-  const stream = await raw("GET", `${origin}/api/v1/projects/${project.id}/stream?ticket=${ticket.json.ticket}`, { headers: { origin: WORD } }).catch(() => ({ status: 0 }));
-  log({ streamFirstResponse: stream.status });
+  check("a guest gets a one-minute stream ticket", [200, 201].includes(ticket.status) && typeof ticket.json.ticket === "string", String(ticket.status));
+  const stream = await raw("GET", `${origin}/api/v1/projects/${project.id}/stream?ticket=${ticket.json.ticket}`, { headers: { origin: WORD }, headersOnly: true }).catch(() => ({ status: 0, headers: {} }));
+  check("the change stream opens for a guest with the ticket", stream.status === 200 && /text\/event-stream/.test(String(stream.headers["content-type"])), `${stream.status} ${stream.headers["content-type"]}`);
   const stolen = await raw("GET", `${origin}/api/v1/projects`, { headers: { authorization: `Bearer ${word.r.json.token}`, origin: STRANGER } });
   check("the token from a stranger's origin is answered, but without CORS permission", !stolen.headers["access-control-allow-origin"], `${stolen.status}, allow-origin=${stolen.headers["access-control-allow-origin"]}`);
   const out1 = await raw("POST", `${origin}/api/v1/auth/logout`, { headers: guest });

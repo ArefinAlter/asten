@@ -76,7 +76,7 @@ try {
   const entity = await api.post(`/projects/${project.id}/entities`, { kind: "character", name: "Elizabeth", aliases: ["Lizzy"], notes: "" });
   await api.post(`/projects/${project.id}/facts`, { entity_key: "elizabeth", predicate: "eye_color", value: "brown", status: "confirmed" });
   const chapter = await api.get(`/projects/${project.id}/documents/${chapters[4].id}`);
-  const sentence = "Elizabeth lifted her head, and her green eyes were bright with anger.";
+  const sentence = "Elizabeth lifted her head, and her blue eyes were bright with anger.";
   const edited = structuredClone(chapter.content_json);
   edited.content.push({ type: "paragraph", attrs: { id: "00000000-0000-7000-8000-000000000001" }, content: [{ type: "text", text: sentence }] });
   const incremental = [];

@@ -193,3 +193,23 @@ export async function until(check, { timeout = 15000, label = "condition" } = {}
     await sleep(200);
   }
 }
+
+/**
+ * Open a document in the editor and wait until it is on screen. The window can
+ * still be settling after launch (it navigates once while the desk pairs), which
+ * drops a route set too early, so the route is set again until the editor shows.
+ * The page is reloaded first so that projects made through the API are listed.
+ */
+export async function openDocument(page, projectId, documentId, { timeout = 60000 } = {}) {
+  const hash = `#/p/${projectId}/write/${documentId}`;
+  const end = Date.now() + timeout;
+  // The window lists projects when it loads; one made through the API since then is not in it yet.
+  await page.reload({ waitUntil: "load" }).catch(() => undefined);
+  await sleep(1500);
+  while (Date.now() < end) {
+    await page.evaluate((h) => { if (location.hash !== h) location.hash = h; }, hash).catch(() => undefined);
+    const shown = await page.locator(".ProseMirror").first().waitFor({ state: "visible", timeout: 6000 }).then(() => true, () => false);
+    if (shown) return;
+  }
+  throw new Error(`the editor never showed ${documentId}`);
+}

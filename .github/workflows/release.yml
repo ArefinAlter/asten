@@ -18,7 +18,7 @@ name: Release
 
 on:
   push:
-    # Full releases only (v1.2.3). Pre-alpha tags such as v0.0.1a are built
+    # Full releases only (v1.2.3). Pre-alpha tags such as v0.0.1b are built
     # by release-prealpha.yml or on the release machine (docs/PLATFORMS.md).
     tags:
       - "v[0-9]+.[0-9]+.[0-9]+"

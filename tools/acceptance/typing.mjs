@@ -9,7 +9,7 @@
 // times how long until the mark exists on the server and appears in the window.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { apiClient, args, deskSession, launchApp, logTo, sleep, stats, until } from "./lib.mjs";
+import { apiClient, args, deskSession, launchApp, logTo, openDocument, sleep, stats, until } from "./lib.mjs";
 
 const exe = args.exe ?? "D:/verne-build/asten/cargo-target/release/asten-desktop.exe";
 const profile = args.profile ?? "D:/verne-build/asten/scratch/profile-typing";
@@ -32,8 +32,12 @@ try {
   const session = await deskSession(page);
   const api = apiClient(session.origin, session.token);
   const project = await api.post("/projects", { name: "Typing test", kind: "novel", description: null });
+  // Whole-book mode: the entire novel as ONE scene inside a manuscript, the worst case for the editor.
+  const shell = whole
+    ? await api.post(`/projects/${project.id}/import`, { filename: "The book", format: "plain", body: "x", parent_id: null, kind: "manuscript", encoding: "utf-8", split: "none" })
+    : null;
   const root = await api.post(`/projects/${project.id}/import`, {
-    filename: "pride.txt", format: "plain", body, parent_id: null, kind: "manuscript", encoding: "utf-8", split: whole ? "none" : "auto",
+    filename: "pride.txt", format: "plain", body, parent_id: shell ? shell.id : null, kind: whole ? "scene" : "manuscript", encoding: "utf-8", split: whole ? "none" : "auto",
   });
   const docs = await api.get(`/projects/${project.id}/documents?fields=summary`);
   const target = whole ? root : docs.filter((d) => d.parent_id === root.id).sort((a, b) => a.position - b.position)[4];
@@ -42,10 +46,9 @@ try {
   await api.post(`/projects/${project.id}/entities`, { kind: "character", name: "Elizabeth", aliases: ["Lizzy"], notes: "" });
   await api.post(`/projects/${project.id}/facts`, { entity_key: "elizabeth", predicate: "eye_color", value: "brown", status: "confirmed" });
 
-  await page.evaluate(([p, d]) => { location.hash = `#/p/${p}/write/${d}`; }, [project.id, target.id]);
   const editor = page.locator(".ProseMirror").first();
   const opened = performance.now();
-  await editor.waitFor({ state: "visible", timeout: 60000 });
+  await openDocument(page, project.id, target.id);
   await until(async () => (await editor.innerText()).length > 200, { timeout: 60000, label: "the page text" });
   log({ pageOpenMs: Math.round(performance.now() - opened) });
   await sleep(1500);
@@ -93,7 +96,7 @@ try {
   check("typing stays responsive: median key-to-frame under 50 ms, p95 under 100 ms", s.median < 50 && s.p95 < 100, JSON.stringify(s));
 
   // A sentence that contradicts a settled fact, then wait for the mark.
-  const clash = "Elizabeth lifted her head, and her green eyes were bright with anger.";
+  const clash = "Elizabeth lifted her head, and her blue eyes were bright with anger.";
   const before = Date.now();
   for (const ch of clash) {
     await page.keyboard.press(ch === " " ? "Space" : ch, { delay: 0 });

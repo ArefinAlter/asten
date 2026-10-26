@@ -7,7 +7,7 @@
 // snapshots, drafts, merge, history, blame and verify; and the Source Control
 // and knowledge views show what the API holds.
 import { join } from "node:path";
-import { apiClient, args, deskSession, launchApp, logTo, sleep, until } from "./lib.mjs";
+import { apiClient, args, deskSession, launchApp, logTo, openDocument, sleep, until } from "./lib.mjs";
 
 const exe = args.exe ?? "D:/verne-build/asten/cargo-target/release/asten-desktop.exe";
 const profile = args.profile ?? "D:/verne-build/asten/scratch/profile-canon";
@@ -90,7 +90,16 @@ try {
   const moved = await api.put(`${p}/world-entries/${world.id}`, { board_x: 120, board_y: 80, status: "settled" }).catch((e) => ({ error: e.message }));
   check("a world board entry can be placed and settled", moved.board_x === 120 || Boolean(moved.error === undefined), JSON.stringify(moved).slice(0, 160));
   const timeline = await api.get(`${p}/events`);
-  check("events are kept in story and reading order", timeline.length === 2 && ev1.id && ev2.id);
+  const rows = Array.isArray(timeline) ? timeline : (timeline.events ?? []);
+  log({ timeline: JSON.stringify(rows).slice(0, 400) });
+  // The repair the writer pressed earlier ("Add an event") left its own change event; it sorts first by story tick.
+  const mine = rows.filter((r) => r.title.startsWith("Mira at the"));
+  check(
+    "events are kept in story and reading order",
+    rows.length === 3 && rows.every((r, k) => k === 0 || rows[k - 1].tick <= r.tick) && /changes to/.test(rows[0].title) && mine.length === 2 && mine[0].title.endsWith("harbour") && mine[0].reading_order < mine[1].reading_order,
+    rows.map((r) => `${r.title}@${r.tick}/${r.reading_order}`).join(", "),
+  );
+
   const pulse = await api.get(`${p}/world-pulse`);
   check("the world pulse reports", Boolean(pulse), JSON.stringify(pulse).slice(0, 120));
 
@@ -116,29 +125,40 @@ try {
   check("blame attributes spans to actors", Object.keys(blame).length >= 1, JSON.stringify(blame).slice(0, 120));
   const restored = await api.post(`${p}/snapshots/${snap.id}/restore`, {});
   check("restoring a snapshot is itself a new entry", Boolean(restored.head_seq) && restored.head_seq > verify.head_seq, `${restored.head_seq} after ${verify.head_seq}`);
-  const bisect = clash ? await api.get(`${p}/story/bisect/${clash.id}`).catch((e) => ({ error: e.message })) : undefined;
-  log({ bisect: bisect && JSON.stringify(bisect).slice(0, 200) });
+  const liveMark = (await marks())[0];
+  const bisect = liveMark ? await api.get(`${p}/story/bisect/${liveMark.id}`).catch((e) => ({ error: e.message })) : undefined;
+  log({ bisect: bisect && JSON.stringify(bisect).slice(0, 300) });
+  check("bisect finds the version that introduced a mark", Boolean(bisect) && !bisect.error, bisect ? (bisect.error ?? JSON.stringify(bisect).slice(0, 120)) : "no live mark to bisect");
 
   // ── Source Control and knowledge views read the same data ──
   const w = app.page;
-  await w.evaluate(([pid, did]) => { location.hash = `#/p/${pid}/write/${did}`; }, [project.id, one.id]);
-  await sleep(2500);
+  // A view is reached by its route; the route is set again if the window was still settling.
+  const view = async (hash, expect) => {
+    for (let i = 0; i < 6; i++) {
+      await w.evaluate((h) => { if (location.hash !== h) location.hash = h; }, hash).catch(() => undefined);
+      await sleep(1500);
+      if (expect.test(await w.content().catch(() => ""))) return true;
+    }
+    return false;
+  };
+  await openDocument(w, project.id, one.id).catch(async (e) => {
+    log({ openFailed: e.message, hash: await w.evaluate(() => location.hash), text: (await w.locator("body").innerText()).slice(0, 400) });
+    await w.screenshot({ path: join(out, "canon-open-failed.png") });
+  });
+  await sleep(1000);
   await w.getByRole("button", { name: /source control/i }).first().click().catch(() => w.keyboard.press("Control+Shift+G"));
   await sleep(1500);
   await w.screenshot({ path: join(out, "canon-source-control.png") });
   const scm = await w.locator(".scm, [class*=scm]").first().innerText().catch(() => "");
   check("Source Control lists the named version", /Before the rewrite/.test(await w.content()) || /Before the rewrite/.test(scm), scm.slice(0, 120));
-  await w.evaluate(([pid]) => { location.hash = `#/p/${pid}/graph`; }, [project.id]);
-  await sleep(2500);
+  await view(`#/p/${project.id}/graph`, /Mira/);
   await w.screenshot({ path: join(out, "canon-knowledge.png") });
   const knowledge = await w.content();
   check("the knowledge view shows the real cast", /Mira/.test(knowledge) && /Oren/.test(knowledge) && /Gull Point|Harbour/.test(knowledge));
-  await w.evaluate(([pid, did]) => { location.hash = `#/p/${pid}/time`; }, [project.id, one.id]);
-  await sleep(2000);
+  await view(`#/p/${project.id}/time`, /Mira at the harbour/);
   await w.screenshot({ path: join(out, "canon-timeline.png") });
   check("the timeline shows the events", /Mira at the harbour/.test(await w.content()));
-  await w.evaluate(([pid]) => { location.hash = `#/p/${pid}/world`; }, [project.id]);
-  await sleep(2000);
+  await view(`#/p/${project.id}/world`, /Gull Point/);
   await w.screenshot({ path: join(out, "canon-world.png") });
   check("the world board shows the entry", /Gull Point/.test(await w.content()));
 } finally {

@@ -108,7 +108,7 @@ dependencies = [
 
 [[package]]
 name = "asten-api"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "anyhow",
  "asten-application",
@@ -140,7 +140,7 @@ dependencies = [
 
 [[package]]
 name = "asten-application"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "asten-auth",
  "asten-blocks",
@@ -168,7 +168,7 @@ dependencies = [
 
 [[package]]
 name = "asten-assistant"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "argon2",
  "asten-application",
@@ -204,7 +204,7 @@ dependencies = [
 
 [[package]]
 name = "asten-auth"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "argon2",
  "base64 0.22.1",
@@ -219,7 +219,7 @@ dependencies = [
 
 [[package]]
 name = "asten-blocks"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "proptest",
  "serde",
@@ -233,7 +233,7 @@ dependencies = [
 
 [[package]]
 name = "asten-desktop"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "asten-api",
  "asten-application",
@@ -259,7 +259,7 @@ dependencies = [
 
 [[package]]
 name = "asten-diagnostics"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "asten-ir",
  "serde",
@@ -270,7 +270,7 @@ dependencies = [
 
 [[package]]
 name = "asten-domain"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "asten-ir",
  "asten-time",
@@ -284,7 +284,7 @@ dependencies = [
 
 [[package]]
 name = "asten-engine"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "asten-blocks",
  "asten-diagnostics",
@@ -299,7 +299,7 @@ dependencies = [
 
 [[package]]
 name = "asten-ir"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "proptest",
  "serde",
@@ -311,7 +311,7 @@ dependencies = [
 
 [[package]]
 name = "asten-logic"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "asten-diagnostics",
  "asten-ir",
@@ -324,7 +324,7 @@ dependencies = [
 
 [[package]]
 name = "asten-ls"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "asten-diagnostics",
  "asten-ir",
@@ -336,7 +336,7 @@ dependencies = [
 
 [[package]]
 name = "asten-perceive"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "aho-corasick",
  "asten-blocks",
@@ -350,7 +350,7 @@ dependencies = [
 
 [[package]]
 name = "asten-prealpha"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "anyhow",
  "asten-api",
@@ -377,7 +377,7 @@ dependencies = [
 
 [[package]]
 name = "asten-storage"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "asten-application",
  "asten-auth",
@@ -397,7 +397,7 @@ dependencies = [
 
 [[package]]
 name = "asten-time"
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 dependencies = [
  "asten-ir",
  "proptest",
