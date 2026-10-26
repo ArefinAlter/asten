@@ -172,6 +172,18 @@ apex is left as drawn. Do not redraw letters.
    the press kit, and the product splash screen.
 3. **Mark only**: app icon, favicon, social avatar.
 
+### The app icon
+
+The application icon is the mark only, on the day page colour (`#F5EEDF`) as a
+square with no rounded plate (this guide defines none): the favicon geometry of
+the Palette (heavier strokes, so it holds at 16 px), the slate at 71% of the
+plate's height (clear space of one well-diameter on every side), larger at 32 px
+and below (88%, 80% up to 64 px), and 60% in the maskable web icon so the whole
+slate sits inside the circle every platform mask keeps. It is drawn by
+`apps/www/scripts/app-icons.mjs` from the mark's own geometry; do not edit the
+PNGs, the `.ico` or the `.icns` by hand. The master is
+`apps/desktop/src-tauri/icon-source/asten-icon.svg`.
+
 ### Colourways
 
 - Carbon on papyrus (default).
