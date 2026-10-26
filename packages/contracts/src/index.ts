@@ -962,6 +962,9 @@ export interface CompileArtifact {
 export type ImportFormat =
   "markdown" | "plain" | "fountain" | "html" | "docx" | "fdx";
 
+/** One document, or a manuscript with a document per chapter. */
+export type ImportSplit = "none" | "auto" | "chapters";
+
 export interface ImportRequest {
   filename: string;
   format: ImportFormat;
@@ -969,6 +972,7 @@ export interface ImportRequest {
   encoding?: string | null;
   parent_id?: DocumentId | null;
   kind?: DocumentKind | null;
+  split?: ImportSplit | null;
 }
 
 export type WorldKind =

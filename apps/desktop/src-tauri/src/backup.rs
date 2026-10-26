@@ -90,6 +90,34 @@ pub async fn back_up(database: &Path, backups: &Path) -> Result<Outcome, BackupE
     Ok(Outcome::Written(target))
 }
 
+/// Take a backup now, whatever the age of the newest one.
+pub async fn back_up_now(database: &Path, backups: &Path) -> Result<PathBuf, BackupError> {
+    if !database.is_file() {
+        return Err(BackupError::Io(io::Error::new(
+            io::ErrorKind::NotFound,
+            "there is no library yet",
+        )));
+    }
+    fs::create_dir_all(backups)?;
+    let stamp = Local::now().format("%Y%m%d-%H%M%S");
+    let target = backups.join(format!("{PREFIX}{stamp}{SUFFIX}"));
+    let partial = backups.join(format!("{PREFIX}{stamp}{SUFFIX}{PARTIAL}"));
+    let _ = fs::remove_file(&partial);
+    let _ = fs::remove_file(&target);
+    if let Err(error) = vacuum_into(database, &partial).await {
+        let _ = fs::remove_file(&partial);
+        return Err(error);
+    }
+    fs::rename(&partial, &target)?;
+    prune(backups)?;
+    Ok(target)
+}
+
+/// A consistent copy of the library at `target` (which must not exist).
+pub async fn vacuum_copy(database: &Path, target: &Path) -> Result<(), BackupError> {
+    vacuum_into(database, target).await
+}
+
 async fn vacuum_into(database: &Path, target: &Path) -> Result<(), BackupError> {
     let options = SqliteConnectOptions::new()
         .filename(database)

@@ -3920,3 +3920,18 @@ button.status-item:hover {
   background: var(--wb-hover);
   color: var(--wb-accent);
 }
+
+/* A list row with small actions beside it (rename, delete). */
+.wb-row-split {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border-bottom: 1px solid var(--wb-border);
+}
+.wb-row-split:last-child {
+  border-bottom: 0;
+}
+.wb-row-split .wb-row {
+  flex: 1;
+  border-bottom: 0;
+}

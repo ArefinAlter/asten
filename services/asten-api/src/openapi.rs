@@ -115,6 +115,10 @@ use crate::ApiState;
         crate::extra::resolve_change,
         crate::extra::compile_project,
         crate::extra::import_document,
+        crate::extra::update_project,
+        crate::extra::delete_project,
+        crate::extra::export_project,
+        crate::extra::import_project_file,
     )
 )]
 struct V1;

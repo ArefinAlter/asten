@@ -1,12 +1,12 @@
 use asten_application::{
     CompileRequest, CreateCanonEntity, CreateComment, CreateSnapshot, CreateSuppression,
     CreateTimelineEvent, CreateTrackedChange, ImportRequest, ResolveTrackedChange,
-    UpdateCanonEntity, UpdateComment, UpdateMethodPack, UpdateTimelineEvent,
+    UpdateCanonEntity, UpdateComment, UpdateMethodPack, UpdateProject, UpdateTimelineEvent,
 };
 use asten_domain::{
     CanonEntity, Comment, CommentId, CompileArtifact, Document, DocumentId, DocumentOp,
-    DocumentSnapshot, EntityId, MethodPack, MethodPackId, ProjectId, SnapshotId, Suppression,
-    TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId,
+    DocumentSnapshot, EntityId, MethodPack, MethodPackId, Project, ProjectId, SnapshotId,
+    Suppression, TimelineEvent, TimelineEventId, TrackedChange, TrackedChangeId,
 };
 use axum::{
     Json, Router,
@@ -87,6 +87,109 @@ pub fn router() -> Router<ApiState> {
             "/projects/{project_id}/import",
             axum::routing::post(import_document),
         )
+        .route("/projects/{project_id}/export", get(export_project))
+        .route("/projects/bundle", axum::routing::post(import_project_file))
+}
+
+#[utoipa::path(
+    put,
+    path = "/projects/{project_id}",
+    tag = "projects",
+    summary = "Rename a project",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    request_body = UpdateProject,
+    responses(
+        (status = 200, description = "The project", body = Project),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse),
+        (status = 404, description = "No project with that id", body = crate::ErrorResponse),
+        (status = 422, description = "The name is empty", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
+pub(crate) async fn update_project(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+    Json(input): Json<UpdateProject>,
+) -> Result<Json<Project>, ApiError> {
+    Ok(Json(
+        state
+            .application
+            .update_project(ProjectId(project_id), input)
+            .await?,
+    ))
+}
+
+#[utoipa::path(
+    delete,
+    path = "/projects/{project_id}",
+    tag = "projects",
+    summary = "Delete a project",
+    description = "Removes the project and everything in it. This cannot be undone; the library's backups still hold the last copy.",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    responses(
+        (status = 204, description = "Deleted"),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse),
+        (status = 404, description = "No project with that id", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
+pub(crate) async fn delete_project(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+) -> Result<StatusCode, ApiError> {
+    state
+        .application
+        .delete_project(ProjectId(project_id))
+        .await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+#[utoipa::path(
+    get,
+    path = "/projects/{project_id}/export",
+    tag = "projects",
+    summary = "Export a project file",
+    description = "The project as one JSON document (format asten-project): documents with their content, cast, facts, timeline, world board, routes, rules, settings and comments. Version history is not included; a backup of the library keeps it.",
+    params(("project_id" = Uuid, Path, description = "The project")),
+    responses(
+        (status = 200, description = "The project file", body = serde_json::Value),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse),
+        (status = 404, description = "No project with that id", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
+pub(crate) async fn export_project(
+    State(state): State<ApiState>,
+    Path(project_id): Path<Uuid>,
+) -> Result<Json<serde_json::Value>, ApiError> {
+    Ok(Json(
+        state
+            .application
+            .export_project(ProjectId(project_id))
+            .await?,
+    ))
+}
+
+#[utoipa::path(
+    post,
+    path = "/projects/bundle",
+    tag = "projects",
+    summary = "Open a project file",
+    description = "Creates a new project from a project file written by the export route. Ids are minted again and every reference rewritten; a file with a record this version cannot read is refused whole.",
+    request_body = serde_json::Value,
+    responses(
+        (status = 201, description = "The new project", body = Project),
+        (status = 401, description = "No valid token or session cookie", body = crate::ErrorResponse),
+        (status = 422, description = "This is not a project file, or one that this version cannot read", body = crate::ErrorResponse)
+    ),
+    security(("asten_token" = []))
+)]
+pub(crate) async fn import_project_file(
+    State(state): State<ApiState>,
+    Json(bundle): Json<serde_json::Value>,
+) -> Result<(StatusCode, Json<Project>), ApiError> {
+    let project = state.application.import_project_bundle(bundle).await?;
+    Ok((StatusCode::CREATED, Json(project)))
 }
 
 #[utoipa::path(

@@ -92,6 +92,16 @@ const TOKEN_COLUMNS: &str =
 const PAIRING_COLUMNS: &str =
     "id, code_hash, salt, label, grants, expires_at, consumed_at, attempts, created_at";
 
+/// The newest schema version this build knows how to open.
+#[must_use]
+pub fn latest_migration() -> i64 {
+    sqlx::migrate!("./migrations")
+        .iter()
+        .map(|migration| migration.version)
+        .max()
+        .unwrap_or(0)
+}
+
 #[async_trait]
 impl Repository for SqliteRepository {
     // ───────────────────────── projects ─────────────────────────
@@ -144,6 +154,15 @@ impl Repository for SqliteRepository {
         .execute(&self.pool)
         .await
         .map_err(storage_error)?;
+        Ok(())
+    }
+
+    async fn delete_project(&self, id: ProjectId) -> Result<()> {
+        sqlx::query("DELETE FROM projects WHERE id = ?")
+            .bind(id.to_string())
+            .execute(&self.pool)
+            .await
+            .map_err(storage_error)?;
         Ok(())
     }
 

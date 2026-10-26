@@ -29,6 +29,7 @@ import { TOOLS } from "../agent/tools";
 import { CONNECTORS, type Connector } from "./connectors";
 import { hostedSession, hostedStartOver, isHosted } from "../../lib/storage";
 import { RELEASE } from "../../version";
+import { Library } from "./Library";
 import { Card, Fixed, Head, SettingRow, Switch } from "./parts";
 
 const ProjectSettings = lazy(() =>
@@ -1218,6 +1219,7 @@ function Storage() {
           note="Asten keeps no copy anywhere else (D8). Put the file where you like; compile any time."
         />
       </Card>
+      <Library />
     </>
   );
 }

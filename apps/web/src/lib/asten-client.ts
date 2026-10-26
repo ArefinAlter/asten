@@ -241,6 +241,26 @@ export class AstenClient {
       body: JSON.stringify(input),
     });
   }
+  renameProject(projectId: ProjectId, name: string): Promise<Project> {
+    return this.request(`/projects/${projectId}`, {
+      method: "PUT",
+      body: JSON.stringify({ name }),
+    });
+  }
+  deleteProject(projectId: ProjectId): Promise<void> {
+    return this.request(`/projects/${projectId}`, { method: "DELETE" });
+  }
+  /** The project as one JSON file (documents, cast, facts, timeline, world, comments). */
+  exportProject(projectId: ProjectId): Promise<unknown> {
+    return this.request(`/projects/${projectId}/export`);
+  }
+  /** Open a project file as a new project. */
+  importProjectFile(file: unknown): Promise<Project> {
+    return this.request("/projects/bundle", {
+      method: "POST",
+      body: JSON.stringify(file),
+    });
+  }
   listDocuments(projectId: ProjectId): Promise<AstenDocument[]> {
     return this.request(`/projects/${projectId}/documents`);
   }

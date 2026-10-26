@@ -10,6 +10,8 @@
 #[cfg(desktop)]
 mod assistant;
 mod backup;
+#[cfg(desktop)]
+mod library;
 mod logging;
 
 use std::{
@@ -38,10 +40,11 @@ struct DesktopState {
 }
 
 /// Where this desk keeps its things, all under the OS app-data directory.
-struct DeskPaths {
-    database: PathBuf,
-    logs: PathBuf,
-    backups: PathBuf,
+#[derive(Clone)]
+pub(crate) struct DeskPaths {
+    pub(crate) database: PathBuf,
+    pub(crate) logs: PathBuf,
+    pub(crate) backups: PathBuf,
 }
 
 impl DeskPaths {
@@ -135,6 +138,12 @@ macro_rules! handlers {
             assistant::ai_local_models,
             assistant::ai_ledger,
             assistant::ai_clear_ledger,
+            library::library_info,
+            library::library_backup_now,
+            library::library_export_copy,
+            library::library_restore,
+            library::library_dismiss_report,
+            library::save_file,
         ]
     };
 }
@@ -158,7 +167,8 @@ pub fn run() {
         .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
             focus_main_window(app);
         }))
-        .plugin(tauri_plugin_updater::Builder::new().build());
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_dialog::init());
     builder
         .plugin(tauri_plugin_process::init())
         .setup(|app| {
@@ -182,6 +192,12 @@ pub fn run() {
                 "Asten is starting"
             );
             let (application, session) = tauri::async_runtime::block_on(async {
+                // A restore the writer asked for is swapped in first, keeping
+                // the library it replaces.
+                #[cfg(desktop)]
+                if let Some(report) = library::apply_pending(&paths).await {
+                    tracing::info!(ok = report.ok, message = %report.message, "restore");
+                }
                 // Copy the file before anything opens it, so a migration that
                 // goes wrong still leaves a known-good file to return to.
                 match backup::back_up(&paths.database, &paths.backups).await {
@@ -237,6 +253,7 @@ pub fn run() {
                 Ok::<_, Box<dyn std::error::Error>>((application, session))
             })?;
             tracing::info!(origin = %session.origin, "embedded API ready");
+            app.manage(paths.clone());
             // The assistant (providers, keys, spend) lives in this process, not
             // in the page. Phones keep the offline assistant only.
             #[cfg(desktop)]

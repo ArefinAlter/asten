@@ -26,7 +26,9 @@ use thiserror::Error;
 use tokio::sync::broadcast;
 
 pub mod auth;
+mod bundle;
 mod compile;
+mod docx_out;
 mod engine_app;
 mod epub;
 mod fdx;
@@ -35,6 +37,7 @@ mod import;
 pub mod story;
 
 pub use asten_auth::AuthMode;
+pub use bundle::{FORMAT as PROJECT_FILE_FORMAT, VERSION as PROJECT_FILE_VERSION};
 pub use compile::{CompileFormat, CompileRequest, compile_documents};
 pub use engine_app::{
     CreateCanonEntity, CreateComment, CreateSnapshot, CreateSuppression, CreateTimelineEvent,
@@ -42,7 +45,9 @@ pub use engine_app::{
     UpdateTimelineEvent,
 };
 pub use history::{CreateDraft, MergePreview, MergeRequest, UpdateDraft, VerifyReport};
-pub use import::{ImportFormat, ImportRequest, imported_document_json, imported_title};
+pub use import::{
+    ImportFormat, ImportRequest, ImportSplit, imported_document_json, imported_title,
+};
 pub use story::{CreateBaseline, CreateInvariant, CreateRoute, UpdateSettings};
 
 #[derive(Debug, Error)]
@@ -100,6 +105,20 @@ pub struct CreateProject {
     pub name: String,
     pub kind: ProjectKind,
     pub description: Option<String>,
+}
+
+/// Rename a project or change its description.
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+#[cfg_attr(
+    feature = "ts",
+    derive(ts_rs::TS),
+    ts(export, export_to = "application/")
+)]
+#[cfg_attr(feature = "openapi", derive(utoipa::ToSchema))]
+#[cfg_attr(feature = "ts", ts(optional_fields = nullable))]
+pub struct UpdateProject {
+    pub name: Option<String>,
+    pub description: Option<Option<String>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -260,6 +279,8 @@ pub trait Repository: Send + Sync {
     async fn find_project(&self, id: ProjectId) -> Result<Option<Project>>;
     async fn insert_project(&self, project: &Project) -> Result<()>;
     async fn update_project(&self, project: &Project) -> Result<()>;
+    /// Remove a project and, by cascade, everything in it.
+    async fn delete_project(&self, id: ProjectId) -> Result<()>;
 
     async fn list_documents(&self, project_id: ProjectId) -> Result<Vec<Document>>;
     async fn find_document(&self, id: DocumentId) -> Result<Option<Document>>;
@@ -505,6 +526,40 @@ impl Application {
             .put_settings(&ProjectSettings::for_project(project.id))
             .await?;
         Ok(project)
+    }
+
+    /// Rename a project or change its description.
+    pub async fn update_project(&self, id: ProjectId, input: UpdateProject) -> Result<Project> {
+        let mut project = self.get_project(id).await?;
+        if let Some(name) = input.name {
+            let name = name.trim();
+            if name.is_empty() {
+                return Err(ApplicationError::Validation(
+                    "a project needs a name".into(),
+                ));
+            }
+            project.name = name.to_owned();
+        }
+        if let Some(description) = input.description {
+            project.description = description
+                .map(|text| text.trim().to_owned())
+                .filter(|text| !text.is_empty());
+        }
+        project.updated_at = Utc::now();
+        self.repository.update_project(&project).await?;
+        Ok(project)
+    }
+
+    /// Delete a project and everything in it. This cannot be undone; the desk
+    /// asks first and the library's backups still hold the last copy.
+    pub async fn delete_project(&self, id: ProjectId) -> Result<()> {
+        self.get_project(id).await?;
+        self.repository.delete_project(id).await?;
+        self.engines
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+            .remove(&id);
+        Ok(())
     }
 
     pub async fn list_documents(&self, project_id: ProjectId) -> Result<Vec<Document>> {
@@ -959,17 +1014,89 @@ impl Application {
         project_id: ProjectId,
         request: ImportRequest,
     ) -> Result<Document> {
-        let content_json = imported_document_json(&request)?;
-        self.create_document(CreateDocument {
-            project_id,
-            parent_id: request.parent_id,
-            kind: request.kind.unwrap_or(DocumentKind::Manuscript),
-            title: imported_title(&request.filename),
-            content_json,
-            position: 0,
-            scene: None,
-        })
-        .await
+        let plan = import::plan(&request)?;
+        let kind = request.kind.unwrap_or(DocumentKind::Manuscript);
+        let mut parent = request.parent_id;
+        let mut container = None;
+        let chapters = plan.container.is_some();
+        if plan.insertions + plan.deletions > 0 {
+            tracing::info!(
+                insertions = plan.insertions,
+                deletions = plan.deletions,
+                "imported tracked changes as marks"
+            );
+        }
+        if let Some(title) = plan.container {
+            // A long file: a manuscript to hold it, a chapter per document.
+            let created = self
+                .create_document(CreateDocument {
+                    project_id,
+                    parent_id: parent,
+                    kind: kind.clone(),
+                    title,
+                    content_json: serde_json::Value::Null,
+                    position: 0,
+                    scene: None,
+                })
+                .await?;
+            parent = Some(created.id);
+            container = Some(created);
+        }
+        let mut first = None;
+        for (position, planned) in plan.documents.into_iter().enumerate() {
+            let created = self
+                .create_document(CreateDocument {
+                    project_id,
+                    parent_id: parent,
+                    kind: if chapters {
+                        DocumentKind::Chapter
+                    } else {
+                        kind.clone()
+                    },
+                    title: planned.title,
+                    content_json: planned.content,
+                    position: position as i64,
+                    scene: None,
+                })
+                .await?;
+            let block_ids: Vec<Option<String>> = created
+                .content_json
+                .get("content")
+                .and_then(serde_json::Value::as_array)
+                .map(|blocks| {
+                    blocks
+                        .iter()
+                        .map(|block| {
+                            block
+                                .pointer("/attrs/id")
+                                .and_then(serde_json::Value::as_str)
+                                .map(str::to_owned)
+                        })
+                        .collect()
+                })
+                .unwrap_or_default();
+            for comment in planned.comments {
+                let Some(block_id) = block_ids.get(comment.block).cloned().flatten() else {
+                    continue;
+                };
+                self.create_comment(CreateComment {
+                    document_id: created.id,
+                    block_id: Some(block_id),
+                    from_offset: i64::from(comment.from),
+                    to_offset: i64::from(comment.to),
+                    body: if comment.author.trim().is_empty() {
+                        comment.body
+                    } else {
+                        format!("{}: {}", comment.author.trim(), comment.body)
+                    },
+                })
+                .await?;
+            }
+            first.get_or_insert(created);
+        }
+        container
+            .or(first)
+            .ok_or_else(|| ApplicationError::Validation("the file holds nothing to import".into()))
     }
 
     /// Entities by key, for mapping engine ids back to rows.

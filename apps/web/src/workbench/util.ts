@@ -1,19 +1,17 @@
 import type { CompileArtifact } from "@asten/contracts";
+import { saveBytes } from "./files";
 
-/** Save a compiled file through the browser; a local blob, no network. */
+/**
+ * Save a compiled file. In the desktop app the writer picks the place in the
+ * system's save dialog; in a browser the file is a local blob the browser
+ * downloads. No network either way.
+ */
 export function downloadArtifact(artifact: CompileArtifact) {
   const bytes =
     artifact.encoding === "base64"
       ? Uint8Array.from(atob(artifact.body), (c) => c.charCodeAt(0))
       : new TextEncoder().encode(artifact.body);
-  const url = URL.createObjectURL(new Blob([bytes], { type: artifact.mime }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = artifact.filename;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 2000);
+  return saveBytes(artifact.filename, bytes, artifact.mime);
 }
 
 export function relativeTime(iso: string, now = Date.now()): string {
