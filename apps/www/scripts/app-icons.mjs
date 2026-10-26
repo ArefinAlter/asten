@@ -12,6 +12,7 @@
  *   apps/desktop/src-tauri/icons/*                      Tauri's full set (`tauri icon`),
  *                                                       then the small PNGs and the
  *                                                       .ico frames drawn directly
+ *   apps/desktop/src-tauri/icons/installer-*.bmp        the Windows installer's header and side picture
  *   apps/web/public/icons/*                             favicon, 180, 192, 512, maskable
  *   apps/addin-word/icon-32.png, icon-64.png
  *
@@ -125,6 +126,48 @@ for (const s of [32, 64, 128]) write(`${icons}/${s}x${s}.png`, drawn(s));
 write(`${icons}/128x128@2x.png`, drawn(256));
 write(`${icons}/icon.png`, render(master, 512));
 write(`${icons}/icon.ico`, ico([16, 24, 32, 48, 64, 128, 256]));
+
+// The Windows installer's pictures (NSIS wants 24-bit bitmaps): the mark on the
+// day page colour, in the header (150 x 57) and beside the welcome page (164 x 314).
+function bmp(width, height, svg) {
+  const { pixels } = new Resvg(svg, { fitTo: { mode: "width", value: width }, font: { loadSystemFonts: false } }).render();
+  const row = Math.ceil((width * 3) / 4) * 4;
+  const body = Buffer.alloc(row * height);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const at = (y * width + x) * 4;
+      const to = (height - 1 - y) * row + x * 3; // bottom-up, BGR
+      body[to] = pixels[at + 2];
+      body[to + 1] = pixels[at + 1];
+      body[to + 2] = pixels[at];
+    }
+  }
+  const head = Buffer.alloc(54);
+  head.write("BM", 0);
+  head.writeUInt32LE(54 + body.length, 2);
+  head.writeUInt32LE(54, 10);
+  head.writeUInt32LE(40, 14);
+  head.writeInt32LE(width, 18);
+  head.writeInt32LE(height, 22);
+  head.writeUInt16LE(1, 26);
+  head.writeUInt16LE(24, 28);
+  head.writeUInt32LE(body.length, 34);
+  head.writeInt32LE(2835, 38);
+  head.writeInt32LE(2835, 42);
+  return Buffer.concat([head, body]);
+}
+/** The mark, `slate` units per pixel scale `unit`, centred at (cx, cy) on a plate of the given size. */
+function picture(width, height, slateHeight, cx, cy) {
+  const unit = slateHeight / 39;
+  const tx = cx - 16 * unit;
+  const ty = cy - 22 * unit;
+  return plate(1, 1)
+    .replace(/<svg[^>]*>/, `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`)
+    .replace(/<rect width="1" height="1"[^>]*\/>/, `<rect width="${width}" height="${height}" fill="${c.page}"/>`)
+    .replace(/translate\([^)]*\) scale\([^)]*\)/, `translate(${tx.toFixed(3)} ${ty.toFixed(3)}) scale(${unit.toFixed(5)})`);
+}
+write(`${icons}/installer-header.bmp`, bmp(150, 57, picture(150, 57, 46, 150 - 30, 28.5)));
+write(`${icons}/installer-sidebar.bmp`, bmp(164, 314, picture(164, 314, 112, 82, 120)));
 
 // The browser desk and the installed web app.
 const web = "apps/web/public/icons";

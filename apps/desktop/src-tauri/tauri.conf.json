@@ -47,6 +47,13 @@
     "longDescription": "Asten keeps your manuscript on this machine and weighs every page against the canon you settle. It never writes your prose.",
     "category": "Productivity",
     "createUpdaterArtifacts": true,
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "headerImage": "icons/installer-header.bmp",
+        "sidebarImage": "icons/installer-sidebar.bmp"
+      }
+    },
     "android": {
       "minSdkVersion": 26
     },
