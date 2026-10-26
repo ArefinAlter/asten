@@ -34,3 +34,6 @@ dist-server/
 /deploy/release/out/
 /deploy/pre-alpha/artifacts/
 /release-assets/
+
+# Raw downloads for the artwork build
+art/.cache/

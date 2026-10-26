@@ -1073,7 +1073,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "The Egyptian motifs on this site, such as the scales, the ibis, the moon, and the scribe’s palette, are original drawings made by Verne. They are inspired by Egyptian art of the Old, Middle, and New Kingdoms, which is public-domain heritage.",
+            text: "The ornaments, icons and diagrams on this site are original drawings made by Verne, inspired by Egyptian art of the Old, Middle, and New Kingdoms, which is public-domain heritage. The painted plates are public-domain works and CC0 Open Access images from museum collections; Verne cut, graded and arranged them, and claims no rights in the works themselves.",
           },
           {
             kind: "p",
@@ -1477,9 +1477,9 @@ export const legalDocs: LegalDoc[] = [
   {
     ...legalIndex["/credits"]!,
     summary: [
-      "This website is set in Fraunces, Literata, IBM Plex Mono, and Noto Sans Egyptian Hieroglyphs, all under the SIL Open Font License 1.1.",
+      "This website is set in Fraunces, Literata, IBM Plex Mono, Caveat, and Noto Sans Egyptian Hieroglyphs, all under the SIL Open Font License 1.1.",
       "It is built with React, React Router, Vite, and TypeScript. Its social images are rendered at build time with Satori and resvg-js.",
-      "The Egyptian illustrations are original drawings by Verne, inspired by public-domain heritage.",
+      "The painted plates are public-domain works from museum collections, named under each picture and in the table below. The ornaments and icons are original drawings by Verne.",
     ],
     sections: [
       {
@@ -1503,6 +1503,11 @@ export const legalDocs: LegalDoc[] = [
               [
                 "IBM Plex Mono",
                 "IBM. © 2017 IBM Corp.",
+                "SIL Open Font License 1.1",
+              ],
+              [
+                "Caveat",
+                "Impallari Type, for Google Fonts. © 2014 The Caveat Project Authors",
                 "SIL Open Font License 1.1",
               ],
               [
@@ -1564,7 +1569,26 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "The illustrations on this site are original SVG drawings by Verne. They are inspired by Egyptian art of the Old, Middle, and New Kingdoms, which is public-domain heritage. See [copyright](/copyright) for how they may be used.",
+            text: "The painted plates on this site are works in the public domain, or images their museums release under CC0 (the Metropolitan Museum of Art’s Open Access programme) or as public domain (the British Museum’s papyrus, the New York Public Library’s scan). Each is cut from its source, graded to one warm light and set on the paper by Verne; nothing is redrawn. The table gives the museum’s own title, date and object number, and the build that makes the files (art/build.py) is in the source repository.",
+          },
+          {
+            kind: "table",
+            head: ["Plate", "Work", "Holding institution", "Licence"],
+            rows: [
+              ["The dusk window", "[*Sunset Sky*](https://www.metmuseum.org/art/collection/search/11326), John Frederick Kensett, 1872, oil on canvas", "The Metropolitan Museum of Art, 74.30", "CC0, Open Access"],
+              ["The dusk window", "[*Cliffs at Deir el Bahri, Egypt*](https://www.metmuseum.org/art/collection/search/12061), John Singer Sargent, 1890–91, oil on canvas", "The Metropolitan Museum of Art, 50.130.24", "CC0, Open Access"],
+              ["Thoth, the weighing", "[*The judgement of the dead in the presence of Osiris*](https://commons.wikimedia.org/wiki/File:The_judgement_of_the_dead_in_the_presence_of_Osiris.jpg), from the Book of the Dead of Hunefer, about 1275 BCE, painted papyrus", "The British Museum, EA 9901 (photograph via Wikimedia Commons)", "Public domain"],
+              ["The surveyors and their scribes", "[*Harvest Scenes, Tomb of Menna*](https://www.metmuseum.org/art/collection/search/548574), facsimile by Charles K. Wilkinson, 1930, after a tomb painting of about 1396–1347 BCE", "The Metropolitan Museum of Art, 30.4.44", "CC0, Open Access"],
+              ["The scribe’s palette", "[*Scribe’s Palette and Brushes*](https://www.metmuseum.org/art/collection/search/544302), Late Period, 664–332 BCE, wood, ink, reed", "The Metropolitan Museum of Art, 14.1.393a–d", "CC0, Open Access"],
+              ["The scribe", "[*Haremhab as a Scribe of the King*](https://www.metmuseum.org/art/collection/search/544692), New Kingdom, about 1328–1314 BCE, granodiorite", "The Metropolitan Museum of Art, 23.10.1", "CC0, Open Access"],
+              ["The lamp", "[*Bronze lamp*](https://www.metmuseum.org/art/collection/search/246975), Roman, about 4th century CE", "The Metropolitan Museum of Art, 01.17.1", "CC0, Open Access"],
+              ["Evening cloud", "[*Cloud Study (Early Evening)*](https://www.metmuseum.org/art/collection/search/438642), Simon Denis, about 1786–1806, oil on paper", "The Metropolitan Museum of Art, 2003.42.18", "CC0, Open Access"],
+              ["The sacred ibis", "[*Ibis blanc ou sacré (Ibis religiosa)*](https://digitalcollections.nypl.org/items/510d47e0-bda9-a3d9-e040-e00a18064a99), plate 7, Histoire naturelle, Oiseaux, after Jules-César Savigny, in the Description de l’Égypte, Imprimerie impériale, 1809, engraving", "Scan: New York Public Library, via Wikimedia Commons", "Public domain"],
+            ],
+          },
+          {
+            kind: "p",
+            text: "The ornaments, icons, friezes and diagrams are original SVG drawings by Verne. See [copyright](/copyright) for how everything on this site may be used.",
           },
         ],
       },

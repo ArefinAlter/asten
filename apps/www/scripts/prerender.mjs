@@ -508,7 +508,7 @@ write(
 const staticFiles = new Set(["/llms.txt", "/llms-full.txt", "/sitemap.xml", "/journal/rss.xml", "/robots.txt", "/icon-512.png", "/verne-mark.png", "/favicon.svg"]);
 const broken = [];
 for (const [target, sources] of links) {
-  if (known.has(target) || staticFiles.has(target) || target.startsWith("/assets/") || target.startsWith("/og/") || target.startsWith("/brand/")) continue;
+  if (known.has(target) || staticFiles.has(target) || target.startsWith("/assets/") || target.startsWith("/art/") || target.startsWith("/og/") || target.startsWith("/brand/")) continue;
   broken.push(`${target}  (from ${[...sources].join(", ")})`);
 }
 

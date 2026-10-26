@@ -26,7 +26,7 @@ export function JournalIndex() {
           {lead ? (
             <Link to={`/journal/${lead.slug}`} className="card article-lead" data-reveal>
               <div className="art-slot">
-                <ArtFor art={lead.art} />
+                <ArtFor art={lead.art} bare />
               </div>
               <div>
                 <span className="article-meta">
@@ -50,7 +50,7 @@ export function JournalIndex() {
                 style={{ "--d": i % 2 } as CSSProperties}
               >
                 <div className="art-slot">
-                  <ArtFor art={article.art} />
+                  <ArtFor art={article.art} bare />
                 </div>
                 <span className="article-meta">
                   {formatDate(article.published)} · {article.minutes} min read

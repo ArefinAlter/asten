@@ -1,36 +1,29 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Wedjat, IbisStandard, Lotus } from "../art/Figures";
+import { IbisStandard } from "../art/Figures";
 import { Glyph } from "../art/Glyphs";
-import { LunarEmblem } from "../art/Night";
-import { PaletteMark } from "../art/Palette";
-import { PyramidSection } from "../art/Pyramid";
-import { Scales } from "../art/Scales";
+import { Plate } from "../personality/Plate";
+import type { PlateKey } from "../personality/plates";
 import type { ArtKey } from "../content/types";
 import { breadcrumbsFor, metaFor } from "../routes";
 import { release } from "../content/release";
 import { Arrow } from "./Icons";
 import { Inline } from "./Inline";
 
-export function ArtFor({ art, className }: { art: ArtKey; className?: string }) {
-  switch (art) {
-    case "scales":
-      return <Scales className={className} tilt={-6} />;
-    case "moon":
-      return <LunarEmblem className={className} />;
-    case "pyramid":
-      return <PyramidSection className={className} />;
-    case "eye":
-      return <Wedjat className={className} />;
-    case "palette":
-      return <PaletteMark className={`hero-palette ${className ?? ""}`} />;
-    case "ibis":
-      return <IbisStandard className={className} />;
-    case "lotus":
-      return <Lotus className={className} />;
-    case "scroll":
-      return <ScrollArt className={className} />;
-  }
+const plateFor: Record<ArtKey, PlateKey> = {
+  scroll: "scribes",
+  scales: "weighing",
+  ibis: "scribe",
+  moon: "dusk",
+  pyramid: "cliffs",
+  palette: "palette",
+  lotus: "ibis",
+  eye: "lamp",
+};
+
+/** The painted plate for a page: a museum label under it, or none (`bare`) when it sits as a thumbnail on a card. */
+export function ArtFor({ art, className, bare = false }: { art: ArtKey; className?: string; bare?: boolean }) {
+  return <Plate name={plateFor[art]} className={`${bare ? "plate--thumb " : ""}${className ?? ""}`.trim()} label={!bare} />;
 }
 
 /** A rolled papyrus, tied, with a red rubric seal. */

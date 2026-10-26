@@ -52,6 +52,10 @@ export function headTags(meta: RouteMeta, jsonLd?: unknown): HeadTag[] {
     { tag: "meta", attrs: { name: "twitter:description", content: meta.description } },
     { tag: "meta", attrs: { name: "twitter:image", content: image } },
   ];
+  // The hero painting is the largest thing above the fold: fetch it first.
+  if (meta.path === "/") {
+    tags.push({ tag: "link", attrs: { rel: "preload", as: "image", href: "/art/hero-window.webp", type: "image/webp", fetchpriority: "high" } });
+  }
   if (isArticle && meta.published) {
     tags.push(
       { tag: "meta", attrs: { property: "article:published_time", content: meta.published } },
