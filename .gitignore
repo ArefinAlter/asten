@@ -37,3 +37,4 @@ dist-server/
 
 # Raw downloads for the artwork build
 art/.cache/
+art/__pycache__/

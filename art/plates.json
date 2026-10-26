@@ -1,0 +1,1490 @@
+{
+  "_note": "One entry per plate. build.py reads this and works.json, writes apps/www/public/art/plate-<key>.webp and apps/www/src/personality/art-manifest.json. crop is [x0, y0, x1, y1] as fractions of the source. shape: torn | arch | band | cut. 'label' is the line under the plate; the credit line is made from works.json.",
+  "plates": [
+    {
+      "key": "scribes",
+      "work": "menna",
+      "shape": "torn",
+      "crop": [
+        0.075,
+        0.045,
+        0.46,
+        0.49
+      ],
+      "width": 1200,
+      "quality": 78,
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.5
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 3.0
+      },
+      "torn": {
+        "amp": 9,
+        "inset": 12
+      },
+      "label": "Measuring the harvest, Tomb of Menna",
+      "alt": "Surveyors stretch a measuring cord across a field of ripe wheat while two boys carry writing boards, painted on a tomb wall in Thebes."
+    },
+    {
+      "key": "palette",
+      "work": "palette",
+      "shape": "cut",
+      "width": 1100,
+      "quality": 84,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 14
+      },
+      "grade": {
+        "sat": 0.9,
+        "light": 0.6,
+        "lift": 0.02
+      },
+      "kuwahara": {
+        "r": 2,
+        "mix": 0.6,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "A scribe’s palette and pens",
+      "alt": "A scribe’s wooden palette with its black ink cake, and three reed pens lying beside it."
+    },
+    {
+      "key": "weighing",
+      "work": "hunefer",
+      "shape": "torn",
+      "crop": [
+        0.115,
+        0.225,
+        0.675,
+        0.985
+      ],
+      "width": 960,
+      "quality": 80,
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.5
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.55,
+        "lift": 0.025
+      },
+      "grain": {
+        "strength": 2.6
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "The weighing of the heart, Papyrus of Hunefer",
+      "alt": "The weighing of the heart on a papyrus: Anubis at the scales, and ibis-headed Thoth with palette and reed, recording the verdict."
+    },
+    {
+      "key": "dusk",
+      "work": "denis",
+      "shape": "torn",
+      "crop": [
+        0.03,
+        0.04,
+        0.97,
+        0.95
+      ],
+      "width": 960,
+      "quality": 78,
+      "grade": {
+        "sat": 0.9,
+        "light": 0.6,
+        "lift": 0.03,
+        "tint": [
+          1.03,
+          0.99,
+          0.93
+        ]
+      },
+      "grain": {
+        "strength": 3.0
+      },
+      "torn": {
+        "amp": 9,
+        "inset": 12
+      },
+      "label": "Evening cloud, an oil study",
+      "alt": "An oil study of evening cloud, white and grey masses lit pink from below."
+    },
+    {
+      "key": "cliffs",
+      "work": "sargent",
+      "shape": "torn",
+      "crop": [
+        0.02,
+        0.04,
+        0.98,
+        0.96
+      ],
+      "width": 1000,
+      "quality": 78,
+      "grade": {
+        "sat": 0.92,
+        "light": 0.55,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.8
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "The cliffs at Deir el-Bahri",
+      "alt": "Golden limestone cliffs above a pale valley, painted in oil at Deir el-Bahri."
+    },
+    {
+      "key": "lamp",
+      "work": "lamp",
+      "shape": "cut",
+      "width": 760,
+      "quality": 84,
+      "cut": {
+        "largest": 25,
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 14
+      },
+      "grade": {
+        "sat": 0.85,
+        "light": 0.6,
+        "lift": 0.03,
+        "tint": [
+          1.04,
+          0.99,
+          0.92
+        ]
+      },
+      "kuwahara": {
+        "r": 2,
+        "mix": 0.6,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.2
+      },
+      "label": "A bronze lamp",
+      "alt": "A green bronze oil lamp with a lid and a long handle."
+    },
+    {
+      "key": "scribe",
+      "work": "statue",
+      "shape": "cut",
+      "width": 560,
+      "quality": 84,
+      "cut": {
+        "largest": 9,
+        "trim_bottom": 0.935,
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 14
+      },
+      "grade": {
+        "sat": 1.25,
+        "light": 0.75,
+        "lift": 0.03,
+        "tint": [
+          1.1,
+          0.99,
+          0.86
+        ]
+      },
+      "kuwahara": {
+        "r": 2,
+        "mix": 0.6,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.2
+      },
+      "label": "Haremhab as a scribe",
+      "alt": "A seated scribe in granite with a papyrus unrolled across his lap."
+    },
+    {
+      "key": "ibis",
+      "work": "ibis",
+      "custom": true,
+      "shape": "torn",
+      "label": "The sacred ibis, an engraved plate",
+      "alt": "An engraving of the sacred ibis, a tall white bird with a curved black bill, on old paper."
+    },
+    {
+      "key": "astrolabe",
+      "work": "astrolabe",
+      "shape": "cut",
+      "width": 620,
+      "quality": 82,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 16,
+        "sure": 62,
+        "maybe": 30,
+        "floor": 12
+      },
+      "grade": {
+        "sat": 1.0,
+        "light": 0.7,
+        "lift": 0.03,
+        "tint": [
+          1.06,
+          0.99,
+          0.9
+        ]
+      },
+      "kuwahara": {
+        "r": 2,
+        "mix": 0.5,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "An astrolabe, for reading the sky",
+      "alt": "A brass astrolabe, a round instrument engraved with circles and a turning pointer, hanging from a ring."
+    },
+    {
+      "key": "ceiling",
+      "work": "ceiling",
+      "shape": "band",
+      "crop": [
+        0.0,
+        0.0,
+        1.0,
+        0.36
+      ],
+      "width": 1400,
+      "quality": 78,
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4
+      },
+      "grade": {
+        "sat": 0.92,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.6
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "A painted ceiling, copied from a tomb",
+      "alt": "A band of painted tiles with orange, blue and red crossed patterns, above a border of small checks."
+    },
+    {
+      "key": "luke",
+      "work": "luke",
+      "shape": "cut",
+      "width": 640,
+      "quality": 82,
+      "cut": {
+        "largest": 17,
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          3
+        ],
+        "pad": 10,
+        "kill_black": [
+          26,
+          0.07
+        ]
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.02
+      },
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "An evangelist at his desk",
+      "alt": "A Byzantine painting on gold of a saint seated at a writing desk with a book on his knee, the paint worn away in patches."
+    },
+    {
+      "key": "balance",
+      "work": "vermeer_balance",
+      "shape": "arch",
+      "width": 760,
+      "quality": 78,
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.4
+      },
+      "torn": {
+        "amp": 6,
+        "inset": 14
+      },
+      "label": "Weighing, painted",
+      "alt": "A woman in a blue jacket stands at a table holding up a small empty balance, with a painting of the Last Judgement on the wall behind her."
+    },
+    {
+      "key": "portrait-red",
+      "work": "fayum_red",
+      "shape": "cut",
+      "width": 520,
+      "quality": 82,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 10,
+        "work_max": 1600,
+        "sure": 55,
+        "maybe": 28,
+        "floor": 10
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.55,
+        "lift": 0.02
+      },
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "A portrait painted in wax for a mummy",
+      "alt": "A young woman with dark curls and a gold wreath, in a red robe, painted on a wooden panel."
+    },
+    {
+      "key": "waterclock",
+      "work": "waterclock",
+      "shape": "cut",
+      "width": 520,
+      "quality": 84,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 14
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.65,
+        "lift": 0.03,
+        "tint": [
+          1.04,
+          0.99,
+          0.92
+        ]
+      },
+      "kuwahara": {
+        "r": 2,
+        "mix": 0.5,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "A water clock, with its baboon",
+      "alt": "A small pale faience vessel with a seated baboon carved on its side, a water clock from ancient Egypt."
+    },
+    {
+      "key": "philae",
+      "work": "philae",
+      "shape": "torn",
+      "crop": [
+        0.02,
+        0.03,
+        0.98,
+        0.95
+      ],
+      "width": 960,
+      "quality": 76,
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.2
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "Philae, as a traveller drew it",
+      "alt": "A tinted lithograph of the island of Philae: a temple with two towers on a low island, palms and ruins in the foreground, hills behind."
+    },
+    {
+      "key": "threshing",
+      "work": "luttrell",
+      "shape": "torn",
+      "crop": [
+        0.0,
+        0.1,
+        1.0,
+        1.0
+      ],
+      "width": 1000,
+      "quality": 78,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.2
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "Threshing, in the margin of a psalter",
+      "alt": "Two men in blue and orange tunics swing flails over a sheaf of grain, painted in the margin of a medieval manuscript."
+    },
+    {
+      "key": "instruments",
+      "work": "instruments",
+      "shape": "cut",
+      "width": 780,
+      "quality": 84,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 14,
+        "sure": 62,
+        "maybe": 30,
+        "floor": 12
+      },
+      "grade": {
+        "sat": 1.0,
+        "light": 0.6,
+        "lift": 0.03,
+        "tint": [
+          1.04,
+          0.99,
+          0.92
+        ]
+      },
+      "kuwahara": {
+        "r": 2,
+        "mix": 0.5,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "A case of drawing instruments",
+      "alt": "A green shagreen case standing open beside a brass rule and four fine brass and steel drawing instruments."
+    },
+    {
+      "key": "portrait-man",
+      "work": "fayum_man",
+      "shape": "cut",
+      "width": 520,
+      "quality": 82,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 10,
+        "work_max": 1600
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.55,
+        "lift": 0.02
+      },
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "A man, painted in wax",
+      "alt": "A bearded man with dark curly hair in a white tunic, painted on a wooden panel against a grey-blue ground."
+    },
+    {
+      "key": "interior",
+      "work": "hammershoi",
+      "shape": "arch",
+      "width": 720,
+      "quality": 78,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.4
+      },
+      "torn": {
+        "amp": 6,
+        "inset": 14
+      },
+      "label": "A quiet room",
+      "alt": "A woman in a black dress seen from behind, standing in a grey room beside a table with a blue and white porcelain tureen."
+    },
+    {
+      "key": "still-life",
+      "work": "claesz",
+      "shape": "torn",
+      "crop": [
+        0.012,
+        0.015,
+        0.988,
+        0.985
+      ],
+      "width": 960,
+      "quality": 78,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.55,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.4
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "A skull, a quill, a book and some ink",
+      "alt": "A still life on a table: a skull resting on paper and a quill, an overturned glass, an inkwell and a small oil lamp."
+    },
+    {
+      "key": "writing",
+      "work": "vermeer_writing",
+      "shape": "arch",
+      "width": 760,
+      "quality": 78,
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.4
+      },
+      "torn": {
+        "amp": 6,
+        "inset": 14
+      },
+      "label": "A lady writing",
+      "alt": "A young woman in a yellow jacket trimmed with ermine sits at a table with a quill in her hand, turning to look out of the picture."
+    },
+    {
+      "key": "atlas",
+      "work": "atlas",
+      "shape": "torn",
+      "crop": [
+        0.04,
+        0.03,
+        0.96,
+        0.97
+      ],
+      "width": 960,
+      "quality": 76,
+      "grade": {
+        "sat": 0.9,
+        "light": 0.5,
+        "lift": 0.03,
+        "tint": [
+          1.03,
+          0.99,
+          0.93
+        ]
+      },
+      "grain": {
+        "strength": 2.2
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "A map of the Nile valley",
+      "alt": "An engraved map sheet showing a river valley running diagonally between deserts, with place names in French and Arabic."
+    },
+    {
+      "key": "dance",
+      "work": "degas",
+      "shape": "torn",
+      "crop": [
+        0.025,
+        0.025,
+        0.975,
+        0.975
+      ],
+      "width": 840,
+      "quality": 72,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 1.5
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "A rehearsal",
+      "alt": "A dance class in a long room: dancers in white tutus stand and stretch, a teacher with a cane in front of a tall window, a score on a stand."
+    },
+    {
+      "key": "lisbeth",
+      "work": "larsson",
+      "shape": "torn",
+      "crop": [
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "width": 840,
+      "quality": 72,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 1.5
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "Reading at the kitchen table",
+      "alt": "A girl reading at a green table in a bright room, a pot of red flowers beside her."
+    },
+    {
+      "key": "tugs",
+      "work": "pissarro_barges",
+      "shape": "torn",
+      "crop": [
+        0.025,
+        0.025,
+        0.975,
+        0.975
+      ],
+      "width": 840,
+      "quality": 72,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 1.5
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "Two steam tugs at Pontoise",
+      "alt": "Two small steam tugs moored at the bank of a dark green river, red stripes on their hulls, trees behind."
+    },
+    {
+      "key": "melencolia",
+      "work": "durer",
+      "shape": "torn",
+      "crop": [
+        0.03,
+        0.03,
+        0.97,
+        0.97
+      ],
+      "width": 640,
+      "quality": 66,
+      "tone": {
+        "lo": 60,
+        "hi": 235
+      },
+      "grade": {
+        "sat": 1.0,
+        "light": 0.3,
+        "lift": 0.02
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "All the instruments, and a thinker",
+      "alt": "An engraving of a winged figure seated with her chin on her fist amid tools, a scale, an hourglass, a bell and a magic square."
+    },
+    {
+      "key": "moneylender",
+      "work": "metsys",
+      "shape": "torn",
+      "crop": [
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "width": 1000,
+      "quality": 78,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.4
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "Weighing coins",
+      "alt": "The hands of a moneylender weighing coins on a small balance, and of his wife turning the pages of an illuminated book."
+    },
+    {
+      "key": "tuileries",
+      "work": "pissarro_tuileries",
+      "shape": "torn",
+      "crop": [
+        0.025,
+        0.025,
+        0.975,
+        0.975
+      ],
+      "width": 840,
+      "quality": 72,
+      "grade": {
+        "sat": 0.92,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 1.5
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "A spring morning in Paris",
+      "alt": "A view down over the Tuileries garden in spring: paths, lawns and trees under a sky of small clouds."
+    },
+    {
+      "key": "road",
+      "work": "sisley_road",
+      "shape": "torn",
+      "crop": [
+        0.025,
+        0.025,
+        0.975,
+        0.975
+      ],
+      "width": 840,
+      "quality": 72,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 1.5
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "The road ahead",
+      "alt": "A country road beneath tall trees and a stormy blue sky, two small figures walking on it."
+    },
+    {
+      "key": "papyrus",
+      "work": "papyrus",
+      "shape": "torn",
+      "crop": [
+        0.03,
+        0.02,
+        0.97,
+        0.98
+      ],
+      "width": 620,
+      "quality": 76,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "The papyrus plant",
+      "alt": "A botanical drawing of papyrus: a tall green stem opening into a fine shower of stalks bearing small brown flowers."
+    },
+    {
+      "key": "bookworm",
+      "work": "spitzweg",
+      "shape": "torn",
+      "crop": [
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "width": 520,
+      "quality": 72,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.4
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "The bookworm",
+      "alt": "A man in a dark coat stands on a ladder in a library, reading a book he has taken from the highest shelf."
+    },
+    {
+      "key": "boulevard",
+      "work": "pissarro_boulevard",
+      "shape": "torn",
+      "crop": [
+        0.025,
+        0.025,
+        0.975,
+        0.975
+      ],
+      "width": 840,
+      "quality": 72,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 1.5
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "The same view, in winter",
+      "alt": "A wide Paris boulevard seen from above on a grey winter morning, carriages and walkers under bare trees."
+    },
+    {
+      "key": "sundial",
+      "work": "sundial",
+      "shape": "cut",
+      "width": 640,
+      "quality": 84,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 14
+      },
+      "grade": {
+        "sat": 1.0,
+        "light": 0.65,
+        "lift": 0.03,
+        "tint": [
+          1.05,
+          0.99,
+          0.91
+        ]
+      },
+      "kuwahara": {
+        "r": 2,
+        "mix": 0.5,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "A pocket sundial",
+      "alt": "An ivory pocket sundial opened like a book, with a compass set into its base and a thread stretched between its two leaves."
+    },
+    {
+      "key": "relief",
+      "work": "luke_relief",
+      "shape": "cut",
+      "width": 520,
+      "quality": 82,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 12
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.6,
+        "lift": 0.03,
+        "tint": [
+          1.04,
+          0.99,
+          0.92
+        ]
+      },
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "Saint Luke at his writing table",
+      "alt": "A small carved and painted wooden relief of a saint seated at a writing desk with an open book, gilded and set in an arch."
+    },
+    {
+      "key": "bedroom",
+      "work": "vangogh",
+      "shape": "torn",
+      "crop": [
+        0.0,
+        0.0,
+        1.0,
+        1.0
+      ],
+      "width": 840,
+      "quality": 72,
+      "grade": {
+        "sat": 0.9,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 1.5
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "A room of one’s own",
+      "alt": "A small bedroom with a wooden bed, two yellow chairs and blue walls, painted in thick strokes, with green shutters at the window."
+    },
+    {
+      "key": "glossy-ibis",
+      "work": "audubon",
+      "shape": "torn",
+      "crop": [
+        0.225,
+        0.15,
+        0.975,
+        0.86
+      ],
+      "width": 940,
+      "quality": 76,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "A glossy ibis",
+      "alt": "A glossy ibis, a long-legged bird with a curved bill and dark glossy plumage, wading at the edge of a pond among flowering plants."
+    },
+    {
+      "key": "portrait-boy",
+      "work": "fayum_boy",
+      "shape": "cut",
+      "width": 520,
+      "quality": 82,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 10,
+        "work_max": 1600
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.55,
+        "lift": 0.02
+      },
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "A boy, painted in wax",
+      "alt": "A boy with short brown hair in a white tunic, painted on a wooden panel."
+    },
+    {
+      "key": "thoth-relief",
+      "work": "ducamp",
+      "shape": "torn",
+      "crop": [
+        0.2,
+        0.15,
+        0.8,
+        0.74
+      ],
+      "trim": true,
+      "width": 600,
+      "quality": 76,
+      "grade": {
+        "sat": 0.9,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "torn": {
+        "amp": 7,
+        "inset": 9
+      },
+      "label": "Thoth at Philae, photographed in 1850",
+      "alt": "A photograph of a relief carved in a temple wall, showing a seated god with the head of an ibis."
+    },
+    {
+      "key": "rouen",
+      "work": "pissarro_rouen",
+      "shape": "torn",
+      "crop": [
+        0.025,
+        0.025,
+        0.975,
+        0.975
+      ],
+      "width": 840,
+      "quality": 72,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 1.5
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "A bridge at Rouen",
+      "alt": "A grey morning over the river Seine at Rouen: an iron bridge, steamers and a tall chimney sending up smoke."
+    },
+    {
+      "key": "portrait-elder",
+      "work": "fayum_elder",
+      "shape": "cut",
+      "width": 520,
+      "quality": 82,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 10,
+        "work_max": 1600
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.55,
+        "lift": 0.02
+      },
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "An elderly woman, with her gold wreath",
+      "alt": "An elderly woman with grey hair wreathed in gold leaf looks out from a wooden panel, painted in wax."
+    },
+    {
+      "key": "inkwell",
+      "work": "inkwell",
+      "shape": "cut",
+      "width": 620,
+      "quality": 84,
+      "cut": {
+        "soft": [
+          2.0,
+          0.3,
+          0.8,
+          2
+        ],
+        "pad": 14,
+        "sure": 62,
+        "maybe": 30,
+        "floor": 12
+      },
+      "grade": {
+        "sat": 1.0,
+        "light": 0.65,
+        "lift": 0.03,
+        "tint": [
+          1.04,
+          0.99,
+          0.92
+        ]
+      },
+      "kuwahara": {
+        "r": 2,
+        "mix": 0.5,
+        "after_grade": true
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "label": "An inkwell, nearly four thousand years old",
+      "alt": "A small wooden box with a round hole for ink and a sliding lid, an inkwell from ancient Egypt."
+    },
+    {
+      "key": "cloud",
+      "work": "constable",
+      "shape": "band",
+      "crop": [
+        0.02,
+        0.03,
+        0.98,
+        0.93
+      ],
+      "width": 1000,
+      "quality": 76,
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.0
+      },
+      "torn": {
+        "amp": 8,
+        "inset": 10
+      },
+      "label": "A cloud study",
+      "alt": "A watercolour study of a wide sky: bands of grey and white cloud over a low blue horizon."
+    },
+    {
+      "key": "text",
+      "work": "hunefer",
+      "shape": "band",
+      "crop": [
+        0.07,
+        0.06,
+        0.98,
+        0.36
+      ],
+      "width": 1200,
+      "quality": 76,
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 2.4
+      },
+      "torn": {
+        "amp": 6,
+        "inset": 8
+      },
+      "label": "The text of the spells, Papyrus of Hunefer",
+      "alt": "Columns of black and red hieroglyphs written on papyrus, above the heads of a row of seated gods."
+    },
+    {
+      "key": "frieze",
+      "series": 13,
+      "window": 0.22,
+      "work": "menna",
+      "shape": "band",
+      "width": 820,
+      "quality": 72,
+      "kuwahara": {
+        "r": 1,
+        "mix": 0.4
+      },
+      "grade": {
+        "sat": 0.95,
+        "light": 0.5,
+        "lift": 0.03
+      },
+      "grain": {
+        "strength": 1.8
+      },
+      "torn": {
+        "amp": 6,
+        "inset": 8
+      },
+      "label": "Harvest Scenes, Tomb of Menna, a detail",
+      "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain.",
+      "rows": [
+        [
+          0.07,
+          0.47
+        ],
+        [
+          0.53,
+          0.93
+        ]
+      ],
+      "xrange": [
+        0.025,
+        0.985
+      ]
+    }
+  ],
+  "pages": {
+    "/how-it-works": {
+      "plate": "astrolabe"
+    },
+    "/features": {
+      "plate": "ceiling"
+    },
+    "/features/desk": {
+      "plate": "luke"
+    },
+    "/features/canon": {
+      "plate": "balance",
+      "side": "left"
+    },
+    "/features/cast": {
+      "plate": "portrait-red"
+    },
+    "/features/time": {
+      "plate": "waterclock",
+      "side": "left"
+    },
+    "/features/world": {
+      "plate": "philae"
+    },
+    "/features/compiler": {
+      "plate": "threshing"
+    },
+    "/features/packs": {
+      "plate": "instruments",
+      "side": "left"
+    },
+    "/features/word-and-google-docs": {
+      "plate": "portrait-man"
+    },
+    "/features/local-first": {
+      "plate": "interior",
+      "side": "left"
+    },
+    "/ai": {
+      "plate": "still-life",
+      "side": "left"
+    },
+    "/for/novelists": {
+      "plate": "writing"
+    },
+    "/for/worldbuilders": {
+      "plate": "atlas",
+      "side": "left"
+    },
+    "/for/screenwriters": {
+      "plate": "dance"
+    },
+    "/for/fan-fiction": {
+      "plate": "lisbeth",
+      "side": "left"
+    },
+    "/for/ai-tinkerers": {
+      "plate": "tugs"
+    },
+    "/compare": {
+      "plate": "moneylender"
+    },
+    "/download": {
+      "plate": "tuileries",
+      "side": "left"
+    },
+    "/roadmap": {
+      "plate": "road"
+    },
+    "/journal": {
+      "plate": "papyrus"
+    },
+    "/journal/ai-editor-not-writer": {
+      "plate": "bookworm"
+    },
+    "/journal/continuity-in-a-long-novel": {
+      "plate": "boulevard"
+    },
+    "/journal/story-time-and-reading-order": {
+      "plate": "sundial"
+    },
+    "/journal/do-you-need-a-story-bible": {
+      "plate": "relief"
+    },
+    "/journal/local-first-writing": {
+      "plate": "bedroom"
+    },
+    "/glossary": {
+      "plate": "glossy-ibis",
+      "side": "left"
+    },
+    "/faq": {
+      "plate": "portrait-boy"
+    },
+    "/guide": {
+      "plate": "melencolia"
+    },
+    "/name": {
+      "plate": "thoth-relief"
+    },
+    "/about": {
+      "plate": "rouen",
+      "side": "left"
+    },
+    "/contact": {
+      "plate": "portrait-elder"
+    },
+    "/brand": {
+      "plate": "inkwell",
+      "side": "left"
+    },
+    "/legal": {
+      "plate": "text"
+    },
+    "/privacy": {
+      "plate": "frieze-01"
+    },
+    "/terms": {
+      "plate": "frieze-02"
+    },
+    "/cookies": {
+      "plate": "frieze-03"
+    },
+    "/license": {
+      "plate": "frieze-04"
+    },
+    "/acceptable-use": {
+      "plate": "frieze-05"
+    },
+    "/ai-policy": {
+      "plate": "frieze-06"
+    },
+    "/accessibility": {
+      "plate": "frieze-07"
+    },
+    "/copyright": {
+      "plate": "frieze-08"
+    },
+    "/trademark": {
+      "plate": "frieze-09"
+    },
+    "/security": {
+      "plate": "frieze-10"
+    },
+    "/subprocessors": {
+      "plate": "frieze-11"
+    },
+    "/credits": {
+      "plate": "frieze-12"
+    },
+    "/notice": {
+      "plate": "frieze-13"
+    },
+    "/404": {
+      "plate": "cloud"
+    }
+  }
+}

@@ -17,6 +17,7 @@ import os
 import subprocess
 import sys
 import urllib.parse
+import zlib
 from pathlib import Path
 
 import cv2
@@ -35,19 +36,10 @@ LIGHT = np.array([252, 244, 228], np.float32)
 
 # ───────────────────────── sources ─────────────────────────
 
-MET = {
-    "kensett": 11326,   # John Frederick Kensett, Sunset Sky, 1872
-    "sargent": 12061,   # John Singer Sargent, Cliffs at Deir el Bahri, Egypt, 1890-91
-    "denis": 438642,    # Simon Denis, Cloud Study (Early Evening), c. 1786-1806
-    "menna": 548574,    # Charles K. Wilkinson, Harvest Scenes, Tomb of Menna
-    "palette": 544302,  # Scribe's Palette and Brushes
-    "statue": 544692,   # Haremhab as a Scribe of the King
-    "lamp": 246975,     # Bronze lamp
-}
-COMMONS = {
-    "hunefer": ("The judgement of the dead in the presence of Osiris.jpg", 2446),
-    "ibis": ("Zoologie. Oiseau. 1. Ibis blanc ou sacré (Ibis religiosa); 2. Ibis noir (Ibis falcinellus) (NYPL b14212718-1268479).jpg", 3840),
-}
+WORKS_FILE = ROOT / "art" / "works.json"
+PLATES_FILE = ROOT / "art" / "plates.json"
+MANIFEST = ROOT / "apps" / "www" / "src" / "personality" / "art-manifest.json"
+WORKS: dict[str, dict] = json.loads(WORKS_FILE.read_text(encoding="utf-8"))["works"]
 
 
 def sh(args: list[str]) -> bytes:
@@ -62,15 +54,15 @@ def fetch(name: str) -> Path:
     """Download a source once; verify it against art/sources.lock.json."""
     CACHE.mkdir(parents=True, exist_ok=True)
     path = CACHE / f"{name}.jpg"
+    src = WORKS[name]["source"]
     if not path.exists():
-        if name in MET:
-            meta = json.loads(sh(["curl", "-s", "-m", "60", "-A", UA, f"https://collectionapi.metmuseum.org/public/collection/v1/objects/{MET[name]}"]))
+        if "met" in src:
+            meta = json.loads(sh(["curl", "-s", "-m", "60", "-A", UA, f"https://collectionapi.metmuseum.org/public/collection/v1/objects/{src['met']}"]))
             if not meta.get("isPublicDomain"):
-                raise SystemExit(f"{name}: Met object {MET[name]} is not public domain")
+                raise SystemExit(f"{name}: Met object {src['met']} is not public domain")
             url = meta["primaryImage"]
         else:
-            title, width = COMMONS[name]
-            url = "https://commons.wikimedia.org/wiki/Special:FilePath/" + urllib.parse.quote(title) + f"?width={width}"
+            url = "https://commons.wikimedia.org/wiki/Special:FilePath/" + urllib.parse.quote(src["commons"]) + f"?width={src['width']}"
         data = sh(["curl", "-s", "-L", "-m", "240", "-A", UA, url])
         path.write_bytes(data)
     lock = json.loads(LOCK.read_text()) if LOCK.exists() else {}
@@ -167,6 +159,10 @@ def torn_alpha(w: int, h: int, seed: int, amp: float = 12.0, inset: float = 16.0
     pts += [(l, y) for y, l in zip(ys[::-1], left[::-1])]
     m = np.zeros((h * S, w * S), np.uint8)
     cv2.fillPoly(m, [np.array(pts, np.float32).reshape(-1, 1, 2).__mul__(S).astype(np.int32)], 255)
+    m = cv2.morphologyEx(m, cv2.MORPH_OPEN, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15)))  # no spikes at the corners
+    n, lcc, stats, _ = cv2.connectedComponentsWithStats((m > 127).astype(np.uint8), 8)
+    if n > 2:  # a fold at a corner can leave a scrap of paper beside the sheet
+        m = np.where(lcc == 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA])), 255, 0).astype(np.uint8)
     m = cv2.resize(m, (w, h), interpolation=cv2.INTER_AREA)
     return m.astype(np.float32) / 255.0
 
@@ -368,96 +364,11 @@ def build_thoth() -> None:
     save_webp(img, "thoth.webp", quality=86)
 
 
-def build_scribes() -> None:
-    """Surveyors and their boy-scribes with writing boards, from the Tomb of Menna (Wilkinson's facsimile)."""
-    img = load("menna")
-    w, h = img.size
-    c = img.crop((int(0.075 * w), int(0.045 * h), int(0.46 * w), int(0.49 * h)))
-    c = fit(c, 1200)
-    a = f32(c)
-    a = kuwahara(a, 1) * 0.5 + a * 0.5
-    a = grade(a, None, sat=0.95, light=0.5, lift=0.03)
-    a = grain(a, 21, 3.0, 1.0)
-    save_webp(torn(to_img(a), 31, amp=9, inset=12), "plate-scribes.webp", quality=78)
-
-
-def build_palette() -> None:
-    img = load("palette")
-    a = f32(img)
-    h, w = a.shape[:2]
-    fg = studio_cut(a)
-    alpha = soft_alpha(fg, 2.0, 0.3, 0.8, 2)
-    a = grade(a, alpha, sat=0.9, light=0.6, lift=0.02)
-    a = kuwahara(a, 2) * 0.6 + a * 0.4
-    a = grain(a, 41, 2.0, 1.0)
-    out = crop_to_alpha(rgba(a, alpha), 14)
-    save_webp(fit(out, 1100), "plate-palette.webp", quality=84)
-
-
-def build_weighing() -> None:
-    img = load("hunefer")
-    w, h = img.size
-    c = img.crop((int(0.115 * w), int(0.225 * h), int(0.675 * w), int(0.985 * h)))
-    c = fit(c, 960)
-    a = f32(c)
-    a = kuwahara(a, 1) * 0.5 + a * 0.5
-    a = grade(a, None, sat=0.95, light=0.55, lift=0.025)
-    a = grain(a, 51, 2.6, 1.0)
-    save_webp(torn(to_img(a), 61, amp=8, inset=10), "plate-weighing.webp", quality=80)
-
-
-def build_dusk() -> None:
-    img = load("denis")
-    w, h = img.size
-    c = fit(img.crop((int(0.03 * w), int(0.04 * h), int(0.97 * w), int(0.95 * h))), 960)
-    a = f32(c)
-    a = grade(a, None, sat=0.9, light=0.6, lift=0.03, tint=(1.03, 0.99, 0.93))
-    a = grain(a, 71, 3.0, 1.0)
-    save_webp(torn(to_img(a), 81, amp=9, inset=12), "plate-dusk.webp", quality=78)
-
-
-def build_cliffs() -> None:
-    img = load("sargent")
-    w, h = img.size
-    c = fit(img.crop((int(0.02 * w), int(0.04 * h), int(0.98 * w), int(0.96 * h))), 1000)
-    a = f32(c)
-    a = grade(a, None, sat=0.92, light=0.55, lift=0.03)
-    a = grain(a, 91, 2.8, 1.0)
-    save_webp(torn(to_img(a), 101, amp=8, inset=10), "plate-cliffs.webp", quality=78)
-
-
 def largest(fg: np.ndarray, open_px: int = 0) -> np.ndarray:
     if open_px:
         fg = cv2.morphologyEx(fg, cv2.MORPH_OPEN, np.ones((open_px, open_px), np.uint8))
     n, lcc, stats, _ = cv2.connectedComponentsWithStats(fg, 8)
     return (lcc == 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA])).astype(np.uint8)
-
-
-def build_lamp() -> None:
-    img = load("lamp")
-    a = f32(img)
-    h, w = a.shape[:2]
-    fg = largest(studio_cut(a), 25)
-    alpha = soft_alpha(fg, 2.0, 0.3, 0.8, 2)
-    a = grade(a, alpha, sat=0.85, light=0.6, lift=0.03, tint=(1.04, 0.99, 0.92))
-    a = kuwahara(a, 2) * 0.6 + a * 0.4
-    a = grain(a, 111, 2.2, 1.0)
-    out = crop_to_alpha(rgba(a, alpha), 14)
-    save_webp(fit(out, 760), "plate-lamp.webp", quality=84)
-
-
-def build_statue() -> None:
-    img = load("statue")
-    a = f32(img)
-    h, w = a.shape[:2]
-    fg = largest(studio_cut(a), 9)
-    fg[int(0.935 * h):] = 0  # the museum's plinth, not the statue
-    alpha = soft_alpha(fg, 2.0, 0.3, 0.8, 2)
-    a = grade(a, alpha, sat=1.25, light=0.75, lift=0.03, tint=(1.1, 0.99, 0.86))
-    a = kuwahara(a, 2) * 0.6 + a * 0.4
-    a = grain(a, 121, 2.2, 1.0)
-    out = crop_to_alpha(rgba(a, alpha), 14)
-    save_webp(fit(out, 560), "plate-scribe.webp", quality=84)
 
 
 def build_ibis() -> None:
@@ -521,23 +432,313 @@ def build_grain() -> None:
     print(f"{'grain.webp':26s} {S:>5}x{S:<5} {(OUT / 'grain.webp').stat().st_size / 1024:6.1f} KB")
 
 
-ASSETS = {
-    "hero": build_hero,
-    "thoth": build_thoth,
-    "scribes": build_scribes,
-    "palette": build_palette,
-    "weighing": build_weighing,
-    "dusk": build_dusk,
-    "cliffs": build_cliffs,
-    "lamp": build_lamp,
-    "statue": build_statue,
-    "ibis": build_ibis,
-    "grain": build_grain,
+def arch_alpha(w: int, h: int, seed: int, amp: float = 6.0, inset: float = 14.0) -> np.ndarray:
+    """A round-topped window: a semicircle over a torn-paper body. The curve wanders a little, as if cut by hand."""
+    ss = 2
+    x0, x1 = inset, w - inset
+    r = (x1 - x0) / 2
+    cy = inset + r
+    m = np.zeros((h * ss, w * ss), np.uint8)
+    cv2.circle(m, (int(w * ss / 2), int(cy * ss)), int(r * ss), 255, -1)
+    cv2.rectangle(m, (int(x0 * ss), int(cy * ss)), (int(x1 * ss), int((h - inset) * ss)), 255, -1)
+    hard = cv2.resize(m, (w, h), interpolation=cv2.INTER_AREA) > 127
+    hard8 = hard.astype(np.uint8)
+    sd = cv2.distanceTransform(hard8, cv2.DIST_L2, 5) - cv2.distanceTransform(1 - hard8, cv2.DIST_L2, 5)
+    rng = np.random.RandomState(seed)
+    wob = rng.normal(0, 1, (h, w)).astype(np.float32)
+    wob = cv2.GaussianBlur(wob, (0, 0), 18)
+    wob /= max(wob.std(), 1e-3)
+    fib = cv2.GaussianBlur(rng.normal(0, 1, (h, w)).astype(np.float32), (0, 0), 1.4)
+    fib /= max(fib.std(), 1e-3)
+    al = np.clip((sd + amp * wob + 1.2 * fib) / 1.6 + 0.5, 0, 1)
+    # the foot of the sheet is torn like the others
+    return np.minimum(al, torn_alpha(w, h, seed + 7, amp=amp, inset=inset))
+
+
+def edge_to_paper(a: np.ndarray, al: np.ndarray, rim: float = 0.6) -> np.ndarray:
+    """Pull the last pixels of a cut edge toward bare paper, so no dark rim shows."""
+    hard = (al > 0.5).astype(np.uint8)
+    edge = hard - cv2.erode(hard, np.ones((3, 3), np.uint8), iterations=2)
+    edge = cv2.GaussianBlur(edge.astype(np.float32), (0, 0), 0.8) * rim
+    return a * (1 - edge[..., None]) + PAPER * edge[..., None]
+
+
+def tone(a: np.ndarray, paper: tuple[int, int, int] = (244, 236, 218), shade: tuple[int, int, int] = (52, 42, 33), lo: float = 40, hi: float = 240) -> np.ndarray:
+    """Re-tone a black-and-white print: ink to a warm brown, paper to the site's cream."""
+    g = a @ np.array([0.299, 0.587, 0.114], np.float32)
+    ink = np.clip((g - lo) / (hi - lo), 0, 1)
+    return np.array(paper, np.float32) * ink[..., None] + np.array(shade, np.float32) * (1 - ink[..., None])
+
+
+def seed_of(key: str) -> int:
+    return zlib.crc32(key.encode()) % 100000
+
+
+def limit(img: Image.Image, longest: int) -> Image.Image:
+    """Shrink so the longest side is at most `longest` (the cut is computed at this size)."""
+    k = longest / max(img.size)
+    return img if k >= 1 else img.resize((round(img.width * k), round(img.height * k)), Image.LANCZOS)
+
+
+def crop_fr(img: Image.Image, box) -> Image.Image:
+    if not box:
+        return img
+    w, h = img.size
+    return img.crop((round(box[0] * w), round(box[1] * h), round(box[2] * w), round(box[3] * h)))
+
+
+def trim_margin(img: Image.Image, thr: float = 45.0, pad: int = 8) -> Image.Image:
+    """Crop away a plain mount or margin: keep the largest region that differs from the colour of the corners."""
+    a = f32(img)
+    ref = np.median(np.concatenate([a[:12, :12].reshape(-1, 3), a[:12, -12:].reshape(-1, 3), a[-12:, :12].reshape(-1, 3), a[-12:, -12:].reshape(-1, 3)]), axis=0)
+    diff = (np.linalg.norm(a - ref, axis=2) > thr).astype(np.uint8)
+    diff = cv2.morphologyEx(diff, cv2.MORPH_CLOSE, np.ones((15, 15), np.uint8))
+    diff = cv2.morphologyEx(diff, cv2.MORPH_OPEN, np.ones((9, 9), np.uint8))
+    n, lcc, stats, _ = cv2.connectedComponentsWithStats(diff, 8)
+    k = 1 + int(np.argmax(stats[1:, cv2.CC_STAT_AREA]))
+    x, y, w, h = stats[k, :4]
+    return img.crop((x + pad, y + pad, x + w - pad, y + h - pad))
+
+
+def build_plate(spec: dict) -> tuple[int, int]:
+    """One plate from plates.json: crop, optional cut-out, smoothing, grade, grain, and the paper shape.
+
+    shape  torn   a deckled rectangle (paintings and prints)
+           arch   a round-topped window with a torn foot
+           band   a wide torn strip
+           cut    the object alone, cut from its studio backdrop
+    """
+    key = spec["key"]
+    shape = spec.get("shape", "torn")
+    seed = spec.get("seed", seed_of(key))
+    gr = dict(spec.get("grade", {}))
+    if "tint" in gr:
+        gr["tint"] = tuple(gr["tint"])
+    kw = spec.get("kuwahara", {})
+    gn = spec.get("grain", {})
+    img = crop_fr(load(spec["work"]), spec.get("crop"))
+    if spec.get("trim"):
+        img = trim_margin(img)
+    width = spec["width"]
+
+    def smooth(a: np.ndarray) -> np.ndarray:
+        if not kw:
+            return a
+        return kuwahara(a, kw.get("r", 1)) * kw.get("mix", 0.5) + a * (1 - kw.get("mix", 0.5))
+
+    if shape == "cut":
+        cut = spec.get("cut", {})
+        a = f32(limit(img, cut.get("work_max", 1800)))
+        h, w = a.shape[:2]
+        fg = studio_cut(a, cut.get("sure", 38.0), cut.get("maybe", 15.0), cut.get("floor", 7.0))
+        if "largest" in cut:
+            fg = largest(fg, cut["largest"])
+        if "trim_bottom" in cut:
+            fg[int(cut["trim_bottom"] * h):] = 0
+        if "trim_top" in cut:
+            fg[: int(cut["trim_top"] * h)] = 0
+        if "drop_dark" in cut:  # slivers of a black backdrop left along a ragged edge
+            k = cut.get("drop_band", 31)
+            band = fg - cv2.erode(fg, np.ones((k, k), np.uint8))
+            fg[(band == 1) & (a.mean(axis=2) < cut["drop_dark"])] = 0
+            fg = cv2.morphologyEx(fg, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+        if "kill_black" in cut:  # near-black pixels along the side edges are the backdrop, not the object
+            thr, edge = cut["kill_black"]
+            dark = a.mean(axis=2) < thr
+            dark[:, int(edge * w):int((1 - edge) * w)] = False
+            fg[dark] = 0
+            fg = cv2.morphologyEx(fg, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+        for x0, y0, x1, y1 in cut.get("erase", []):  # hand-placed boxes (fractions) to remove
+            fg[int(y0 * h):int(y1 * h), int(x0 * w):int(x1 * w)] = 0
+        if cut.get("largest_after_erase"):
+            fg = largest(fg, 0)
+        alpha = soft_alpha(fg, *cut.get("soft", [2.0, 0.3, 0.8, 2]))
+        a = grade(a, alpha, **gr)
+        a = smooth(a)
+        a = grain(a, seed, gn.get("strength", 2.2), gn.get("size", 1.0))
+        a = edge_to_paper(a, alpha, cut.get("rim", 0.0))
+        out = fit(crop_to_alpha(rgba(a, alpha), cut.get("pad", 14)), width)
+    else:
+        a = f32(fit(img, width))
+        if spec.get("tone"):
+            a = tone(a, **{k: tuple(v) if isinstance(v, list) else v for k, v in spec["tone"].items()})
+        if not kw.get("after_grade"):
+            a = smooth(a)
+        a = grade(a, None, **gr)
+        if kw.get("after_grade"):
+            a = smooth(a)
+        a = grain(a, seed, gn.get("strength", 2.6), gn.get("size", 1.0))
+        base = to_img(a)
+        tr = spec.get("torn", {})
+        if shape == "arch":
+            al = arch_alpha(base.width, base.height, seed, tr.get("amp", 6.0), tr.get("inset", 14.0))
+            aa = edge_to_paper(a, al, tr.get("rim", 0.6))
+            out = Image.fromarray(np.dstack([np.clip(aa, 0, 255), al * 255]).astype(np.uint8), "RGBA")
+        else:
+            out = torn(base, seed + 1, amp=tr.get("amp", 9.0), inset=tr.get("inset", 12.0), rim=tr.get("rim", 0.6))
+    save_webp(out, f"plate-{key}.webp", quality=spec.get("quality", 78))
+    return out.size
+
+
+def expand_series(specs: list[dict]) -> list[dict]:
+    """A spec with "series": N becomes N plates, windows along a long work (a frieze) taken across its rows."""
+    out: list[dict] = []
+    for sp in specs:
+        n = sp.get("series")
+        if not n:
+            out.append(sp)
+            continue
+        rows = sp["rows"]
+        x0, x1 = sp["xrange"]
+        win = sp["window"]
+        base = {k: v for k, v in sp.items() if k not in ("series", "window", "rows", "xrange")}
+        for i in range(n):
+            r = i % len(rows)
+            idx = i // len(rows)
+            count = len(range(r, n, len(rows)))
+            left = x0 + (x1 - x0 - win) * (idx / max(count - 1, 1))
+            out.append({**base, "key": f"{sp['key']}-{i + 1:02d}", "crop": [left, rows[r][0], left + win, rows[r][1]]})
+    return out
+
+
+def load_specs() -> tuple[list[dict], dict]:
+    doc = json.loads(PLATES_FILE.read_text(encoding="utf-8"))
+    return expand_series(doc["plates"]), doc["pages"]
+
+
+SOURCES_MD = ROOT / "art" / "SOURCES.md"
+
+SOURCES_HEAD = """# Sources for the painted artwork
+
+Everything under `apps/www/public/art/` is made by `art/build.py` from the public-domain and CC0 works below. Raw
+downloads stay in `art/.cache` (ignored by git); `art/sources.lock.json` holds the SHA-256 of each source file the build
+used, so a later run can tell if a museum has replaced an image. No work here was drawn, generated or redrawn: each is
+cropped, cut, graded and set on paper, nothing more.
+
+This file is generated by `python art/build.py` from `art/works.json` (the works) and `art/plates.json` (what is made from
+them and where it is shown). Edit those, not this. The same list, as a table with links, is on `/credits`, made from the
+same data, and the label under each plate on the site is made from it too.
+
+Run `python art/build.py` (Python 3.10+, Pillow, NumPy, opencv-python, curl). `python art/build.py astrolabe luke`
+builds only those plates (a plate key, a work key, or a prefix such as `frieze`); `ASTEN_ART_CACHE=/some/dir` moves the
+download cache.
+
+Licences. Met, Cleveland, Yale, National Gallery of Art and British Library images are released by the holder under
+Creative Commons Zero; the Met API field `isPublicDomain` is checked before any Met download. The others are in the public
+domain by age, and Wikimedia Commons marks each as public domain; where a library or museum made the scan, it is named in
+the table and claims no right over a faithful reproduction.
+
+## Works
+
+"""
+
+SOURCES_FONTS = """
+## Fonts
+
+| Font | Copyright | Licence |
+| --- | --- | --- |
+| Caveat (the margin hand) | (c) 2014 The Caveat Project Authors, Impallari Type for Google Fonts | SIL Open Font License 1.1 |
+
+The other fonts (Fraunces, Literata, IBM Plex Mono, Noto Sans Egyptian Hieroglyphs) are listed on `/credits`.
+
+## What the build does
+
+One grade for the whole set (`grade()` in `build.py`): the highlights are gained toward a warm paper light, saturation is
+eased to 0.85 to 0.95, the blacks are lifted a little (a matte), and the cast is warmed. The goal is one lighting
+temperature across a Hudson River sky, a New Kingdom papyrus, a Roman lamp, an 1809 engraving and a faience water clock.
+
+Shapes (`shape` in `plates.json`):
+
+- `torn`: a deckled rectangle. Each side wanders by fractal noise (`torn_alpha`) and the last pixels of the edge are blended
+  toward bare paper. Seeds are fixed, so the same tear comes out every build.
+- `arch`: a round-topped window with the same torn foot (`arch_alpha`).
+- `band`: a wide torn strip, used as a banner or a frieze detail.
+- `cut`: the object alone. The studio backdrop is modelled per row from the left and right margins, GrabCut settles the
+  uncertain band (`studio_cut`), the largest component is kept, the matte is feathered and shrunk 2 px, and a quadrant-mean
+  (Kuwahara) smoothing is blended in so the photograph sits with the paintings.
+- Frieze series (`frieze-01` to `frieze-13`) are windows along the Tomb of Menna facsimile, two rows of seven and six.
+
+Engravings and prints (`tone` in `plates.json`) are re-toned: ink to a warm brown, paper to the site's cream.
+
+Four assets are made by hand-written builders because they need hand-placed cuts:
+
+| Output | From | Treatment |
+| --- | --- | --- |
+| `hero-window.webp` | `kensett`, `sargent` | A portrait slice of the sky down past its gold band; Sargent's cliffs with their own sky removed (flood-filled from the top plus one hand-drawn polygon over the hazy valley, edge feathered 2.6 px); a horizon glow and a low vignette; Kuwahara radius 2 blended 55%; grade; fine grain. |
+| `thoth.webp` | `hunefer` | Thoth is cut along his own ink outline: pixels close to the papyrus ground, not enclosed by a dark outline and connected to the border, are background; the gap between the legs and the neighbouring figures are removed with hand-placed polygons; the figure is enlarged 2.2x, smoothed and re-sharpened on the ink line; feathered 1.5 px and shrunk 1 px so no ground colour rims the edge. |
+| `plate-ibis.webp` | `ibis` | The black ibis is removed by painting over the largest dark connected component with the plate's own margin colour; the engraving is re-toned to the site's paper; torn edge. |
+| `grain.webp` | none (procedural) | A 128 px seamless paper-fibre tile: four octaves of Gaussian noise and seventy short fibres, dark specks and pale fibres as a low-alpha overlay. |
+"""
+
+
+def write_sources(specs: list[dict], pages: dict) -> None:
+    """Regenerate art/SOURCES.md: the works table and the plates table come from the JSON, so they cannot drift."""
+    used_on: dict[str, list[str]] = {}
+    for path, pp in pages.items():
+        used_on.setdefault(pp["plate"], []).append(path)
+    lines = [SOURCES_HEAD, "| Key | Work | Maker and date | Holding institution and object | Licence | Source |", "| --- | --- | --- | --- | --- | --- |"]
+    for key, w in WORKS.items():
+        medium = f", {w['medium']}" if w.get("medium") else ""
+        lines.append(f"| `{key}` | *{w['title']}*{medium} | {w['by']}, {w['date']} | {w['where']} | {w['licence']} | {w['href']} |")
+    lines.append(SOURCES_FONTS)
+    lines += ["", "## Plates", "", "| File | Work | Shape | Crop | Width | Shown on |", "| --- | --- | --- | --- | --- | --- |"]
+    for sp in specs:
+        f = OUT / f"plate-{sp['key']}.webp"
+        kb = f"{f.stat().st_size / 1024:.0f} KB" if f.exists() else "not built"
+        crop = "none" if not sp.get("crop") else ", ".join(f"{v:.2f}" for v in sp["crop"])
+        shown = ", ".join(f"`{x}`" for x in used_on.get(sp["key"], [])) or "Home"
+        lines.append(f"| `plate-{sp['key']}.webp` ({kb}) | `{sp['work']}` | {sp.get('shape', 'torn')} | {crop} | {sp.get('width', '')} | {shown} |")
+    SOURCES_MD.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
+    print("art/SOURCES.md written")
+
+
+CUSTOM = {
+    "hero": (build_hero, "hero-window.webp"),
+    "thoth": (build_thoth, "thoth.webp"),
+    "ibis": (build_ibis, "plate-ibis.webp"),
+    "grain": (build_grain, "grain.webp"),
 }
 
+
+def write_manifest(specs: list[dict], pages: dict) -> None:
+    """Everything the site needs to show the art: sizes from the built files, labels, credits, page map."""
+    plates: dict[str, dict] = {}
+    for sp in specs:
+        f = OUT / f"plate-{sp['key']}.webp"
+        if not f.exists():
+            continue
+        with Image.open(f) as im:
+            w, h = im.size
+        plates[sp["key"]] = {
+            "src": f"/art/plate-{sp['key']}.webp",
+            "width": w,
+            "height": h,
+            "bytes": f.stat().st_size,
+            "shape": sp.get("shape", "torn"),
+            "works": sp.get("works") or [sp["work"]],
+            "label": sp["label"],
+            "alt": sp["alt"],
+        }
+    doc = {"_note": "Generated by art/build.py from works.json and plates.json. Do not edit.", "works": {k: {kk: vv for kk, vv in v.items() if kk != "source"} for k, v in WORKS.items()}, "plates": plates, "pages": pages}
+    MANIFEST.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(f"manifest: {len(plates)} plates, {len(WORKS)} works")
+
+
 if __name__ == "__main__":
-    wanted = sys.argv[1:] or list(ASSETS)
-    for key in wanted:
-        if key not in ASSETS:
-            raise SystemExit(f"unknown asset {key!r}; choose from {', '.join(ASSETS)}")
-        ASSETS[key]()
+    specs, pages = load_specs()
+    by_key = {sp["key"]: sp for sp in specs}
+    names = sys.argv[1:]
+    todo_custom = [n for n in CUSTOM if not names or n in names]
+    def wanted(sp: dict) -> bool:
+        return not names or any(sp["key"] == n or sp["key"].startswith(n + "-") or sp["work"] == n for n in names)
+
+    todo_plates = [sp for sp in specs if not sp.get("custom") and wanted(sp)]
+    unknown = [n for n in names if n not in CUSTOM and n not in WORKS and not any(k == n or k.startswith(n + "-") for k in by_key)]
+    if unknown:
+        raise SystemExit(f"unknown {unknown}; choose from {', '.join([*CUSTOM, *by_key])}")
+    for n in todo_custom:
+        CUSTOM[n][0]()
+    for sp in todo_plates:
+        build_plate(sp)
+    write_manifest(specs, pages)
+    write_sources(specs, pages)
