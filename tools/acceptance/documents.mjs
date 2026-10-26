@@ -74,7 +74,7 @@ try {
 
   // ── incremental: a canon fact, a contradicting sentence, one block re-perceived ──
   const entity = await api.post(`/projects/${project.id}/entities`, { kind: "character", name: "Elizabeth", aliases: ["Lizzy"], notes: "" });
-  await api.post(`/projects/${project.id}/facts`, { entity_key: "elizabeth", predicate: "eye_color", value: "dark", status: "confirmed" });
+  await api.post(`/projects/${project.id}/facts`, { entity_key: "elizabeth", predicate: "eye_color", value: "brown", status: "confirmed" });
   const chapter = await api.get(`/projects/${project.id}/documents/${chapters[4].id}`);
   const sentence = "Elizabeth lifted her head, and her green eyes were bright with anger.";
   const edited = structuredClone(chapter.content_json);

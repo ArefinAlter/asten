@@ -86,6 +86,8 @@ fn off(start: &BytesStart) -> bool {
 struct Styles {
     /// styleId to (lower-case name, basedOn)
     by_id: HashMap<String, (String, Option<String>)>,
+    /// styleId to the numbering the style itself carries (Word's List Bullet).
+    numbered: HashMap<String, String>,
 }
 
 impl Styles {
@@ -100,6 +102,13 @@ impl Styles {
                 Ok(Event::Start(e)) | Ok(Event::Empty(e)) => {
                     let local = e.local_name().as_ref().to_owned();
                     match local.as_str() {
+                        "numId" if current.is_some() => {
+                            if let (Some(id), Some(num)) = (current.clone(), attr(&e, "val")) {
+                                if num != "0" {
+                                    styles.numbered.insert(id, num);
+                                }
+                            }
+                        }
                         "style" => {
                             current = attr(&e, "styleId");
                             name.clear();
@@ -122,6 +131,22 @@ impl Styles {
             }
         }
         styles
+    }
+
+    /// The numbering a style carries, itself or through the styles it is based on.
+    fn numbering_of(&self, id: &str) -> Option<String> {
+        let mut next = Some(id.to_owned());
+        for _ in 0..6 {
+            let current = next.take()?;
+            if let Some(num) = self.numbered.get(&current) {
+                return Some(num.clone());
+            }
+            next = self
+                .by_id
+                .get(&current)
+                .and_then(|(_, based)| based.clone());
+        }
+        None
     }
 
     /// The style's own name and those it is based on, nearest first.
@@ -266,6 +291,8 @@ struct Para {
     style: Vec<String>,
     outline: Option<u8>,
     num: Option<String>,
+    /// Numbering that comes from the paragraph's style rather than the paragraph.
+    style_num: Option<String>,
     /// Characters so far, for comment offsets.
     chars: u32,
 }
@@ -339,6 +366,7 @@ impl Parser<'_> {
             "pStyle" if self.in_ppr && self.change == 0 => {
                 if let (Some(para), Some(id)) = (self.para.as_mut(), attr(e, "val")) {
                     para.style = self.styles.names(&id);
+                    para.style_num = self.styles.numbering_of(&id);
                 }
             }
             "outlineLvl" if self.in_ppr && self.change == 0 => {
@@ -564,9 +592,25 @@ impl Parser<'_> {
             self.blocks.push(Block::SceneBreak);
             return;
         }
-        if let Some(num) = &para.num {
+        // A list item by its own numbering, its style's numbering, or the name
+        // of a style Word ships ("List Bullet", "List Number").
+        let by_name = para.style.iter().find_map(|name| {
+            if name.starts_with("list bullet") {
+                Some("style:bullet".to_owned())
+            } else if name.starts_with("list number") {
+                Some("style:number".to_owned())
+            } else {
+                None
+            }
+        });
+        let list_num = para.num.clone().or(para.style_num.clone()).or(by_name);
+        if let Some(num) = &list_num {
             self.close_quote();
-            let ordered = self.numbering.get(num).copied().unwrap_or(false);
+            let ordered = match num.as_str() {
+                "style:bullet" => false,
+                "style:number" => true,
+                other => self.numbering.get(other).copied().unwrap_or(false),
+            };
             let item = vec![Block::Paragraph(inlines)];
             match &mut self.pending_list {
                 Some((existing, items)) if *existing == ordered => items.push(item),
@@ -864,6 +908,25 @@ mod tests {
         let imported = read(docx(&document, STYLES, None)).unwrap();
         assert!(matches!(&imported.blocks[0], Block::List { items, .. } if items.len() == 2));
         assert_eq!(block_text(&imported.blocks[1]), "shown");
+    }
+
+    #[test]
+    fn a_list_whose_numbering_lives_in_its_style_is_a_list() {
+        let styles = "<w:styles xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:style w:styleId=\"ListBullet\"><w:name w:val=\"List Bullet\"/><w:pPr><w:numPr><w:numId w:val=\"7\"/></w:numPr></w:pPr></w:style><w:style w:styleId=\"ListNumber\"><w:name w:val=\"List Number\"/></w:style></w:styles>";
+        let document = format!(
+            "<w:document {W}><w:body>\
+<w:p><w:pPr><w:pStyle w:val=\"ListBullet\"/></w:pPr><w:r><w:t>Rope</w:t></w:r></w:p>\
+<w:p><w:pPr><w:pStyle w:val=\"ListBullet\"/></w:pPr><w:r><w:t>Lantern</w:t></w:r></w:p>\
+<w:p><w:pPr><w:pStyle w:val=\"ListNumber\"/></w:pPr><w:r><w:t>First</w:t></w:r></w:p>\
+</w:body></w:document>"
+        );
+        let imported = read(docx(&document, styles, None)).unwrap();
+        assert!(
+            matches!(&imported.blocks[0], Block::List { ordered: false, items } if items.len() == 2)
+        );
+        assert!(
+            matches!(&imported.blocks[1], Block::List { ordered: true, items } if items.len() == 1)
+        );
     }
 
     #[test]

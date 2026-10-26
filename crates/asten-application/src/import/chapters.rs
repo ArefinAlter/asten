@@ -83,7 +83,12 @@ pub(crate) fn split(blocks: &[Block], comments: &[ImportedComment], mode: Mode) 
     let mut parts = Vec::new();
     let first = starts[0];
     let front: Vec<Block> = blocks[..first].to_vec();
-    if front.iter().any(|b| !block_text(b).trim().is_empty()) {
+    // Only headings before the chapters (a title, the manuscript's name) are a
+    // title, not a front-matter document.
+    let mut title_from_front = None;
+    if !front.is_empty() && front.iter().all(|b| matches!(b, Block::Heading(..))) {
+        title_from_front = Some(heading_title(&front[0]));
+    } else if front.iter().any(|b| !block_text(b).trim().is_empty()) {
         parts.push(Part {
             title: "Front matter".into(),
             blocks: front,
@@ -123,7 +128,7 @@ pub(crate) fn split(blocks: &[Block], comments: &[ImportedComment], mode: Mode) 
     }
     // A heading at the very top with nothing under it is the book's title,
     // not a chapter.
-    let mut title = None;
+    let mut title = title_from_front;
     if starts[0] == 0 && parts.first().is_some_and(|p| p.blocks.is_empty()) && parts.len() > needed
     {
         let first = parts.remove(0);
@@ -185,6 +190,23 @@ mod tests {
         let split = split(&blocks, &[], Mode::Auto).unwrap();
         assert_eq!(split.title.as_deref(), Some("The Salt Road"));
         assert_eq!(split.parts.len(), 3);
+    }
+
+    #[test]
+    fn headings_alone_before_the_chapters_are_a_title_not_a_document() {
+        let blocks = vec![
+            heading(1, "The Salt Road"),
+            heading(2, "One"),
+            para("a"),
+            heading(2, "Two"),
+            para("b"),
+            heading(2, "Three"),
+            para("c"),
+        ];
+        let split = split(&blocks, &[], Mode::Auto).unwrap();
+        assert_eq!(split.title.as_deref(), Some("The Salt Road"));
+        assert_eq!(split.parts.len(), 3);
+        assert_eq!(split.parts[0].title, "One");
     }
 
     #[test]
