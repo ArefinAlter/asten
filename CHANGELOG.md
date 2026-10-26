@@ -7,6 +7,65 @@ major version is 0, a minor version may change behaviour.
 
 ## [Unreleased]
 
+## [0.0.1-beta] - 2026-10-26
+
+Tagged `v0.0.1b`, the second public pre-release (pre-alpha). The desktop app is
+now complete standalone software for writers, with an optional assistant that
+uses a model of the writer's choosing.
+
+### Added
+
+- The assistant (D30): `crates/asten-assistant`, wired into the desktop shell
+  by `ai_*` commands. Providers: Anthropic Messages; the OpenAI Chat
+  Completions family (OpenAI, Mistral, DeepSeek, Qwen, Kimi, GLM, Ollama and
+  any OpenAI-compatible endpoint); Google Gemini. Streaming, tool calling
+  (with a JSON fallback for models without it), retries with backoff,
+  cancellation, size limits, no redirects. Keys live in the operating
+  system's credential store or an encrypted file (Argon2id, ChaCha20-Poly1305)
+  and never reach the page, logs, errors, exports or the ledger. Consent per
+  provider, tied to the host and a notice version; offline mode; spend
+  ledger and caps (zero means no call); the exact request can be read first
+  (the builder is the sender's own, with the key as a placeholder); manuscript
+  wording is excluded unless the writer attaches a passage. The tool table is
+  closed (ten tools that read or prepare, five closed by rule); a request for
+  prose is refused before any provider is contacted, the system prompt and the
+  tool gate say it again, and a reply that reads like new narrative is
+  withheld.
+- Importers that read structure (D32): Markdown, plain text, HTML and Word
+  into a block model; Word tracked changes become marks and comments keep
+  their ranges; long files with chapter headings arrive as a manuscript with
+  a document per chapter (`split`: `auto`, `chapters`, `none`). Compile writes
+  the same formatting back: Word with real styles, lists and revisions, HTML
+  with its emphasis.
+- A project file (`.asten`, D31): a project as one JSON file to move to
+  another computer, opened as a new project with fresh ids; project rename and
+  delete.
+- Library backups and restore (D31): on demand and at launch (the newest seven
+  kept), a copy saved anywhere, and a validated restore that swaps at the next
+  launch and keeps the library it replaced. Native save dialogs for files the
+  writer names (`save_file`).
+- Asten's own mark in every application icon (the Palette on the day page
+  colour, drawn by `apps/www/scripts/app-icons.mjs`): desktop, installer and
+  uninstaller (with a header and a side picture for the wizard), web app,
+  favicon, Word add-in and Android. They had been the brown "M" placeholder.
+- Acceptance scripts under `tools/acceptance/` that drive the real desktop
+  window with a scratch profile (see `docs/ACCEPTANCE-0.0.1b.md`).
+
+### Changed
+
+- D6 is amended by D30: keys, provider calls, the library and file saving are
+  Tauri commands; the story stays on the HTTP API.
+- One underline extension in the editor (the editor registered it twice).
+
+### Known limits
+
+- The assistant's providers are verified against mock servers that speak each
+  vendor's wire format, not against live services; a live call needs your key.
+- Eye-colour clashes between brown and green are not raised: the colour
+  lattice treats hazel as a neighbour of both (D15 still means no pronoun
+  resolution).
+- The hosted pre-alpha stays on 0.0.1a and has no assistant.
+
 ## [0.0.1-alpha] - 2026-10-25
 
 Tagged `v0.0.1a`, the first public pre-release (pre-alpha).

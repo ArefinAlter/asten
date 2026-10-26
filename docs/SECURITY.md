@@ -232,8 +232,10 @@ changes.
   at 48 MB; the state store caps value size, total size and key count.
 - **What the gateway stores beside the sandboxes** (`/svc/v1/state`): the
   desk's own preferences, assistant threads, console history and layout.
-  Provider keys are never sent to it; on every build they stay in the page's
-  memory (`apps/web/src/workbench/secrets.ts`).
+  Provider keys are never sent to it. The hosted pre-alpha and the browser
+  desk call no provider and keep a typed key in the page's memory only
+  (`apps/web/src/workbench/secrets.ts`); the desktop app keeps keys in the shell
+  (see "The assistant").
 - **No egress.** The gateway container sits on a Docker network with no route
   out; only a forwarding nginx container is reachable, on loopback, behind the
   host's TLS nginx with request-rate and body-size limits. Compile, import and
@@ -246,6 +248,47 @@ changes.
 The gateway's own tests (`services/asten-prealpha/tests/gateway.rs`) cover
 isolation between visitors, the origin rule, the quotas, the state limits,
 sign-out recovery and expiry.
+
+## The assistant (desktop)
+
+Release 0.0.1b (D30). Everything below happens in the desktop shell's Rust
+process (`crates/asten-assistant`, the `ai_*` commands); the webview has no
+permission to reach a provider and its content-security policy still allows
+only loopback.
+
+- **Keys.** Typed once into `ai_set_key` and never returned. Stored in the
+  operating system's credential store (Windows Credential Manager, the Secret
+  Service, the Keychain) or, where none exists, in a file sealed with
+  Argon2id and ChaCha20-Poly1305 that the writer unlocks with a passphrase.
+  Held in zeroizing types with no `Serialize`; they never appear in logs,
+  events, errors, exports, the ledger or the exact-request preview (which shows
+  a placeholder). Tests plant `ZEUS-CANARY-` style markers and search every
+  output.
+- **Where requests go.** Only to the endpoint of a provider the writer enabled
+  and consented to: HTTPS everywhere, plain HTTP only to a loopback address;
+  userinfo, query strings and fragments in an endpoint are refused; redirects
+  are not followed, so a key cannot follow one; size caps and idle timeouts
+  apply to bodies and streams.
+- **Consent.** Per provider, tied to the host and a notice version; a different
+  host or a new notice asks again. The master switch is off by default;
+  offline mode allows only loopback providers; a cap of zero means no call.
+- **What is sent.** The writer's question and the thread, the fixed
+  instructions, the tool definitions, and what the tools return. Manuscript
+  wording is excluded unless the writer attaches a passage; wording quoted in
+  a mark is withheld unless that mark is attached. The preview is produced by
+  the same builder as the sender and carries the SHA-256 of the body it shows.
+- **What it cannot do.** The tool table is closed: ten tools read or prepare
+  (explain a mark, search, summarise a source, propose a fact for the writer
+  to confirm) and five are closed by rule (anything that would edit the
+  manuscript, confirm canon, change settings, run a command or decide an
+  approval). An invented or closed tool name is refused and shown. A request
+  for prose is refused before any provider is contacted (a classifier), the
+  system prompt says it again, the tool gate says it a third time, and an
+  output guard withholds a reply that reads like new narrative. Tests drive
+  mock providers that try to comply.
+- **Not covered.** What a provider does with text it receives is governed by
+  that provider's terms. The adapters are tested against mock servers, not
+  live services.
 
 ## Dependencies
 

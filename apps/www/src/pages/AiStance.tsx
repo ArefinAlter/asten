@@ -10,16 +10,17 @@ const rules = [
   { title: "Proposals only", text: "AI may propose a fact, a link, or an explanation. Nothing it suggests becomes canon until you confirm it." },
   { title: "Evidence attached", text: "Every proposal cites the sentence it came from, so you can check it." },
   { title: "Local first", text: "Where a model is practical on your own machine, that is the default." },
-  { title: "Your provider and key", text: "If you choose a cloud model, you choose the provider, you hold the key, and Asten tells you plainly what will be sent." },
+  { title: "Your provider and key", text: "If you choose a cloud model, you choose the provider, you hold the key (kept in your operating system’s credential store, never in the page), and you consent to that provider before anything is sent." },
+  { title: "You can read the request", text: "Before a request leaves, Asten shows it exactly as the provider will receive it, with your key replaced by a placeholder. Your manuscript’s wording is left out unless you pick a passage." },
   { title: "A full switch-off", text: "AI features can be switched off completely. Asten remains a full desk and a full compiler without them." },
   { title: "No training on manuscripts", text: "Your manuscript is never used to train any model, by Verne or anyone Verne works with." },
 ];
 
 const faqs: QA[] = [
-  { q: "Does Asten use AI today?", a: "No. Asten runs no AI model today, local or remote. Its continuity checks are deterministic rules over facts you confirm." },
+  { q: "Does Asten use AI?", a: "Only if you ask it to. Asten’s continuity checks run no model: they are deterministic rules over facts you confirm. Release 0.0.1b adds an optional assistant to the desktop app that can use a model you choose. It is off by default, local models come first, a cloud provider needs your own key and your consent, and one switch turns it all off. The [AI policy](/ai-policy) says exactly what is sent, when, and to whom." },
   { q: "Why would a writing app refuse to write?", a: "Because the writing is the part that makes the work yours. Asten aims at the part writers find tedious: remembering hundreds of settled details and noticing when a page drifts from them." },
-  { q: "Can I use ChatGPT or Claude with Asten?", a: "You can use any assistant you like alongside Asten. Asten doesn’t connect to them and won’t send them your manuscript. What you paste into another tool is governed by that tool’s terms." },
-  { q: "Will Asten’s future AI features cost money?", a: "Pricing hasn’t been decided. The commitments on this page don’t depend on price: proposals only, local first, your key, a full switch-off, and no training on manuscripts." },
+  { q: "Can I use ChatGPT or Claude with Asten?", a: "In the desktop app, yes, with your own account: the assistant can call OpenAI, Anthropic, Google Gemini, Mistral, DeepSeek, Qwen, Kimi, GLM, a model on your own machine through Ollama, or any OpenAI-compatible endpoint you enter. You choose the provider, you hold the key, you consent to that provider, and you can read the exact request before it is sent. The assistant never writes your prose. What you paste into other tools is governed by their terms." },
+  { q: "Does the assistant cost money?", a: "Asten has nothing to buy, and pricing hasn’t been decided. If you use a cloud provider, that provider bills your own account; Asten keeps a local spend ledger and lets you set a cap, and a cap of zero means no call at all. The commitments on this page don’t depend on price." },
 ];
 
 export function AiStance() {
@@ -27,13 +28,13 @@ export function AiStance() {
     <>
       <PageHero
         title="Asten and AI"
-        lede="Asten does not write prose and runs no AI model. This page describes what Asten does today and the conditions any future AI feature has to meet."
+        lede="Asten does not write prose. Its checks run no model. An optional assistant can use a model you choose, under the conditions this page states."
       />
 
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
           <div data-reveal>
-            <Answer text="Asten never generates prose and never trains on manuscripts. Today it runs no AI model at all; its checks are deterministic rules. Planned AI features will only propose facts with cited evidence for the author to confirm, will run locally where practical, will use the author’s own provider and key otherwise, and can be switched off entirely." />
+            <Answer text="Asten never generates prose and never trains on manuscripts. Its checks run no model; they are deterministic rules. The optional assistant in release 0.0.1b explains marks, searches your canon and proposes facts with cited evidence for you to confirm; it runs a model locally where you have one, uses your own provider and key otherwise, only with your consent, and can be switched off entirely." />
           </div>
         </div>
       </section>
@@ -66,13 +67,13 @@ export function AiStance() {
         <div className="wrap">
           <SectionHead
             id="today-h"
-            title="No model runs inside Asten."
+            title="No model runs inside the checks."
             text="Every mark comes from a deterministic rule with a stable code. The same project produces the same marks, and no network is involved."
           />
           <div className="card-grid card-grid--3">
             {[
               { title: "Deterministic", text: "Rules you can read and test, from CANON-E013 to CANON-E601, and perception that is dictionaries and cues, not a model." },
-              { title: "Offline", text: "Everything runs on your machine. Nothing is sent anywhere." },
+              { title: "Offline by default", text: "Everything runs on your machine. The only things that leave it are a request you send from the assistant to a provider you chose and consented to, and the update check when you press it." },
               { title: "Explainable", text: "Every mark points to evidence: the settled fact and the page that disagrees." },
             ].map((item, i) => (
               <div key={item.title} className="card" data-reveal style={{ "--d": i } as CSSProperties}>
@@ -88,8 +89,8 @@ export function AiStance() {
         <div className="wrap">
           <SectionHead
             id="rules-h"
-            title="Conditions for any future AI feature"
-            text="These are commitments, written down before the features exist, so they shape the features rather than the other way round."
+            title="The conditions every AI feature meets"
+            text="These commitments were written down before the features existed, so they shaped the features rather than the other way round."
           />
           <ol className="rules">
             {rules.map((rule, i) => (

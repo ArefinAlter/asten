@@ -48,7 +48,7 @@ function application(): Node {
     applicationCategory: "UtilitiesApplication",
     applicationSubCategory: "Creative writing software",
     operatingSystem: "Windows 10 and 11 (x64), Linux (x86_64); a hosted copy in the browser",
-    softwareVersion: "0.0.1a (pre-alpha)",
+    softwareVersion: "0.0.1b (pre-alpha)",
     downloadUrl: release.releaseUrl,
     releaseNotes: release.releaseUrl,
     image: `${site.origin}/og/home.png`,

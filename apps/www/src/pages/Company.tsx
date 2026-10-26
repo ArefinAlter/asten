@@ -89,7 +89,7 @@ export function About() {
                 </tr>
                 <tr>
                   <th scope="row">Status</th>
-                  <td>Pre-alpha (release 0.0.1a, Windows and Linux)</td>
+                  <td>Pre-alpha (release 0.0.1b, Windows and Linux)</td>
                 </tr>
                 <tr>
                   <th scope="row">Contact</th>
@@ -202,7 +202,7 @@ export function Contact() {
           <Wedjat />
           <div>
             <h2>Try the pre-alpha</h2>
-            <p>Open it in your browser, or download release 0.0.1a for Windows or Linux. No form to fill in.</p>
+            <p>Open it in your browser, or download release 0.0.1b for Windows or Linux. No form to fill in.</p>
           </div>
           <a className="btn btn--primary" href={release.hostedUrl} data-magnetic>
             Try the pre-alpha

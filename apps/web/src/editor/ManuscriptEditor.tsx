@@ -142,7 +142,10 @@ export function ManuscriptEditor({
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit.configure({ heading: { levels: [1, 2, 3] }, underline: false }),
+      StarterKit.configure({
+        heading: { levels: [1, 2, 3] },
+        underline: false,
+      }),
       Placeholder.configure({ placeholder: "The sentence stays yours." }),
       CharacterCount,
       Underline,

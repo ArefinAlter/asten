@@ -257,7 +257,7 @@ export const article: Article = {
           kind: "callout",
           tone: "rubric",
           title: "What a mark does",
-          text: "Marks point at a sentence and the settled fact it disagrees with. They never rewrite it. No AI model runs in Asten today; the checks are deterministic rules over facts you confirm.",
+          text: "Marks point at a sentence and the settled fact it disagrees with. They never rewrite it. No AI model runs in the checks; they are deterministic rules over facts you confirm.",
         },
       ],
     },

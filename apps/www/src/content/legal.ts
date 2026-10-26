@@ -27,6 +27,7 @@ export const legalDocs: LegalDoc[] = [
     ...legalIndex["/privacy"]!,
     summary: [
       "In the desktop app, your manuscript stays in a SQLite file on your computer. Verne never receives it, and Asten has no account, no sync, and no telemetry.",
+      "The desktop app has an optional assistant, off by default. If you switch it on, choose a provider and consent, each message you send goes from your computer straight to that provider and nowhere else. See What the assistant sends.",
       "This website sets no cookies and runs no analytics or ads. Vercel, the host, processes ordinary request data to deliver pages and keep the site safe.",
       "The hosted pre-alpha, if you open it, keeps what you type in a private sandbox on a server Verne runs, under one session cookie, and deletes it all 24 hours after your first visit.",
       "If you email Verne, your address and message are used to reply, then deleted within 24 months unless the conversation continues.",
@@ -48,6 +49,42 @@ export const legalDocs: LegalDoc[] = [
           {
             kind: "p",
             text: "Verne has not appointed an EU or UK representative. You can reach Verne about anything in this policy at [info@vernesystems.com](mailto:info@vernesystems.com). Company details are published at [vernesystems.com/legal/company](https://vernesystems.com/legal/company).",
+          },
+        ],
+      },
+      {
+        id: "the-assistant",
+        heading: "What the assistant sends",
+        blocks: [
+          {
+            kind: "p",
+            text: "Release 0.0.1b has an optional assistant in the desktop app. It is off by default, and with it off the desktop app sends nothing to any AI service. The hosted pre-alpha and the browser desk have no such feature and call no provider.",
+          },
+          {
+            kind: "p",
+            text: "**When.** Only when you press send in the assistant panel, and only after you have turned on AI providers, enabled one provider, entered your own key (for a cloud provider), and consented to that provider. Consent is tied to the provider’s address: if the address changes, Asten asks again. A cap of zero means no call, and offline mode allows only a model on your own machine.",
+          },
+          {
+            kind: "p",
+            text: "**To whom.** Only to the provider you chose, directly from your computer over an encrypted connection (plain HTTP only to a model on your own machine). The built-in choices are OpenAI (api.openai.com), Anthropic (api.anthropic.com), Google Gemini (generativelanguage.googleapis.com), Mistral (api.mistral.ai), DeepSeek (api.deepseek.com), Qwen (dashscope-intl.aliyuncs.com), Kimi (api.moonshot.ai), GLM (open.bigmodel.cn), Ollama on your machine (127.0.0.1), or an OpenAI-compatible address you enter. Nothing goes to Verne, and Asten refuses redirects so a key cannot follow one to another site.",
+          },
+          {
+            kind: "p",
+            text: "**What.** Your question and the conversation so far, the assistant’s fixed instructions, the names of the tools it may use, and what those tools return when it uses them: a mark’s code and explanation, settled facts, cast entries, page titles, source summaries. Your manuscript’s wording is left out unless you pick a passage to share, and wording quoted inside a mark is left out unless you attach that mark. Your key is never part of what is sent to a model; it travels only as the provider’s authentication header.",
+          },
+          {
+            kind: "p",
+            text: "**See it first.** Before sending, you can open the exact request, with your key shown as a placeholder. Every call is also written to a spend ledger on your computer (time, provider, model, token counts, cost estimate), which Verne never sees.",
+          },
+          {
+            kind: "p",
+            text: "**Your key.** Asten keeps it in your operating system’s credential store (Windows Credential Manager, the Secret Service, the Keychain) or, where there is none, in an encrypted file you unlock with a passphrase. The page you see never receives it back, and it does not appear in logs, errors, exports or the ledger.",
+          },
+          {
+            kind: "callout",
+            tone: "note",
+            title: "What the provider does with it",
+            text: "Once a request reaches a provider you chose, that provider’s own terms and privacy policy govern it. Verne is not a party to that and cannot see it. Read the provider’s terms before you switch it on, and use a provider whose terms you accept for the passages you choose to share.",
           },
         ],
       },
@@ -296,7 +333,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "Apart from the Office.js request the Word task pane must make, Asten sends nothing off your computer today. If a future feature would send any data anywhere, for example to an AI provider you choose, the product will say so in the interface before that feature sends anything. Updating this page alone will never be treated as enough. See the [AI policy](/ai-policy).",
+            text: "Apart from the Office.js request the Word task pane must make, the update check when you press it, and the assistant’s requests to a provider you chose and consented to (see [what the assistant sends](#the-assistant)), Asten sends nothing off your computer. If a future feature would send any other data anywhere, the product will say so in the interface before that feature sends anything. Updating this page alone will never be treated as enough. See the [AI policy](/ai-policy).",
           },
         ],
       },
@@ -363,7 +400,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Asten is in early development. Release 0.0.1a is a public pre-alpha: anyone may download the desktop builds or open the hosted copy.",
+            text: "Asten is in early development. Release 0.0.1b is a public pre-alpha: anyone may download the desktop builds or open the hosted copy.",
           },
           {
             kind: "list",
@@ -449,7 +486,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Some parts of Asten work alongside services Verne does not control: Microsoft Word and Office.js for the Word task pane, Google Docs and Apps Script for the Docs sidebar, and Vercel, which hosts this website. Your use of those services is governed by their own terms and privacy policies, and Verne is not responsible for them.",
+            text: "Some parts of Asten work alongside services Verne does not control: Microsoft Word and Office.js for the Word task pane, Google Docs and Apps Script for the Docs sidebar, any AI provider you connect to the assistant with your own key, and Vercel, which hosts this website. Your use of those services is governed by their own terms and privacy policies, and Verne is not responsible for them.",
           },
         ],
       },
@@ -731,7 +768,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Asten is in early development, and release 0.0.1a is a pre-alpha. A build may stop running, may change between versions, and may be replaced or withdrawn. Verne has no obligation to provide updates, support, or any particular feature.",
+            text: "Asten is in early development, and release 0.0.1b is a pre-alpha. A build may stop running, may change between versions, and may be replaced or withdrawn. Verne has no obligation to provide updates, support, or any particular feature.",
           },
           {
             kind: "p",
@@ -880,9 +917,9 @@ export const legalDocs: LegalDoc[] = [
   {
     ...legalIndex["/ai-policy"]!,
     summary: [
-      "Asten does not run any AI model today, local or cloud. Its checks are deterministic rules over facts you confirm.",
-      "If AI features arrive, they will only propose. They will never write your prose or change your canon without you.",
-      "Your manuscript will never be used to train a model, by Verne or by any provider Verne chooses.",
+      "Asten’s checks run no AI model, local or cloud. They are deterministic rules over facts you confirm.",
+      "Release 0.0.1b adds an optional assistant to the desktop app. It is off by default, local models come first, a cloud provider needs your own key and your consent, and one switch turns it all off. It only explains, searches and proposes. It never writes your prose or changes your canon without you.",
+      "What is sent, when, and to whom is stated below. Your manuscript is never used to train a model, by Verne or by any provider Verne chooses.",
       "Asten will tell you in the interface before this policy changes.",
     ],
     sections: [
@@ -892,11 +929,11 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Asten does not run any AI model, on your computer or in the cloud. When Asten marks that Mira’s hair is black in chapter 14 after chapter 2 settled it as auburn, that mark comes from a deterministic rule comparing facts you confirmed. The same project gives the same result every time.",
+            text: "Asten’s checks do not run any AI model, on your computer or in the cloud. When Asten marks that Mira’s hair is black in chapter 14 after chapter 2 settled it as auburn, that mark comes from a deterministic rule comparing facts you confirmed. The same project gives the same result every time.",
           },
           {
             kind: "p",
-            text: "Release 0.0.1a lets you enter AI provider settings, off by default, but calls none of them. The assistant panel answers from Asten’s own tools and never writes prose.",
+            text: "Release 0.0.1b adds an optional assistant to the desktop app. The assistant panel answers from Asten’s own tools by default. If you turn on AI providers, choose one, and consent, it can also call that provider’s model to explain a mark, search your canon, summarise a source, or propose a fact for you to confirm. It has ten tools that read or prepare and no tool that edits your manuscript; a request to write, rewrite or continue prose is refused before any provider is contacted, and a reply that reads like new narrative is withheld. [What the assistant sends](/privacy#the-assistant) lists exactly what leaves your computer, when, and to whom.",
           },
           {
             kind: "p",
@@ -906,23 +943,23 @@ export const legalDocs: LegalDoc[] = [
       },
       {
         id: "principles",
-        heading: "Principles for any future AI feature",
+        heading: "Principles every AI feature meets",
         blocks: [
           {
             kind: "p",
-            text: "Verne plans optional assisted features, such as proposing facts from your prose for you to confirm. These are plans, not promises, and none has a date; see the [roadmap](/roadmap). If any AI feature ships, it will follow these principles:",
+            text: "The assistant in release 0.0.1b is the first optional assisted feature. Further ones, such as proposing facts from your prose for you to confirm, are plans, not promises, and none has a date; see the [roadmap](/roadmap). Every AI feature follows these principles:",
           },
           {
             kind: "list",
             items: [
-              "**Editor, not writer.** AI in Asten will never write, rewrite, or continue your prose.",
-              "**Proposals only.** AI output arrives as a proposal in red ink: a suggested fact, a possible contradiction, a question. Nothing takes effect until you accept it.",
-              "**Never silent canon.** An AI proposal never becomes a confirmed fact on its own. Only you can confirm it.",
-              "**Local first.** Deterministic rules come first, then models that run on your computer. Nothing leaves your computer unless you decide it should.",
-              "**Your provider, your key, your consent.** Asten will send text to a cloud AI provider only if you choose that provider, use your own account and key, and explicitly turn the feature on. Whenever a provider is in use, the interface will say which one.",
-              "**A complete switch-off.** You will be able to turn every AI feature off in one place. Off means no model runs and nothing is sent.",
+              "**Editor, not writer.** AI in Asten never writes, rewrites, or continues your prose.",
+              "**Proposals only.** AI output arrives as a proposal: a suggested fact, a possible contradiction, a question. Nothing takes effect until you accept it.",
+              "**Never silent canon.** An AI proposal never becomes a confirmed fact on its own. Only you can confirm it; the assistant has no tool that does.",
+              "**Local first.** Deterministic rules come first, then models that run on your computer (through Ollama or any OpenAI-compatible address on your machine). Nothing leaves your computer unless you decide it should.",
+              "**Your provider, your key, your consent.** Asten sends text to a cloud AI provider only if you choose that provider, use your own account and key, and consent to that provider. Consent is tied to the provider’s address, and the interface shows which provider a request goes to.",
+              "**A complete switch-off.** You can turn every AI feature off in one place (Settings, AI providers, Allow AI providers). Off means no model runs and nothing is sent. Offline mode allows only a model on your own machine, and a spending cap of zero means no call.",
               "**No training on manuscripts, ever.** Your manuscript will never be used to train or improve a model, by Verne or by any provider Verne chooses.",
-              "**You can see what was sent.** Where practical, Asten will offer an audit view of each request: what text left your computer, when, and to which provider.",
+              "**You can see what is sent.** Before a request leaves, you can open it exactly as the provider will receive it, with your key replaced by a placeholder. A local ledger records each call: when, which provider and model, how many tokens, and an estimated cost.",
             ],
           },
           {
@@ -949,7 +986,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "If this policy changes, Asten will tell you in the interface first, and this page will show the new date. Turning on any AI feature will always be your choice.",
+            text: "If this policy changes, Asten will tell you in the interface first, and this page will show the new date. Consent you gave is tied to a version of the notice: a new version asks again. Turning on any AI feature is always your choice.",
           },
           {
             kind: "p",
@@ -1398,7 +1435,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "None. Your manuscript is stored in SQLite on your computer and is never sent to Verne, so no vendor processes it on Verne’s behalf. Asten does not call any AI model or cloud service today. If a future build would send data to a third party, the interface will say so first, and this page will be updated.",
+            text: "None. Your manuscript is stored in SQLite on your computer and is never sent to Verne, so no vendor processes it on Verne’s behalf. The optional assistant in release 0.0.1b can send requests to an AI provider you choose with your own key and consent; that provider acts for you, under your own agreement with it, and Verne receives nothing through it. If a future build would send data to any other third party, the interface will say so first, and this page will be updated.",
           },
         ],
       },
@@ -1575,7 +1612,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "The desk is built on open-source work too. The main components include SQLite (public domain), Tauri (MIT or Apache 2.0), Axum and Tokio (MIT), SQLx (MIT or Apache 2.0), Tiptap and ProseMirror (MIT), and React (MIT). This is not a complete list, and each component’s own license applies.",
+            text: "The desk is built on open-source work too. The main components include SQLite (public domain), Tauri (MIT or Apache 2.0), Axum and Tokio (MIT), SQLx (MIT or Apache 2.0), Tiptap and ProseMirror (MIT), and React (MIT). The assistant adds rustls and ring (Apache 2.0, MIT and ISC-style), reqwest (MIT or Apache 2.0), keyring (MIT or Apache 2.0), and the RustCrypto implementations of Argon2 and ChaCha20-Poly1305 (MIT or Apache 2.0). Importing and exporting Word and Open Packaging files uses quick-xml and zip (MIT). This is not a complete list, and each component’s own license applies.",
           },
         ],
       },

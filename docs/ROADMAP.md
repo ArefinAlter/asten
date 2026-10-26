@@ -28,6 +28,11 @@ No dates. Items move down the page as they ship.
 - Pre-alpha 0.0.1a: unsigned desktop builds for Windows x64 and Linux x64 with
   the `asten-api` runtime, and the hosted pre-alpha (one real API per visitor,
   deleted after 24 hours; D29).
+- Pre-alpha 0.0.1b: the desktop app as complete standalone software: the
+  bring-your-own-key assistant (D30), importers that read structure and split
+  chapters (D32), the project file, library backups and restore (D31),
+  Asten's own mark in every icon, and acceptance runs on the real window
+  (`docs/ACCEPTANCE-0.0.1b.md`).
 
 ## Merged since the first wave (stacked pull requests, merged in order)
 
@@ -57,7 +62,7 @@ All twelve are on `main`; what they added is in the Shipped list above.
 
 - **Signed installers and more platforms.** Add the Windows and Apple
   signing secrets; notarise the macOS build; ship macOS, Windows ARM64 and
-  Linux aarch64 builds alongside the 0.0.1a targets.
+  Linux aarch64 builds alongside the 0.0.1b targets.
 - **Mobile shells tested.** The Android project is committed and builds an
   unsigned APK; it needs a keystore, a device run, and the share-sheet path for
   compile output. The iOS project needs a Mac with Xcode for `tauri ios init`.

@@ -130,7 +130,7 @@ export function Related({ paths, title = "Keep reading" }: { paths: string[]; ti
 
 export function CtaBand({
   title = "Try the pre-alpha",
-  text = "Open the workbench in your browser on a sample novel, or download release 0.0.1a for Windows or Linux.",
+  text = "Open the workbench in your browser on a sample novel, or download release 0.0.1b for Windows or Linux.",
 }: {
   title?: string;
   text?: string;

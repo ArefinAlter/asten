@@ -1,6 +1,6 @@
 # Asten — handoff
 
-Updated 26 October 2026. Asten is a Verne Ltd. product.
+Updated 26 October 2026 (release 0.0.1b). Asten is a Verne Ltd. product.
 
 Local-first writing desk with a canon engine. The manuscript stays in SQLite on
 the machine. Asten may notice a contradiction and explain it. It does not write
@@ -150,8 +150,12 @@ version.
 - Signed installers for Windows, macOS and Linux. The release workflow targets
   the configured desktop platforms on a `v*` tag; installer verification is
   still pending; signing turns on when the Windows and Apple
-  secrets exist (see `docs/PLATFORMS.md`). Release 0.0.1a (Windows x64 and Linux
-  x64) is published unsigned; the download page links it.
+  secrets exist (see `docs/PLATFORMS.md`). Release 0.0.1b (Windows x64 and Linux
+  x64) is published unsigned; the download page links it. The hosted
+  pre-alpha still runs 0.0.1a (rebuilding its image needs the VPS password).
+- Live-provider checks of the assistant: it is tested against mock servers
+  that speak each wire format; run it once with a real key per vendor before
+  calling a provider supported.
 - Mobile shells generated, built and tested on devices (`tauri android init`,
   `tauri ios init` on machines with the SDKs); hardware testing of the ARM
   builds; an ARM runner for the Linux aarch64 release job.

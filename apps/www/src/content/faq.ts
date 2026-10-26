@@ -49,15 +49,23 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Does Asten use AI right now?",
-        a: "No AI model runs in Asten today, local or cloud. Asten reads names and plain attributes from the page with fixed rules, and its checks are deterministic over those readings and the facts you confirm, so the same manuscript and the same canon always produce the same marks. See [Asten and AI](/ai).",
+        a: "Only if you turn it on. The checks run no model: Asten reads names and plain attributes from the page with fixed rules, and its marks are deterministic over those readings and the facts you confirm, so the same manuscript and the same canon always produce the same marks. Release 0.0.1b adds an optional assistant to the desktop app. It is off by default; if you turn it on and choose a provider (a model on your own machine, or a cloud provider with your own key and your consent), it can explain marks, search your canon and propose facts for you to confirm. It never writes or changes your prose. See [Asten and AI](/ai) and the [AI policy](/ai-policy).",
       },
       {
         q: "Will Asten add AI features in the future?",
-        a: "Asten reads the page with fixed rules rather than a model, and it never turns a reading into canon by itself. The roadmap’s later step is small local classifiers that read mentions, attributes, time phrases, and speakers and propose facts: nothing becomes canon until you confirm it. The [AI policy](/ai-policy) sets the conditions for any AI feature: local models first, a cloud provider only with your own key and explicit consent, and a complete switch-off. None of this has a date; see [the roadmap](/roadmap).",
+        a: "The assistant in release 0.0.1b is the first AI feature. The checks themselves still read the page with fixed rules rather than a model, and nothing ever turns a reading into canon by itself. The roadmap’s later step is small local classifiers that read mentions, attributes, time phrases, and speakers and propose facts: nothing becomes canon until you confirm it. The [AI policy](/ai-policy) sets the conditions for any AI feature: local models first, a cloud provider only with your own key and explicit consent, and a complete switch-off. None of this has a date; see [the roadmap](/roadmap).",
       },
       {
         q: "Will my writing be used to train an AI model?",
-        a: "Never: no manuscript written in Asten is used to train any model. Asten doesn’t send your manuscript anywhere, and Verne never receives it. See the [AI policy](/ai-policy).",
+        a: "Never: no manuscript written in Asten is used to train any model. The checks send nothing anywhere, and Verne never receives your manuscript. If you turn on the assistant, a request goes only to the provider you chose, with your manuscript’s wording left out unless you pick a passage; that provider’s own terms then apply to what you sent. See the [AI policy](/ai-policy).",
+      },
+      {
+        q: "What does the assistant send, and when?",
+        a: "Nothing, until you turn on AI providers, choose one, enter your own key (for a cloud provider), consent to that provider, and press send in the assistant panel. A request then goes from your computer straight to that provider’s address over an encrypted connection (plain HTTP only to a model on your own machine), and nowhere else. It holds your question, the assistant’s fixed instructions, the names of the tools it may use, and what those tools return: a mark’s code and explanation, settled facts, cast entries. Your manuscript’s wording is left out unless you pick a passage to share, and the wording quoted inside a mark is left out unless that mark is attached. You can read the exact request, with your key shown as a placeholder, before it is sent. See the [AI policy](/ai-policy).",
+      },
+      {
+        q: "Can the assistant write or change my text?",
+        a: "No. It cannot edit your manuscript: it has ten tools that read or prepare things (explain a mark, search the project, summarise a source, propose a fact for you to confirm) and the tools that would change your text are closed. A request to write, rewrite or continue prose is refused before any provider is contacted, and a reply that reads like new narrative is withheld.",
       },
       {
         q: "How is Asten different from AI writing tools?",
@@ -145,7 +153,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What does Verne receive when I use Asten?",
-        a: "Verne receives nothing from your Asten desk: there is no account, no sync, and no telemetry, and your manuscript never leaves your computer. If you email info@vernesystems.com, Verne receives your address and message and uses them to reply; there is no mailing list. See the [privacy notice](/privacy).",
+        a: "Verne receives nothing from your Asten desk: there is no account, no sync, and no telemetry, and your manuscript stays on your computer. The optional assistant talks to the provider you chose, never to Verne. If you email info@vernesystems.com, Verne receives your address and message and uses them to reply; there is no mailing list. See the [privacy notice](/privacy).",
       },
     ],
   },
@@ -155,7 +163,7 @@ export const faq: FaqGroup[] = [
     items: [
       {
         q: "Can I download Asten?",
-        a: "Yes. Release 0.0.1a, a pre-alpha, is on the [download page](/download) for Windows x64 and Linux x64, and a hosted copy runs in your browser in a private sandbox that is deleted after 24 hours. The installers are not signed yet, so your system warns before the first run. macOS comes later.",
+        a: "Yes. Release 0.0.1b, a pre-alpha, is on the [download page](/download) for Windows x64 and Linux x64, and a hosted copy runs in your browser in a private sandbox that is deleted after 24 hours. The installers are not signed yet, so your system warns before the first run. macOS comes later.",
       },
       {
         q: "How much does Asten cost?",
@@ -163,7 +171,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What platforms does Asten run on?",
-        a: "Release 0.0.1a runs as a desktop app on Windows 10 and 11 (x64) and on Linux x86_64 (Ubuntu 22.04 or newer, or another desktop with WebKitGTK 4.1), and as a hosted copy in any modern browser. The same shell is configured for Windows on ARM, macOS 11 or later and Linux aarch64, but those builds still need building and verifying on hardware; macOS comes later. The desktop app keeps your projects on your machine; the hosted copy is a 24-hour sandbox for trying Asten.",
+        a: "Release 0.0.1b runs as a desktop app on Windows 10 and 11 (x64) and on Linux x86_64 (Ubuntu 22.04 or newer, or another desktop with WebKitGTK 4.1), and as a hosted copy in any modern browser. The same shell is configured for Windows on ARM, macOS 11 or later and Linux aarch64, but those builds still need building and verifying on hardware; macOS comes later. The desktop app keeps your projects on your machine; the hosted copy is a 24-hour sandbox for trying Asten.",
       },
       {
         q: "Is there a mobile app for Asten?",
@@ -205,7 +213,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Who do I contact for press inquiries about Asten?",
-        a: "Press inquiries about Asten go to info@vernesystems.com, and [the brand page](/brand) covers the logo and how to use it. When describing Asten, please keep to what exists today: a local-first writing desk with deterministic canon checks, no AI model, and a public pre-alpha (release 0.0.1a) with unsigned installers.",
+        a: "Press inquiries about Asten go to info@vernesystems.com, and [the brand page](/brand) covers the logo and how to use it. When describing Asten, please keep to what exists today: a local-first writing desk with deterministic canon checks, an optional assistant that never writes prose, and a public pre-alpha (release 0.0.1b) with unsigned installers.",
       },
       {
         q: "Where can I find Verne’s company details?",

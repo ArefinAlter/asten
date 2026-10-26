@@ -14,9 +14,13 @@ prose; any AI feature follows the AI policy (D27).
 
 ## Try the pre-alpha
 
-Release [0.0.1a](https://github.com/ArefinAlter/asten/releases/tag/v0.0.1a)
+Release [0.0.1b](https://github.com/ArefinAlter/asten/releases/tag/v0.0.1b)
 (pre-alpha) has unsigned desktop builds for Windows x64 and Linux x64. The
-desktop app runs the engine on your machine and can open a sample novel. The
+desktop app runs the engine on your machine, can open a sample novel, imports
+Word, Markdown, HTML and plain text, moves a project as one `.asten` file,
+backs up its library, and has an optional bring-your-own-key assistant (off by
+default; it explains, searches and proposes, never writes, and shows you the
+exact request before it is sent). The
 same workbench runs at <https://asten.103.191.50.32.sslip.io/> with the real
 engine in a private sandbox per visitor, deleted 24 hours after the first
 visit; it is for trying Asten, not for manuscripts. How it is hosted:
@@ -24,8 +28,9 @@ visit; it is for trying Asten, not for manuscripts. How it is hosted:
 
 ## Platforms
 
-Published today: release 0.0.1a for Windows x64 and Linux x64 (unsigned), and
-the hosted pre-alpha in any modern browser. Configured but not yet published:
+Published today: release 0.0.1b for Windows x64 and Linux x64 (unsigned), and
+the hosted pre-alpha in any modern browser (it still runs 0.0.1a and has no
+assistant). Configured but not yet published:
 Windows ARM64, macOS 11+ (one universal build), Linux aarch64, and the Android
 and iOS shells. A browser can also talk to the local API. See
 `docs/PLATFORMS.md` for the support matrix, build recipes and signing.

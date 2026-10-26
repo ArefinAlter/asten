@@ -13,10 +13,10 @@ verified. Adding a workflow does not demonstrate a successful build.
 
 | Platform                   | Processor         | Desktop shell                 | Browser desk                     | Status                                     |
 | -------------------------- | ----------------- | ----------------------------- | -------------------------------- | ------------------------------------------ |
-| Windows 10 1809+ / 11      | x64               | NSIS and MSI installers       | Edge, Chrome, Firefox            | Published in release 0.0.1a (installer and portable zip, unsigned); signing pending |
+| Windows 10 1809+ / 11      | x64               | NSIS and MSI installers       | Edge, Chrome, Firefox            | Published in release 0.0.1b (installer and portable zip, unsigned; installed, run, updated and uninstalled on Windows 11); signing pending |
 | Windows 11 on ARM          | ARM64             | NSIS installer                | Edge, Chrome                     | Cross-build configured; installer and hardware verification pending |
 | macOS 11 Big Sur and later | Apple silicon, Intel | Universal `.app` and `.dmg` | Safari, Chrome, Firefox          | Universal build configured; installer verification pending |
-| Linux (glibc 2.35+)        | x86_64            | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Published in release 0.0.1a (AppImage and .deb, unsigned; the .rpm is not published); hardware verification pending |
+| Linux (glibc 2.35+)        | x86_64            | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Published in release 0.0.1b (AppImage and .deb, unsigned; the .rpm is not published); the AppImage was run under a virtual display and the .deb installed and run on a clean Ubuntu 22.04, but not on physical hardware |
 | Linux                      | aarch64           | `.deb`, `.rpm`, AppImage      | Firefox, Chromium                | Release job present; needs an ARM runner   |
 | Android 8+                 | arm64, x86_64     | Tauri app (see below)         | Chrome, as an installed web app  | Project committed; an unsigned arm64 APK built, with Gradle run by hand on Windows (see below) |
 | iOS and iPadOS 15+         | arm64             | Tauri app (see below)         | Safari, as an installed web app  | Shell scaffold; project files generated on a Mac with Xcode |
@@ -124,7 +124,7 @@ Fedora: `webkit2gtk4.1-devel libappindicator-gtk3-devel librsvg2-devel openssl-d
 
 ### Pre-alpha releases
 
-`v0.0.1a` (`0.0.1-alpha`) was built on the release machine, not in Actions:
+`v0.0.1a` (`0.0.1-alpha`) and `v0.0.1b` (`0.0.1-beta`) were built on the release machine, not in Actions. 0.0.1b: Windows as below; Linux in a private WSL 2 distribution of Ubuntu 22.04 (a clean `git archive` copied in, `pnpm install --frozen-lockfile`, the web build, `tauri build --bundles deb,appimage` with `APPIMAGE_EXTRACT_AND_RUN=1`, the updater key passed through `WSLENV`, never as an argument), and the .deb tested on a second, clean 22.04 distribution:
 
 ```sh
 # Windows x64, on Windows (updater key from outside the repository)

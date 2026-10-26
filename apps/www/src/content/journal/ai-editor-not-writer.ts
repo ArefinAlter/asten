@@ -9,7 +9,7 @@ export const article: Article = {
     "Drafting is where your voice lives; hand it to a model and the book drifts toward the average.",
     "An editor’s most useful work is memory and evidence: what you decided, and where a page disagrees.",
     "That work suits software because you can check it, and because it never has to touch your sentences.",
-    "Asten today runs deterministic rules over facts you confirm. No AI model runs in it.",
+    "Asten’s checks are deterministic rules over facts you confirm; no model runs in them. An optional assistant, off by default, never writes.",
     "Any future AI in Asten is planned as proposals you confirm, local first, and never trained on your manuscript.",
   ],
   sections: [
@@ -172,12 +172,12 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "Those rules are deterministic. **No AI model runs in Asten today**, local or cloud. The checks compare facts you’ve confirmed with each other and with plain attributes that fixed rules read from the page. They don’t claim to understand your story, and nothing they read from the page becomes canon unless you settle it yourself. Optional craft hints (a note when you lean on “very” or “really”) live in a [method pack](/glossary#method-pack) that is off by default, and they’re labeled as notes, not errors.",
+          text: "Those rules are deterministic. **No AI model runs in Asten’s checks**, local or cloud. (Release 0.0.1b adds an optional assistant that can use a model you choose; it explains, searches and proposes, and the [AI policy](/ai-policy) says exactly what it sends.) The checks compare facts you’ve confirmed with each other and with plain attributes that fixed rules read from the page. They don’t claim to understand your story, and nothing they read from the page becomes canon unless you settle it yourself. Optional craft hints (a note when you lean on “very” or “really”) live in a [method pack](/glossary#method-pack) that is off by default, and they’re labeled as notes, not errors.",
         },
         {
           kind: "callout",
           tone: "note",
-          text: "There’s nothing to buy today. Asten is in early development; release 0.0.1a is a public pre-alpha you can try in the browser or download for Windows and Linux. See [Download](/download).",
+          text: "There’s nothing to buy today. Asten is in early development; release 0.0.1b is a public pre-alpha you can try in the browser or download for Windows and Linux. See [Download](/download).",
         },
       ],
     },
@@ -233,7 +233,7 @@ export const article: Article = {
   faqs: [
     {
       q: "Does Asten use AI to check my story?",
-      a: "No. No AI model runs in Asten today, local or cloud. Its checks are deterministic rules that compare facts you have confirmed.",
+      a: "Not for its checks: they are deterministic rules that compare facts you have confirmed. The desktop app’s optional assistant can call a model you choose, with your consent, and it never writes your prose.",
     },
     {
       q: "Will Asten ever draft prose?",
