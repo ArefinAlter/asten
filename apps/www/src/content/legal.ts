@@ -1,21 +1,19 @@
-import { creditedWorks, plates } from "../personality/plates";
+import { creditedWorks } from "../personality/plates";
 import { legalIndex } from "./legal-index";
 import type { LegalDoc } from "./types";
 
-/** Where a work is used that is not a plate of its own: the arched window and the cut-out Thoth on the home page. */
-const windowUse: Record<string, string> = {
-  kensett: "The dusk window",
-  sargent: "The dusk window",
-  hunefer: "Thoth in the window",
-};
+/** "Home", or the paths a work appears on; a long list is shortened. */
+function appearsOn(pages: string[]): string {
+  const names = pages.map((p) => (p === "/" ? "Home" : `\`${p}\``));
+  return names.length <= 4 ? names.join(", ") : `${names.slice(0, 3).join(", ")} and ${names.length - 3} more pages`;
+}
 
-/** The table of painted works on /credits, made from the same manifest that makes the labels under the plates. */
+/** The table of painted works on /credits, made from the same manifest that makes the pictures. */
 function artworkRows(): string[][] {
-  return creditedWorks().map(({ key, work, plates: used }) => {
-    const uses = [...new Set([...(windowUse[key] ? [windowUse[key]!] : []), ...used.map((name) => plates[name]!.label)])];
+  return creditedWorks().map(({ work, pages }) => {
     const href = work.href.replace(/\(/g, "%28").replace(/\)/g, "%29");
     const medium = work.medium ? `, ${work.medium}` : "";
-    return [uses.join("; "), `[*${work.title}*](${href}), ${work.by}, ${work.date}${medium}`, work.where, work.licence];
+    return [`[*${work.title}*](${href}), ${work.by}, ${work.date}${medium}`, work.where, work.licence, appearsOn(pages)];
   });
 }
 
@@ -1497,7 +1495,7 @@ export const legalDocs: LegalDoc[] = [
     summary: [
       "This website is set in Fraunces, Literata, IBM Plex Mono, Caveat, and Noto Sans Egyptian Hieroglyphs, all under the SIL Open Font License 1.1.",
       "It is built with React, React Router, Vite, and TypeScript. Its social images are rendered at build time with Satori and resvg-js.",
-      "The painted plates are public-domain or CC0 works from museum and library collections, named under each picture and in the table below. The ornaments and icons are original drawings by Verne.",
+      "The painted plates are public-domain or CC0 works from museum and library collections, credited in the table below. The ornaments and icons are original drawings by Verne.",
     ],
     sections: [
       {
@@ -1591,7 +1589,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "table",
-            head: ["Shown as", "Work", "Holding institution", "Licence"],
+            head: ["Work", "Holding institution", "Licence", "Appears on"],
             rows: artworkRows(),
           },
           {

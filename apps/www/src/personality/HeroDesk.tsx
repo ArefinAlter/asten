@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import { Manuscript } from "./Manuscript";
 import { clamp, fbm1, reducedMotion } from "./random";
 
@@ -91,12 +90,6 @@ export function HeroDesk() {
         </div>
       </figure>
       <Manuscript />
-      <p className="plate-label hero-label">
-        <span className="plate-label-title">Dusk at Deir el-Bahri, Thoth standing</span>
-        <span className="plate-label-credit">
-          Sunset sky after J. F. Kensett (1872) and cliffs after J. S. Sargent (1890–91), The Metropolitan Museum of Art; Thoth from the Papyrus of Hunefer, about 1275 BCE, The British Museum. <Link to="/credits">Credits</Link>
-        </span>
-      </p>
     </div>
   );
 }

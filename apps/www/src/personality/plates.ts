@@ -1,8 +1,8 @@
 /**
  * The painted plates. art/build.py reads art/works.json (what each work is, who holds it, under what licence)
  * and art/plates.json (what to cut from it, and which page it belongs to), makes the WebP files, and writes
- * art-manifest.json beside this file. Nothing here is typed by hand: the museum label under every plate, the
- * credit line in it and the table on /credits all come from the same two files, so they cannot drift.
+ * art-manifest.json beside this file. Nothing here is typed by hand: the table on /credits comes from the
+ * same two files, so it cannot drift. No picture carries a caption; the credits live on /credits only.
  */
 import manifest from "./art-manifest.json";
 
@@ -30,8 +30,8 @@ export interface PlateSpec {
   shape: PlateShape;
   /** Keys into `works`. */
   works: string[];
-  /** Short caption shown first on the museum label. */
-  label: string;
+  /** Where the object is kept in view when a card crops it (CSS object-position). */
+  focus?: string;
   /** What a person who cannot see it needs to know. */
   alt: string;
 }
@@ -54,13 +54,17 @@ export function plateForPath(path: string): PagePlate | undefined {
   return pagePlates[clean.length > 1 ? clean.replace(/\/+$/, "") : clean];
 }
 
-/** Every work shown anywhere on the site, in the order of its first plate, for the credits table. */
-export function creditedWorks(): { key: string; work: Work; plates: string[] }[] {
+/** Every work shown anywhere on the site, with the pages it appears on (the home page is "/"), for the credits table. */
+export function creditedWorks(): { key: string; work: Work; pages: string[] }[] {
+  const pagesOf = new Map<string, string[]>();
+  for (const [path, pp] of Object.entries(pagePlates)) pagesOf.set(pp.plate, [...(pagesOf.get(pp.plate) ?? []), path]);
   const used = new Map<string, string[]>();
   for (const [key, spec] of Object.entries(plates)) {
-    for (const w of spec.works) used.set(w, [...(used.get(w) ?? []), key]);
+    // a plate no page claims is one of the home page's
+    const where = pagesOf.get(key) ?? ["/"];
+    for (const w of spec.works) used.set(w, [...(used.get(w) ?? []), ...where]);
   }
   // the hero window and the cut-out Thoth are not plates, but they are made from these works
-  for (const w of ["kensett", "sargent", "hunefer"]) if (!used.has(w)) used.set(w, []);
-  return [...used.entries()].map(([key, list]) => ({ key, work: works[key]!, plates: list }));
+  for (const w of ["kensett", "sargent", "hunefer"]) used.set(w, [...new Set(["/", ...(used.get(w) ?? [])])]);
+  return [...used.entries()].map(([key, pages]) => ({ key, work: works[key]!, pages }));
 }

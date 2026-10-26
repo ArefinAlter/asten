@@ -399,7 +399,6 @@
       "works": [
         "menna"
       ],
-      "label": "Measuring the harvest, Tomb of Menna",
       "alt": "Surveyors stretch a measuring cord across a field of ripe wheat while two boys carry writing boards, painted on a tomb wall in Thebes."
     },
     "palette": {
@@ -411,7 +410,6 @@
       "works": [
         "palette"
       ],
-      "label": "A scribe’s palette and pens",
       "alt": "A scribe’s wooden palette with its black ink cake, and three reed pens lying beside it."
     },
     "weighing": {
@@ -423,7 +421,6 @@
       "works": [
         "hunefer"
       ],
-      "label": "The weighing of the heart, Papyrus of Hunefer",
       "alt": "The weighing of the heart on a papyrus: Anubis at the scales, and ibis-headed Thoth with palette and reed, recording the verdict."
     },
     "dusk": {
@@ -435,7 +432,6 @@
       "works": [
         "denis"
       ],
-      "label": "Evening cloud, an oil study",
       "alt": "An oil study of evening cloud, white and grey masses lit pink from below."
     },
     "cliffs": {
@@ -447,7 +443,6 @@
       "works": [
         "sargent"
       ],
-      "label": "The cliffs at Deir el-Bahri",
       "alt": "Golden limestone cliffs above a pale valley, painted in oil at Deir el-Bahri."
     },
     "lamp": {
@@ -459,7 +454,6 @@
       "works": [
         "lamp"
       ],
-      "label": "A bronze lamp",
       "alt": "A green bronze oil lamp with a lid and a long handle."
     },
     "scribe": {
@@ -471,7 +465,6 @@
       "works": [
         "statue"
       ],
-      "label": "Haremhab as a scribe",
       "alt": "A seated scribe in granite with a papyrus unrolled across his lap."
     },
     "ibis": {
@@ -483,7 +476,6 @@
       "works": [
         "ibis"
       ],
-      "label": "The sacred ibis, an engraved plate",
       "alt": "An engraving of the sacred ibis, a tall white bird with a curved black bill, on old paper."
     },
     "astrolabe": {
@@ -495,19 +487,17 @@
       "works": [
         "astrolabe"
       ],
-      "label": "An astrolabe, for reading the sky",
       "alt": "A brass astrolabe, a round instrument engraved with circles and a turning pointer, hanging from a ring."
     },
     "ceiling": {
       "src": "/art/plate-ceiling.webp",
-      "width": 1400,
-      "height": 445,
-      "bytes": 84462,
+      "width": 1600,
+      "height": 509,
+      "bytes": 84434,
       "shape": "band",
       "works": [
         "ceiling"
       ],
-      "label": "A painted ceiling, copied from a tomb",
       "alt": "A band of painted tiles with orange, blue and red crossed patterns, above a border of small checks."
     },
     "luke": {
@@ -519,7 +509,6 @@
       "works": [
         "luke"
       ],
-      "label": "An evangelist at his desk",
       "alt": "A Byzantine painting on gold of a saint seated at a writing desk with a book on his knee, the paint worn away in patches."
     },
     "balance": {
@@ -531,7 +520,6 @@
       "works": [
         "vermeer_balance"
       ],
-      "label": "Weighing, painted",
       "alt": "A woman in a blue jacket stands at a table holding up a small empty balance, with a painting of the Last Judgement on the wall behind her."
     },
     "portrait-red": {
@@ -543,7 +531,6 @@
       "works": [
         "fayum_red"
       ],
-      "label": "A portrait painted in wax for a mummy",
       "alt": "A young woman with dark curls and a gold wreath, in a red robe, painted on a wooden panel."
     },
     "waterclock": {
@@ -555,7 +542,6 @@
       "works": [
         "waterclock"
       ],
-      "label": "A water clock, with its baboon",
       "alt": "A small pale faience vessel with a seated baboon carved on its side, a water clock from ancient Egypt."
     },
     "philae": {
@@ -567,7 +553,6 @@
       "works": [
         "philae"
       ],
-      "label": "Philae, as a traveller drew it",
       "alt": "A tinted lithograph of the island of Philae: a temple with two towers on a low island, palms and ruins in the foreground, hills behind."
     },
     "threshing": {
@@ -579,7 +564,6 @@
       "works": [
         "luttrell"
       ],
-      "label": "Threshing, in the margin of a psalter",
       "alt": "Two men in blue and orange tunics swing flails over a sheaf of grain, painted in the margin of a medieval manuscript."
     },
     "instruments": {
@@ -591,7 +575,6 @@
       "works": [
         "instruments"
       ],
-      "label": "A case of drawing instruments",
       "alt": "A green shagreen case standing open beside a brass rule and four fine brass and steel drawing instruments."
     },
     "portrait-man": {
@@ -603,7 +586,6 @@
       "works": [
         "fayum_man"
       ],
-      "label": "A man, painted in wax",
       "alt": "A bearded man with dark curly hair in a white tunic, painted on a wooden panel against a grey-blue ground."
     },
     "interior": {
@@ -615,7 +597,6 @@
       "works": [
         "hammershoi"
       ],
-      "label": "A quiet room",
       "alt": "A woman in a black dress seen from behind, standing in a grey room beside a table with a blue and white porcelain tureen."
     },
     "still-life": {
@@ -627,8 +608,8 @@
       "works": [
         "claesz"
       ],
-      "label": "A skull, a quill, a book and some ink",
-      "alt": "A still life on a table: a skull resting on paper and a quill, an overturned glass, an inkwell and a small oil lamp."
+      "alt": "A still life on a table: a skull resting on paper and a quill, an overturned glass, an inkwell and a small oil lamp.",
+      "focus": "50% 50%"
     },
     "writing": {
       "src": "/art/plate-writing.webp",
@@ -639,7 +620,6 @@
       "works": [
         "vermeer_writing"
       ],
-      "label": "A lady writing",
       "alt": "A young woman in a yellow jacket trimmed with ermine sits at a table with a quill in her hand, turning to look out of the picture."
     },
     "atlas": {
@@ -651,7 +631,6 @@
       "works": [
         "atlas"
       ],
-      "label": "A map of the Nile valley",
       "alt": "An engraved map sheet showing a river valley running diagonally between deserts, with place names in French and Arabic."
     },
     "dance": {
@@ -663,7 +642,6 @@
       "works": [
         "degas"
       ],
-      "label": "A rehearsal",
       "alt": "A dance class in a long room: dancers in white tutus stand and stretch, a teacher with a cane in front of a tall window, a score on a stand."
     },
     "lisbeth": {
@@ -675,7 +653,6 @@
       "works": [
         "larsson"
       ],
-      "label": "Reading at the kitchen table",
       "alt": "A girl reading at a green table in a bright room, a pot of red flowers beside her."
     },
     "tugs": {
@@ -687,7 +664,6 @@
       "works": [
         "pissarro_barges"
       ],
-      "label": "Two steam tugs at Pontoise",
       "alt": "Two small steam tugs moored at the bank of a dark green river, red stripes on their hulls, trees behind."
     },
     "melencolia": {
@@ -699,7 +675,6 @@
       "works": [
         "durer"
       ],
-      "label": "All the instruments, and a thinker",
       "alt": "An engraving of a winged figure seated with her chin on her fist amid tools, a scale, an hourglass, a bell and a magic square."
     },
     "moneylender": {
@@ -711,7 +686,6 @@
       "works": [
         "metsys"
       ],
-      "label": "Weighing coins",
       "alt": "The hands of a moneylender weighing coins on a small balance, and of his wife turning the pages of an illuminated book."
     },
     "tuileries": {
@@ -723,7 +697,6 @@
       "works": [
         "pissarro_tuileries"
       ],
-      "label": "A spring morning in Paris",
       "alt": "A view down over the Tuileries garden in spring: paths, lawns and trees under a sky of small clouds."
     },
     "road": {
@@ -735,7 +708,6 @@
       "works": [
         "sisley_road"
       ],
-      "label": "The road ahead",
       "alt": "A country road beneath tall trees and a stormy blue sky, two small figures walking on it."
     },
     "papyrus": {
@@ -747,7 +719,6 @@
       "works": [
         "papyrus"
       ],
-      "label": "The papyrus plant",
       "alt": "A botanical drawing of papyrus: a tall green stem opening into a fine shower of stalks bearing small brown flowers."
     },
     "bookworm": {
@@ -759,8 +730,8 @@
       "works": [
         "spitzweg"
       ],
-      "label": "The bookworm",
-      "alt": "A man in a dark coat stands on a ladder in a library, reading a book he has taken from the highest shelf."
+      "alt": "A man in a dark coat stands on a ladder in a library, reading a book he has taken from the highest shelf.",
+      "focus": "50% 58%"
     },
     "boulevard": {
       "src": "/art/plate-boulevard.webp",
@@ -771,8 +742,8 @@
       "works": [
         "pissarro_boulevard"
       ],
-      "label": "The same view, in winter",
-      "alt": "A wide Paris boulevard seen from above on a grey winter morning, carriages and walkers under bare trees."
+      "alt": "A wide Paris boulevard seen from above on a grey winter morning, carriages and walkers under bare trees.",
+      "focus": "50% 42%"
     },
     "sundial": {
       "src": "/art/plate-sundial.webp",
@@ -783,8 +754,8 @@
       "works": [
         "sundial"
       ],
-      "label": "A pocket sundial",
-      "alt": "An ivory pocket sundial opened like a book, with a compass set into its base and a thread stretched between its two leaves."
+      "alt": "An ivory pocket sundial opened like a book, with a compass set into its base and a thread stretched between its two leaves.",
+      "focus": "50% 64%"
     },
     "relief": {
       "src": "/art/plate-relief.webp",
@@ -795,8 +766,8 @@
       "works": [
         "luke_relief"
       ],
-      "label": "Saint Luke at his writing table",
-      "alt": "A small carved and painted wooden relief of a saint seated at a writing desk with an open book, gilded and set in an arch."
+      "alt": "A small carved and painted wooden relief of a saint seated at a writing desk with an open book, gilded and set in an arch.",
+      "focus": "50% 26%"
     },
     "bedroom": {
       "src": "/art/plate-bedroom.webp",
@@ -807,8 +778,8 @@
       "works": [
         "vangogh"
       ],
-      "label": "A room of one’s own",
-      "alt": "A small bedroom with a wooden bed, two yellow chairs and blue walls, painted in thick strokes, with green shutters at the window."
+      "alt": "A small bedroom with a wooden bed, two yellow chairs and blue walls, painted in thick strokes, with green shutters at the window.",
+      "focus": "50% 50%"
     },
     "glossy-ibis": {
       "src": "/art/plate-glossy-ibis.webp",
@@ -819,7 +790,6 @@
       "works": [
         "audubon"
       ],
-      "label": "A glossy ibis",
       "alt": "A glossy ibis, a long-legged bird with a curved bill and dark glossy plumage, wading at the edge of a pond among flowering plants."
     },
     "portrait-boy": {
@@ -831,7 +801,6 @@
       "works": [
         "fayum_boy"
       ],
-      "label": "A boy, painted in wax",
       "alt": "A boy with short brown hair in a white tunic, painted on a wooden panel."
     },
     "thoth-relief": {
@@ -843,7 +812,6 @@
       "works": [
         "ducamp"
       ],
-      "label": "Thoth at Philae, photographed in 1850",
       "alt": "A photograph of a relief carved in a temple wall, showing a seated god with the head of an ibis."
     },
     "rouen": {
@@ -855,7 +823,6 @@
       "works": [
         "pissarro_rouen"
       ],
-      "label": "A bridge at Rouen",
       "alt": "A grey morning over the river Seine at Rouen: an iron bridge, steamers and a tall chimney sending up smoke."
     },
     "portrait-elder": {
@@ -867,7 +834,6 @@
       "works": [
         "fayum_elder"
       ],
-      "label": "An elderly woman, with her gold wreath",
       "alt": "An elderly woman with grey hair wreathed in gold leaf looks out from a wooden panel, painted in wax."
     },
     "inkwell": {
@@ -879,7 +845,6 @@
       "works": [
         "inkwell"
       ],
-      "label": "An inkwell, nearly four thousand years old",
       "alt": "A small wooden box with a round hole for ink and a sliding lid, an inkwell from ancient Egypt."
     },
     "cloud": {
@@ -891,175 +856,160 @@
       "works": [
         "constable"
       ],
-      "label": "A cloud study",
       "alt": "A watercolour study of a wide sky: bands of grey and white cloud over a low blue horizon."
     },
     "text": {
       "src": "/art/plate-text.webp",
-      "width": 1200,
-      "height": 180,
-      "bytes": 47648,
+      "width": 1600,
+      "height": 239,
+      "bytes": 76540,
       "shape": "band",
       "works": [
         "hunefer"
       ],
-      "label": "The text of the spells, Papyrus of Hunefer",
       "alt": "Columns of black and red hieroglyphs written on papyrus, above the heads of a row of seated gods."
     },
     "frieze-01": {
       "src": "/art/plate-frieze-01.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 43224,
+      "width": 1600,
+      "height": 415,
+      "bytes": 34256,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-02": {
       "src": "/art/plate-frieze-02.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 42440,
+      "width": 1600,
+      "height": 414,
+      "bytes": 56080,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-03": {
       "src": "/art/plate-frieze-03.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 51198,
+      "width": 1600,
+      "height": 414,
+      "bytes": 32024,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-04": {
       "src": "/art/plate-frieze-04.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 37658,
+      "width": 1600,
+      "height": 415,
+      "bytes": 43036,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-05": {
       "src": "/art/plate-frieze-05.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 42280,
+      "width": 1600,
+      "height": 416,
+      "bytes": 33230,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-06": {
       "src": "/art/plate-frieze-06.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 37826,
+      "width": 1600,
+      "height": 414,
+      "bytes": 45060,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-07": {
       "src": "/art/plate-frieze-07.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 34008,
+      "width": 1600,
+      "height": 414,
+      "bytes": 32530,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-08": {
       "src": "/art/plate-frieze-08.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 35544,
+      "width": 1600,
+      "height": 416,
+      "bytes": 40576,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-09": {
       "src": "/art/plate-frieze-09.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 35240,
+      "width": 1600,
+      "height": 416,
+      "bytes": 23914,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-10": {
       "src": "/art/plate-frieze-10.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 28456,
+      "width": 1600,
+      "height": 414,
+      "bytes": 39328,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-11": {
       "src": "/art/plate-frieze-11.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 31138,
+      "width": 1600,
+      "height": 414,
+      "bytes": 25318,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-12": {
       "src": "/art/plate-frieze-12.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 23542,
+      "width": 1600,
+      "height": 416,
+      "bytes": 25636,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     },
     "frieze-13": {
       "src": "/art/plate-frieze-13.webp",
-      "width": 820,
-      "height": 626,
-      "bytes": 27586,
+      "width": 1600,
+      "height": 416,
+      "bytes": 18214,
       "shape": "band",
       "works": [
         "menna"
       ],
-      "label": "Harvest Scenes, Tomb of Menna, a detail",
       "alt": "A detail of a tomb painting: farm workers cutting, binding and carrying grain."
     }
   },

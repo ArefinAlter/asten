@@ -131,7 +131,7 @@ export function Name() {
           <h2 id="n6">How we use Egyptian art</h2>
           <p>
             Egyptian art is the heritage of Egypt and of everyone who has learned from it. We try to use it with care. The
-            painted plates are public-domain works from museum collections, named under each picture and on the{" "}
+            painted plates are public-domain works from museum collections, credited on the{" "}
             <Link to="/credits">credits page</Link>; the ornaments and icons are original drawings in the flat, outlined style of
             tomb painting and papyrus, made for Asten. We don’t invent fake hieroglyphic “text”: where real signs appear, we say what they are, and the name toy above is
             labeled as a playful alphabet. And no mummy jokes.

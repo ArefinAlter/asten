@@ -45,20 +45,16 @@ export function LegalPage({ path }: { path: string }) {
       <header className="page-hero legal-hero">
         <div className="wrap">
           <Breadcrumbs />
-          <div className="page-hero-grid">
-            <div>
-              <h1>{doc.title}</h1>
-              <p className="byline">
-                <span>
-                  Updated <time dateTime={legalUpdated}>{formatDate(legalUpdated)}</time>
-                </span>
-                <span>{site.legalName}</span>
-              </p>
-            </div>
-            <div className="page-hero-art page-hero-art--plate">
-              <PagePlate path={doc.path} eager />
-            </div>
-          </div>
+          <h1>{doc.title}</h1>
+          <p className="byline">
+            <span>
+              Updated <time dateTime={legalUpdated}>{formatDate(legalUpdated)}</time>
+            </span>
+            <span>{site.legalName}</span>
+          </p>
+        </div>
+        <div className="page-hero-band">
+          <PagePlate path={doc.path} eager />
         </div>
       </header>
       <section className="register register--sunk legal-summary-reg" aria-labelledby="short-h">

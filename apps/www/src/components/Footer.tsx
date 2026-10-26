@@ -79,6 +79,7 @@ export function Footer() {
           <span className="no-trackers">
             <Glyph name="eye" /> No cookies. No trackers.
           </span>
+          <Link to="/credits">Art credits</Link>
           <a href="/llms.txt">llms.txt</a>
           <a href="/journal/rss.xml">RSS</a>
           <a href="/sitemap.xml">Sitemap</a>

@@ -233,14 +233,14 @@ export function Brand() {
           <SectionHead
             id="b-art"
             title="Illustration"
-            text="Two kinds of picture. The painted plates are public-domain works from museum collections, cut and graded to one warm light and laid on the paper, each with a museum label that is also its credit. The ornaments, icons and diagrams below are original SVG drawings in the Egyptian composite view: head and legs in profile, shoulders and eye frontal, flat pigment fills, carbon outlines, ground lines."
+            text="Two kinds of picture. The painted plates are public-domain works from museum collections, cut and graded to one warm light and laid on the paper, credited on the credits page. The ornaments, icons and diagrams below are original SVG drawings in the Egyptian composite view: head and legs in profile, shoulders and eye frontal, flat pigment fills, carbon outlines, ground lines."
           />
           <h3 className="sub-h">Painted plates</h3>
           <p className="fine brand-plates-note">
             One light for all of them: highlights gained toward warm paper, saturation eased, the blacks lifted a little, a fine
             grain over everything. A painting or a print is a torn sheet; a window is a round arch with a torn foot; an object is
-            cut from its studio backdrop and stands on the paper alone; a frieze runs as a band. Every plate has a museum label that
-            is also its credit, and all of them are listed on the <Link to="/credits">credits page</Link>.
+            cut from its studio backdrop and stands on the paper alone; a frieze runs as a band across the page. No picture
+            carries a caption: every work is credited, with its holder, its licence and a link, on the <Link to="/credits">credits page</Link>.
           </p>
           <div className="brand-plates">
             <Plate name="balance" />
@@ -401,7 +401,7 @@ export function Brand() {
           <p>
             No mummy jokes, curses, or pharaoh kitsch. No invented hieroglyphic “text”: when we show real signs, we name them, and
             the cartouche name toy is labeled as a playful alphabet. Thoth is drawn with dignity, with his ibis head, lunar disk,
-            palette, and pen. The painted plates are named under each picture and on the <Link to="/credits">credits page</Link>; the drawings are original, made for Asten, in the spirit of the tradition. See <Link to="/name">the name</Link>.
+            palette, and pen. The painted plates are credited on the <Link to="/credits">credits page</Link>; the drawings are original, made for Asten, in the spirit of the tradition. See <Link to="/name">the name</Link>.
           </p>
         </div>
       </section>

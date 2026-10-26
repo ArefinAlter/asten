@@ -81,12 +81,12 @@ export function PageHero({
           </div>
           {media}
         </div>
-        {pp && band ? (
-          <div className="page-hero-band">
-            <Plate name={pp.plate} eager />
-          </div>
-        ) : null}
       </div>
+      {pp && band ? (
+        <div className="page-hero-band">
+          <Plate name={pp.plate} eager />
+        </div>
+      ) : null}
     </header>
   );
 }

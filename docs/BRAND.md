@@ -333,7 +333,7 @@ graded to one light and set on the paper. The scribe's desk is where they live.
   so a Hudson River sky, a New Kingdom papyrus, a faience water clock and a
   Dutch still life can share a page.
 - **Four shapes.** A *torn sheet* for paintings and prints; an *arch* (a round
-  top over a torn foot) for a window; a *band* for a banner or a frieze detail;
+  top over a torn foot) for a window; a *band* for a strip across the page;
   a *cut-out* for an object or a portrait panel, cut from its studio backdrop
   and standing on the paper alone. Cut edges are shrunk and feathered so no
   backdrop colour rims them. Scale and crop vary from page to page.
@@ -345,20 +345,29 @@ graded to one light and set on the paper. The scribe's desk is where they live.
   different hours; the cast are portraits painted for mummies; a map for the
   worldbuilders; threshing for the compiler; a cloud study for a page that is
   not there.
-- **A museum label under every plate**, which is also its credit: a caption in
-  mono small capitals, then the work in italics, the maker, the date, the holder
-  and its object number, and a link to `/credits`. Never remove it. The `alt`
-  text says what the picture shows.
+- **No captions, no credit lines beside a picture.** Not under the hero window,
+  not on a journal card, not in a margin, not in the footer text. The credit for
+  every work (title, maker, date, holder, object number, licence, link) is on
+  `/credits`, which is generated from the same data as the pictures, and the
+  footer carries one small plain link, "Art credits". Every picture has `alt`
+  text that says what it shows. (Asten's own marginalia, the handwritten notes
+  beside the manuscript text in the product and on the home page, are part of the
+  design and stay: they are not credits.)
+- **The paintings are present, not thumbnails.** A plate at the head of a page
+  takes half the width of the head. Pages that open with a band get a strip laid
+  across the whole page, edge to edge. A journal card is a painting cropped to
+  fill its slot, with the object kept in view (`focus`). Do not shrink a painting
+  into a vignette.
 - **No text in a plate, and nothing behind running text.** Plates sit beside or
-  above the words. The one at the head of a page loads eagerly; every other
-  loads lazily and has its width and height in the markup.
+  above the words. The one at the head of a page loads eagerly and is preloaded;
+  every other loads lazily and has its width and height in the markup.
 - **Budgets.** The hero window is at most 300 KB and a plate at most about
   150 KB; the home page, with all its plates, stays near 1.5 MB.
 - **Reproducible.** `art/build.py` makes every file from `art/works.json` (the
   works) and `art/plates.json` (the crops and the pages). It also writes
   `apps/www/src/personality/art-manifest.json`, `art/SOURCES.md` and the SHA-256
-  lock `art/sources.lock.json`; the labels and the table on `/credits` are made
-  from the same manifest. To add a plate, add the work, add the spec, run the
+  lock `art/sources.lock.json`; the table on `/credits` is made from the same
+  manifest. To add a plate, add the work, add the spec, run the
   build.
 - **At night** plates are dimmed (brightness 0.82) and lit by a pool of lamplight.
 
@@ -491,8 +500,8 @@ brand applies there, with less ornament.
 - Interactive demos are keyboard operable and announce results in a polite live
   region.
 - Reduced motion is honoured everywhere, and the page works without JavaScript.
-- Painted plates have alt text that says what they show; the museum label is
-  real text. A plate never carries text of its own.
+- Painted plates have alt text that says what they show. A plate never carries
+  text of its own, and there are no captions; credits are on `/credits`.
 - Diagnostics are never colour-only.
 
 ---

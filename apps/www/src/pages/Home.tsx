@@ -302,7 +302,7 @@ export function Home() {
 
       <section className="register" aria-labelledby="privacy-h">
         <div className="wrap privacy-grid">
-          <div className="plate-slot" data-reveal style={{ "--plate-w": "300px" } as CSSProperties}>
+          <div className="plate-slot" data-reveal style={{ "--plate-w": "420px" } as CSSProperties}>
             <Plate name="scribe" tilt={-1.2} />
           </div>
           <div data-reveal>
@@ -360,7 +360,7 @@ export function Home() {
                 Our AI stance <Arrow />
               </Link>
             </div>
-            <div className="plate-slot" style={{ "--plate-w": "340px" } as CSSProperties}>
+            <div className="plate-slot" style={{ "--plate-w": "460px" } as CSSProperties}>
               <Plate name="ibis" tilt={1.4} />
             </div>
           </div>
