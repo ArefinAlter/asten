@@ -85,6 +85,21 @@ async fn start_pairing(
     })
 }
 
+/// The data folder the writer asked for, if any: `--data-dir <folder>` on the
+/// command line, else the `ASTEN_DATA_DIR` environment variable. Empty values
+/// are ignored.
+fn data_dir_override() -> Option<PathBuf> {
+    let mut args = std::env::args_os().skip(1);
+    while let Some(arg) = args.next() {
+        if arg == "--data-dir" {
+            return args.next().filter(|v| !v.is_empty()).map(PathBuf::from);
+        }
+    }
+    std::env::var_os("ASTEN_DATA_DIR")
+        .filter(|v| !v.is_empty())
+        .map(PathBuf::from)
+}
+
 /// Bring the one running window forward when a second copy is launched.
 #[cfg(desktop)]
 fn focus_main_window(app: &tauri::AppHandle) {
@@ -111,7 +126,13 @@ pub fn run() {
     builder
         .plugin(tauri_plugin_process::init())
         .setup(|app| {
-            let data_directory = app.path().app_data_dir()?;
+            // `ASTEN_DATA_DIR` (or `--data-dir <folder>`) keeps everything in one
+            // folder of the writer's choosing: a portable copy on a USB stick,
+            // a second profile, or a throwaway one for tests.
+            let data_directory = match data_dir_override() {
+                Some(dir) => dir,
+                None => app.path().app_data_dir()?,
+            };
             std::fs::create_dir_all(&data_directory)?;
             let paths = DeskPaths::under(&data_directory);
             std::fs::create_dir_all(&paths.logs)?;
