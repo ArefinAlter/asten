@@ -85,8 +85,8 @@ decided, and they want none with the part that makes the work theirs.
 Secondary: **AI tinkerers and builders.** They care that the tool runs locally,
 that the rules are deterministic and documented with stable codes, that the
 architecture is plain (Rust, SQLite, a loopback API), and that any future model
-can be local or bring-your-own. (The source repository is private today; never
-call Asten open source.)
+can be local or bring-your-own. (The source is public on GitHub under the MIT
+License; say so plainly, and say that the names and logos are not covered by it.)
 
 What they fear: losing their voice, their work being used to train models,
 cloud lock-in, nagging "grammar police" tools, and a 40-field character form
@@ -106,7 +106,7 @@ peer who reads carefully, not a guru and not a hype machine.
 | --- | --- |
 | Plain. Short sentences, real words. | Jargon-first ("leverage our NLP pipeline"). |
 | Concrete: Mira's auburn hair, the mentor who died in Act One. | Abstract ("unlock your creative potential"). |
-| Honest about limits ("Today you run it from source."). | Over-promising ("AI that understands your story"). |
+| Honest about limits ("It's a pre-alpha, and the installers are unsigned."). | Over-promising ("AI that understands your story"). |
 | Respectful of the writer's authority. | Prescriptive ("Fix this weak sentence"). |
 | Lightly mythic, once per page at most. | Costume-y ("Behold, mortal!"). |
 
@@ -135,8 +135,9 @@ seamless, effortless, 10x, game-changing, "AI-powered" (as a headline), "smart".
   auburn."
 - Diagnostic body: where the two sides are. "Chapter 2 says auburn. This page
   says black."
-- Actions are verbs the author owns: *Keep my sentence*, *Update canon*, *Add an
-  event*, *Mark as a lie*, *Silence this rule*.
+- Actions are verbs the author owns, worded as the engine words them: *Keep my
+  sentence*, *Add an event*, *Retire "auburn"*, *Mark the scene as a memory*,
+  *Silence this mark*.
 - Never use "error" in front of the author for craft hints. Hints are "notes".
 - Buttons: sentence case, two or three words. "Get Asten", "See how it works".
 
@@ -429,5 +430,6 @@ brand applies there, with less ornament.
   after the first mention on a legal page.)
 - Footer credit: "Designed and built by Verne Ltd.", linking to
   `https://vernesystems.com`.
-- Don't invent a postal address, company number, or governing law. Add them only
-  when Verne Ltd. supplies them.
+- The registered address and company number on the legal pages come from
+  `https://vernesystems.com/legal/company`. Don't invent or alter them, and
+  don't add a governing law that Verne Ltd. has not supplied.

@@ -22,7 +22,7 @@ const MAX = 21;
  * Two registers, like two bands on a tomb wall: reading order above, story
  * time below. The scenes form one run declared continuous. Inside it, a scene
  * that steps backward in story time from the last scene before it gets a
- * CANON-E201 mark; scenes marked as flashbacks are never compared (D5).
+ * CANON-E201 mark; a scene taken out of the run (a flashback) is not compared (D5).
  */
 export function ClocksDemo() {
   const [scenes, setScenes] = useState(initial);
@@ -57,7 +57,7 @@ export function ClocksDemo() {
             const quiet = flashbacks.has(scene.id);
             return (
               <li key={scene.id} className={`clock-card${marked ? " is-marked" : ""}${quiet ? " is-quiet" : ""}`}>
-                <span className="clock-num">Ch. {i + 8}{quiet ? " · flashback" : ""}</span>
+                <span className="clock-num">Ch. {i + 8}{quiet ? " · flashback, outside the run" : ""}</span>
                 <strong>{scene.title}</strong>
                 <span className="clock-day">
                   <button type="button" aria-label={`Move ${scene.title} one day earlier`} onClick={() => step(scene.id, -1)}>
@@ -106,7 +106,7 @@ export function ClocksDemo() {
         {live.length === 0 ? (
           <p className="clocks-calm">
             {flashbacks.size > 0
-              ? "No scene in the run steps backward in story time. Scenes marked as flashbacks are not compared."
+              ? "No scene in the run steps backward in story time. A scene taken out of the run is not compared."
               : "Story time only moves forward in this run. Nothing to mark."}
           </p>
         ) : (
@@ -117,7 +117,7 @@ export function ClocksDemo() {
                 Inside the continuous run, “{mark.scene.title}” (day {mark.scene.day}) comes after “{mark.prev.title}” (day {mark.prev.day}) in reading order but earlier in story time.
               </span>
               <button type="button" onClick={() => setFlashbacks((s) => new Set(s).add(mark.id))}>
-                Mark it a flashback
+                This scene is not part of the run
               </button>
             </div>
           ))

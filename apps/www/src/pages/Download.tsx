@@ -100,7 +100,7 @@ export function Download() {
           </div>
           <ul className="honest-list" data-reveal>
             <li>The desk, canon, cast, two clocks, and optional world tools</li>
-            <li>Seventeen canon rules in seven families, plus name hygiene and setup ledgers, in eight method packs</li>
+            <li>Fifteen canon rules in seven families, plus name hygiene and a setup ledger, in eight method packs</li>
             <li>Compile to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx), and import of all but EPUB</li>
             <li>The Word task pane and Google Docs sidebar, for sideloading against the desktop app</li>
             <li>No account, no sync, no telemetry; AI providers can be configured, but none is called in this release</li>

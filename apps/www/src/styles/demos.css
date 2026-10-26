@@ -294,7 +294,12 @@
 
 .clocks {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0;
+}
+
+.clocks > * {
+  min-width: 0;
 }
 
 .clocks-reading ol {
@@ -724,7 +729,7 @@
 
 .packs-list li {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 12px;
   align-items: center;
   padding: 12px 14px;

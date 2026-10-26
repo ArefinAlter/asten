@@ -95,9 +95,9 @@ export const article: Article = {
           code: "CANON-E013",
           title: "Mira’s hair was settled as auburn.",
           lines: [
-            "Chapter 2 settled: Mira · hair · auburn",
-            "Chapter 19 says: “She pushed her black hair out of her eyes…”",
-            "Keep my sentence · Update canon · Add an event",
+            "① Settled: Mira · hair · auburn",
+            "② Chapter 19 says: “black”",
+            "Add an event · Retire “auburn” · Silence this mark · Keep my sentence",
           ],
         },
         {
@@ -160,7 +160,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "You write in the [desk](/features/desk): a binder of chapters and scenes, a rich-text editor, comments, and named snapshots. As you go, you settle the details that matter as [canon](/glossary#canon). A [fact](/glossary#fact) is just an entity, a property, and a value, like *Mira · hair · auburn*. The [compiler](/features/compiler) then weighs the draft against that record with seventeen rules in seven families. Three examples:",
+          text: "You write in the [desk](/features/desk): a binder of chapters and scenes, a rich-text editor, comments, and named snapshots. As you go, you settle the details that matter as [canon](/glossary#canon). A [fact](/glossary#fact) is just an entity, a property, and a value, like *Mira · hair · auburn*. The [compiler](/features/compiler) then weighs the draft against that record with fifteen rules in seven families. Three examples:",
         },
         {
           kind: "list",
@@ -172,7 +172,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "Those rules are deterministic. **No AI model runs in Asten today**, local or cloud. The checks compare facts you’ve confirmed with each other and with plain attributes that fixed rules read from the page. They don’t claim to understand your story, and anything they read from the page arrives as a proposal for you to confirm. Optional craft hints (a note when you lean on “very” or “really”) live in a [method pack](/glossary#method-pack) that is off by default, and they’re labeled as notes, not errors.",
+          text: "Those rules are deterministic. **No AI model runs in Asten today**, local or cloud. The checks compare facts you’ve confirmed with each other and with plain attributes that fixed rules read from the page. They don’t claim to understand your story, and nothing they read from the page becomes canon unless you settle it yourself. Optional craft hints (a note when you lean on “very” or “really”) live in a [method pack](/glossary#method-pack) that is off by default, and they’re labeled as notes, not errors.",
         },
         {
           kind: "callout",
@@ -187,7 +187,7 @@ export const article: Article = {
       blocks: [
         {
           kind: "p",
-          text: "The [roadmap](/roadmap) has AI on it, in a narrow role. Asten already makes fact *proposals* from what fixed rules read on the page, along the lines of “This looks like Mira’s hair is auburn. Settle it?” The next step on the roadmap is small local classifiers that read more of the page and likewise only propose. Every proposal waits for you to confirm it. Nothing becomes canon silently.",
+          text: "The [roadmap](/roadmap) has AI on it, in a narrow role. Asten does not make fact proposals today: its fixed rules read the page and weigh it against what you settled. The planned step is small local classifiers that read more of the page and propose facts, along the lines of “This looks like Mira’s hair is auburn. Settle it?” Every proposal will wait for you to confirm it. Nothing becomes canon silently.",
         },
         {
           kind: "list",

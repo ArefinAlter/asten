@@ -14,8 +14,9 @@ export const site = {
     x: "https://x.com/VerneOf",
     linkedin: "https://www.linkedin.com/company/verneoff",
   },
-  updated: "2026-10-06",
-  updatedLabel: "6 October 2026",
+  published: "2026-10-06",
+  updated: "2026-10-26",
+  updatedLabel: "26 October 2026",
   tagline: "Let AI be your editor, not your writer.",
   description:
     "Asten is a local-first writing app that remembers the facts of your story and marks contradictions in red. It never writes a word for you.",

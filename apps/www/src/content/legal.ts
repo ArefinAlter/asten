@@ -719,7 +719,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "Your project file does not expire with a build. Before a build expires, keep the database, or export your work, and you will lose nothing.",
+            text: "Your project file does not depend on a build. Before a build is replaced or withdrawn, keep the database, or export your work, and you will lose nothing.",
           },
         ],
       },

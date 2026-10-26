@@ -14,7 +14,7 @@ export const legalIndex: Record<string, LegalMeta> = {
     title: "Privacy policy",
     metaTitle: "Privacy policy: your manuscript stays on your computer",
     description:
-      "How Verne handles personal data for Asten: your manuscript stays on your computer, this website sets no cookies, the hosted pre-alpha deletes its sandboxes after 24 hours, and email is used only to reply to you.",
+      "How Verne handles personal data for Asten: your manuscript stays on your computer, this site sets no cookies, hosted sandboxes are deleted after 24 hours, and email is used only to reply.",
   },
   "/terms": {
     path: "/terms",
@@ -28,9 +28,9 @@ export const legalIndex: Record<string, LegalMeta> = {
     path: "/cookies",
     nav: "Cookies",
     title: "Cookie notice",
-    metaTitle: "Cookie notice: no cookies here, one session cookie in the hosted pre-alpha",
+    metaTitle: "Cookie notice: none here, one in the hosted pre-alpha",
     description:
-      "The Asten website sets no cookies and runs no trackers. One optional localStorage key remembers your theme. The hosted pre-alpha sets one strictly necessary session cookie for 24 hours.",
+      "This website sets no cookies and runs no trackers; one optional localStorage key remembers your theme. The hosted pre-alpha sets one strictly necessary cookie for 24 hours.",
   },
   "/license": {
     path: "/license",

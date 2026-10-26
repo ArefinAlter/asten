@@ -1,6 +1,6 @@
 # Asten — handoff
 
-12 October 2026. Asten is a Verne Ltd. product.
+Updated 26 October 2026. Asten is a Verne Ltd. product.
 
 Local-first writing desk with a canon engine. The manuscript stays in SQLite on
 the machine. Asten may notice a contradiction and explain it. It does not write
@@ -56,10 +56,12 @@ writing app.
   hypothetical). Lies and dreams do not count against the world.
 - Analyses and codes: `CANON-E013/E014/E015` attribute and quantity clashes,
   `E101/E102/E103` lifecycle, `E201/E202/E203` two clocks and temporal
-  network, `E301/E302` routes, `E401` knowledge, `E501/E502/E503` relations,
-  `E601/E602` author invariants; `NAME-W001–W004` name hygiene;
-  `PLOT-I001/I002`. Severity by pairing (settled vs settled is an error,
-  prose vs settled a warning, prose vs prose information), confidence
+  network, `E301` routes, `E401` knowledge, `E501/E502/E503` relations,
+  `E601` author invariants; `NAME-W001–W004` name hygiene; `PLOT-I001` the
+  setup ledger. `E302`, `E602` and `PLOT-I002` are in the catalogue but no rule
+  raises them yet. Severity by pairing (settled vs settled is an error,
+  prose vs settled a warning, a merely possible clash information; proposed vs
+  proposed shows only at the Thorough setting), confidence
   thresholds, single-fault priors, explanation chains (①②③) and ranked
   repairs the author owns. Suppressions carry an evidence fingerprint and go
   stale when the evidence changes. Baselines for "new since".
@@ -128,7 +130,7 @@ writing app.
 - Public site (`apps/www`): features, FAQ, glossary, audience pages, roadmap
   and reference refreshed on 12 October to match what shipped.
 
-## In review (21 October, stacked pull requests)
+## Merged on 21 to 25 October (stacked pull requests)
 
 1. Cross-platform builds: Windows x64 and ARM64, macOS universal, Linux
    x86_64 and aarch64; CI on three operating systems; mobile-ready crate;
@@ -140,7 +142,7 @@ writing app.
 4. `docs/DECISIONS.md` and `docs/ROADMAP.md`, with the site roadmap and FAQ
    brought into line.
 
-`docs/ROADMAP.md` is now the engineering roadmap; the list below is the short
+`docs/ROADMAP.md` is the engineering roadmap; the list below is the short
 version.
 
 ## Still to do
@@ -148,16 +150,13 @@ version.
 - Signed installers for Windows, macOS and Linux. The release workflow targets
   the configured desktop platforms on a `v*` tag; installer verification is
   still pending; signing turns on when the Windows and Apple
-  secrets exist (see `docs/PLATFORMS.md`). The download page still says to run
-  from source until a signed build exists.
+  secrets exist (see `docs/PLATFORMS.md`). Release 0.0.1a (Windows x64 and Linux
+  x64) is published unsigned; the download page links it.
 - Mobile shells generated, built and tested on devices (`tauri android init`,
   `tauri ios init` on machines with the SDKs); hardware testing of the ARM
   builds; an ARM runner for the Linux aarch64 release job.
 - Tier A perception models (M1–M5 in the design) and the training pipeline.
   Everything today is Tier B/C.
-- An OpenAPI document for the routes. The TypeScript types are now generated
-  from Rust (`pnpm contracts:gen`) and drift-checked in CI; the route list is
-  not yet described formally.
 - Docker: the compose file runs the API in pairing mode behind nginx with the
   stream unbuffered and unlogged. The images have not been built; the Docker
   daemon was not running in this session.
@@ -166,15 +165,13 @@ version.
 - Reindex the research collection `asten_chunks`.
 - Set `site.origin` in `apps/www/src/site.ts` when a real domain replaces
   `asten-writing.vercel.app`.
-- Legal identity: footer says "Verne Ltd."; legal pages use the entity at
-  vernesystems.com/legal/company. Confirm which name is right. Counsel review
-  before launch.
+- Legal identity: Verne Ltd. everywhere (D28). Counsel review before launch.
 - Rotate the Vercel token that an earlier session printed, if not done.
 
 ## Where things are written down
 
 - `docs/DECISIONS.md`: the decisions and why, as a record that is appended to.
-- `docs/ROADMAP.md`: shipped, in review, next, later, never.
+- `docs/ROADMAP.md`: shipped, next, later, never.
 - `docs/PLATFORMS.md`: support matrix, build recipes, signing.
 - `docs/PARITY.md`: what each client can do and why.
 - `docs/PHONE_SETUP.md`: trusted HTTPS, pairing and phone acceptance checks.

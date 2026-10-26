@@ -152,7 +152,7 @@ export function schemaFor(meta: RouteMeta, trail: RouteMeta[], image: string): N
       headline: meta.og.headline,
       description: meta.description,
       dateModified: meta.modified ?? site.updated,
-      datePublished: meta.published ?? site.updated,
+      datePublished: meta.published ?? site.published,
       author: { "@id": ORG },
       publisher: { "@id": ORG },
       image,

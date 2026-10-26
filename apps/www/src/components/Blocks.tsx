@@ -56,7 +56,7 @@ export function BlockView({ block }: { block: Block }) {
       );
     case "table":
       return (
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="region" aria-label={block.caption ?? "Table"}>
           <table>
             {block.caption ? <caption>{block.caption}</caption> : null}
             <thead>

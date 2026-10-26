@@ -190,8 +190,8 @@ export function Guide() {
             <h2 id="g-codes">The rules that ship today</h2>
             <div className="card-grid card-grid--3">
               <Diagnostic code="CANON-E013" title="Attribute contradiction" lines={["Two values for one attribute at the same story time, no change between", "Settled against settled is an error; the page against canon a warning", "Scribe pack · always on · siblings E014, E015, NAME-W001 to W004"]} />
-              <Diagnostic code="CANON-E101" title="Life after a settled death" lines={["A later beat in story time for someone settled as dead", "Memories and flashbacks excepted", "Lifecycle pack · on · siblings E102, E103"]} />
-              <Diagnostic code="CANON-E201" title="Backward inside a continuous run" lines={["Dated scenes in a run you declared continuous step backward", "E202 dates that cannot all be true · E203 effect before cause", "Clocks pack · on · also Atlas E301/E302, Knowledge E401, Relations E501–E503, Invariants E601"]} />
+              <Diagnostic code="CANON-E101" title="Life after a settled death" lines={["A later beat in story time for someone settled as dead", "A scene placed earlier in story time is not marked", "Lifecycle pack · on · siblings E102, E103"]} />
+              <Diagnostic code="CANON-E201" title="Backward inside a continuous run" lines={["Dated scenes in a run you declared continuous step backward", "E202 dates that cannot all be true · E203 effect before cause", "Clocks pack · on · also Atlas E301, Knowledge E401, Relations E501–E503, Invariants E601"]} />
             </div>
           </section>
 

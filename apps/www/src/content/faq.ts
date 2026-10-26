@@ -53,7 +53,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Will Asten add AI features in the future?",
-        a: "Asten already proposes facts it reads from the page, using fixed rules rather than a model. The roadmap’s later step is small local classifiers that read mentions, attributes, time phrases, and speakers, and that likewise only propose: nothing becomes canon until you confirm it. The [AI policy](/ai-policy) sets the conditions for any AI feature: local models first, a cloud provider only with your own key and explicit consent, and a complete switch-off. None of this has a date; see [the roadmap](/roadmap).",
+        a: "Asten reads the page with fixed rules rather than a model, and it never turns a reading into canon by itself. The roadmap’s later step is small local classifiers that read mentions, attributes, time phrases, and speakers and propose facts: nothing becomes canon until you confirm it. The [AI policy](/ai-policy) sets the conditions for any AI feature: local models first, a cloud provider only with your own key and explicit consent, and a complete switch-off. None of this has a date; see [the roadmap](/roadmap).",
       },
       {
         q: "Will my writing be used to train an AI model?",
@@ -83,11 +83,11 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What continuity errors can Asten catch?",
-        a: "Asten ships seventeen canon rules in seven families. `CANON-E013` marks two values for one attribute, such as auburn and black hair, whether both are confirmed or one is on the page; `CANON-E101` marks a character acting after a confirmed death, such as Captain Oren after chapter 9; `CANON-E201` to `E203` cover story time stepping backward inside a continuous run, dates that cannot all be true, and an effect before its cause; `E301` and `E302` cover travel time and being in two places at once; `E401` knowledge a character cannot have yet; `E501` to `E503` genealogy and exclusive relations; `E601` rules you write yourself. See [the compiler](/features/compiler).",
+        a: "Asten ships fifteen canon rules in seven families. `CANON-E013` marks two values for one attribute, such as auburn and black hair, whether both are confirmed or one is on the page, and also what marks someone placed in two places at once; `CANON-E101` marks a character acting after a confirmed death, such as Captain Oren after chapter 9; `CANON-E201` to `E203` cover story time stepping backward inside a continuous run, dates that cannot all be true, and an effect before its cause; `E301` covers a journey that does not fit the time between two scenes; `E401` knowledge a character cannot have yet; `E501` to `E503` genealogy and exclusive relations; `E601` rules you write yourself. The catalogue also reserves `E302` and `E602`, which no rule raises yet. See [the compiler](/features/compiler).",
       },
       {
         q: "Does Asten find contradictions in my prose automatically?",
-        a: "Yes, for plain attributes. Asten reads names, aliases, hair and eye color, height, age, location, alive or dead, and relations from the page with fixed rules, no model, and weighs them against your canon as warnings. What it reads arrives as proposals you confirm or reject, never as silent canon. Deeper reading, such as a pronoun with no name in the sentence, is not weighed.",
+        a: "Yes, for plain attributes. Asten reads names, aliases, hair and eye color, height, age, location, alive or dead, and relations from the page with fixed rules, no model, and weighs them against the facts you have confirmed, as warnings. What it reads is used only for that comparison; it is never stored as a fact or turned into canon. Deeper reading, such as a pronoun with no name in the sentence, is not weighed.",
       },
       {
         q: "How do I silence a warning in Asten?",
@@ -95,7 +95,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What if a contradiction in my story is intentional?",
-        a: "Asten gives you several ways to keep an intentional contradiction. Anything inside quotation marks counts as something a character says, not as world truth; a scene can be marked a memory, dream, vision, or frame story and nothing in it is weighed against the world; a narrator can be marked unreliable; a fact can be marked contested or deprecated; or you can suppress the single mark with a reason and keep your sentence. The canon is yours; Asten only records it.",
+        a: "Asten gives you several ways to keep an intentional contradiction. Anything inside quotation marks counts as something a character says, not as world truth; a scene can be marked a dream, vision, or frame story and nothing in it is weighed against the world, while a memory is weighed at the story time you give it; a narrator can be marked unreliable; a fact can be marked contested or deprecated; or you can suppress the single mark with a reason and keep your sentence. The canon is yours; Asten only records it.",
       },
       {
         q: "Do I have to fill out a story bible before I start writing in Asten?",
@@ -107,7 +107,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Does Asten work with flashbacks?",
-        a: "Yes, Asten allows flashbacks: it keeps two clocks, story time and reading order, so a scene can happen early and be told late, and it argues only inside a run of scenes you declared continuous. A scene marked as a memory or flashback is never weighed against the world. `CANON-E201` appears only when a continuous run steps backward in story time. See [time](/features/time).",
+        a: "Yes, Asten allows flashbacks: it keeps two clocks, story time and reading order, so a scene can happen early and be told late, and it argues only inside a run of scenes you declared continuous. A flashback is a scene placed earlier in story time, and a memory is weighed at the story time you give it. `CANON-E201` appears only when a continuous run steps backward in story time. See [time](/features/time).",
       },
     ],
   },
