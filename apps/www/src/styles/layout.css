@@ -364,7 +364,7 @@
 }
 
 .nav-menu--narrow .menu-grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .menu-link {
@@ -675,7 +675,7 @@
 
 @media (max-width: 860px) {
   .page-hero-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .page-hero-art {
@@ -870,7 +870,7 @@
 
 @media (max-width: 960px) {
   .footer-inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .footer-cols {

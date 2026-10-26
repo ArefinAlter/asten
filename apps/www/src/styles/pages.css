@@ -38,7 +38,7 @@
 @media (max-width: 900px) {
   .split,
   .split-prose {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -310,7 +310,7 @@
 
 @media (max-width: 720px) {
   .compare-cols {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -394,7 +394,7 @@
 @media (max-width: 640px) {
   .lanes,
   .lanes--compact {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -427,7 +427,7 @@
 
 @media (max-width: 760px) {
   .article-lead {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -478,7 +478,7 @@
 
 @media (max-width: 900px) {
   .article-summary {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -625,7 +625,7 @@
 
 @media (max-width: 860px) {
   .glossary-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .glossary-tools {
@@ -654,6 +654,7 @@
 .guide {
   display: grid;
   gap: clamp(48px, 6vw, 80px);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .guide > section > h2 {
@@ -848,7 +849,7 @@
 
 @media (max-width: 720px) {
   .dodont {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

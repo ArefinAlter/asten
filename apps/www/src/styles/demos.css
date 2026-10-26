@@ -605,7 +605,7 @@
 
 @media (max-width: 860px) {
   .pyramid-explorer {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -619,6 +619,8 @@
 
 .cartouche-input {
   width: min(100%, 320px);
+  min-width: 0;
+  max-width: 100%;
   padding: 12px 18px;
   border: 1.5px solid var(--rule-strong);
   border-radius: 999px;
@@ -855,7 +857,7 @@
 
 @media (max-width: 860px) {
   .packs-demo {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -997,7 +999,7 @@
 
 @media (max-width: 760px) {
   .local-demo {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .local-wire {
@@ -1234,7 +1236,7 @@
 
 @media (max-width: 900px) {
   .desk-body {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .desk-binder {

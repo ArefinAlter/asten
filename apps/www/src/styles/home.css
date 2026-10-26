@@ -230,7 +230,7 @@
 
 @media (max-width: 900px) {
   .hero-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .stela {
@@ -409,7 +409,7 @@
 
 @media (max-width: 860px) {
   .inks {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .inks-art .palette-mark {
@@ -419,7 +419,7 @@
 
 @media (max-width: 560px) {
   .contrast {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -491,7 +491,7 @@
 
 @media (max-width: 520px) {
   .steps {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .step {
@@ -550,7 +550,7 @@
 
 @media (max-width: 960px) {
   .night-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -619,7 +619,7 @@
 
 @media (max-width: 900px) {
   .privacy-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .privacy-grid .wedjat {
@@ -629,7 +629,7 @@
 
 @media (max-width: 520px) {
   .promises {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -717,7 +717,7 @@
 
 @media (max-width: 900px) {
   .hood {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -762,7 +762,7 @@
 
 @media (max-width: 900px) {
   .status-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
