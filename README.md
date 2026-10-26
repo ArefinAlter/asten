@@ -24,11 +24,11 @@ visit; it is for trying Asten, not for manuscripts. How it is hosted:
 
 ## Platforms
 
-Windows (x64, ARM64), macOS 11+ (Apple silicon and Intel, one universal
-build), Linux (x86_64, aarch64) as a desktop app; any modern browser against
-the local API; Android and iOS through the same Tauri shell once the platform
-projects are generated. See `docs/PLATFORMS.md` for the support matrix, build
-recipes and signing.
+Published today: release 0.0.1a for Windows x64 and Linux x64 (unsigned), and
+the hosted pre-alpha in any modern browser. Configured but not yet published:
+Windows ARM64, macOS 11+ (one universal build), Linux aarch64, and the Android
+and iOS shells. A browser can also talk to the local API. See
+`docs/PLATFORMS.md` for the support matrix, build recipes and signing.
 
 ## Prerequisites
 

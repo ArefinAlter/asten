@@ -91,18 +91,22 @@ curl -s $API/desk -H "$AUTH"
 # A project and a scene.
 PROJECT=$(curl -s -X POST $API/projects -H "$AUTH" -H 'content-type: application/json' \
   -d '{ "name": "The Harbor", "kind": "novel", "description": null }' | jq -r .id)
-DOCUMENT=$(curl -s -X POST $API/projects/$PROJECT/documents -H "$AUTH" -H 'content-type: application/json' \
-  -d '{ "kind": "scene", "title": "Arrival", "parent_id": null }' | jq -r .id)
+CREATED=$(curl -s -X POST $API/projects/$PROJECT/documents -H "$AUTH" -H 'content-type: application/json' \
+  -d '{ "kind": "scene", "title": "Arrival", "parent_id": null }')
+DOCUMENT=$(echo "$CREATED" | jq -r .id)
+HEAD=$(echo "$CREATED" | jq -r .head_seq)   # 1: creating a document is its first event
 
 # Write, with optimistic concurrency: the commit is refused with 409 when the
-# document moved past the head sequence you last saw.
+# document moved past the head sequence you last saw (the response carries the
+# new `head_seq`).
 curl -s -X PUT $API/projects/$PROJECT/documents/$DOCUMENT -H "$AUTH" -H 'content-type: application/json' \
-  -d '{ "content_json": { "type": "doc", "content": [ { "type": "paragraph",
-        "content": [ { "type": "text", "text": "Mira had black hair." } ] } ] },
-        "expected_head_seq": 0 }'
+  -d "{ \"content_json\": { \"type\": \"doc\", \"content\": [ { \"type\": \"paragraph\",
+        \"content\": [ { \"type\": \"text\", \"text\": \"Mira had black hair.\" } ] } ] },
+        \"expected_head_seq\": $HEAD }"
 
 # What the engine thinks.
 curl -s $API/projects/$PROJECT/story/diagnostics -H "$AUTH"
+# A fact card needs an entity in the cast (create one under Cast, or POST /entities).
 curl -s "$API/projects/$PROJECT/story/fact-card?entity=mira" -H "$AUTH"
 ```
 
@@ -114,6 +118,7 @@ Errors share one shape, with the HTTP status repeated in `error.code`:
 
 | Status | Meaning                                                                 |
 | ------ | ----------------------------------------------------------------------- |
+| `400`  | A path parameter is not a valid id. The body is plain text, not the envelope above. |
 | `401`  | No valid token, cookie or ticket. `WWW-Authenticate: Bearer` is set.    |
 | `403`  | A guest token asked for something only a desk or owner session may do.  |
 | `404`  | The project, document or other record does not exist.                   |

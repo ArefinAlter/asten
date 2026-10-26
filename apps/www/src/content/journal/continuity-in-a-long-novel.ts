@@ -208,14 +208,14 @@ export const article: Article = {
           code: "CANON-E013",
           title: "Mira’s hair was settled as auburn.",
           lines: [
-            "Chapter 2 settled: Mira · hair · auburn",
-            "Chapter 19 says: “She pushed her black hair…”",
-            "Keep my sentence · Update canon · Add an event",
+            "① Settled: Mira · hair · auburn",
+            "② Chapter 19 says: “black”",
+            "Add an event · Retire “auburn” · Silence this mark · Keep my sentence",
           ],
         },
         {
           kind: "p",
-          text: "The mark doesn’t fix anything. It names the rule, the sentence, and the settled fact, and leaves you the choice. *Keep my sentence* if chapter 19 is right and you’ll revisit chapter 2. *Update canon* if black is the new truth. *Add an event* if Mira dyed her hair and the story should show it. Or [suppress](/glossary#suppression) the mark with a reason; the suppression is saved with the project, so it won’t come back on the next pass.",
+          text: "The mark doesn’t fix anything. It names the rule, the sentence, and the settled fact, and leaves you the choice. *Keep my sentence* if chapter 19 is right and you’ll revisit chapter 2. *Retire “auburn”* if black is the new truth. *Add an event* if Mira dyed her hair and the story should show it. Or [suppress](/glossary#suppression) the mark with a reason; the suppression is saved with the project, so it won’t come back on the next pass.",
         },
         {
           kind: "h3",
@@ -230,9 +230,9 @@ export const article: Article = {
           code: "CANON-E101",
           title: "Captain Oren acts after a settled death.",
           lines: [
-            "Chapter 9 settled: Captain Oren · lifecycle · dead",
-            "Chapter 14 beat: Oren orders the harbor chain lowered",
-            "Mark it a flashback · Update canon · Silence this rule",
+            "① Captain Oren dies (day 9)",
+            "② Chapter 14 mentions Captain Oren in narration: “Captain Oren”",
+            "Mark the scene as a memory · Set the scene’s time · Move the death later · Silence this mark · Keep my sentence",
           ],
         },
         {
@@ -247,7 +247,7 @@ export const article: Article = {
       blocks: [
         {
           kind: "p",
-          text: "Be wary of any tool that promises to catch everything. Asten doesn’t. It reads only plain attributes from your prose, such as hair color, age, or whether someone is alive, and only when a name is in the same sentence; a pronoun on its own is not weighed, and what it reads arrives as a proposal for you to confirm. Travel checks work only along routes you declare with a travel time. Name drift is still partly a job for your search passes, though Asten flags names that aren’t in the cast and names that are easy to confuse, and giving an entity its aliases means “the Captain” and Oren are recorded as the same person.",
+          text: "Be wary of any tool that promises to catch everything. Asten doesn’t. It reads only plain attributes from your prose, such as hair color, age, or whether someone is alive, and only when a name is in the same sentence; a pronoun on its own is not weighed, and what it reads is never stored as a fact. Travel checks work only along routes you declare with a travel time. Name drift is still partly a job for your search passes, though Asten flags names that aren’t in the cast and names that are easy to confuse, and giving an entity its aliases means “the Captain” and Oren are recorded as the same person.",
         },
         {
           kind: "p",
@@ -273,7 +273,7 @@ export const article: Article = {
     },
     {
       q: "Can software find continuity errors automatically?",
-      a: "Software can compare new pages against details you have settled. Asten marks contradictions against confirmed facts. It also reads plain attributes from the page with fixed rules, but only proposes them; you decide what is settled.",
+      a: "Software can compare new pages against details you have settled. Asten marks contradictions against confirmed facts. It also reads plain attributes from the page with fixed rules and weighs them against your facts, but it never settles anything; you decide what is canon.",
     },
     {
       q: "How does Asten handle a character who changes, like dyed hair?",

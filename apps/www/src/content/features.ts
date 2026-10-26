@@ -93,11 +93,11 @@ export const features: Feature[] = [
     h1: "Check the manuscript against settled facts",
     lede: "Canon is what your story says is true. Settle a fact (*Mira · hair · auburn*) and Asten weighs every later page against it. If chapter 19 says black, you get a red mark with both sides, never a rewrite.",
     answer:
-      "Canon checks in Asten compare your manuscript against facts you have settled. A fact is an entity, a predicate, and a value, with a status, a modality, an optional span of story time, and a source. When two confirmed facts disagree, or the page says something different from what you settled, Asten marks it in red with code CANON-E013 and shows both sides. Asten reads plain attributes from your prose with fixed rules, not a model, and treats dialogue, belief, memory, and dreams as separate contexts.",
+      "Canon checks in Asten compare your manuscript against facts you have settled. A fact is an entity, a predicate, and a value, with a status, a modality, an optional span of story time, and a source. When two confirmed facts disagree, or the page says something different from what you settled, Asten marks it in red with code CANON-E013 and shows both sides. Asten reads plain attributes from your prose with fixed rules, not a model, and keeps dialogue, belief, dreams, visions, and frame stories in contexts of their own.",
     points: [
       { title: "Facts with a source", text: "Every fact records where it came from, so a mark can show you the sentence that settled it." },
-      { title: "Statuses you control", text: "Proposed, confirmed, deprecated, rejected. Confirmed against confirmed is an error; the page against your canon is a warning; the page against itself is information." },
-      { title: "Room for lies and legends", text: "Dialogue, belief, memory, dream, vision, and frame stories are separate contexts. What a character says or dreams never contradicts the world, and contested facts stay quiet." },
+      { title: "Statuses you control", text: "Proposed, confirmed, deprecated, rejected. Confirmed against confirmed is an error, the page against a confirmed fact is a warning, and a clash that is only possible is information." },
+      { title: "Room for lies and legends", text: "Dialogue, belief, dream, vision, and frame stories are separate contexts. What a character says or dreams never contradicts the world, and contested facts stay quiet. A memory is weighed at the story time you give it." },
       { title: "Change over time", text: "Give a fact a valid-from and valid-to in story time, and a dyed head of hair stops being a contradiction." },
       { title: "Stable codes", text: "Every mark carries a code, like CANON-E013, that means the same thing every time." },
       { title: "Silence with a reason", text: "Suppress a mark or a whole rule. Suppressions are stored with the project, so the decision is remembered." },
@@ -115,7 +115,7 @@ export const features: Feature[] = [
             { term: "Status", text: "Proposed, confirmed, deprecated, or rejected. Only confirmed facts produce errors." },
             { term: "Modality", text: "Established, inferred, contested, or author override. Contested facts stay quiet." },
             { term: "Story time", text: "An optional valid-from and valid-to, for facts that change during the book." },
-            { term: "Context", text: "World, narration, dialogue, belief, memory, dream, vision, frame, or hypothetical. Only world and reliable narration count against canon." },
+            { term: "Context", text: "World, narration, dialogue, belief, memory, dream, vision, frame, or hypothetical. World, reliable narration, and memory (at the story time you give it) count against canon; the rest do not." },
           ] },
         ],
       },
@@ -124,8 +124,8 @@ export const features: Feature[] = [
         heading: "What does a mark look like?",
         blocks: [
           { kind: "p", text: "A mark is short and specific. It names the rule, quotes both sides, and lists what you can do. It does not tell you which side is right, because only you know that." },
-          { kind: "diagnostic", code: "CANON-E013", title: "Mira’s hair was settled as auburn.", lines: ["Settled in chapter 2: Mira · hair_color · auburn", "Chapter 19 says: “Mira pushed her black hair out of her eyes.”", "Keep my sentence · Update canon · Add a change in story time · Silence this rule"] },
-          { kind: "p", text: "Two confirmed facts that disagree over overlapping story time are an **error**. The page disagreeing with a confirmed fact is a **warning**: worth a look, not a verdict. The page disagreeing with itself is **information**. Every mark reads as a numbered chain (①②③), names the statement most likely at fault, and lists repairs you own: add a change event, mark the scene a memory, retire the fact, or keep your sentence." },
+          { kind: "diagnostic", code: "CANON-E013", title: "Mira’s hair was settled as auburn.", lines: ["① Settled: Mira · hair · auburn", "② Chapter 19 says: “black”", "Most likely slip: ②", "Add an event · auburn holds until day 39 · Retire “auburn” · Silence this mark · Keep my sentence"] },
+          { kind: "p", text: "Two confirmed facts that disagree over overlapping story time are an **error**. The page disagreeing with a confirmed fact is a **warning**: worth a look, not a verdict. A clash that is only possible, because a scene’s time is uncertain, is **information**; a merely proposed fact speaks only at the Thorough setting. Every mark reads as a numbered chain (①②③), names the statement most likely at fault, and lists repairs you own: add a change event, mark the scene a memory, retire the fact, or keep your sentence." },
         ],
       },
       {
@@ -135,11 +135,9 @@ export const features: Feature[] = [
           { kind: "list", items: [
             "Add them directly in the cast or canon views.",
             "Settle a world entry. Moving it from *sketched* to *settled* can mint a confirmed fact.",
-            "Give a wiki page an entity and attributes; each attribute becomes a fact.",
-            "Write an inline assertion in a note, such as `[[mira.hair_color=auburn]]`, if you like typing more than clicking.",
-            "Let the page propose. Asten reads names and plain attributes from your prose (hair, eyes, height, age, where someone is, alive or dead, who is married to whom) and lists them as proposals you confirm or reject.",
+            "Add a fact with the status *proposed* to park it: it can raise a warning at most, never an error, until you confirm it.",
           ] },
-          { kind: "callout", tone: "rubric", title: "Asten reads the page, not your mind", text: "The reading is deterministic: fixed rules over words and cues, no model. It attributes an observation to a name in the same sentence, so a pronoun on its own is not weighed. Anything inside quotation marks counts as something a character *says*, not as world truth. Nothing Asten reads becomes canon until you confirm it." },
+          { kind: "callout", tone: "rubric", title: "Asten reads the page, not your mind", text: "The reading is deterministic: fixed rules over words and cues, no model. It attributes an observation to a name in the same sentence, so a pronoun on its own is not weighed. Anything inside quotation marks counts as something a character *says*, not as world truth. What Asten reads (hair, eyes, height, age, where someone is, alive or dead, who is married to whom) is weighed against your canon and never stored as a fact; only you settle canon. You can also type an explicit reading into the prose, such as `[[mira.hair_color=black]]`, and Asten weighs it the same way." },
         ],
       },
       {
@@ -210,7 +208,7 @@ export const features: Feature[] = [
     short: "Story time and reading order, kept separately, so flashbacks are a choice and not a mistake.",
     title: "Two clocks: story time and reading order",
     description:
-      "Asten keeps two clocks: when events happen (story time) and when readers meet them (reading order). It marks story time that steps backward inside a run of scenes you declared continuous.",
+      "Asten keeps two clocks: when events happen (story time) and when readers meet them (reading order). It marks story time that steps backward only inside a run you declared continuous.",
     h1: "Story time and reading order, kept apart",
     lede: "Every story has two timelines: the order things happen, and the order readers find out. Asten keeps both, and marks the moments they cross so you can tell a flashback from a slip.",
     answer:
@@ -219,7 +217,7 @@ export const features: Feature[] = [
       { title: "Story time", text: "When it happens in the world: day 14, 1890-03-02, the winter of 1890, three days after the siege. Day counts, Gregorian dates, or a fictional calendar with your own months." },
       { title: "Reading order", text: "When the reader meets it: chapter 3, scene 2." },
       { title: "CANON-E201 to E203", text: "Story time stepping backward inside a run you declared continuous; dates that cannot all be true; an effect seen before its cause." },
-      { title: "CANON-E101", text: "Someone acting after a settled death gets a mark, unless the scene is a memory, a flashback, or placed earlier in story time." },
+      { title: "CANON-E101", text: "Someone acting after a settled death gets a mark, unless the scene is placed earlier in story time than the death (a flashback), or the mention is a dream, a vision, or something a character says." },
       { title: "Silent until dated", text: "The clocks only compare scenes you’ve placed on both. Undated scenes are never judged." },
       { title: "No timeline required", text: "Draft first. Date scenes when the order starts to matter." },
     ],
@@ -236,9 +234,9 @@ export const features: Feature[] = [
         id: "what-asten-checks",
         heading: "What does Asten check, exactly?",
         blocks: [
-          { kind: "diagnostic", code: "CANON-E201", title: "Inside the run “The siege”, story time steps backward.", lines: ["① The harbor burns · day 15 · chapter 9", "② Oren sails · day 14 · chapter 10", "Reorder the binder · Retcon a date · Mark chapter 10 a flashback · Keep my order"] },
+          { kind: "diagnostic", code: "CANON-E201", title: "Story time runs backward inside the continuous run “The siege”.", lines: ["① Chapter 10: placed at day 17", "② Chapter 11: placed at day 4", "Set the scene’s time · This scene is not part of the run · Silence this mark · Keep my sentence"] },
           { kind: "p", text: "Asten compares scenes only inside a run you declared continuous, so an ordinary flashback raises nothing. Give scenes dates, or relative placements such as “three days after the siege”, and Asten solves them together: if no placement satisfies them all, CANON-E202 lists the dates in the knot. If a state is seen before the event that causes it, CANON-E203 says so." },
-          { kind: "diagnostic", code: "CANON-E101", title: "Oren acts after a settled death (Oren pours the tea).", lines: ["Settled: Captain Oren · status · dead (chapter 9)", "Later beat: “Oren pours the tea” · chapter 14", "Mark the beat a flashback · Move the death · Silence this rule"] },
+          { kind: "diagnostic", code: "CANON-E101", title: "Captain Oren acts after a settled death.", lines: ["① Captain Oren dies (day 9)", "② Chapter 14 mentions Captain Oren in narration: “Captain Oren”", "③ Chapter 14: placed at day 14", "Mark the scene as a memory · Set the scene’s time · Move the death later · Silence this mark · Keep my sentence"] },
         ],
       },
       {
@@ -250,7 +248,7 @@ export const features: Feature[] = [
       },
     ],
     faqs: [
-      { q: "Does Asten treat every flashback as an error?", a: "No. Asten compares story time only inside a run of scenes you declared continuous, and a scene marked as a memory or flashback is never weighed against the world. CANON-E201 appears only when a run you said was continuous steps backward." },
+      { q: "Does Asten treat every flashback as an error?", a: "No. Asten compares story time only inside a run of scenes you declared continuous, and a flashback is simply a scene placed earlier in story time. CANON-E201 appears only when a run you said was continuous steps backward; take a scene out of the run and it is no longer compared." },
       { q: "Do I have to date every scene in Asten?", a: "No. Asten only compares scenes that have both a story time and a reading order. Undated scenes are never marked." },
       { q: "Can Asten use a fantasy calendar?", a: "Yes. A project’s clock can count days, use Gregorian dates such as “1890-03-02” or “the winter of 1890”, or use a fictional calendar whose months you define. Relative placements such as “three days after the siege” resolve against the scene they name." },
     ],
@@ -296,7 +294,7 @@ export const features: Feature[] = [
     ],
     faqs: [
       { q: "Is Asten a worldbuilding app?", a: "Asten is a writing app with optional worldbuilding. Its wall, atlas, and dossier hold places, cultures, systems, creatures, items, questions, and fragments, but none of them are required to write." },
-      { q: "Does Asten’s atlas check travel times?", a: "Yes, once you declare routes. Give two places a route with a travel time, and CANON-E301 marks a journey that does not fit the story time between two scenes; CANON-E302 marks someone placed in two places at once." },
+      { q: "Does Asten’s atlas check travel times?", a: "Yes, once you declare routes. Give two places a route with a travel time, and CANON-E301 marks a journey that does not fit the story time between two scenes. Someone placed in two places at the same story time is marked CANON-E013, because where a person is counts as a one-valued attribute." },
     ],
     demo: "pyramid",
     art: "pyramid",
@@ -314,11 +312,11 @@ export const features: Feature[] = [
     h1: "Deterministic checks with stable codes",
     lede: "Programmers have compilers that read code and point at the line that breaks. Asten does the same for a story’s facts, with deterministic rules, stable codes, and evidence for every mark.",
     answer:
-      "Asten’s compiler is a deterministic rule engine written in Rust. It reads your settled facts, your timeline, and the page itself, and emits diagnostics with stable codes (CANON-E013 to E602, NAME-W001 to W004, PLOT-I001 and I002, and optional CRAFT hints) at four severities: error, warning, information, and hint. Each mark explains itself in a numbered chain and offers repairs. It runs entirely on your machine and never changes your text.",
+      "Asten’s compiler is a deterministic rule engine written in Rust. It reads your settled facts, your timeline, and the page itself, and emits diagnostics with stable codes (CANON-E013 to E601, NAME-W001 to W004, PLOT-I001, and optional CRAFT hints) at four severities: error, warning, information, and hint. Each mark explains itself in a numbered chain and offers repairs. It runs entirely on your machine and never changes your text.",
     points: [
       { title: "Deterministic", text: "Same project, same marks. No model, no randomness, no “it depends on the prompt”." },
       { title: "Stable codes", text: "CANON-E013 always means an attribute contradiction. Search it, discuss it, suppress it." },
-      { title: "Four severities", text: "Errors for confirmed against confirmed, warnings for the page against canon, information for the page against itself, hints for optional craft notes." },
+      { title: "Four severities", text: "Errors for confirmed against confirmed, warnings for the page against a confirmed fact, information for clashes that are only possible, hints for confusable names and optional craft notes." },
       { title: "Evidence attached", text: "Every mark points at a span in a document, reads as a numbered chain (①②③), and names the statement most likely at fault." },
       { title: "Repairs you own", text: "Add an event, mark the scene a memory, retire a fact, silence the mark, or keep your sentence. Bisect finds the edit that raised a mark." },
       { title: "Append-only history", text: "Document operations are recorded, and named snapshots restore a revision on your own disk." },
@@ -334,12 +332,13 @@ export const features: Feature[] = [
             ["CANON-E014 / E015", "Scribe", "An immutable attribute (a birthplace) changed; an attribute on the wrong kind of thing", "Always on"],
             ["CANON-E101 / E102 / E103", "Lifecycle", "Acting after a settled death; appearing before birth; an item used after it was destroyed", "On"],
             ["CANON-E201 / E202 / E203", "Clocks", "Story time stepping backward inside a continuous run; dates that cannot all be true; an effect before its cause", "On"],
-            ["CANON-E301 / E302", "Atlas", "A journey that does not fit the time between scenes; in two places at once", "On"],
+            ["CANON-E301", "Atlas", "A journey that does not fit the time between two scenes. Two places at one story time is marked E013.", "On"],
             ["CANON-E401", "Knowledge", "A character using knowledge no event has given them yet", "On"],
             ["CANON-E501 / E502 / E503", "Relations", "Their own ancestor; two of an exclusive relation at once; a parent too young", "On"],
-            ["CANON-E601 / E602", "Invariants", "A rule you wrote in the invariants panel fails on the scene trace; a pack rule fails", "On"],
+            ["CANON-E601", "Invariants", "A rule you wrote in the invariants panel fails on the scene trace", "On"],
             ["NAME-W001 to W004", "Scribe", "A name not in the cast; named before being introduced; confusable names; a fact pointing at a removed entity", "Always on"],
-            ["PLOT-I001 / I002", "Invariants", "A setup not yet paid off; set up and never used by the end", "On"],
+            ["PLOT-I001", "Invariants", "A setup you marked for payoff has not been paid off yet", "On"],
+            ["CANON-E302, CANON-E602, PLOT-I002", "Reserved", "Codes the catalogue holds for later; no rule raises them yet", "Not raised"],
             ["CRAFT-H001 / H002", "Diction watch", "Filter words such as “very” and “really”, as optional notes", "Off"],
           ] },
         ],
@@ -374,7 +373,7 @@ export const features: Feature[] = [
     short: "Optional sets of rules and hints. Turn on what helps; nothing becomes doctrine.",
     title: "Method packs: rules you can decline",
     description:
-      "Asten’s checks come in packs: Scribe (always on), Lifecycle, Clocks, Relations, Knowledge, Atlas, Invariants, and the optional Diction watch. Enable what helps you. No craft doctrine is ever a default.",
+      "Asten’s checks come in eight packs: Scribe (always on), Lifecycle, Clocks, Relations, Knowledge, Atlas, Invariants, and the optional Diction watch. No craft doctrine is a default.",
     h1: "Optional groups of rules",
     lede: "Asten doesn’t believe in one right way to write. Its checks come in packs you turn on and off, and craft advice stays switched off until you ask for it.",
     answer:
@@ -383,8 +382,8 @@ export const features: Feature[] = [
       { title: "Scribe", text: "The core canon compiler. Attribute contradictions and name hygiene, CANON-E013 to E015 and NAME-W001 to W004. Always on." },
       { title: "Lifecycle", text: "A settled death followed by a later act, a birth after a first appearance, an item used after it was destroyed. CANON-E101 to E103." },
       { title: "Clocks", text: "Story time inside continuous runs, dates that cannot all be true, effects before causes. CANON-E201 to E203. Silent until scenes are dated." },
-      { title: "Relations, Knowledge, Atlas", text: "Genealogy and exclusive relations (E501 to E503), who knows what and when (E401), routes and travel time (E301, E302)." },
-      { title: "Invariants", text: "Rules you write yourself in plain patterns (“after X, never Y”), checked against the scene trace. CANON-E601, and setup ledgers PLOT-I001 and I002." },
+      { title: "Relations, Knowledge, Atlas", text: "Genealogy and exclusive relations (E501 to E503), who knows what and when (E401), routes and travel time (E301)." },
+      { title: "Invariants", text: "Rules you write yourself in plain patterns (“after X, never Y”), checked against the scene trace. CANON-E601, and the setup ledger PLOT-I001." },
       { title: "Diction watch", text: "Optional craft hints for filter words. Never a canon error. Off until you enable it." },
     ],
     sections: [
@@ -420,7 +419,7 @@ export const features: Feature[] = [
     short: "Compile to Markdown, Fountain, HTML, .docx, EPUB, and Final Draft. Optional Word and Docs add-ins talk to your own machine.",
     title: "Word and Google Docs: export, import, and add-ins",
     description:
-      "Asten compiles to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx), and imports all but EPUB back. Optional Word and Google Docs add-ins show marks from your local Asten.",
+      "Asten compiles to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx), and imports all but EPUB. Word and Google Docs add-ins show marks from your local Asten.",
     h1: "Export, import, and add-ins for Word and Google Docs",
     lede: "Your editor wants a .docx. Your co-writer lives in Google Docs. Asten sends the manuscript out and takes it back, and two small add-ins let those apps show Asten’s marks without your canon leaving your machine.",
     answer:

@@ -29,7 +29,7 @@ const details: Section[] = [
         { term: "Veld · east of · the reef", text: "Settled from the atlas." },
         { term: "The guild · founded · year 300", text: "Contested: three characters disagree, and that’s the point." },
       ] },
-      { kind: "p", text: "You can settle facts from the cast, from a world entry you mark *settled*, from a wiki page’s attributes, or with an inline note like `[[mira.hair_color=auburn]]`. Asten also reads names and plain attributes from the page with fixed rules; what it reads arrives as a proposal and becomes canon only if you confirm it." },
+      { kind: "p", text: "You can settle facts from the cast or canon views, or from a world entry you mark *settled*. Asten also reads names and plain attributes from the page with fixed rules and weighs them against your facts; what it reads is never stored as a fact, so canon changes only when you change it." },
     ],
   },
   {
@@ -45,9 +45,10 @@ const details: Section[] = [
     blocks: [
       { kind: "p", text: "A mark is a question, not a correction. Every mark offers choices, and none of them touch your sentence unless you do:" },
       { kind: "list", items: [
-        "**Keep my sentence.** Silence the mark. The suppression and your reason stay with the project.",
-        "**Update canon.** The page was right; the record changes.",
-        "**Record a change.** Give facts a span in story time: auburn until chapter 12, black after.",
+        "**Keep my sentence.** Nothing changes on the page, and the mark stays until you decide.",
+        "**Silence the mark.** The suppression and your reason stay with the project, and the mark comes back for review if its evidence changes.",
+        "**Retire the old fact.** The page was right; retire “auburn” and settle black.",
+        "**Record a change.** Add an event, or let auburn hold until a day: auburn until chapter 12, black after.",
         "**Mark it contested.** For lies, legends, and unreliable narrators. Contested facts never raise errors.",
         "**Deprecate the old fact.** It stays in history but stops being compared.",
       ] },
@@ -115,16 +116,16 @@ export function HowItWorks() {
 
       <section className="register register--sunk" aria-labelledby="codes-h">
         <div className="wrap">
-          <SectionHead id="codes-h" title="Three of the seventeen rules" text="Asten ships seventeen canon rules in seven families, each with a stable code that means the same thing every time. Three examples:" />
+          <SectionHead id="codes-h" title="Three of the fifteen rules" text="Asten ships fifteen canon rules in seven families, each with a stable code that means the same thing every time. Three examples:" />
           <div className="card-grid card-grid--3">
             <div data-reveal>
-              <Diagnostic code="CANON-E013" title="Mira’s hair was settled as auburn." lines={["Chapter 2: Mira · hair_color · auburn", "Chapter 19: “…her black hair…”", "Keep · Update canon · Add change"]} />
+              <Diagnostic code="CANON-E013" title="Mira’s hair was settled as auburn." lines={["① Settled: Mira · hair · auburn", "② Chapter 19 says: “black”", "Add an event · Retire “auburn” · Silence this mark · Keep my sentence"]} />
             </div>
             <div data-reveal>
-              <Diagnostic code="CANON-E101" title="Oren acts after a settled death." lines={["Chapter 9: Oren · status · dead", "Chapter 14: “Oren pours the tea”", "Mark flashback · Move the death · Silence"]} />
+              <Diagnostic code="CANON-E101" title="Oren acts after a settled death." lines={["① Captain Oren dies (day 9)", "② Chapter 14 mentions Captain Oren in narration", "Mark the scene as a memory · Set the scene’s time · Keep my sentence"]} />
             </div>
             <div data-reveal>
-              <Diagnostic code="CANON-E201" title="Story time runs backward inside a continuous run." lines={["Ch. 11 “The harbor burns”: day 17", "Ch. 12 “The morning after”: day 4", "Reorder · Retcon a date · Mark it a flashback"]} />
+              <Diagnostic code="CANON-E201" title="Story time runs backward inside a continuous run." lines={["① Chapter 10: placed at day 17", "② Chapter 11: placed at day 4", "Set the scene’s time · This scene is not part of the run · Keep my sentence"]} />
             </div>
           </div>
         </div>

@@ -64,7 +64,7 @@ export const glossary: GlossaryTerm[] = [
     term: "CANON-E101",
     short:
       "CANON-E101 is Asten’s life-after-death rule: it marks a character who acts after their death has been confirmed.",
-    long: "Captain Oren dies in chapter 9. If a later scene in story time has him giving orders, Asten marks it; a memory or a flashback is not marked. The rule belongs to the Lifecycle pack, which is on by default.",
+    long: "Captain Oren dies in chapter 9. If a later scene in story time has him giving orders, Asten marks it; a scene placed earlier in story time (a flashback) is not marked. The rule belongs to the Lifecycle pack, which is on by default.",
     see: "/features/compiler",
     related: ["lifecycle-pack", "diagnostic", "confirmed-fact", "entity"],
   },
@@ -73,7 +73,7 @@ export const glossary: GlossaryTerm[] = [
     term: "CANON-E201",
     short:
       "CANON-E201 is Asten’s clocks rule: it marks story time stepping backward inside a run of scenes you declared continuous.",
-    long: "It belongs to the Clocks pack, which is on by default, and it stays silent until scenes are dated and placed in a run. A flashback outside a run, or a scene marked as a memory, is never marked. Its siblings are CANON-E202, for dates that cannot all be true, and CANON-E203, for an effect seen before its cause.",
+    long: "It belongs to the Clocks pack, which is on by default, and it stays silent until scenes are dated and placed in a run. A flashback outside a run is never marked, and a scene you take out of the run is no longer compared. Its siblings are CANON-E202, for dates that cannot all be true, and CANON-E203, for an effect seen before its cause.",
     see: "/features/time",
     related: ["story-time", "reading-order", "clocks-pack", "flashback"],
   },
@@ -109,7 +109,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Confirmed fact",
     short:
       "A confirmed fact is a fact you have settled as canon; in Asten, only confirmed facts can produce hard contradictions.",
-    long: "Mira · hair color · auburn, confirmed in chapter 2, is one. Facts Asten reads from the page stay proposals until you confirm them.",
+    long: "Mira · hair color · auburn, confirmed in chapter 2, is one. What Asten reads from the page is weighed against your facts but never becomes a fact by itself.",
     see: "/features/canon",
     related: ["fact", "proposed-fact", "deprecated-fact", "canon"],
   },
@@ -217,7 +217,7 @@ export const glossary: GlossaryTerm[] = [
     term: "Flashback",
     short:
       "A flashback is a scene that shows events from earlier in story time than the scenes around it.",
-    long: "Asten allows them and keeps story time and reading order as separate clocks. It argues only inside a run of scenes you declared continuous, and a scene marked as a memory or flashback is never weighed against the world.",
+    long: "Asten allows them and keeps story time and reading order as separate clocks. It argues only inside a run of scenes you declared continuous, and a flashback is simply a scene placed earlier in story time.",
     see: "/features/time",
     related: ["story-time", "reading-order", "canon-e201", "fabula-and-syuzhet"],
   },
@@ -324,8 +324,8 @@ export const glossary: GlossaryTerm[] = [
     slug: "proposed-fact",
     term: "Proposed fact",
     short:
-      "A proposed fact is a fact waiting for your decision; Asten records it, but it can’t produce a hard contradiction until you confirm it.",
-    long: "Facts Asten reads from the page arrive as proposals like this, with the sentence they came from. Nothing becomes canon until you confirm it.",
+      "A proposed fact is a fact waiting for your decision; Asten keeps it on file, but it can’t produce a hard contradiction until you confirm it.",
+    long: "You can add a fact as proposed to keep it on file: it can raise a warning at most, never an error, until you confirm it. Nothing becomes canon until you confirm it.",
     see: "/features/canon",
     related: ["confirmed-fact", "deprecated-fact", "fact"],
   },

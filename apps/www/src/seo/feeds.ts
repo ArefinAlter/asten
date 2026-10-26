@@ -21,7 +21,7 @@ export function llmsText(): string {
     "",
     "Key facts:",
     "- Asten is a writing environment for novels, screenplays, and other long fiction. Its slogan is “Let AI be your editor, not your writer.”",
-    "- It never generates prose. It runs no AI model: its checks are seventeen deterministic rules over facts the author confirms and plain attributes read from the page (for example CANON-E013 attribute contradiction, CANON-E101 life after a settled death, CANON-E201 story time stepping backward inside a continuous run).",
+    "- It never generates prose. It runs no AI model: its checks are fifteen deterministic rules over facts the author confirms and plain attributes read from the page (for example CANON-E013 attribute contradiction, CANON-E101 life after a settled death, CANON-E201 story time stepping backward inside a continuous run).",
     "- It is local-first: the project is a SQLite file on the author’s computer. No account, no sync, no telemetry. Manuscripts are never used to train models.",
     "- Asten 0.0.1a is a public pre-alpha: unsigned desktop builds for Windows x64 and Linux x64 at https://github.com/ArefinAlter/asten/releases/tag/v0.0.1a, and a hosted copy at https://asten.103.191.50.32.sslip.io/ that keeps a private sandbox per visitor for 24 hours. macOS comes later.",
     `- Asten is published by ${site.publisher} (${site.legalName}, Dhaka, Bangladesh): ${site.publisherUrl}`,

@@ -75,7 +75,7 @@ export function Footer() {
       </div>
       <div className="wrap footer-base">
         <p>
-          <span>© 2026 {site.legalName}. Asten is a Verne product.</span>
+          <span>© 2026 {site.legalName} Asten is a Verne product.</span>
           <span className="no-trackers">
             <Glyph name="eye" /> No cookies. No trackers.
           </span>

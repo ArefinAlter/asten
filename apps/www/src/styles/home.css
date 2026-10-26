@@ -672,6 +672,21 @@
   white-space: pre;
 }
 
+@media (max-width: 560px) {
+  .terminal pre {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+
+.terminal-note {
+  padding: 0 22px 18px;
+  font-family: var(--font-text);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: #b3a58c;
+}
+
 .terminal .t-red {
   color: #f08a70;
 }

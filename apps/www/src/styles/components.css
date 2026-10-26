@@ -165,6 +165,16 @@
   margin-right: 6px;
 }
 
+:root[data-theme="night"] .chip--code {
+  color: var(--rubric-deep);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="day"]) .chip--code {
+    color: var(--rubric-deep);
+  }
+}
+
 .chip--code::after {
   content: "";
   position: absolute;

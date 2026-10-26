@@ -64,7 +64,7 @@ export const homeFaqs: QA[] = [
   },
   {
     q: "What does Asten check today?",
-    a: "Seven families of rules, all deterministic: attributes that disagree with your canon or with the page itself (CANON-E013 to E015), lifecycle such as acting after a settled death (E101 to E103), the two clocks and dates that cannot all be true (E201 to E203), travel and place (E301, E302), who knows what and when (E401), relations and genealogy (E501 to E503), and rules you write yourself (E601, E602). Name hygiene and setup ledgers come along. Optional diction hints are off until you turn them on.",
+    a: "Seven families of rules, all deterministic: attributes that disagree with your canon or with each other (CANON-E013 to E015), lifecycle such as acting after a settled death (E101 to E103), the two clocks and dates that cannot all be true (E201 to E203), a journey that does not fit the time (E301), who knows what and when (E401), relations and genealogy (E501 to E503), and rules you write yourself (E601). Name hygiene and a setup ledger come along. Optional diction hints are off until you turn them on.",
   },
   {
     q: "How do I get Asten?",

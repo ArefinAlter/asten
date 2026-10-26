@@ -207,7 +207,7 @@ export const article: Article = {
         {
           kind: "callout",
           tone: "note",
-          text: "Asten reads only plain attributes from your prose, and only proposes them; you decide what is settled. The atlas checks travel only along routes you declare with a travel time, and there is no graph view yet; a graph is [planned](/roadmap).",
+          text: "Asten reads only plain attributes from your prose and never settles them for you; you decide what is canon. The atlas checks travel only along routes you declare with a travel time, and there is no graph view yet; a graph is [planned](/roadmap).",
         },
       ],
     },

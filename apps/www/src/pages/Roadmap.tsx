@@ -14,7 +14,7 @@ export function Roadmap() {
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
           <div data-reveal>
-            <Answer text="The current code includes the desk, canon with seventeen rules in seven families, rule-based reading of the page, method packs, cast, two clocks with calendars, optional world tools, compile and import, the Word and Docs add-ins, generated API contracts, and local-first storage. Next: verified and signed installers, tested Android and iOS shells, and verified ARM builds. Never: writing your prose or training on it." />
+            <Answer text="The current code includes the desk, canon with fifteen rules in seven families, rule-based reading of the page, method packs, cast, two clocks with calendars, optional world tools, compile and import, the Word and Docs add-ins, generated API contracts, and local-first storage. Next: verified and signed installers, tested Android and iOS shells, and verified ARM builds. Never: writing your prose or training on it." />
           </div>
         </div>
       </section>

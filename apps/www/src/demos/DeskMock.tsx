@@ -101,7 +101,7 @@ export function DeskMock() {
             <div className="desk-note">
               <span className="chip chip--code">CANON-E013</span>
               <p>Mira’s hair was settled as auburn in chapter 2.</p>
-              <p className="desk-note-actions">Keep · Update canon · Add change</p>
+              <p className="desk-note-actions">Add an event · Retire “auburn” · Keep my sentence</p>
             </div>
           ) : (
             <div className="desk-quiet">

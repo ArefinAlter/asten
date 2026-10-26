@@ -6,9 +6,11 @@ No dates. Items move down the page as they ship.
 
 ## Shipped
 
-- Engine: Story IR, clocks and calendars, block model, seventeen canon rules in
-  seven families, name hygiene, setup ledgers, repairs, suppressions with
-  evidence fingerprints, baselines, bisect.
+- Engine: Story IR, clocks and calendars, block model, fifteen canon rules in
+  seven families, name hygiene, a setup ledger, repairs, suppressions with
+  evidence fingerprints, baselines, bisect. The catalogue also holds CANON-E302,
+  CANON-E602 and PLOT-I002, which no rule raises yet (two places at one story
+  time is marked as E013).
 - Perception without models: names across scripts, plain attributes, dialogue,
   belief, memory, dream and frame contexts.
 - Desk: editor with inline marks, the Scales, Binder, Cast, Canon, Timeline,
@@ -27,7 +29,9 @@ No dates. Items move down the page as they ship.
   the `asten-api` runtime, and the hosted pre-alpha (one real API per visitor,
   deleted after 24 hours; D29).
 
-## In review (stacked pull requests, merge in order)
+## Merged since the first wave (stacked pull requests, merged in order)
+
+All twelve are on `main`; what they added is in the Shipped list above.
 
 1. **Cross-platform builds** (#1): Windows x64 and ARM64, macOS universal,
    Linux x86_64 and aarch64; mobile-ready crate.
@@ -60,8 +64,8 @@ No dates. Items move down the page as they ship.
 - **Device testing for ARM.** Windows on ARM and Linux aarch64 have configured
   release jobs; first verify their artifacts, then run them on hardware and record the result in `docs/PLATFORMS.md`.
 
-- **Linux aarch64 runner.** Enable an ARM runner for the private repository so
-  the release job stops being optional.
+- **Linux aarch64 runner.** Enable an ARM runner so the release job stops
+  being optional.
 - **Docker images built and smoke-tested** on a machine with the daemon
   running; the compose file is ready.
 

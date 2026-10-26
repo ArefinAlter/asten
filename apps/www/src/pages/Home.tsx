@@ -345,25 +345,27 @@ export function Home() {
               </Link>
             </div>
           </div>
-          <figure className="terminal" data-reveal aria-label="An example of Asten’s diagnostics">
+          <figure className="terminal" data-reveal aria-label="A diagnostic returned by Asten’s local API">
             <div className="terminal-bar" aria-hidden="true">
               <i />
               <i />
               <i />
             </div>
-            <pre>
-              <span className="t-red">error[CANON-E013]</span>: attribute contradiction{"\n"}
-              <span className="t-dim">  --&gt; book-one/ch19-veld: paragraph 2</span>{"\n"}
-              {"\n"}
-              {"   “Mira pushed her black hair out of her eyes.”\n"}
-              <span className="t-red">{`${" ".repeat(20)}^^^^^`}</span>
-              {"\n\n"}
-              {"   settled: Mira · hair_color · auburn\n"}
-              <span className="t-dim">{"   source:  ch02-arrival, paragraph 7\n"}</span>
-              {"\n"}
-              <span className="t-gold">   actions</span>
-              {": keep · update canon · add change · silence"}
+            <pre tabIndex={0}>
+              <span className="t-dim">{"$ curl -s -H \"authorization: Bearer $ASTEN_TOKEN\" \\\n    127.0.0.1:4317/api/v1/projects/$PROJECT/story/diagnostics\n\n"}</span>
+              <span className="t-red">CANON-E013</span>
+              {"  warning\n"}
+              {"Mira's hair was settled as auburn.\n\n"}
+              {"① Settled: Mira · hair · auburn\n"}
+              {"② Chapter 19 says: “black” (Chapter 19)\n"}
+              {"③ No event between an unplaced time and day 40\n   changes Mira's hair.\n"}
+              {"Most likely slip: ② (93%)\n"}
+              <span className="t-gold">Fixes</span>
+              {": Add an event · Mark the scene as a\n   memory · auburn holds until day 39 · Retire\n   “auburn” · Silence this mark · Keep my sentence"}
             </pre>
+            <figcaption className="terminal-note">
+              Message text as the local API returns it for a sample project, with line breaks added and the other fields left out.
+            </figcaption>
           </figure>
         </div>
       </section>
@@ -380,9 +382,9 @@ export function Home() {
               <h3>Works today</h3>
               <ul>
                 <li>The desk: binder, comments, page view, track changes, snapshots</li>
-                <li>Canon with seventeen continuity rules, read from the page and from what you settle</li>
+                <li>Canon with fifteen continuity rules, read from the page and from what you settle</li>
                 <li>Cast, two clocks, optional world</li>
-                <li>Compile and import: Markdown, Fountain, HTML, .docx, EPUB, FDX</li>
+                <li>Compile to Markdown, plain text, Fountain, HTML, .docx, EPUB, and FDX; import of all but EPUB</li>
               </ul>
             </div>
             <div className="status-col" style={{ "--status": "var(--gold)" } as CSSProperties}>

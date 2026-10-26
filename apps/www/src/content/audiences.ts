@@ -222,7 +222,7 @@ export const audiences: Audience[] = [
     ],
     helps: [
       { title: "Deterministic first", text: "Rules you can read, test, and argue with. Same project, same marks.", href: "/features/compiler" },
-      { title: "Stable codes", text: "CANON-E013 to E602, NAME-W, PLOT-I, CRAFT-H. Searchable, suppressible, documented.", href: "/glossary#diagnostic" },
+      { title: "Stable codes", text: "CANON-E013 to E601, NAME-W, PLOT-I, CRAFT-H. Searchable, suppressible, documented.", href: "/glossary#diagnostic" },
       { title: "Plain architecture", text: "Rust crates, SQLite, Axum on loopback, React, Tauri.", href: "/features/compiler" },
       { title: "A written AI policy", text: "Proposals only, local first, your key, full switch-off, no training.", href: "/ai-policy" },
     ],

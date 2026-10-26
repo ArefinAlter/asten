@@ -46,9 +46,9 @@ export function WeighDemo({ compact = false }: { compact?: boolean }) {
   const status = disagrees
     ? `Chapter 19 says ${color}, but canon says ${canon}. Asten marks it with CANON-E013.`
     : resolution === "kept"
-      ? "You kept your sentence. The mark is silenced, and your reason is stored with the project."
+      ? "Silenced. Your reason is stored with the project, and if the evidence changes the mark comes back for review."
       : resolution === "canon"
-        ? `Canon updated: Mira’s hair is now ${canon}. The page and the record agree.`
+        ? `Retired the old fact and settled ${canon}. The page and the record agree.`
         : resolution === "change"
           ? `Change recorded: auburn until chapter 12, ${color} after. Both are true in their time.`
           : "The page agrees with canon. The scales are level.";
@@ -114,7 +114,7 @@ export function WeighDemo({ compact = false }: { compact?: boolean }) {
             </p>
             <div className="weigh-actions">
               <button type="button" onClick={() => setResolution("kept")}>
-                Keep my sentence
+                Silence this mark
               </button>
               <button
                 type="button"
@@ -123,7 +123,7 @@ export function WeighDemo({ compact = false }: { compact?: boolean }) {
                   setResolution("canon");
                 }}
               >
-                Update canon
+                Retire “auburn”
               </button>
               <button type="button" onClick={() => setResolution("change")}>
                 She dyed it in ch. 12

@@ -13,8 +13,8 @@ export const roadmap: RoadmapLane[] = [
     items: [
       { title: "The desk", text: "Binder, rich-text page, comments, find, word counts, letter page view, track-change marks, named snapshots, an append-only history you can verify, blame, and drafts you can merge." },
       { title: "Canon", text: "Facts with status, context, story-time span, confidence, and a source anchored to the sentence that settled them. Entities with aliases and an introduction point." },
-      { title: "Reading the page", text: "Deterministic perception, no model: names and aliases across scripts, hair and eyes, height and age, where someone is, alive or dead, who is married to whom. Dialogue, belief, memory, dream, and frame stories are separate contexts, so a lie is not a contradiction." },
-      { title: "Seventeen canon rules", text: "Attributes (CANON-E013–E015), lifecycle (E101–E103), two clocks and a temporal network (E201–E203), travel and place (E301–E302), knowledge (E401), relations and genealogy (E501–E503), author invariants (E601–E602), plus name hygiene (NAME-W001–W004) and setup ledgers (PLOT-I001–I002)." },
+      { title: "Reading the page", text: "Deterministic perception, no model: names and aliases across scripts, hair and eyes, height and age, where someone is, alive or dead, who is married to whom. Dialogue, belief, dream, and frame stories are separate contexts, so a lie is not a contradiction; a memory is weighed at the story time you give it." },
+      { title: "Fifteen canon rules", text: "Attributes (CANON-E013–E015), lifecycle (E101–E103), two clocks and a temporal network (E201–E203), travel (E301), knowledge (E401), relations and genealogy (E501–E503), and author invariants (E601), plus name hygiene (NAME-W001–W004) and a setup ledger (PLOT-I001). The catalogue also holds CANON-E302, CANON-E602 and PLOT-I002, which no rule raises yet." },
       { title: "The Scales", text: "Every mark explains itself in a numbered chain, names the most likely slip, and offers repairs you own: add an event, mark the scene a memory, retire a fact, keep your sentence. Suppressions know when their evidence changed. Bisect finds the edit that raised a mark." },
       { title: "Two clocks and calendars", text: "Story time as day counts, Gregorian dates (“winter of 1890”), or a fictional calendar with your own months, plus relative placements (“three days after the siege”). Flashbacks are a choice: Asten argues only inside a run you declared continuous." },
       { title: "Method packs", text: "Scribe, Lifecycle, Clocks, Relations, Knowledge, Atlas, Invariants, and the optional Diction watch. Suppressions and baselines stored with the project." },
@@ -45,6 +45,7 @@ export const roadmap: RoadmapLane[] = [
       { title: "More views", text: "Graph, maps with scale, and boards." },
       { title: "More packs", text: "Mystery clue ledgers, screenplay sequences, and other methods, always optional, with a runtime for third-party packs." },
       { title: "Collaboration", text: "A second author on the same project without giving up offline work. This is still a design question, not a feature." },
+      { title: "Store listings", text: "The Word and Google Docs add-ins in the Microsoft and Google stores, and the phone apps in Google Play and the App Store, once they are signed and tested." },
     ],
   },
   {

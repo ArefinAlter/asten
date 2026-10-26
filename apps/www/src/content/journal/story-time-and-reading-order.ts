@@ -182,16 +182,16 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "The rule that does the comparing is **CANON-E201**, part of the Clocks [method pack](/glossary#method-pack), which is on by default. It looks only inside a run of scenes you have declared continuous, so an ordinary flashback outside such a run raises nothing, and a scene marked as a memory or flashback is never weighed against the world. If you never state a story time, you never hear from it. When story time steps backward inside a run, it marks the spot:",
+          text: "The rule that does the comparing is **CANON-E201**, part of the Clocks [method pack](/glossary#method-pack), which is on by default. It looks only inside a run of scenes you have declared continuous, so an ordinary flashback outside such a run raises nothing, and a scene you take out of the run is no longer compared. If you never state a story time, you never hear from it. When story time steps backward inside a run, it marks the spot:",
         },
         {
           kind: "diagnostic",
           code: "CANON-E201",
           title: "Inside the run “The funeral”, story time steps backward.",
           lines: [
-            "Chapter 10 · Oren’s funeral · story time: day 15",
-            "Chapter 11 · The morning after · story time: day 14",
-            "Reorder the binder · Retcon a date · Silence this rule",
+            "① Chapter 10 · Oren’s funeral · placed at day 15",
+            "② Chapter 11 · The morning after · placed at day 14",
+            "Set the scene’s time · This scene is not part of the run · Silence this mark · Keep my sentence",
           ],
         },
         {
@@ -243,7 +243,7 @@ export const article: Article = {
     },
     {
       q: "When does Asten’s CANON-E201 rule mark a scene?",
-      a: "CANON-E201 marks a scene when story time steps backward inside a run of scenes you declared continuous. Scenes outside a run, and scenes marked as a memory or flashback, are not marked, and any mark can be suppressed with a reason.",
+      a: "CANON-E201 marks a scene when story time steps backward inside a run of scenes you declared continuous. Scenes outside a run, and scenes you take out of a run, are not marked, and any mark can be suppressed with a reason.",
     },
   ],
   related: [
