@@ -80,6 +80,32 @@ impl Transport {
         mut decoder: Box<dyn Decoder>,
         on_piece: &mut (dyn FnMut(Piece) + Send),
     ) -> Result<Completion> {
+        if super::local_agent::agent_for_url(wire.url.as_str()).is_some() {
+            let v = tokio::select! {
+                v = super::local_agent::complete(wire.url.as_str(), &wire.body, Duration::from_secs(240)) => v.map_err(|e| AssistantError::NotReady(e.to_string()))?,
+                () = cancel.cancelled() => return Err(AssistantError::Cancelled),
+            };
+            let mut pieces = Vec::new();
+            decoder
+                .event(
+                    &SseEvent {
+                        event: None,
+                        data: v.to_string(),
+                    },
+                    &mut pieces,
+                )
+                .map_err(|_| {
+                    AssistantError::NotReady(
+                        "The installed agent response could not be read".into(),
+                    )
+                })?;
+            for piece in pieces {
+                on_piece(piece);
+            }
+            return decoder.finish().map_err(|_| {
+                AssistantError::NotReady("The installed agent response was incomplete".into())
+            });
+        }
         let body = wire.body_bytes();
         if body.len() > MAX_REQUEST_BYTES {
             return Err(AssistantError::Invalid(format!(

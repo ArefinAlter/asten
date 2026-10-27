@@ -291,6 +291,42 @@ pub fn default_providers() -> Vec<ProviderConfig> {
             "glm-5.3",
             "https://api.z.ai/api/paas/v4",
         ),
+        provider(
+            "codex-subscription",
+            "Codex (existing sign-in)",
+            Cloud,
+            Openai,
+            "subscription",
+            "default",
+            "https://codex.local-agent.invalid/v1",
+        ),
+        provider(
+            "claude-subscription",
+            "Claude Code (existing sign-in)",
+            Cloud,
+            Openai,
+            "subscription",
+            "default",
+            "https://claude.local-agent.invalid/v1",
+        ),
+        provider(
+            "cursor-subscription",
+            "Cursor (existing sign-in)",
+            Cloud,
+            Openai,
+            "subscription",
+            "default",
+            "https://cursor.local-agent.invalid/v1",
+        ),
+        provider(
+            "antigravity-subscription",
+            "Antigravity (existing sign-in)",
+            Cloud,
+            Openai,
+            "subscription",
+            "default",
+            "https://antigravity.local-agent.invalid/v1",
+        ),
     ]
 }
 
@@ -359,6 +395,11 @@ impl AssistantConfig {
 }
 
 impl ProviderConfig {
+    /// Uses an installed agent's own sign-in; still remote for consent and offline mode.
+    pub fn is_subscription(&self) -> bool {
+        crate::provider::local_agent::agent_for_url(&self.endpoint).is_some()
+    }
+
     /// The host requests go to.
     #[must_use]
     pub fn host(&self) -> String {
@@ -628,6 +669,9 @@ mod tests {
                 .iter()
                 .all(|p| !p.enabled && p.consent.is_none())
         );
-        assert_eq!(c.providers.len(), 9);
+        assert_eq!(c.providers.len(), 13);
+        let subscriptions: Vec<_> = c.providers.iter().filter(|p| p.is_subscription()).collect();
+        assert_eq!(subscriptions.len(), 4);
+        assert!(subscriptions.iter().all(|p| p.family == "subscription"));
     }
 }
