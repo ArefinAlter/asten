@@ -1,0 +1,30 @@
+{"check":"a first run opens on the welcome page with no project","ok":true,"detail":""}
+{"check":"the welcome page offers a new project and the sample","ok":true,"detail":""}
+{"check":"the sample novel is created as a real project","ok":true,"detail":"Salt and Lantern"}
+{"check":"the sample has scenes, a cast and marks the engine found","ok":true,"detail":"5 scenes, 9 entities"}
+{"sampleMarks":["CANON-E201","NAME-W001","NAME-W003"]}
+{"check":"a new project is created from File, New","ok":true,"detail":"Lantern Notes, Salt and Lantern"}
+{"check":"typing is saved without pressing anything","ok":true,"detail":""}
+{"check":"the status line says saved","ok":true,"detail":""}
+{"check":"the library is one file in the scratch folder","ok":true,"detail":"D:\\verne-build\\asten\\scratch\\profile-ui\\data\\asten.db"}
+{"check":"after a restart both projects are still there","ok":true,"detail":"Lantern Notes, Salt and Lantern"}
+{"check":"and the typed line is in the scene","ok":true,"detail":""}
+{"check":"the desk opens where it was left","ok":true,"detail":"#/p/01a17b33-2830-73f3-869b-b65af06f1ce7/overview"}
+{"check":"choosing Dark changes the theme at once","ok":true,"detail":"night"}
+{"check":"a keybinding can be recorded","ok":true,"detail":"F7 -> Ctrl+Alt+J"}
+{"check":"the AI switch is off by default and says what it means","ok":true,"detail":"AI providers |  | Local models first; a cloud provider only with your own key and your consent; and a switch that turns all of it off. |  | Allow AI providers | Off by default. Off means no provider is ever con"}
+{"check":"Storage shows the library file and its folder","ok":true,"detail":""}
+{"check":"Back up now writes a consistent copy","ok":true,"detail":"asten-20261027-083201.db, asten-20261027-083208.db"}
+{"saveDialog":"{\"found\":true,\"window\":\"Save As\",\"typed\":true,\"pressed\":\"Enter (keyboard)\"}"}
+{"check":"Save a project file writes through the Windows dialog","ok":true,"detail":"{\"found\":true,\"window\":\"Save As\",\"typed\":true,\"pressed\":\"Enter (keyboard)\"}"}
+{"check":"the project file is asten-project v1 with the manuscript","ok":true,"detail":"asten-project v1"}
+{"check":"Open a project file creates a third project from it","ok":true,"detail":"Salt and Lantern, Salt and Lantern (original), Lantern Notes"}
+{"renamedIsTheCopy":true}
+{"check":"a project can be renamed from the Open page","ok":true,"detail":""}
+{"check":"a project can be deleted by typing its name","ok":true,"detail":""}
+{"check":"the theme is still Dark after a restart","ok":true,"detail":"night"}
+{"check":"the accent and density are kept","ok":true,"detail":""}
+{"check":"the recorded keybinding is kept","ok":true,"detail":""}
+{"check":"the projects are all still there","ok":true,"detail":""}
+{"check":"the owner's real %APPDATA%\\com.asten.app was not touched","ok":true,"detail":"unchanged"}
+{"summary":"26 of 26 checks passed","failed":[]}

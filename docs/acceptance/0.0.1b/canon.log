@@ -1,0 +1,27 @@
+{"check":"settled against the page: CANON-E013 appears","ok":true,"detail":"Mira's hair was settled as black."}
+{"check":"the mark names its sentence and offers repairs, 'keep my sentence' among them","ok":true,"detail":"Add an event | black holds until day 1 | Mark the scene as a memory | Retire “black” | Silence this mark | Keep my sentence"}
+{"check":"fixing the sentence clears the mark","ok":true,"detail":""}
+{"check":"a repair the writer presses is applied and reported","ok":true,"detail":"Add an event: Added a change event. The engine will re-check."}
+{"check":"the repair clears or changes the mark","ok":true,"detail":"see canon log for the applied change"}
+{"check":"suppress with a reason hides the mark","ok":true,"detail":"01a1796b-6f4c-737f-b053-ed738f51e59c"}
+{"check":"the suppressed mark is still reported as suppressed","ok":true,"detail":""}
+{"check":"lifting the suppression brings it back","ok":true,"detail":""}
+{"check":"a baseline freezes today's marks (none are new)","ok":true,"detail":"0"}
+{"check":"a mark made after the baseline is flagged new","ok":true,"detail":"CANON-E013"}
+{"check":"a world board entry can be placed and settled","ok":true,"detail":"{\"id\":\"01a1796b-6f69-778b-9015-5b9067179a76\",\"project_id\":\"01a1796b-6a4d-7306-b282-86581b3f193c\",\"kind\":\"place\",\"title\":\"Gull Point\",\"summary\":\"A headland with "}
+{"timeline":"[{\"id\":\"01a1796b-6a84-760f-ad8a-c2ebd3ac3bed\",\"project_id\":\"01a1796b-6a4d-7306-b282-86581b3f193c\",\"entity_id\":\"01a1796b-6a5d-739e-a148-8a3602b189ec\",\"document_id\":\"01a1796b-6a6f-747f-8839-7320dd41426a\",\"title\":\"Mira's hair color changes to red\",\"story_time\":\"Day 1\",\"reading_order\":null,\"duration\":null,\"notes\":\"Added from mark CANON-E013\",\"kind\":{\"kind\":\"changes\",\"fluent\":{\"predicate\":\"hair_color\","}
+{"check":"events are kept in story and reading order","ok":true,"detail":"Mira's hair color changes to red@1/null, Mira at the harbour@100/1, Mira at the lighthouse@101/2"}
+{"check":"the world pulse reports","ok":true,"detail":"{\"sparks\":0,\"sketched\":0,\"settled\":1,\"questions\":0,\"places\":1,\"systems\":0,\"scenes\":3,\"underwater\":1,\"iceberg\":0.25,\"disc"}
+{"check":"a named snapshot is made","ok":true,"detail":"Before the rewrite"}
+{"check":"a draft previews its three-way merge without touching the page","ok":true,"detail":"1 ops, 0 conflicts"}
+{"check":"merging applies the draft","ok":true,"detail":"Mira pushed her black hair back and looked at the grey sea."}
+{"check":"history lists events and verify recomputes the hash chain","ok":true,"detail":"4 events, ok=true"}
+{"check":"blame attributes spans to actors","ok":true,"detail":"{\"ad7197b3-a808-436a-a5f5-fa9558ca1021\":[{\"start\":0,\"end\":50,\"seq\":3,\"actor\":\"author\",\"at\":\"2026-10-26T18:14:06.43196860"}
+{"check":"restoring a snapshot is itself a new entry","ok":true,"detail":"5 after 4"}
+{"bisect":"{\"diagnostic_id\":\"4d36af8c28754ced66a56657\",\"found\":true,\"document\":\"01a1796b-6a6b-720e-8bc2-dd05c1c6db5a\",\"seq\":3,\"actor\":\"author\",\"at\":\"2026-10-26T18:14:06.431968600+00:00\",\"event_type\":\"NodeCreated\",\"probes\":2}"}
+{"check":"bisect finds the version that introduced a mark","ok":true,"detail":"{\"diagnostic_id\":\"4d36af8c28754ced66a56657\",\"found\":true,\"document\":\"01a1796b-6a6b-720e-8bc2-dd05c1c6db5a\",\"seq\":3,\"acto"}
+{"check":"Source Control lists the named version","ok":true,"detail":"main · Arrival\nCommit 2 pages\nCHANGES\n2\nArrival\nM\nThe Letter\nU\nDRAFTS OF THIS PAGE\n1\nQuieter opening\nmerged\nHISTORY\n1\nBe"}
+{"check":"the knowledge view shows the real cast","ok":true,"detail":""}
+{"check":"the timeline shows the events","ok":true,"detail":""}
+{"check":"the world board shows the entry","ok":true,"detail":""}
+{"summary":"24 of 24 checks passed","failed":[]}

@@ -2,7 +2,7 @@ name: Release (pre-alpha)
 
 # Pre-alpha desktop builds: Windows x64 and Linux x64 only, unsigned, as a
 # GitHub pre-release. Started by hand only (Actions minutes are rationed; the
-# 0.0.1a assets were built on the release machine with the same commands, see
+# 0.0.1a and 0.0.1b assets were built on the release machine with the same commands, see
 # docs/PLATFORMS.md "Pre-alpha releases").
 #
 # Optional secrets:
@@ -16,7 +16,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag to build and publish, e.g. v0.0.1a"
+        description: "Tag to build and publish, e.g. v0.0.1b"
         required: true
 
 permissions:

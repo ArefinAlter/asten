@@ -1,7 +1,7 @@
 {
   "name": "@asten/web",
   "private": true,
-  "version": "0.0.1-alpha",
+  "version": "0.0.1-beta",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -28,6 +28,7 @@
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@tanstack/react-query": "^5.90.0",
     "@tauri-apps/api": "^2.8.0",
+    "@tauri-apps/plugin-dialog": "^2.8.3",
     "@tauri-apps/plugin-process": "^2.4.0",
     "@tauri-apps/plugin-updater": "^2.14.0",
     "@tiptap/core": "^3.31.4",

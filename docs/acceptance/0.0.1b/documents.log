@@ -1,0 +1,81 @@
+{"importMs":6674,"sourceWords":127360}
+{"check":"the novel became a manuscript with a document per chapter","ok":true,"detail":"63 chapters"}
+{"check":"every word arrived","ok":true,"detail":"127237 of 127360"}
+{"check":"chapters are titled from their headings","ok":true,"detail":"Front matter | PREFACE. | Chapter I. | CHAPTER II."}
+{"check":"hard-wrapped lines were joined and _italics_ became italics","ok":true,"detail":"{\"content\":[{\"attrs\":{\"id\":\"01a1796a-9de9-73f9-91e4-4092dd1255a4\"},\"content\":[{\"text\":\"It is a truth universally acknowledged, that a single man in possession of a good fortune must be in want of a wi"}
+{"diagnosticsTimings":[{"wall":493,"engine":30,"perceive":5,"analyze":24,"cached":2448,"total":2448},{"wall":71,"engine":29,"perceive":4,"analyze":25,"cached":2448,"total":2448},{"wall":69,"engine":30,"perceive":4,"analyze":25,"cached":2448,"total":2448},{"wall":67,"engine":29,"perceive":4,"analyze":25,"cached":2448,"total":2448}]}
+{"marksOnTheBareBook":{"NAME-W001":269},"blocks":2448}
+{"check":"the engine weighs a 120,000-word book in under two seconds, cold","ok":true,"detail":"493 ms wall, 30 ms engine"}
+{"incremental":[{"saveMs":5,"checkMs":245,"engineMs":29,"cached":2449,"total":2449},{"saveMs":5,"checkMs":102,"engineMs":29,"cached":2449,"total":2449},{"saveMs":6,"checkMs":99,"engineMs":29,"cached":2449,"total":2449},{"saveMs":5,"checkMs":96,"engineMs":27,"cached":2449,"total":2449},{"saveMs":5,"checkMs":67,"engineMs":29,"cached":2448,"total":2449}]}
+{"check":"a contradicting sentence raises CANON-E013","ok":true,"detail":"Elizabeth's eyes was settled as brown."}
+{"check":"one block is re-perceived, the rest come from the cache","ok":true,"detail":"{\"saveMs\":5,\"checkMs\":67,\"engineMs\":29,\"cached\":2448,\"total\":2449}"}
+{"check":"the check after an edit is fast","ok":true,"detail":"{\"n\":5,\"min\":67,\"median\":99,\"p95\":245,\"max\":245,\"mean\":121.8}"}
+{"check":"the mark offers repairs the author owns","ok":true,"detail":"Add an event | Mark the scene as a memory | Retire “brown” | Silence this mark | Keep my sentence"}
+{"check":"the Word file's title names the manuscript and its headings became chapters","ok":true,"detail":"The Salt Road: Chapter One: The Harbour | Chapter Two: The Ledger | Chapter Three: The Lantern"}
+{"check":"italics survived","ok":true,"detail":""}
+{"check":"bold survived","ok":true,"detail":""}
+{"check":"tracked insertions and deletions became marks","ok":true,"detail":""}
+{"check":"the scene break, the quote and the list survived","ok":true,"detail":""}
+{"check":"the comments came with their authors and ranges","ok":true,"detail":"[[\"Ida: Check the hair colour against chapter three.\",19,25],[\"Ida: Black? Earlier she was auburn.\",19,24]]"}
+{"wordProjectMarks":0}
+{"compiled":{"markdown":{"name":"pride-and-prejudice.md","bytes":734760,"ms":31},"plain":{"name":"pride-and-prejudice.txt","bytes":727008,"ms":34},"html":{"name":"pride-and-prejudice.html","bytes":755642,"ms":39},"fountain":{"name":"pride-and-prejudice.fountain","bytes":734706,"ms":33},"docx":{"name":"pride-and-prejudice.docx","bytes":273176,"ms":66},"epub":{"name":"pride-and-prejudice.epub","bytes":346050,"ms":42},"fdx":{"name":"pride-and-prejudice.fdx","bytes":926595,"ms":79}}}
+{"check":"export (novel) docx: opens with python-docx","ok":true,"detail":"2514 paragraphs"}
+{"check":"export (novel) docx: has a title and headings","ok":true,"detail":"['Title', 'Heading 1', 'Heading 2', 'Heading 2', 'Heading 2']"}
+{"check":"export (novel) docx: keeps italics","ok":true,"detail":"548 italic runs"}
+{"check":"export (novel) docx: core parts present","ok":true,"detail":"['[Content_Types].xml', '_rels/.rels', 'docProps/core.xml', 'docProps/app.xml', 'word/document.xml', 'word/_rels/document.xml.rels', 'word/styles.xml', 'word/numbering.xml']"}
+{"check":"export (novel) epub: mimetype is the first entry","ok":true,"detail":"mimetype"}
+{"check":"export (novel) epub: mimetype is stored, not compressed","ok":true,"detail":""}
+{"check":"export (novel) epub: mimetype content","ok":true,"detail":""}
+{"check":"export (novel) epub: container.xml points at the package","ok":true,"detail":"OEBPS/package.opf"}
+{"check":"export (novel) epub: every manifest item exists","ok":true,"detail":"[]"}
+{"check":"export (novel) epub: spine items are in the manifest","ok":true,"detail":"['doc-1', 'doc-2', 'doc-3']"}
+{"check":"export (novel) epub: has a navigation document","ok":true,"detail":""}
+{"check":"export (novel) epub: has an NCX for older readers","ok":true,"detail":""}
+{"check":"export (novel) epub: title, identifier and language","ok":true,"detail":""}
+{"check":"export (novel) epub: dcterms:modified present","ok":true,"detail":""}
+{"check":"export (novel) epub: every XML and XHTML part is well-formed","ok":true,"detail":"[]"}
+{"check":"export (novel) epub: one XHTML per document","ok":true,"detail":"64"}
+{"check":"export (novel) fdx: root is FinalDraft","ok":true,"detail":"FinalDraft"}
+{"check":"export (novel) fdx: has paragraphs with types","ok":true,"detail":"2513"}
+{"check":"export (novel) fountain: has a title page","ok":true,"detail":"pride-and-prejudice.fountain"}
+{"check":"export (novel) html: tags balance","ok":true,"detail":"errors=0 open=[]"}
+{"check":"export (novel) html: headings and paragraphs and emphasis","ok":true,"detail":"['body', 'em', 'h1', 'h2', 'h3', 'head', 'html', 'main', 'meta', 'p', 'section', 'style']"}
+{"check":"export (novel) html: declares utf-8 and a language","ok":true,"detail":""}
+{"check":"export (novel) markdown: has a title and chapter headings","ok":true,"detail":"pride-and-prejudice.md"}
+{"check":"export (novel) markdown: keeps italics","ok":true,"detail":""}
+{"check":"export (novel) plain: not empty, no markup","ok":true,"detail":"pride-and-prejudice.txt"}
+{"check":"export (novel) docx: carries the whole manuscript","ok":true,"detail":"127378 of about 123539 words"}
+{"check":"export (novel) epub: carries the whole manuscript","ok":true,"detail":"127688 of about 123539 words"}
+{"check":"export (novel) md: carries the whole manuscript","ok":true,"detail":"127443 of about 123539 words"}
+{"check":"export (novel) txt: carries the whole manuscript","ok":true,"detail":"127565 of about 123539 words"}
+{"check":"export (word) docx: opens with python-docx","ok":true,"detail":"15 paragraphs"}
+{"check":"export (word) docx: has a title and headings","ok":true,"detail":"['Title', 'Heading 1', 'Heading 2', 'Heading 2', 'Heading 2']"}
+{"check":"export (word) docx: keeps italics","ok":true,"detail":"2 italic runs"}
+{"check":"export (word) docx: core parts present","ok":true,"detail":"['[Content_Types].xml', '_rels/.rels', 'docProps/core.xml', 'docProps/app.xml', 'word/document.xml', 'word/_rels/document.xml.rels', 'word/styles.xml', 'word/numbering.xml']"}
+{"check":"export (word) docx: tracked insertions and deletions are real Word revisions","ok":true,"detail":""}
+{"check":"export (word) epub: mimetype is the first entry","ok":true,"detail":"mimetype"}
+{"check":"export (word) epub: mimetype is stored, not compressed","ok":true,"detail":""}
+{"check":"export (word) epub: mimetype content","ok":true,"detail":""}
+{"check":"export (word) epub: container.xml points at the package","ok":true,"detail":"OEBPS/package.opf"}
+{"check":"export (word) epub: every manifest item exists","ok":true,"detail":"[]"}
+{"check":"export (word) epub: spine items are in the manifest","ok":true,"detail":"['doc-1', 'doc-2', 'doc-3']"}
+{"check":"export (word) epub: has a navigation document","ok":true,"detail":""}
+{"check":"export (word) epub: has an NCX for older readers","ok":true,"detail":""}
+{"check":"export (word) epub: title, identifier and language","ok":true,"detail":""}
+{"check":"export (word) epub: dcterms:modified present","ok":true,"detail":""}
+{"check":"export (word) epub: every XML and XHTML part is well-formed","ok":true,"detail":"[]"}
+{"check":"export (word) epub: one XHTML per document","ok":true,"detail":"4"}
+{"check":"export (word) fdx: root is FinalDraft","ok":true,"detail":"FinalDraft"}
+{"check":"export (word) fdx: has paragraphs with types","ok":true,"detail":"14"}
+{"check":"export (word) fountain: has a title page","ok":true,"detail":"the-salt-road.fountain"}
+{"check":"export (word) html: tags balance","ok":true,"detail":"errors=0 open=[]"}
+{"check":"export (word) html: headings and paragraphs and emphasis","ok":true,"detail":"['blockquote', 'body', 'del', 'em', 'h1', 'h2', 'h3', 'head', 'html', 'ins', 'li', 'main']"}
+{"check":"export (word) html: declares utf-8 and a language","ok":true,"detail":""}
+{"check":"export (word) markdown: has a title and chapter headings","ok":true,"detail":"the-salt-road.md"}
+{"check":"export (word) markdown: keeps italics","ok":true,"detail":""}
+{"check":"export (word) plain: not empty, no markup","ok":true,"detail":"the-salt-road.txt"}
+{"readBack":{"markdown":{"chapters":64,"words":127249},"plain":{"chapters":63,"words":127442},"html":{"chapters":63,"words":127249},"docx":{"chapters":3,"words":59}}}
+{"check":"Markdown, plain, HTML and Word exports import again with every chapter","ok":true,"detail":"{\"markdown\":{\"chapters\":64,\"words\":127249},\"plain\":{\"chapters\":63,\"words\":127442},\"html\":{\"chapters\":63,\"words\":127249},\"docx\":{\"chapters\":3,\"words\":59}}"}
+{"check":"fountain imports","ok":true,"detail":"the-salt-road"}
+{"check":"fdx imports","ok":true,"detail":"the-salt-road"}
+{"summary":"73 of 73 checks passed","failed":[]}

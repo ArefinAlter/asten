@@ -581,3 +581,39 @@ time. No new auth mode was needed; if a future host needs one, it gets its own
 decision.
 
 **Status.** Accepted for release 0.0.1a, following the owner's request of 25 October 2026.
+
+## D30. The assistant's providers run in the desktop shell, not in the page
+
+*October 2026*
+
+**Context.** Release 0.0.1a let the writer configure AI providers and held their keys in the page's memory, but called none: the assistant answered from Asten's own tools. D27 allows a generative model under the AI policy (off by default, local models first, a cloud provider only with the writer's own key and consent, a complete switch-off, no prose written, no training on manuscripts). The owner asked for a working bring-your-own-key assistant. D6 had left the desktop shell exactly two commands and made the HTTP API the only transport.
+
+**Decision.** Keys, consent, provider calls and the spend ledger live in the desktop shell's Rust process (`crates/asten-assistant`, wired by `ai_*` commands). The webview types a key once into `ai_set_key` and never gets it back: it goes to the operating system's credential store (Windows Credential Manager, the Secret Service, the Keychain), or, where none exists, to an encrypted file (Argon2id and ChaCha20-Poly1305) the writer unlocks with a passphrase. The webview keeps its loopback-only connection policy and no permission to reach any provider. Requests go from Rust straight to the provider the writer chose over TLS (plain HTTP only for this machine), with retries, streaming, cancellation and size limits, and redirects refused so a key cannot follow one. Consent is per provider and tied to the host: a different host needs consent again. The master switch is off by default; offline mode blocks every provider that is not on this machine; a cap of zero means no model call; every call lands in a local ledger. The tool table stays closed: ten tools that read or prepare, five closed by rule. A request for prose is refused before any provider is contacted, the system prompt says it again, an invented or closed tool is refused and shown, and a reply that reads like new narrative is withheld. Manuscript wording is sent only when the writer picks a passage; quoted wording inside a mark is left out unless that mark is attached. The writer can read the exact request, with the key as a placeholder, before it is sent. The hosted pre-alpha and the browser desk have no such process and call no provider.
+
+**Consequences.** D6 stands for the story: one HTTP API. Outside it the shell now has commands for the assistant (`ai_*`), the library (`library_*`), saving files the writer named (`save_file`), and the two it always had. Nothing the page can reach decides an approval, reads a key or runs a command. The cost is a provider layer to maintain against six vendors' wire formats; it is tested against mock servers that speak each format, and live calls need a key.
+
+**Status.** Accepted by the owner's request of 26 October 2026, for release 0.0.1b.
+
+## D31. A project file for moving a project, a backup for keeping a library
+
+*October 2026*
+
+**Context.** The library is one SQLite file, and a writer needs to move one project to another computer, keep a copy, and put a copy back, without a sync service (D8).
+
+**Decision.** A project can be saved as one `.asten` file (JSON, `format: asten-project`, `version: 1`) holding the manuscript, cast, facts, timeline, world board, routes, rules, settings and comments, and opened as a new project; ids are minted again and every reference rewritten, and a file with one unreadable record is refused whole. Version history, baselines and suppressions stay in the library. The library is backed up on demand and at launch (`VACUUM INTO`, the newest seven kept), a copy can be saved anywhere, and a copy can be restored: the file is validated, set aside, and swapped in at the next launch, after the library it replaces is kept as `before-restore-<time>.db`. A project can be renamed and deleted.
+
+**Consequences.** Two levels of safety with different promises: the project file moves work, the backup keeps everything. Restoring needs a restart because a running app holds the file. A deleted project is gone except from backups.
+
+**Status.** Accepted for release 0.0.1b.
+
+## D32. Imports read structure, and a long file becomes chapters
+
+*October 2026*
+
+**Context.** The 0.0.1a importers flattened a Word file to one paragraph of text, ran HTML together without paragraph breaks, left hard-wrapped lines broken and kept Markdown emphasis as literal characters. A novel imported as one page is slow to edit and impossible to navigate.
+
+**Decision.** Markdown, plain text, HTML and Word are read into a small block model (paragraphs, headings, quotes, lists, rules, scene breaks, spans with italic, bold, underline, strike, insertion and deletion marks) before they become a page. Word's tracked changes become marks and its comments become comments with their ranges. A long file with chapter headings (Heading 1 in Word, `#` in Markdown, a line that is only "Chapter IV." in plain text) arrives as a manuscript with a document per chapter when asked (`split`: `auto` needs three chapters, `chapters` two); a heading alone above the chapters names the manuscript. Compile writes the same formatting back out: Word with real styles, lists and revisions, HTML with its emphasis. Fountain and Final Draft keep their own readers. Text is decoded by byte-order mark, then UTF-8, then Windows-1252.
+
+**Consequences.** What a writer imports is what they see. The cost is a heuristic for chapter headings in plain text, stated in the interface, and the things still left out of Word files: pictures, footnotes, headers and footers, text boxes.
+
+**Status.** Accepted for release 0.0.1b.

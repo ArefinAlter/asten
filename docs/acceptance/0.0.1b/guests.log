@@ -1,0 +1,28 @@
+{"api":"http://127.0.0.1:59918","defaultPortFree":false}
+{"check":"preflight from Word task pane: allowed","ok":true,"detail":"200 allow-origin=https://localhost:3000 private-network=true"}
+{"check":"preflight from Apps Script sidebar: allowed","ok":true,"detail":"200 allow-origin=https://n-abcdefg123-0lu-script.googleusercontent.com private-network=true"}
+{"check":"preflight from a stranger's page: refused","ok":true,"detail":"200 allow-origin=undefined private-network=undefined"}
+{"check":"a code minted by the app pairs a Word guest","ok":true,"detail":"201 guest"}
+{"check":"a cross-origin guest gets a bearer token and no cookie","ok":true,"detail":""}
+{"check":"a code works once","ok":true,"detail":"401"}
+{"check":"the same for a Docs guest","ok":true,"detail":"201"}
+{"check":"a guest lists projects","ok":true,"detail":""}
+{"check":"a guest files a selection as a scene","ok":true,"detail":"201"}
+{"check":"a guest reads the Scales","ok":true,"detail":""}
+{"check":"a guest cannot mint a pairing code","ok":true,"detail":"403"}
+{"check":"a guest cannot list tokens","ok":true,"detail":"403"}
+{"check":"a guest gets a one-minute stream ticket","ok":true,"detail":"201"}
+{"check":"the change stream opens for a guest with the ticket","ok":true,"detail":"200 text/event-stream"}
+{"check":"the token from a stranger's origin is answered, but without CORS permission","ok":true,"detail":"200, allow-origin=undefined"}
+{"check":"a guest can revoke itself","ok":true,"detail":"204"}
+{"check":"and is refused afterwards","ok":true,"detail":"401"}
+{"check":"port 3000 was free for the task pane","ok":true,"detail":"ok"}
+{"check":"the task pane loads over HTTPS and offers pairing","ok":true,"detail":"The desk is up. Pair this Word once."}
+{"check":"an https page pairs with the http loopback API","ok":true,"detail":"The Scales are level. Nothing to weigh. | "}
+{"live":"Live. The Scales follow the desk.","problems":0}
+{"check":"the pane follows the change stream (live)","ok":true,"detail":"Live. The Scales follow the desk."}
+{"check":"filing the selection from the pane creates a scene","ok":true,"detail":"From Word, From Word"}
+{"check":"forgetting the pairing revokes the token on the desk","ok":true,"detail":"[[\"Docs sidebar\",false],[\"Desktop desk\",false]]"}
+{"consoleLines":[]}
+{"summary":"23 of 23 checks passed","failed":[]}
+{"notChecked":["Word itself (no Word host here): the pane runs in Chromium with a stub for Office.js","Google Docs itself: the sidebar's Origin and the preflight are checked, not Apps Script","Safari-based hosts (Word for Mac): mixed-content handling of https pages calling http://127.0.0.1 is not tested"]}

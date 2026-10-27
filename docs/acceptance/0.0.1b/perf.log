@@ -1,0 +1,5 @@
+{"words":127360,"importMs":4323,"chapters":63}
+{"firstFullCheck":{"wallMs":960,"engine":{"perceive":12,"analyze":29,"total":42},"marks":249,"blocks":2448}}
+{"warmChecksMs":[84,79,75,70,69],"warm":{"n":5,"min":69,"median":75,"p95":84,"max":84,"mean":75.4}}
+{"saveOneEditMs":[43,7,5,3,94],"saveStats":{"n":5,"min":3,"median":7,"p95":94,"max":94,"mean":30.4},"checkAfterEditMs":[222,83,80,78,83],"checkStats":{"n":5,"min":78,"median":83,"p95":222,"max":222,"mean":109.2}}
+{"libraryBytes":7499776}

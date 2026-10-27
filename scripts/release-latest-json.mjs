@@ -3,7 +3,7 @@
 // (apps/www/public/updates/latest.json), from a folder of release assets that
 // includes the updater signatures (.sig) made with the release key.
 //
-//   node scripts/release-latest-json.mjs --assets release-assets --tag v0.0.1a
+//   node scripts/release-latest-json.mjs --assets release-assets --tag v0.0.1b
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 
@@ -18,7 +18,7 @@ const args = Object.fromEntries(
 const root = resolve(import.meta.dirname, "..");
 const assets = resolve(args.assets ?? "release-assets");
 const tag = args.tag;
-if (!tag) throw new Error("--tag is required, e.g. --tag v0.0.1a");
+if (!tag) throw new Error("--tag is required, e.g. --tag v0.0.1b");
 const out = resolve(args.out ?? join(root, "apps/www/public/updates/latest.json"));
 const version = JSON.parse(
   readFileSync(join(root, "apps/desktop/src-tauri/tauri.conf.json"), "utf8"),

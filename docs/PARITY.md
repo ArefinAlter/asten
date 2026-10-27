@@ -43,6 +43,9 @@ their SDK builds and device testing remain pending, not certified by this matrix
 | Dark and light theme                         | ✓       | ✓                  | ✓               | ✓             | ◐ follows Office | ◐ follows Docs |
 | Keyboard shortcuts (Ctrl/⌘ F, J)             | ✓       | ✓                  | —               | —             | —         | —            |
 | Works with no network at all                 | ✓       | ✓ (same machine)   | ✗ needs the LAN | ✓             | ✗         | ✗            |
+| Assistant with your own provider and key (D30) | ✓ (Tauri commands) | ✗ (no provider is called) | ✗ | ✗ | ✗ | ✗ |
+| Project file (.asten) save and open (D31)    | ✓ (native dialogs) | ◐ download and file picker | ◐ | ◐ | — | — |
+| Library backup and restore (D31)             | ✓       | ✗                  | ✗               | ✗             | —         | —            |
 
 ¹ Margin cards need a second column; on a narrow screen the inline underline
 and the Scales carry the same information.

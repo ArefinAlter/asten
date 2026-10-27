@@ -5,6 +5,7 @@ import { getPrefs, setPrefs, type Prefs, type Theme } from "../prefs";
 import { RIBBON_TABS } from "./model";
 import { QAT_CHOICES } from "./Ribbon";
 import { CONNECTORS } from "../settings/connectors";
+import { aiAvailable } from "../ai/bridge";
 
 export const OPTION_PAGES = [
   "General",
@@ -405,8 +406,12 @@ export function OptionsDialog({
                   "Nothing in Asten writes, rewrites or continues your prose.",
                 )}
                 {fixed(
-                  "Keys stay in memory",
-                  "Provider keys are never stored on disk in this release and never shown again.",
+                  aiAvailable()
+                    ? "Keys stay in the credential store"
+                    : "Keys stay in memory",
+                  aiAvailable()
+                    ? "Provider keys live in your operating system's credential store, never in the page, and are shown only as the last four characters."
+                    : "Provider keys are never stored on disk in this copy and never shown again.",
                 )}
                 {check(
                   "Allow AI providers (off by default)",

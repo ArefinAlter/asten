@@ -54,7 +54,7 @@ export const legalIndex: Record<string, LegalMeta> = {
     title: "AI policy",
     metaTitle: "AI policy: an editor, never a writer",
     description:
-      "Asten runs no AI model today. If AI ever arrives, it will only propose, run locally first, switch off completely, and never be trained on your manuscript.",
+      "Asten’s checks run no AI model. The optional assistant only proposes, runs locally first, needs your own key and consent for a cloud provider, switches off completely, and never trains on your manuscript.",
   },
   "/accessibility": {
     path: "/accessibility",

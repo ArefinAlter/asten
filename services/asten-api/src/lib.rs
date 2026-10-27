@@ -273,7 +273,12 @@ pub fn router(application: Application, config: ApiConfig) -> Router {
     let api = Router::new()
         .route("/desk", get(desk_info))
         .route("/projects", get(list_projects).post(create_project))
-        .route("/projects/{project_id}", get(get_project))
+        .route(
+            "/projects/{project_id}",
+            get(get_project)
+                .put(extra::update_project)
+                .delete(extra::delete_project),
+        )
         .route(
             "/projects/{project_id}/documents",
             get(list_documents).post(create_document),

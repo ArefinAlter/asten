@@ -1,0 +1,9 @@
+{"check":"the older build installs silently into the scratch folder","ok":true,"detail":"D:\\verne-build\\asten\\install-old\\asten-desktop.exe"}
+{"check":"it is the older version","ok":true,"detail":"0.0.1-alpha"}
+{"apiReportsCrateVersion":"0.0.1-beta"}
+{"check":"pressing Check for updates finds 0.0.1-beta, and only then","ok":true,"detail":"GET /latest.json"}
+{"check":"nothing was requested before the button was pressed","ok":true,"detail":"GET /latest.json"}
+{"check":"an installer whose signature does not match is refused","ok":true,"detail":"Could not check: The signature verification failed"}
+{"check":"and the installed program is still the older build","ok":true,"detail":"0.0.1-alpha"}
+{"check":"the uninstaller removes the program","ok":true,"detail":""}
+{"summary":"7 of 7 checks passed","failed":[]}

@@ -83,10 +83,10 @@ pub fn compile_documents(
             filename: format!("{slug}.html"),
             mime: "text/html".into(),
             encoding: "utf-8".into(),
-            body: to_html(project_name, &included),
+            body: to_html(project_name, &ordered),
         }),
         CompileFormat::Docx => {
-            let bytes = to_docx(project_name, &included)?;
+            let bytes = crate::docx_out::to_docx(project_name, &ordered)?;
             Ok(CompileArtifact {
                 filename: format!("{slug}.docx"),
                 mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -208,100 +208,46 @@ fn to_fountain(title: &str, documents: &[&Document]) -> String {
     body
 }
 
-fn to_html(title: &str, documents: &[&Document]) -> String {
+fn to_html(title: &str, documents: &[(usize, &Document)]) -> String {
     let mut body = format!(
-        "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"/><title>{}</title></head><body>",
+        "<!doctype html>
+<html lang=\"en\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><title>{}</title><style>{HTML_STYLE}</style></head><body><main>
+",
         escape_xml(title)
     );
-    body.push_str(&format!("<h1>{}</h1>", escape_xml(title)));
-    for document in documents {
-        body.push_str(&format!("<h2>{}</h2>", escape_xml(&document.title)));
-        for paragraph in document_plain_text(&document.content_json).split("\n\n") {
-            body.push_str(&format!("<p>{}</p>", escape_xml(paragraph)));
+    body.push_str(&format!(
+        "<h1>{}</h1>
+",
+        escape_xml(title)
+    ));
+    for (depth, document) in documents {
+        let level = (depth + 2).clamp(2, 6);
+        body.push_str(&format!(
+            "<section>
+<h{level}>{}</h{level}>
+",
+            escape_xml(&document.title)
+        ));
+        if let Some(nodes) = document
+            .content_json
+            .get("content")
+            .and_then(serde_json::Value::as_array)
+        {
+            crate::epub::write_blocks(nodes, &mut body, depth + 1);
         }
+        body.push_str(
+            "</section>
+",
+        );
     }
-    body.push_str("</body></html>");
+    body.push_str(
+        "</main></body></html>
+",
+    );
     body
 }
 
-fn to_docx(title: &str, documents: &[&Document]) -> Result<Vec<u8>> {
-    use std::io::{Cursor, Write};
-    use zip::{ZipWriter, write::SimpleFileOptions};
-
-    let mut paragraphs = String::new();
-    paragraphs.push_str(&docx_paragraph(title, true));
-    for document in documents {
-        paragraphs.push_str(&docx_paragraph(&document.title, true));
-        let text = document_plain_text(&document.content_json);
-        if text.is_empty() {
-            paragraphs.push_str(&docx_paragraph("", false));
-        } else {
-            for block in text.split("\n\n") {
-                paragraphs.push_str(&docx_paragraph(block, false));
-            }
-        }
-    }
-
-    let document_xml = format!(
-        r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:body>
-    {paragraphs}
-    <w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr>
-  </w:body>
-</w:document>"#
-    );
-    let content_types = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-  <Default Extension="xml" ContentType="application/xml"/>
-  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-</Types>"#;
-    let rels = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-</Relationships>"#;
-    let document_rels = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"/>"#;
-
-    let mut cursor = Cursor::new(Vec::new());
-    {
-        let mut zip = ZipWriter::new(&mut cursor);
-        let options =
-            SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
-        zip.start_file("[Content_Types].xml", options)
-            .map_err(|error| ApplicationError::Storage(error.to_string()))?;
-        zip.write_all(content_types.as_bytes())
-            .map_err(|error| ApplicationError::Storage(error.to_string()))?;
-        zip.start_file("_rels/.rels", options)
-            .map_err(|error| ApplicationError::Storage(error.to_string()))?;
-        zip.write_all(rels.as_bytes())
-            .map_err(|error| ApplicationError::Storage(error.to_string()))?;
-        zip.start_file("word/document.xml", options)
-            .map_err(|error| ApplicationError::Storage(error.to_string()))?;
-        zip.write_all(document_xml.as_bytes())
-            .map_err(|error| ApplicationError::Storage(error.to_string()))?;
-        zip.start_file("word/_rels/document.xml.rels", options)
-            .map_err(|error| ApplicationError::Storage(error.to_string()))?;
-        zip.write_all(document_rels.as_bytes())
-            .map_err(|error| ApplicationError::Storage(error.to_string()))?;
-        zip.finish()
-            .map_err(|error| ApplicationError::Storage(error.to_string()))?;
-    }
-    Ok(cursor.into_inner())
-}
-
-fn docx_paragraph(text: &str, heading: bool) -> String {
-    let style = if heading {
-        r#"<w:pPr><w:pStyle w:val="Heading1"/></w:pPr>"#
-    } else {
-        ""
-    };
-    format!(
-        "<w:p>{style}<w:r><w:t xml:space=\"preserve\">{}</w:t></w:r></w:p>",
-        escape_xml(text)
-    )
-}
+const HTML_STYLE: &str = "body{margin:0;background:#faf7f0;color:#1d1a16;font:18px/1.7 Georgia,'Times New Roman',serif}main{max-width:40em;margin:0 auto;padding:3em 1.2em}h1,h2,h3,h4{line-height:1.25}h1{text-align:center;margin:2em 0}p{margin:0;text-indent:1.5em}h2+p,h3+p,.scene-break+p,hr+p{text-indent:0}.scene-break{text-align:center;text-indent:0;margin:1.6em 0}blockquote{margin:1em 2em;font-style:italic}ins{text-decoration:none;border-bottom:2px solid #2d7a4f}del{color:#a33}";
 
 /// Text or attribute content for XML: the five special characters escaped
 /// and the control characters XML 1.0 forbids dropped, so every part stays

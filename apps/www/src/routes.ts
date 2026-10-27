@@ -133,12 +133,12 @@ const product: RouteMeta[] = [
     path: "/download",
     title: "Try the Asten pre-alpha",
     description:
-      "Asten 0.0.1a, a pre-alpha: open it in your browser in a private 24-hour sandbox, or download the unsigned desktop app for Windows x64 or Linux x64.",
+      "Asten 0.0.1b, a pre-alpha: download the unsigned desktop app for Windows x64 or Linux x64, or open the hosted copy in your browser in a private 24-hour sandbox.",
     label: "Get Asten",
     kind: "product",
     schema: "howto",
     priority: 0.9,
-    og: { eyebrow: "Pre-alpha 0.0.1a", headline: "Try the pre-alpha" },
+    og: { eyebrow: "Pre-alpha 0.0.1b", headline: "Try the pre-alpha" },
   }),
   page({
     path: "/roadmap",

@@ -3,6 +3,7 @@ resolver = "2"
 members = [
   "apps/desktop/src-tauri",
   "crates/asten-application",
+  "crates/asten-assistant",
   "crates/asten-auth",
   "crates/asten-blocks",
   "crates/asten-diagnostics",
@@ -19,7 +20,7 @@ members = [
 ]
 
 [workspace.package]
-version = "0.0.1-alpha"
+version = "0.0.1-beta"
 license = "MIT"
 edition = "2024"
 rust-version = "1.85"
@@ -35,6 +36,7 @@ serde_json = "1.0"
 sqlx = { version = "0.8", features = ["runtime-tokio", "sqlite", "migrate", "uuid", "chrono"] }
 tauri = "2.8"
 tauri-build = "2.4"
+tauri-plugin-dialog = "2"
 tauri-plugin-process = "2"
 tauri-plugin-single-instance = "2"
 tauri-plugin-updater = "2"
@@ -62,6 +64,15 @@ futures = "0.3"
 hex = "0.4"
 proptest = "1.5"
 ts-rs = { version = "12", features = ["serde-compat", "chrono-impl", "uuid-impl", "serde-json-impl", "no-serde-warnings"] }
+chacha20poly1305 = "0.10"
+keyring = "4"
+regex = "1"
+reqwest = { version = "0.13", default-features = false, features = ["json", "stream", "rustls-no-provider", "http2"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+tempfile = "3"
+tokio-util = "0.7"
+url = "2"
+zeroize = "1"
 utoipa = { version = "5.5", features = ["axum_extras", "chrono", "uuid", "preserve_order"] }
 
 [profile.release]

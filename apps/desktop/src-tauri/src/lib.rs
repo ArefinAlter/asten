@@ -7,7 +7,11 @@
 //! of the database at launch, a log file, one running copy at a time, and an
 //! update check that runs only when asked.
 
+#[cfg(desktop)]
+mod assistant;
 mod backup;
+#[cfg(desktop)]
+mod library;
 mod logging;
 
 use std::{
@@ -36,10 +40,11 @@ struct DesktopState {
 }
 
 /// Where this desk keeps its things, all under the OS app-data directory.
-struct DeskPaths {
-    database: PathBuf,
-    logs: PathBuf,
-    backups: PathBuf,
+#[derive(Clone)]
+pub(crate) struct DeskPaths {
+    pub(crate) database: PathBuf,
+    pub(crate) logs: PathBuf,
+    pub(crate) backups: PathBuf,
 }
 
 impl DeskPaths {
@@ -85,6 +90,21 @@ async fn start_pairing(
     })
 }
 
+/// The data folder the writer asked for, if any: `--data-dir <folder>` on the
+/// command line, else the `ASTEN_DATA_DIR` environment variable. Empty values
+/// are ignored.
+fn data_dir_override() -> Option<PathBuf> {
+    let mut args = std::env::args_os().skip(1);
+    while let Some(arg) = args.next() {
+        if arg == "--data-dir" {
+            return args.next().filter(|v| !v.is_empty()).map(PathBuf::from);
+        }
+    }
+    std::env::var_os("ASTEN_DATA_DIR")
+        .filter(|v| !v.is_empty())
+        .map(PathBuf::from)
+}
+
 /// Bring the one running window forward when a second copy is launched.
 #[cfg(desktop)]
 fn focus_main_window(app: &tauri::AppHandle) {
@@ -93,6 +113,46 @@ fn focus_main_window(app: &tauri::AppHandle) {
         let _ = window.show();
         let _ = window.set_focus();
     }
+}
+
+/// The commands the page may call. The assistant's belong to desktop builds.
+#[cfg(desktop)]
+macro_rules! handlers {
+    () => {
+        tauri::generate_handler![
+            desk_session,
+            start_pairing,
+            assistant::ai_status,
+            assistant::ai_update,
+            assistant::ai_add_provider,
+            assistant::ai_remove_provider,
+            assistant::ai_set_key,
+            assistant::ai_forget_key,
+            assistant::ai_unlock,
+            assistant::ai_consent,
+            assistant::ai_withdraw_all,
+            assistant::ai_preview,
+            assistant::ai_run,
+            assistant::ai_cancel,
+            assistant::ai_test,
+            assistant::ai_local_models,
+            assistant::ai_ledger,
+            assistant::ai_clear_ledger,
+            library::library_info,
+            library::library_backup_now,
+            library::library_export_copy,
+            library::library_restore,
+            library::library_dismiss_report,
+            library::save_file,
+        ]
+    };
+}
+
+#[cfg(mobile)]
+macro_rules! handlers {
+    () => {
+        tauri::generate_handler![desk_session, start_pairing]
+    };
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -107,11 +167,18 @@ pub fn run() {
         .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
             focus_main_window(app);
         }))
-        .plugin(tauri_plugin_updater::Builder::new().build());
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_dialog::init());
     builder
         .plugin(tauri_plugin_process::init())
         .setup(|app| {
-            let data_directory = app.path().app_data_dir()?;
+            // `ASTEN_DATA_DIR` (or `--data-dir <folder>`) keeps everything in one
+            // folder of the writer's choosing: a portable copy on a USB stick,
+            // a second profile, or a throwaway one for tests.
+            let data_directory = match data_dir_override() {
+                Some(dir) => dir,
+                None => app.path().app_data_dir()?,
+            };
             std::fs::create_dir_all(&data_directory)?;
             let paths = DeskPaths::under(&data_directory);
             std::fs::create_dir_all(&paths.logs)?;
@@ -125,6 +192,12 @@ pub fn run() {
                 "Asten is starting"
             );
             let (application, session) = tauri::async_runtime::block_on(async {
+                // A restore the writer asked for is swapped in first, keeping
+                // the library it replaces.
+                #[cfg(desktop)]
+                if let Some(report) = library::apply_pending(&paths).await {
+                    tracing::info!(ok = report.ok, message = %report.message, "restore");
+                }
                 // Copy the file before anything opens it, so a migration that
                 // goes wrong still leaves a known-good file to return to.
                 match backup::back_up(&paths.database, &paths.backups).await {
@@ -180,13 +253,24 @@ pub fn run() {
                 Ok::<_, Box<dyn std::error::Error>>((application, session))
             })?;
             tracing::info!(origin = %session.origin, "embedded API ready");
+            app.manage(paths.clone());
+            // The assistant (providers, keys, spend) lives in this process, not
+            // in the page. Phones keep the offline assistant only.
+            #[cfg(desktop)]
+            {
+                let state = tauri::async_runtime::block_on(assistant::open(
+                    application.clone(),
+                    &data_directory,
+                ))?;
+                app.manage(state);
+            }
             app.manage(DesktopState {
                 application,
                 session,
             });
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![desk_session, start_pairing])
+        .invoke_handler(handlers!())
         .run(tauri::generate_context!())
         .expect("error while running Asten");
 }

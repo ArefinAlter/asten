@@ -390,7 +390,7 @@ fn document_xhtml(entry: &Entry, language: &str) -> String {
     )
 }
 
-fn write_blocks(nodes: &[Value], out: &mut String, depth: usize) {
+pub(crate) fn write_blocks(nodes: &[Value], out: &mut String, depth: usize) {
     for node in nodes {
         write_block(node, out, depth);
     }

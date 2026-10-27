@@ -95,7 +95,7 @@ export const article: Article = {
         },
         {
           kind: "p",
-          text: "Local storage answers the question in a simpler way. A company can’t train on a manuscript it never receives. When the only copy lives on your machine and the software sends nothing home, privacy stops being a matter of trust and fine print and becomes a matter of where the file is.",
+          text: "Local storage answers the question in a simpler way. A company can’t train on a manuscript it never receives. When the only copy lives on your machine and the software sends nothing home, privacy stops being a matter of trust and fine print and becomes a matter of where the file is. (The one exception is the assistant you may switch on: it sends a request to the provider you chose, only after you consent, and the [AI policy](/ai-policy) lists exactly what goes.)",
         },
         {
           kind: "p",
@@ -176,9 +176,9 @@ export const article: Article = {
           items: [
             "**Your project is a file on your disk.** Asten stores it in SQLite, a widely used database format, in a file called `asten.db` in your operating system’s application-data folder when you use the desktop app.",
             "**No account.** There’s nothing to sign in to.",
-            "**No sync and no telemetry.** Asten doesn’t send your work, or reports about how you use it, anywhere. Verne, the company that makes Asten, never receives your manuscript.",
+            "**No sync and no telemetry.** Asten doesn’t send reports about how you use it anywhere, and it sends your work nowhere unless you switch on the assistant and ask it a question. Verne, the company that makes Asten, never receives your manuscript.",
             "**Open exports.** [Compile](/features/word-and-google-docs) to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, or Final Draft (.fdx). For a PDF, print the HTML page. Import reads the same formats except EPUB.",
-            "**No training.** No manuscript is used to train any model, and no AI model runs in Asten today. The [AI policy](/ai-policy) and [privacy notice](/privacy) say so in full.",
+            "**No training.** No manuscript is used to train any model, and the checks run no AI model. The [AI policy](/ai-policy) and [privacy notice](/privacy) say so in full.",
           ],
         },
         {
@@ -194,7 +194,7 @@ export const article: Article = {
         {
           kind: "callout",
           tone: "note",
-          text: "Local-first has trade-offs. Asten has no sync, no collaboration, and no app in the phone app stores today; collaboration is [planned](/roadmap) without giving up offline work. Asten is in early development; release 0.0.1a is a public pre-alpha for Windows and Linux. See [Download](/download).",
+          text: "Local-first has trade-offs. Asten has no sync, no collaboration, and no app in the phone app stores today; collaboration is [planned](/roadmap) without giving up offline work. Asten is in early development; release 0.0.1b is a public pre-alpha for Windows and Linux. See [Download](/download).",
         },
       ],
     },

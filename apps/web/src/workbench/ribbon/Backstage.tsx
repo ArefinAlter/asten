@@ -6,6 +6,7 @@ import { PaletteMark } from "../../brand/Palette";
 import { useWorkbench } from "../context";
 import { Icon } from "../icons";
 import { log } from "../output";
+import { saveBytes } from "../files";
 import { downloadArtifact, relativeTime } from "../util";
 import { BACKSTAGE_PAGES, type BackstagePage } from "./model";
 
@@ -97,6 +98,60 @@ export function Backstage({
       onSelectProject(project.id);
       onClose();
     },
+  });
+  const projectFile = useRef<HTMLInputElement>(null);
+  const rename = useMutation({
+    mutationFn: ({ id, name: next }: { id: string; name: string }) =>
+      api.client.renameProject(id, next),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["projects"] }),
+    onError: (error) => api.toast(error.message, "error"),
+  });
+  const remove = useMutation({
+    mutationFn: (id: string) => api.client.deleteProject(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      api.toast(
+        "Project deleted. The library's backups still hold the last copy.",
+      );
+    },
+    onError: (error) => api.toast(error.message, "error"),
+  });
+  const saveProjectFile = useMutation({
+    mutationFn: async () => {
+      const file = await api.client.exportProject(api.projectId!);
+      const text = JSON.stringify(file);
+      const stem = (api.project?.name ?? "project")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+      return saveBytes(
+        `${stem || "project"}.asten`,
+        new TextEncoder().encode(text),
+        "application/json",
+      );
+    },
+    onSuccess: (path) => {
+      if (path) api.toast("Saved the project file.");
+    },
+    onError: (error) => api.toast(error.message, "error"),
+  });
+  const openProjectFile = useMutation({
+    mutationFn: async (file: File) => {
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(await file.text());
+      } catch {
+        throw new Error("That is not an Asten project file.");
+      }
+      return api.client.importProjectFile(parsed);
+    },
+    onSuccess: async (project) => {
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      api.toast(`Opened “${project.name}” as a new project.`);
+      onSelectProject(project.id);
+      onClose();
+    },
+    onError: (error) => api.toast(error.message, "error"),
   });
   const compile = useMutation({
     mutationFn: (format: CompileFormat) =>
@@ -247,30 +302,100 @@ export function Backstage({
             <h1>Open</h1>
             <div className="wb-card wb-rows">
               {(projects.data ?? []).map((project) => (
-                <button
-                  key={project.id}
-                  type="button"
-                  className="wb-row clickable"
-                  onClick={() => {
-                    onSelectProject(project.id);
-                    onClose();
-                  }}
-                >
-                  <Icon name="book" />
-                  <span className="wb-row-main">
-                    <strong>{project.name}</strong>
-                    <small>{project.kind.replace("_", " ")}</small>
-                  </span>
-                  <span className="muted">
-                    {relativeTime(project.updated_at)}
-                  </span>
-                </button>
+                <div key={project.id} className="wb-row-split">
+                  <button
+                    type="button"
+                    className="wb-row clickable"
+                    onClick={() => {
+                      onSelectProject(project.id);
+                      onClose();
+                    }}
+                  >
+                    <Icon name="book" />
+                    <span className="wb-row-main">
+                      <strong>{project.name}</strong>
+                      <small>{project.kind.replace("_", " ")}</small>
+                    </span>
+                    <span className="muted">
+                      {relativeTime(project.updated_at)}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="wb-icon-btn"
+                    title="Rename"
+                    aria-label={`Rename ${project.name}`}
+                    onClick={async () => {
+                      const next = await api.ask({
+                        title: "Rename the project",
+                        label: "Name",
+                        initial: project.name,
+                        confirm: "Rename",
+                      });
+                      if (next?.trim() && next.trim() !== project.name)
+                        rename.mutate({ id: project.id, name: next.trim() });
+                    }}
+                  >
+                    <Icon name="edit" />
+                  </button>
+                  <button
+                    type="button"
+                    className="wb-icon-btn"
+                    title="Delete"
+                    aria-label={`Delete ${project.name}`}
+                    onClick={async () => {
+                      const typed = await api.ask({
+                        title: `Delete “${project.name}”?`,
+                        label:
+                          "This removes the project and everything in it. Type its name to confirm.",
+                        placeholder: project.name,
+                        confirm: "Delete for good",
+                      });
+                      if (typed?.trim() === project.name)
+                        remove.mutate(project.id);
+                      else if (typed !== null)
+                        api.toast(
+                          "The name did not match; nothing was deleted.",
+                        );
+                    }}
+                  >
+                    <Icon name="trash" />
+                  </button>
+                </div>
               ))}
             </div>
+            <h2>Open a project file</h2>
+            <p className="muted">
+              A <code>.asten</code> file written by Save a project file opens as
+              a new project: manuscript, cast, facts, timeline, world board and
+              comments. Version history stays in the library it came from.
+            </p>
+            <input
+              ref={projectFile}
+              type="file"
+              hidden
+              accept=".asten,.json,application/json"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) openProjectFile.mutate(file);
+                e.target.value = "";
+              }}
+            />
+            <button
+              type="button"
+              className="wb-btn"
+              disabled={openProjectFile.isPending}
+              onClick={() => projectFile.current?.click()}
+            >
+              <Icon name="upload" /> Open a project file…
+            </button>
             <h2>Import a file</h2>
             <p className="muted">
               Markdown, plain text, HTML, Fountain, Word (.docx) or Final Draft
-              (.fdx) becomes a new page in the binder.
+              (.fdx) becomes a new page in the binder. A long file with chapter
+              headings (Chapter 1, Part Two, or Heading 1 in Word) arrives as a
+              manuscript with a document per chapter. Word comments and tracked
+              changes come with it.
             </p>
             <input
               ref={fileInput}
@@ -375,6 +500,21 @@ export function Backstage({
                   <strong>Save a named version</strong>
                   <small>
                     A snapshot of the open page, listed in Source Control.
+                  </small>
+                </span>
+              </button>
+              <button
+                type="button"
+                className="wb-row clickable"
+                disabled={!api.projectId || saveProjectFile.isPending}
+                onClick={() => saveProjectFile.mutate()}
+              >
+                <Icon name="save" />
+                <span className="wb-row-main">
+                  <strong>Save a project file</strong>
+                  <small>
+                    The whole project as one .asten file you can keep or move to
+                    another copy of Asten (without version history).
                   </small>
                 </span>
               </button>

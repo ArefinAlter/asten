@@ -1,0 +1,11 @@
+{"document":"pride","words":127360}
+{"pageOpenMs":2282}
+{"keystrokes":474,"wallMs":31063,"keyToFrameMs":{"n":474,"min":30.19999998807907,"median":33,"p95":42.59999996423721,"max":137.80000001192093,"mean":35.3964135020594},"slowEvents":944,"worstEventMs":144}
+{"check":"every keystroke reached the screen","ok":true,"detail":"474 of 471"}
+{"check":"typing stays responsive: median key-to-frame under 50 ms, p95 under 100 ms","ok":true,"detail":"{\"n\":474,\"min\":30.19999998807907,\"median\":33,\"p95\":42.59999996423721,\"max\":137.80000001192093,\"mean\":35.3964135020594}"}
+{"markOnServerAfterLastKeyMs":1662,"mark":"Elizabeth's eyes was settled as brown."}
+{"check":"the mark exists on the server within a few seconds of the last key","ok":true,"detail":"1662 ms"}
+{"markInWindowAfterLastKeyMs":2561}
+{"check":"the mark appears in the window","ok":true,"detail":"2561 ms"}
+{"totalSince":7607}
+{"summary":"4 of 4 checks passed","failed":[]}

@@ -2,5 +2,10 @@
 import type { DocumentId } from "../domain/DocumentId";
 import type { DocumentKind } from "../domain/DocumentKind";
 import type { ImportFormat } from "./ImportFormat";
+import type { ImportSplit } from "./ImportSplit";
 
-export type ImportRequest = { filename: string, format: ImportFormat, body: string, encoding?: string | null, parent_id?: DocumentId | null, kind?: DocumentKind | null, };
+export type ImportRequest = { filename: string, format: ImportFormat, body: string, encoding?: string | null, parent_id?: DocumentId | null, kind?: DocumentKind | null, 
+/**
+ * Split a long file into chapters. Absent means one document.
+ */
+split?: ImportSplit | null, };

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 44">
+  <style>
+    .s{fill:#FBF7EE;stroke:#1E1A15}.b{fill:#1E1A15}.r{fill:#B0351F}.t{fill:#ECE2CC;stroke:#1E1A15}
+    @media (prefers-color-scheme: dark){.s{fill:#15233D;stroke:#F1E7D2}.b{fill:#F1E7D2}.r{fill:#E8694C}.t{fill:#0B1424;stroke:#F1E7D2}}
+  </style>
+  <rect class="s" x="3.5" y="2.5" width="25" height="39" rx="5.5" stroke-width="2.6"/>
+  <circle class="b" cx="11.2" cy="11" r="4.4"/>
+  <circle class="r" cx="20.8" cy="11" r="4.4"/>
+  <rect class="t" x="13.4" y="18.5" width="5.2" height="19.5" rx="2.6" stroke-width="1.6"/>
+  <path d="M16 16.5 V32.4" stroke="#C98A2E" stroke-width="2.8" stroke-linecap="round"/>
+</svg>

@@ -7,7 +7,7 @@
       "name": "MIT",
       "identifier": "MIT"
     },
-    "version": "0.0.1-alpha",
+    "version": "0.0.1-beta",
     "x-asten": {
       "auth_modes": [
         {
@@ -828,6 +828,61 @@
         ]
       }
     },
+    "/api/v1/projects/bundle": {
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Open a project file",
+        "description": "Creates a new project from a project file written by the export route. Ids are minted again and every reference rewritten; a file with a record this version cannot read is refused whole.",
+        "operationId": "import_project_file",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The new project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid token or session cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "This is not a project file, or one that this version cannot read",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "asten_token": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}": {
       "get": {
         "tags": [
@@ -857,6 +912,132 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "No valid token or session cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No project with that id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "asten_token": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Rename a project",
+        "operationId": "update_project",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "The project",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProject"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No valid token or session cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No project with that id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "The name is empty",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "asten_token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Delete a project",
+        "description": "Removes the project and everything in it. This cannot be undone; the library's backups still hold the last copy.",
+        "operationId": "delete_project",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "The project",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
           },
           "401": {
             "description": "No valid token or session cookie",
@@ -3943,6 +4124,63 @@
           },
           "404": {
             "description": "No event with that id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "asten_token": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/export": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Export a project file",
+        "description": "The project as one JSON document (format asten-project): documents with their content, cast, facts, timeline, world board, routes, rules, settings and comments. Version history is not included; a backup of the library keeps it.",
+        "operationId": "export_project",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "description": "The project",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The project file",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "description": "No valid token or session cookie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No project with that id",
             "content": {
               "application/json": {
                 "schema": {
@@ -9335,8 +9573,28 @@
                 "$ref": "#/components/schemas/DocumentKind"
               }
             ]
+          },
+          "split": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ImportSplit",
+                "description": "Split a long file into chapters. Absent means one document."
+              }
+            ]
           }
         }
+      },
+      "ImportSplit": {
+        "type": "string",
+        "description": "Whether a long file becomes one document or one per chapter.",
+        "enum": [
+          "none",
+          "auto",
+          "chapters"
+        ]
       },
       "Invariant": {
         "type": "object",
@@ -11949,6 +12207,24 @@
         "properties": {
           "enabled": {
             "type": "boolean"
+          }
+        }
+      },
+      "UpdateProject": {
+        "type": "object",
+        "description": "Rename a project or change its description.",
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },

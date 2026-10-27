@@ -329,6 +329,18 @@ export function Workbench() {
     queryKey: ["projects"],
     queryFn: () => client.listProjects(),
   });
+  // A project deleted elsewhere (or just now) is no longer the open one.
+  useEffect(() => {
+    if (
+      selectedProjectId &&
+      projects.data &&
+      !projects.data.some((p) => p.id === selectedProjectId)
+    ) {
+      setSelectedProjectId(undefined);
+      setSelectedDocumentId(undefined);
+      setViewState("overview");
+    }
+  }, [projects.data, selectedProjectId]);
   // The hosted copies open their one project straight away.
   useEffect(() => {
     if ((sample || hosted) && !selectedProjectId && projects.data?.length === 1)
@@ -499,22 +511,51 @@ export function Workbench() {
   });
   const importDocument = useMutation({
     mutationFn: async (file: File) => {
+      if (/\.(rtf|odt|pages|pdf|doc)$/i.test(file.name))
+        throw new Error(
+          "Asten reads .docx, .md, .txt, .html, .fountain and .fdx. Save the file from your word processor as one of those and import that.",
+        );
       const format = importFormat(file.name);
-      const buffer = await file.arrayBuffer();
-      const body =
-        format === "docx"
-          ? toBase64(new Uint8Array(buffer))
-          : new TextDecoder().decode(buffer);
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      // Text goes as UTF-8 when it is; otherwise (UTF-16, Windows-1252) the
+      // bytes go as they are and the engine reads the byte-order mark.
+      let body: string;
+      let encoding: "utf-8" | "base64" = "base64";
+      if (format === "docx") body = toBase64(bytes);
+      else
+        try {
+          body = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+          encoding = "utf-8";
+        } catch {
+          body = toBase64(bytes);
+        }
       return client.importDocument(selectedProjectId!, {
         filename: file.name,
         format,
         body,
-        encoding: format === "docx" ? "base64" : "utf-8",
+        encoding,
+        split: "auto",
       });
     },
     onSuccess: async (document) => {
-      log("Desk", `Imported “${document.title}”.`);
-      setSelectedDocumentId(document.id);
+      // A long file arrives as a manuscript with a document per chapter:
+      // say so, and open the first chapter rather than the empty container.
+      const all = await client.listDocumentSummaries(selectedProjectId!);
+      const chapters = all
+        .filter((d) => d.parent_id === document.id)
+        .sort((a, b) => a.position - b.position);
+      log(
+        "Desk",
+        chapters.length
+          ? `Imported “${document.title}” as ${chapters.length} chapters.`
+          : `Imported “${document.title}”.`,
+      );
+      toast(
+        chapters.length
+          ? `Imported ${chapters.length} chapters under “${document.title}”.`
+          : `Imported “${document.title}”.`,
+      );
+      setSelectedDocumentId(chapters[0]?.id ?? document.id);
       setView("write");
       await queryClient.invalidateQueries({ queryKey: ["documents"] });
     },

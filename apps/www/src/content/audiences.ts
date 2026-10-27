@@ -57,7 +57,7 @@ export const audiences: Audience[] = [
     },
     honest: [
       "Asten reads only plain attributes from your prose (hair, eyes, age, location, alive or dead, relations), and only when a name is in the same sentence. Anything subtler, you settle yourself.",
-      "It is a pre-alpha: release 0.0.1a for Windows and Linux, unsigned, with macOS later.",
+      "It is a pre-alpha: release 0.0.1b for Windows and Linux, unsigned, with macOS later.",
       "It won’t typeset your book. Compile to .docx for your editor or publisher.",
     ],
     faqs: [
@@ -193,7 +193,7 @@ export const audiences: Audience[] = [
     honest: [
       "Asten doesn’t import a franchise’s canon for you. You settle the facts that matter.",
       "There’s no posting integration; compile to HTML or Markdown and post as usual.",
-      "It is a pre-alpha (release 0.0.1a); expect rough edges.",
+      "It is a pre-alpha (release 0.0.1b); expect rough edges.",
     ],
     faqs: [
       { q: "Is Asten good for writing fan fiction?", a: "Yes. Asten’s canon model fits fan fiction naturally: settle the facts of your version, keep changed source canon on file as contested, and get marks when your canon contradicts itself. Your writing stays on your computer." },
@@ -212,9 +212,9 @@ export const audiences: Audience[] = [
     description:
       "For AI enthusiasts who write: Asten is a local-first, deterministic canon engine with stable diagnostic codes, a loopback API, and a clear rule that AI edits and never writes.",
     h1: "Asten for AI tinkerers",
-    lede: "If you use models every day, you know where they are unreliable. Asten’s checks are deterministic rules. The planned models are small local classifiers that only propose facts, and your manuscript is never used for training.",
+    lede: "If you use models every day, you know where they are unreliable. Asten’s checks are deterministic rules. The assistant is optional: bring your own key or run a local model, read the exact request before it is sent, and know that it never writes your prose and your manuscript is never used for training.",
     answer:
-      "Asten is a local-first writing environment with a deterministic canon engine: Rust, SQLite, a loopback HTTP API on 127.0.0.1:4317, and stable diagnostic codes. No model runs today: perception is deterministic. Planned perception models are small local classifiers that only propose; any generative AI, if ever, is optional and never trains on manuscripts.",
+      "Asten is a local-first writing environment with a deterministic canon engine: Rust, SQLite, a loopback HTTP API on 127.0.0.1:4317, and stable diagnostic codes. The checks run no model: perception is deterministic. The optional assistant in the desktop app (bring your own key, or a local model) only explains, searches and proposes; it never writes prose and never trains on manuscripts.",
     pains: [
       { title: "Voice flattening", text: "Every AI draft sounds like every other AI draft." },
       { title: "Confident nonsense", text: "A model “remembers” a plot point that never happened." },
@@ -227,21 +227,21 @@ export const audiences: Audience[] = [
       { title: "A written AI policy", text: "Proposals only, local first, your key, full switch-off, no training.", href: "/ai-policy" },
     ],
     scenario: {
-      title: "How AI will fit (planned)",
+      title: "How the assistant fits",
       lines: [
-        "You finish a chapter. A local model reads it and proposes three facts: “Mira · hair_color · black?”",
+        "You finish a chapter and ask the assistant what the draft implies. It reads what you attach and proposes three facts: “Mira · hair_color · black?”",
         "Each proposal cites the sentence it came from. None of them is canon yet.",
         "You confirm one, reject one, and mark one as a lie Mira tells. Only the confirmed one joins canon.",
         "The compiler, still deterministic, does the checking. The model never touches your prose.",
       ],
     },
     honest: [
-      "No model ships today. The scenario above is planned work, described as a design commitment, not a feature.",
+      "The assistant is new in 0.0.1b and has only been tested against mock providers that speak each vendor’s wire format; live providers need your key and are untested by Verne. The checks that judge contradictions stay rule-based.",
       "Asten is open source under the MIT License; the source is on GitHub.",
       "The local API binds to loopback by default and answers only to paired clients. Don’t expose it to a network without TLS and an owner passphrase.",
     ],
     faqs: [
-      { q: "Does Asten run a local LLM?", a: "Not today. Asten’s checks are deterministic rules. Planned AI features will prefer local models, support bring-your-own provider keys with explicit consent, and can be switched off entirely." },
+      { q: "Does Asten run a local LLM?", a: "Asten does not bundle one. Its checks are deterministic rules. The optional assistant can call a local model through Ollama (or any OpenAI-compatible endpoint on your machine), or a cloud provider with your own key and consent, and everything AI-related switches off in one place." },
       { q: "Does Asten have an API?", a: "Asten runs a local HTTP API on 127.0.0.1:4317 that its desk and add-ins use. It is a loopback API on your own machine, not a public cloud API." },
       { q: "Is Asten open source?", a: "Yes. Asten is released under the MIT License, and the source is on GitHub (ArefinAlter/asten). Its rules and diagnostic codes are documented on this site." },
     ],
