@@ -14,7 +14,7 @@ prose; any AI feature follows the AI policy (D27).
 
 ## Try the pre-alpha
 
-Release [0.0.1b](https://github.com/ArefinAlter/asten/releases/tag/v0.0.1b)
+Release [0.0.1c](https://github.com/ArefinAlter/asten/releases/tag/v0.0.1c)
 (pre-alpha) has unsigned desktop builds for Windows x64 and Linux x64. The
 desktop app runs the engine on your machine, can open a sample novel, imports
 Word, Markdown, HTML and plain text, moves a project as one `.asten` file,
@@ -28,7 +28,7 @@ visit; it is for trying Asten, not for manuscripts. How it is hosted:
 
 ## Platforms
 
-Published today: release 0.0.1b for Windows x64 and Linux x64 (unsigned), and
+Published today: release 0.0.1c for Windows x64 and Linux x64 (unsigned), and
 the hosted pre-alpha in any modern browser (it still runs 0.0.1a and has no
 assistant). Configured but not yet published:
 Windows ARM64, macOS 11+ (one universal build), Linux aarch64, and the Android
@@ -150,3 +150,5 @@ names Asten and Verne and their logos are not covered by it.
 
 The engine design draws on the MIT-licensed `dynodoc-engine` reference. No
 code from the AGPL `dynodoc` application is used.
+
+0.0.1c: The optional assistant supports installed subscription CLIs alongside API keys. Canon checks remain rule based, proposed facts require confirmation, and the assistant never writes prose. The native assistant completed a real bounded Claude subscription request. See [installed agent connections](docs/INSTALLED-AGENTS.md) and [acceptance](docs/ACCEPTANCE-0.0.1c.md).

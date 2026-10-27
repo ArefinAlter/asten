@@ -1,15 +1,15 @@
 {
-  "version": "0.0.1-beta",
-  "notes": "Asten 0.0.1b (pre-alpha). Release notes: https://github.com/ArefinAlter/asten/releases/tag/v0.0.1b",
-  "pub_date": "2026-10-26T18:13:01Z",
+  "version": "0.0.1-beta.1",
+  "notes": "Asten 0.0.1c (pre-alpha). Release notes: https://github.com/ArefinAlter/asten/releases/tag/v0.0.1c",
+  "pub_date": "2026-10-27T20:16:10.028681Z",
   "platforms": {
     "windows-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTQ3orb0c1bC96aWJ0eVNubWUvL3VLcXlmU0RmcExCODlpYk55TDg5NnFSOGZ1bWsxRE1UTDZMdlVGZGlOYzFpa09MaW1zOE4zdG1aMUQxQTNGYVBLc0xIOUtCU0VjV3dnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMDM3Mzg5CWZpbGU6QXN0ZW5fMC4wLjEtYmV0YV94NjQtc2V0dXAuZXhlCXZlcnNpb246MC4wLjEtYmV0YQpqc1laUlc1UFdZZkl2L0pIbEZFaVI5SGxibFhoS2NUekU1alFrQXB5RE5ISHFRNVVrWVAxaTVqTkx0RG5nRXcvTE1kOXZ1YkVlblROdkp0Q3IrUStDdz09Cg==",
-      "url": "https://github.com/ArefinAlter/asten/releases/download/v0.0.1b/Asten_0.0.1-beta_x64-setup.exe"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTQ3orb0c1bC96aVpTdWNDeEVFcGt0K0R3ZVQwUFVzT08xeHpUb3pFWXRvSXZKM2Via2FJRVUrdUF6YWUyeW93ZXVKaTlBemZDUVV2cGlWQ0NQZFVpNys1WThVK2JHQ3dnPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTI4OTUyCWZpbGU6QXN0ZW5fMC4wLjEtYmV0YS4xX3g2NC1zZXR1cC5leGUJdmVyc2lvbjowLjAuMS1iZXRhLjEKNTR0enFxaGFtb0YxSUdMUER4c2lRWkNrOVEwQ3BSRzUwSzF6SUtRZEVFSVVzWDB4VzdSaEJKaUY3THp6UjhKTXkvUUpvaFp6dEFsOTdSbko0Y3MrQ1E9PQo=",
+      "url": "https://github.com/ArefinAlter/asten/releases/download/v0.0.1c/Asten_0.0.1-beta.1_x64-setup.exe"
     },
     "linux-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTQ3orb0c1bC96aWZ6akZKSHhFcWVHbmxrV1dxeVhaanowTWdLL0RMWCt1ZEsxczNMbzR3dkhhL3RTcTNxSE8vN3Z0YUVqalpwaEd3RTJVNSsrRVRPQndjVWcxU2hMeXdzPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMDIwOTEwCWZpbGU6QXN0ZW5fMC4wLjEtYmV0YV9hbWQ2NC5BcHBJbWFnZQl2ZXJzaW9uOjAuMC4xLWJldGEKSGxqOStNd3hOZy84SnQwNW5icG5pQlY1ZHhnODMwV2RpZ3JXTGdGbUlKWklTWThSR0Z5VUJEaDJ5MGJaL2NreXdBUmZHM2JxazVIcmowV08zVG1YQmc9PQo=",
-      "url": "https://github.com/ArefinAlter/asten/releases/download/v0.0.1b/Asten_0.0.1-beta_amd64.AppImage"
+      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVTQ3orb0c1bC96aVdDdytnN003RnlGaW5MK3dEZysrbzJMNE9ZOGMyNWxBVitmMjZ0bHFrZjJiRW1SeGRCcUM0OVpsMWt0N1FOeGMzMHVYSXVQbjU5dU9FWW1RUWdNL3dZPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzkzMTMxNTA3CWZpbGU6QXN0ZW5fMC4wLjEtYmV0YS4xX2FtZDY0LkFwcEltYWdlCXZlcnNpb246MC4wLjEtYmV0YS4xCjd6ZGZEbm0xNXBqSzBtcGdudkVkeWdWbVFzTEhUY0NZM0hYVm9kZy9hRUpCWklPcHhlZ1BXVWllZHRwZ1d2MDMwampVemxJVUxWMXBhWlRNOTZ2TUNnPT0K",
+      "url": "https://github.com/ArefinAlter/asten/releases/download/v0.0.1c/Asten_0.0.1-beta.1_amd64.AppImage"
     }
   }
 }
