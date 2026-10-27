@@ -174,10 +174,8 @@ fn closer(chars: &[char], open: usize, ch: char, len: usize, budget: &mut usize)
     if first.is_whitespace() {
         return None;
     }
-    if ch == '_' {
-        if open > 0 && is_word(chars[open - 1]) {
-            return None;
-        }
+    if ch == '_' && open > 0 && is_word(chars[open - 1]) {
+        return None;
     }
     // `*` right before `*` of a longer run is not this delimiter's opener.
     if len == 1 && chars.get(after) == Some(&ch) {

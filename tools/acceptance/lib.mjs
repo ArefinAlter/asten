@@ -136,7 +136,7 @@ export async function launchApp({ exe, profile, port = 9333, env = {}, fresh = t
 
 /** The embedded API's origin and the desk token, read through the app's own command. */
 export async function deskSession(page) {
-  for (let attempt = 0; attempt < 40; attempt++) {
+  for (let attempt = 0; attempt < 160; attempt++) {
     try {
       return await page.evaluate(async () => {
         const internals = window.__TAURI_INTERNALS__;

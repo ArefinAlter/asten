@@ -434,12 +434,11 @@ mod tests {
             let text = read(&bytes, name);
             let mut reader = quick_xml::Reader::from_str(&text);
             loop {
-                match reader
+                let event = reader
                     .read_event()
-                    .unwrap_or_else(|e| panic!("{name}: {e}"))
-                {
-                    quick_xml::events::Event::Eof => break,
-                    _ => {}
+                    .unwrap_or_else(|e| panic!("{name}: {e}"));
+                if matches!(event, quick_xml::events::Event::Eof) {
+                    break;
                 }
             }
         }
