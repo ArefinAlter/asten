@@ -1,0 +1,11 @@
+{"document":"CHAPTER III.","words":1719}
+{"pageOpenMs":1678}
+{"keystrokes":474,"wallMs":15690,"keyToFrameMs":{"n":474,"min":3.299999952316284,"median":5.099999964237213,"p95":8.5,"max":16.900000035762787,"mean":5.459493669653743},"slowEvents":142,"worstEventMs":24}
+{"check":"every keystroke reached the screen","ok":true,"detail":"474 of 471"}
+{"check":"typing stays responsive: median key-to-frame under 50 ms, p95 under 100 ms","ok":true,"detail":"{\"n\":474,\"min\":3.299999952316284,\"median\":5.099999964237213,\"p95\":8.5,\"max\":16.900000035762787,\"mean\":5.459493669653743}"}
+{"markOnServerAfterLastKeyMs":1289,"mark":"Elizabeth's eyes was settled as brown."}
+{"check":"the mark exists on the server within a few seconds of the last key","ok":true,"detail":"1289 ms"}
+{"markInWindowAfterLastKeyMs":1332}
+{"check":"the mark appears in the window","ok":true,"detail":"1332 ms"}
+{"totalSince":4073}
+{"summary":"4 of 4 checks passed","failed":[]}

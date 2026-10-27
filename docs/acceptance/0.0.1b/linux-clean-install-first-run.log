@@ -1,0 +1,36 @@
+== clean system: Ubuntu 22.04.5 LTS; webkit installed before: 0
+== apt install of the deb (dependencies resolved from the archive)
+The following NEW packages will be installed:
+0 upgraded, 95 newly installed, 0 to remove and 210 not upgraded.
+Unpacking asten (0.0.1-beta) ...
+Setting up asten (0.0.1-beta) ...
+installed: Status: install ok installed Version: 0.0.1-beta 
+/usr/share/applications
+/usr/share/applications/Asten.desktop
+/usr/share/icons
+/usr/share/icons/hicolor
+/usr/share/icons/hicolor/256x256@2
+/usr/share/icons/hicolor/256x256@2/apps
+/usr/share/icons/hicolor/256x256@2/apps/asten-desktop.png
+/usr/share/icons/hicolor/32x32
+/usr/share/icons/hicolor/32x32/apps
+/usr/share/icons/hicolor/32x32/apps/asten-desktop.png
+/usr/share/icons/hicolor/128x128
+/usr/share/icons/hicolor/128x128/apps
+/usr/share/icons/hicolor/128x128/apps/asten-desktop.png
+/usr/bin/asten-desktop
+== desktop entry validates
+desktop-file-validate: ok
+== missing shared libraries
+not found count: 0
+== run under xvfb
+port: 4317
+health: {"status":"ok","service":"asten-api","version":"0.0.1-beta"}
+window: 
+screenshot written
+Terminated
+== remove
+Removing asten (0.0.1-beta) ...
+left after remove: 0 listed; binary present: no; desktop entry present: no
+DONE
+exit 0

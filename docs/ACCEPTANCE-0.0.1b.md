@@ -35,14 +35,14 @@ October 2026 for the release `v0.0.1b` (`0.0.1-beta`). The scripts are in
 
 | # | Scenario | Result | Evidence |
 | --- | --- | --- | --- |
-| 1 | Fresh install, sample novel, new project, autosave, reopen | Passed | `ui.log` (26 of 26), `ui-1` to `ui-5` screenshots |
+| 1 | Fresh install, sample novel, new project, autosave, reopen | Passed | `ui.log` (26 of 26); `docs/images/asten-0.0.1b-welcome.png`, `asten-0.0.1b-sample-novel.png` |
 | 2 | A real long manuscript and a Word file; typing, engine, numbers | Passed, with a limit on one very long scene | `documents.log` (73 of 73), `perf.log`, `typing.log`, `typing-whole-book.log` |
 | 3 | The canon workflow end to end | Passed | `canon.log` (24 of 24) |
 | 4 | Compile and export, import of six formats | Passed | `documents.log` |
 | 5 | Word and Google Docs guests over loopback | Passed, with limits | `guests.log` (23 of 23) |
 | 6 | The bring-your-own-key assistant | Passed against mock providers; live providers not run | `assistant.log` (25 of 25), `cargo test -p asten-assistant` |
-| 7 | The updater, older build to this release | Passed | `updater.log` (9 of 9 and 7 of 7 with a bad signature) |
-| 8 | Linux: AppImage and .deb | Passed, with limits | `linux-clean-install.log`, `linux-smoke.png`, `linux-clean-install.png` |
+| 7 | The updater, older build to this release | Passed | `updater.log` (9 of 9), `updater-bad-signature.log` (7 of 7) |
+| 8 | Linux: AppImage and .deb | Passed, with limits | `linux-clean-install-first-run.log`, `linux-clean-install.log`; `docs/images/asten-0.0.1b-linux-appimage.png` |
 | 9 | Settings, keybindings, themes, storage, project file, backup and restore | Passed | `ui.log`, `restore.log` (8 of 8) |
 
 ### 1. First run, sample, new project, autosave, reopen
@@ -65,23 +65,24 @@ one file in the scratch folder.
 
 | What | Result |
 | --- | --- |
-| Import, split into chapters | 1.4 s |
-| First full check (cold) | 0.86 s wall; the engine itself 34 ms (perceive 6, analyse 27); 249 marks |
-| Full check again (warm, cached) | median 68 ms (65 to 72) |
-| Save one edited paragraph | median 5 ms (4 to 7; one outlier of 173 ms) |
-| Check after that edit (incremental) | median 100 ms (74 to 113) |
-| Typing in a 1,719-word chapter: key to the key's pixels on screen | 474 keystrokes, median 4.6 ms, p95 6.0 ms, worst 14.9 ms |
-| A sentence that contradicts a settled fact: mark on the server / in the window | 1.2 s / 1.2 s after the last key |
-| The whole novel as one 127,360-word scene: page opens | 2.6 s |
-| Typing in that scene | median 33.5 ms, p95 39.4 ms, worst 136 ms |
-| The same contradiction in that scene: mark on the server / in the window | 1.6 s / 2.5 s |
+| Import, split into chapters | 4.3 s in the final run (1.4 s to 5.1 s across five runs) |
+| First full check (cold) | 0.96 s wall; the engine itself 42 ms (perceive 12, analyse 29); 249 marks |
+| Full check again (warm, cached) | median 75 ms (69 to 84) |
+| Save one edited paragraph | median 7 ms (3 to 94) |
+| Check after that edit (incremental) | median 83 ms (78 to 222) |
+| Typing in a 1,719-word chapter: key to the key's pixels on screen | 474 keystrokes, median 5.1 ms, p95 8.5 ms, worst 16.9 ms |
+| A sentence that contradicts a settled fact: mark on the server / in the window | 1.3 s / 1.3 s after the last key |
+| The whole novel as one 127,360-word scene: page opens | 2.3 s |
+| Typing in that scene | median 33.0 ms, p95 42.6 ms, worst 137.8 ms |
+| The same contradiction in that scene: mark on the server / in the window | 1.7 s / 2.6 s |
 | Library file after all of this | 7.5 MB |
 
-The numbers were taken while other builds ran on the same machine, so they are
-a ceiling rather than a best case. A whole novel in one scene is slower to type
-in than a chapter (about 34 ms against 5 ms per keystroke) but stays well under
-the 50 ms the script allows; splitting at chapters, which the importer does, is
-the intended way to work.
+The numbers are from the installed build on a machine with nothing else heavy
+running (an earlier run, while other builds were going, was slower but passed
+the same limits). A whole novel in one scene is slower to type in than a
+chapter (about 33 ms against 5 ms per keystroke) but stays under the 50 ms the
+script allows; splitting at chapters, which the importer does, is the intended
+way to work.
 
 ### 3. The canon workflow
 
@@ -190,13 +191,13 @@ environment) and the `asten-api` archive.
   Windows desktop through WSLg): the embedded API answers `/health` with
   `{"status":"ok","service":"asten-api","version":"0.0.1-beta"}`, the window is
   titled "Asten" at 1440x900, and the screenshot shows the welcome page
-  (`linux-smoke.png`).
+  (`docs/images/asten-0.0.1b-linux-appimage.png`).
 - The .deb was installed with `apt` on a second, clean Ubuntu 22.04 (95 packages
   pulled in to satisfy `libwebkit2gtk-4.1-0` and `libgtk-3-0`), the desktop entry
   validates (`desktop-file-validate`), the hicolor icons (32, 128, 256@2) are the
   new mark, `ldd` finds no missing library, the app starts and answers
   `/health`, and `apt remove` leaves no file behind
-  (`linux-clean-install.log`, `linux-clean-install.png`).
+  (`linux-clean-install-first-run.log` is the install with dependencies pulled in; `linux-clean-install.log` the run after).
 
 Limits: no physical machine or GPU was available. Under a virtual display the
 window needs `WEBKIT_DISABLE_COMPOSITING_MODE=1 WEBKIT_DISABLE_DMABUF_RENDERER=1`
@@ -230,6 +231,16 @@ uninstaller all carry the Asten mark (`docs/images/asten-icons-installed.png`),
 and the running window's taskbar button shows it
 (`docs/images/asten-taskbar-button.png`). The installer's wizard has a header
 and a side picture drawn from the mark.
+
+## Gates
+
+`cargo fmt --check` clean; `cargo clippy --workspace --all-targets -- -D warnings`
+clean; `cargo test --workspace --exclude asten-desktop` 324 passed, 0 failed, and
+`cargo test -p asten-desktop` 7 passed; web `tsc -b`, vitest (49 tests) and
+`prettier --check .` clean; `pnpm contracts:gen` leaves no drift. The release
+binaries were built from the commit before the last two clippy clean-ups (an
+`if` collapsed in the Markdown importer, a `match` in a test); neither changes
+behaviour.
 
 ## What was not done, and why
 

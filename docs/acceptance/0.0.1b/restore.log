@@ -1,0 +1,12 @@
+{"check":"a backup is made","ok":true,"detail":"asten-20261027-002537.db"}
+{"check":"two projects exist before the restore","ok":true,"detail":""}
+{"check":"the app asks before it replaces the library; Escape cancels and nothing changes","ok":true,"detail":"{\"found\":true,\"window\":\"Restore the library\",\"pressed\":\"keys {ESC}\"}"}
+{"confirmDialog":"{\"found\":true,\"window\":\"Restore the library\",\"pressed\":\"keys {ENTER}\"}"}
+{"check":"confirming restores and restarts","ok":true,"detail":"{\"found\":true,\"window\":\"Restore the library\",\"pressed\":\"keys {ENTER}\"}"}
+{"windowsAfterConfirm":"Dynodoc | Tauri Window | pid 9596\r // Open | #32770 | pid 41300\r // Asten | Tauri Window | pid 17684\r // Ogun Studio | Tauri Window | pid 38876\r"}
+{"afterConfirm":{"statusText":[],"pageStillAnswers":false}}
+{"check":"the app restarted itself","ok":true,"detail":""}
+{"check":"the library is the backed-up one: the later project is gone","ok":true,"detail":"Kept by the backup"}
+{"check":"the app reports the restore","ok":true,"detail":"{\"ok\":true,\"message\":\"Your library was restored. The one it replaced is kept in Backups as before-restore.\",\"at\":\"2026-10-27T00:25:57.844505800+06:00\"}"}
+{"check":"the library it replaced was kept","ok":true,"detail":"before-restore-20261027-002557.db"}
+{"summary":"8 of 8 checks passed","failed":[]}

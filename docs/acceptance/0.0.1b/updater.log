@@ -1,0 +1,11 @@
+{"check":"the older build installs silently into the scratch folder","ok":true,"detail":"D:\\verne-build\\asten\\install-old\\asten-desktop.exe"}
+{"check":"it is the older version","ok":true,"detail":"0.0.1-alpha"}
+{"apiReportsCrateVersion":"0.0.1-beta"}
+{"check":"pressing Check for updates finds 0.0.1-beta, and only then","ok":true,"detail":"GET /latest.json"}
+{"check":"nothing was requested before the button was pressed","ok":true,"detail":"GET /latest.json"}
+{"check":"the installer ran and replaced the program with 0.0.1-beta","ok":true,"detail":"0.0.1-beta"}
+{"check":"the new installer was fetched from the manifest's address, with its signature checked","ok":true,"detail":"GET /latest.json | GET /Asten_0.0.1-beta_x64-setup.exe"}
+{"check":"the app that is running afterwards reports 0.0.1-beta","ok":true,"detail":"0.0.1-beta (relaunched by the update)"}
+{"check":"the project made before the update is still there","ok":true,"detail":"Made before the update"}
+{"check":"the uninstaller removes the program","ok":true,"detail":""}
+{"summary":"9 of 9 checks passed","failed":[]}
