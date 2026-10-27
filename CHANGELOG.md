@@ -7,7 +7,7 @@ major version is 0, a minor version may change behaviour.
 
 ## [Unreleased]
 
-## [0.0.1-beta] - 2026-10-26
+## [0.0.1-beta] - 2026-10-27
 
 Tagged `v0.0.1b`, the second public pre-release (pre-alpha). The desktop app is
 now complete standalone software for writers, with an optional assistant that
