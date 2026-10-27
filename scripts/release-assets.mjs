@@ -45,7 +45,9 @@ const release = join(target, "release");
 const bundle = join(release, "bundle");
 
 function only(dir, test) {
-  const found = existsSync(dir) ? readdirSync(dir).filter(test) : [];
+  const found = existsSync(dir)
+    ? readdirSync(dir).filter(test).filter((file) => file.includes(`_${version}_`))
+    : [];
   if (found.length !== 1)
     throw new Error(`expected one match in ${dir}, found ${found.join(", ") || "none"}`);
   return join(dir, found[0]);
