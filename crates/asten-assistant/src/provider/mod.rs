@@ -21,6 +21,9 @@ use crate::{
     error::{AssistantError, Result},
 };
 
+#[path = "../../../../shared/local_agent.rs"]
+pub mod local_agent;
+
 pub mod anthropic;
 pub mod gemini;
 pub mod openai;

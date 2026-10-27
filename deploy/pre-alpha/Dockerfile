@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     && mkdir -p /data && chown asten:asten /data
 COPY artifacts/asten-prealpha /usr/local/bin/asten-prealpha
 COPY artifacts/desk /desk
+RUN chmod 755 /usr/local/bin/asten-prealpha && chmod -R a+rX /desk
 USER asten
 ENV PREALPHA_BIND=0.0.0.0:8080 \
     PREALPHA_DATA=/data \

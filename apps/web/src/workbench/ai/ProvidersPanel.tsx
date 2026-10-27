@@ -119,8 +119,9 @@ export function ProvidersDesktop() {
   return (
     <>
       <Head title="AI providers">
-        Local models first; a cloud provider only with your own key and your
-        consent; and a switch that turns all of it off.
+        Use a local model, an API key or an installed agent's existing sign-in.
+        Cloud connections require your consent. Your agent's plan limits and
+        extra-usage settings apply.
       </Head>
       {problem && (
         <p className="settings-problem" role="alert">
@@ -403,7 +404,11 @@ export function ProvidersDesktop() {
                   <span
                     className={`wb-pill wb-pill--${p.local ? "ok" : "muted"}`}
                   >
-                    {p.local ? "this computer" : p.kind}
+                    {p.endpoint.includes(".local-agent.invalid/")
+                      ? "existing agent sign-in · plan limits apply"
+                      : p.local
+                        ? "this computer"
+                        : p.kind}
                   </span>
                   {p.consent_valid && (
                     <span className="wb-pill wb-pill--ok">consent given</span>
@@ -412,7 +417,11 @@ export function ProvidersDesktop() {
                     <span className="wb-pill wb-pill--ok">ready</span>
                   )}
                 </strong>
-                <small className="mono">{p.host}</small>
+                <small className="mono">
+                  {p.endpoint.includes(".local-agent.invalid/")
+                    ? "Uses your installed agent"
+                    : p.host}
+                </small>
                 {p.enabled && p.not_ready && (
                   <small className="not-ready">{p.not_ready}</small>
                 )}
@@ -443,79 +452,82 @@ export function ProvidersDesktop() {
                       )}
                     </datalist>
                   </label>
-                  <label>
-                    Base URL
-                    <input
-                      className="wb-input mono"
-                      defaultValue={p.endpoint}
-                      key={`${p.id}-${p.endpoint}`}
-                      aria-label={`${p.name} base URL`}
-                      onBlur={(event) => {
-                        const value = event.target.value.trim();
-                        if (value && value !== p.endpoint)
-                          void guarded("endpoint", () =>
-                            ai.update({
-                              providers: [{ id: p.id, endpoint: value }],
-                            }),
-                          );
-                      }}
-                    />
-                  </label>
+                  {!p.endpoint.includes(".local-agent.invalid/") && (
+                    <label>
+                      Base URL
+                      <input
+                        className="wb-input mono"
+                        defaultValue={p.endpoint}
+                        key={`${p.id}-${p.endpoint}`}
+                        aria-label={`${p.name} base URL`}
+                        onBlur={(event) => {
+                          const value = event.target.value.trim();
+                          if (value && value !== p.endpoint)
+                            void guarded("endpoint", () =>
+                              ai.update({
+                                providers: [{ id: p.id, endpoint: value }],
+                              }),
+                            );
+                        }}
+                      />
+                    </label>
+                  )}
                 </div>
-                {(p.kind === "cloud" || p.custom) && (
-                  <div className="key-row">
-                    {p.key_stored ? (
-                      <>
-                        <span className="wb-pill">
-                          key stored · ••••{p.key_last4}
-                        </span>
-                        <button
-                          type="button"
-                          className="wb-btn wb-btn--small wb-btn--ghost"
-                          onClick={() =>
-                            void guarded("forget", () => ai.forgetKey(p.id))
-                          }
-                        >
-                          Forget
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <input
-                          type="password"
-                          className="wb-input"
-                          autoComplete="off"
-                          spellCheck={false}
-                          placeholder="Paste your key"
-                          aria-label={`${p.name} key`}
-                          value={keyDraft[p.id] ?? ""}
-                          onChange={(event) =>
-                            setKeyDraft({
-                              ...keyDraft,
-                              [p.id]: event.target.value,
-                            })
-                          }
-                        />
-                        <button
-                          type="button"
-                          className="wb-btn wb-btn--small"
-                          disabled={
-                            !keyDraft[p.id]?.trim() ||
-                            (status.vault.backend === "file" &&
-                              status.vault.locked)
-                          }
-                          onClick={() => {
-                            const key = keyDraft[p.id] ?? "";
-                            setKeyDraft({ ...keyDraft, [p.id]: "" });
-                            void guarded("key", () => ai.setKey(p.id, key));
-                          }}
-                        >
-                          Store key
-                        </button>
-                      </>
-                    )}
-                  </div>
-                )}
+                {(p.kind === "cloud" || p.custom) &&
+                  !p.endpoint.includes(".local-agent.invalid/") && (
+                    <div className="key-row">
+                      {p.key_stored ? (
+                        <>
+                          <span className="wb-pill">
+                            key stored · ••••{p.key_last4}
+                          </span>
+                          <button
+                            type="button"
+                            className="wb-btn wb-btn--small wb-btn--ghost"
+                            onClick={() =>
+                              void guarded("forget", () => ai.forgetKey(p.id))
+                            }
+                          >
+                            Forget
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <input
+                            type="password"
+                            className="wb-input"
+                            autoComplete="off"
+                            spellCheck={false}
+                            placeholder="Paste your key"
+                            aria-label={`${p.name} key`}
+                            value={keyDraft[p.id] ?? ""}
+                            onChange={(event) =>
+                              setKeyDraft({
+                                ...keyDraft,
+                                [p.id]: event.target.value,
+                              })
+                            }
+                          />
+                          <button
+                            type="button"
+                            className="wb-btn wb-btn--small"
+                            disabled={
+                              !keyDraft[p.id]?.trim() ||
+                              (status.vault.backend === "file" &&
+                                status.vault.locked)
+                            }
+                            onClick={() => {
+                              const key = keyDraft[p.id] ?? "";
+                              setKeyDraft({ ...keyDraft, [p.id]: "" });
+                              void guarded("key", () => ai.setKey(p.id, key));
+                            }}
+                          >
+                            Store key
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
                 <div className="provider-fields provider-fields--small">
                   <label>
                     Tool calling
@@ -755,9 +767,11 @@ export function ProvidersDesktop() {
           >
             <h2>Use {consentFor.name}?</h2>
             <p>
-              {consentFor.local
-                ? "This model runs on this machine. Nothing leaves it."
-                : `Requests go from this computer straight to ${consentFor.host}, under your own key and that provider's terms. Asten sends nothing to Verne.`}
+              {consentFor.endpoint.includes(".local-agent.invalid/")
+                ? "Asten sends this request through your installed agent and its existing sign-in. Content may leave this computer. That provider controls model access, plan limits and extra-usage billing."
+                : consentFor.local
+                  ? "This model runs on this machine. Nothing leaves it."
+                  : `Requests go from this computer straight to ${consentFor.host}, under your own key and that provider's terms. Asten sends nothing to Verne.`}
             </p>
             <h3>What is sent</h3>
             <ul>

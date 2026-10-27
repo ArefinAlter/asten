@@ -320,7 +320,9 @@ impl Assistant {
     }
 
     async fn key_of(&self, provider: &ProviderConfig) -> Result<Option<Secret>> {
-        if provider.kind == Kind::Local && provider.key_last4.is_none() {
+        if provider.is_subscription()
+            || (provider.kind == Kind::Local && provider.key_last4.is_none())
+        {
             return Ok(None);
         }
         let keys = self.keys.clone();
@@ -350,7 +352,7 @@ impl Assistant {
                 p.name
             )));
         }
-        if p.kind == Kind::Cloud && !has_key {
+        if p.kind == Kind::Cloud && !p.is_subscription() && !has_key {
             return Err(AssistantError::NotReady(format!(
                 "No key is stored for {}",
                 p.name
@@ -599,7 +601,7 @@ impl Assistant {
             notes: vec![
                 "This is the first request. If the model asks for a tool, a second request carries that tool's result (marks, canon facts, or a research note you asked about). Each request is listed in the thread's log with its size and digest, and can be opened to read exactly what was sent.".into(),
                 "Manuscript wording is not in this request unless you picked a passage. Quoted wording inside marks is left out unless you attach that mark.".into(),
-                "Your key is added to the request header by Asten at the moment of sending. It is never shown here, in a log, or to the page.".into(),
+                if provider.is_subscription() { "Asten hands this request to the installed agent. That program owns sign-in and may add its own instructions and context. Your plan limits and extra-usage settings apply.".into() } else { "Your key is added to the request header by Asten at the moment of sending. It is never shown here, in a log, or to the page.".into() },
             ],
         })
     }

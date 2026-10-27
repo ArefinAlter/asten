@@ -20,12 +20,13 @@ members = [
 ]
 
 [workspace.package]
-version = "0.0.1-beta"
+version = "0.0.1-beta.1"
 license = "MIT"
 edition = "2024"
 rust-version = "1.85"
 
 [workspace.dependencies]
+win32job = "2"
 anyhow = "1.0"
 async-trait = "0.1"
 axum = "0.8"
@@ -41,7 +42,7 @@ tauri-plugin-process = "2"
 tauri-plugin-single-instance = "2"
 tauri-plugin-updater = "2"
 thiserror = "2.0"
-tokio = { version = "1.47", features = ["fs", "macros", "net", "rt-multi-thread", "signal", "sync", "time"] }
+tokio = { version = "1.47", features = ["fs", "macros", "net", "rt-multi-thread", "signal", "sync", "time", "process", "io-util"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["catch-panic", "compression-gzip", "cors", "fs", "request-id", "set-header", "timeout", "trace"] }
 tracing = "0.1"

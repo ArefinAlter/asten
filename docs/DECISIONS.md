@@ -617,3 +617,16 @@ decision.
 **Consequences.** What a writer imports is what they see. The cost is a heuristic for chapter headings in plain text, stated in the interface, and the things still left out of Word files: pictures, footnotes, headers and footers, text boxes.
 
 **Status.** Accepted for release 0.0.1b.
+
+
+## D33 — Existing installed-agent sign-ins (27 October 2026)
+
+The owner requested subscription-backed agents in all four products. This extends
+D27's optional cloud access: a writer may explicitly choose the sign-in managed by
+an installed Codex, Claude Code, Cursor or Antigravity CLI, as well as an API key.
+Consent, the master switch, offline mode, passage selection, closed tools, refusal
+to write prose and the rule-based canon engine remain. Starting a local CLI is
+not local inference. Credentials are kept and refreshed by the owning CLI; Asten
+does not import its token files or browser state. Request previews show what Asten
+hands to the agent; the agent may add its own instructions/context. Provider plan
+limits and extra-usage settings remain authoritative. See INSTALLED-AGENTS.md.
