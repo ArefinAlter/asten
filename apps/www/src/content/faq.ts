@@ -49,7 +49,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Does Asten use AI right now?",
-        a: "Only if you turn it on. The checks run no model: Asten reads names and plain attributes from the page with fixed rules, and its marks are deterministic over those readings and the facts you confirm, so the same manuscript and the same canon always produce the same marks. Release 0.0.1b adds an optional assistant to the desktop app. It is off by default; if you turn it on and choose a provider (a model on your own machine, or a cloud provider with your own key and your consent), it can explain marks, search your canon and propose facts for you to confirm. It never writes or changes your prose. See [Asten and AI](/ai) and the [AI policy](/ai-policy).",
+        a: "Only if you turn it on. The checks run no model: Asten reads names and plain attributes from the page with fixed rules, and its marks are deterministic over those readings and the facts you confirm, so the same manuscript and the same canon always produce the same marks. Release 0.0.1b adds an optional assistant to the desktop app. It is off by default; if you turn it on and choose a provider (a model on your own machine, or a cloud provider with your own key or an installed subscription CLI, and your consent), it can explain marks, search your canon and propose facts for you to confirm. It never writes or changes your prose. See [Asten and AI](/ai) and the [AI policy](/ai-policy).",
       },
       {
         q: "Will Asten add AI features in the future?",
@@ -61,7 +61,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What does the assistant send, and when?",
-        a: "Nothing, until you turn on AI providers, choose one, enter your own key (for a cloud provider), consent to that provider, and press send in the assistant panel. A request then goes from your computer straight to that provider’s address over an encrypted connection (plain HTTP only to a model on your own machine), and nowhere else. It holds your question, the assistant’s fixed instructions, the names of the tools it may use, and what those tools return: a mark’s code and explanation, settled facts, cast entries. Your manuscript’s wording is left out unless you pick a passage to share, and the wording quoted inside a mark is left out unless that mark is attached. You can read the exact request, with your key shown as a placeholder, before it is sent. See the [AI policy](/ai-policy).",
+        a: "Nothing, until you turn on AI providers, choose one, enter your own key or select an installed subscription CLI (for a cloud provider), consent to that provider, and press send in the assistant panel. A request then goes from your computer straight to that provider’s address over an encrypted connection (plain HTTP only to a model on your own machine), and nowhere else. It holds your question, the assistant’s fixed instructions, the names of the tools it may use, and what those tools return: a mark’s code and explanation, settled facts, cast entries. Your manuscript’s wording is left out unless you pick a passage to share, and the wording quoted inside a mark is left out unless that mark is attached. You can read the exact request, with your key shown as a placeholder, before it is sent. See the [AI policy](/ai-policy).",
       },
       {
         q: "Can the assistant write or change my text?",
@@ -163,7 +163,7 @@ export const faq: FaqGroup[] = [
     items: [
       {
         q: "Can I download Asten?",
-        a: "Yes. Release 0.0.1b, a pre-alpha, is on the [download page](/download) for Windows x64 and Linux x64, and a hosted copy runs in your browser in a private sandbox that is deleted after 24 hours. The installers are not signed yet, so your system warns before the first run. macOS comes later.",
+        a: "Yes. Release 0.0.1c, a pre-alpha, is on the [download page](/download) for Windows x64 and Linux x64, and a hosted copy runs in your browser in a private sandbox that is deleted after 24 hours. The installers are not signed yet, so your system warns before the first run. macOS comes later.",
       },
       {
         q: "How much does Asten cost?",
@@ -171,7 +171,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What platforms does Asten run on?",
-        a: "Release 0.0.1b runs as a desktop app on Windows 10 and 11 (x64) and on Linux x86_64 (Ubuntu 22.04 or newer, or another desktop with WebKitGTK 4.1), and as a hosted copy in any modern browser. The same shell is configured for Windows on ARM, macOS 11 or later and Linux aarch64, but those builds still need building and verifying on hardware; macOS comes later. The desktop app keeps your projects on your machine; the hosted copy is a 24-hour sandbox for trying Asten.",
+        a: "Release 0.0.1c runs as a desktop app on Windows 10 and 11 (x64) and on Linux x86_64 (Ubuntu 22.04 or newer, or another desktop with WebKitGTK 4.1), and as a hosted copy in any modern browser. The same shell is configured for Windows on ARM, macOS 11 or later and Linux aarch64, but those builds still need building and verifying on hardware; macOS comes later. The desktop app keeps your projects on your machine; the hosted copy is a 24-hour sandbox for trying Asten.",
       },
       {
         q: "Is there a mobile app for Asten?",
@@ -213,7 +213,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Who do I contact for press inquiries about Asten?",
-        a: "Press inquiries about Asten go to info@vernesystems.com, and [the brand page](/brand) covers the logo and how to use it. When describing Asten, please keep to what exists today: a local-first writing desk with deterministic canon checks, an optional assistant that never writes prose, and a public pre-alpha (release 0.0.1b) with unsigned installers.",
+        a: "Press inquiries about Asten go to info@vernesystems.com, and [the brand page](/brand) covers the logo and how to use it. When describing Asten, please keep to what exists today: a local-first writing desk with deterministic canon checks, an optional assistant that never writes prose, and a public pre-alpha (release 0.0.1c) with unsigned installers.",
       },
       {
         q: "Where can I find Verne’s company details?",

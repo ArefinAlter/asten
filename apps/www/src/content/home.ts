@@ -33,7 +33,7 @@ export const accessSteps: Step[] = [
   },
   {
     title: "Install the desktop app",
-    text: "Download release 0.0.1b for Windows x64 or Linux x64. It runs the engine on your own computer, with your projects in one file on your disk, and offers “Open the sample novel”. The installers are not signed yet, so your system warns before the first run.",
+    text: "Download release 0.0.1c for Windows x64 or Linux x64. It runs the engine on your own computer, with your projects in one file on your disk, and offers “Open the sample novel”. The installers are not signed yet, so your system warns before the first run.",
   },
   {
     title: "Start a project",
@@ -52,7 +52,7 @@ export const homeFaqs: QA[] = [
   },
   {
     q: "Does Asten use AI?",
-    a: "The checks run no model: Asten reads names and plain attributes from the page with fixed rules and weighs them against facts you confirm. The desktop app has an optional assistant (off by default) that can use a model on your machine, or a cloud provider with your own key and consent, to explain marks and propose facts for you to confirm. It never writes your prose.",
+    a: "The checks run no model: Asten reads names and plain attributes from the page with fixed rules and weighs them against facts you confirm. The desktop app has an optional assistant (off by default) that can use a model on your machine, or a cloud provider with your own key or an installed subscription CLI and consent, to explain marks and propose facts for you to confirm. It never writes your prose.",
   },
   {
     q: "Will my writing be used to train AI?",
@@ -68,6 +68,6 @@ export const homeFaqs: QA[] = [
   },
   {
     q: "How do I get Asten?",
-    a: "Try the pre-alpha: open the hosted copy in your browser, or download release 0.0.1b for Windows x64 or Linux x64 from the [download page](/download). macOS comes later. The builds are unsigned, so your system warns before the first run.",
+    a: "Try the pre-alpha: open the hosted copy in your browser, or download release 0.0.1c for Windows x64 or Linux x64 from the [download page](/download). macOS comes later. The builds are unsigned, so your system warns before the first run.",
   },
 ];

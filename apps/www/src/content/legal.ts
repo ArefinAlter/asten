@@ -62,7 +62,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "**When.** Only when you press send in the assistant panel, and only after you have turned on AI providers, enabled one provider, entered your own key (for a cloud provider), and consented to that provider. Consent is tied to the provider’s address: if the address changes, Asten asks again. A cap of zero means no call, and offline mode allows only a model on your own machine.",
+            text: "**When.** Only when you press send in the assistant panel, and only after you have turned on AI providers, enabled one provider, entered your own key or selected an installed subscription CLI (for a cloud provider), and consented to that provider. Consent is tied to the provider’s address: if the address changes, Asten asks again. A cap of zero means no call, and offline mode allows only a model on your own machine.",
           },
           {
             kind: "p",
@@ -74,7 +74,7 @@ export const legalDocs: LegalDoc[] = [
           },
           {
             kind: "p",
-            text: "**See it first.** Before sending, you can open the exact request, with your key shown as a placeholder. Every call is also written to a spend ledger on your computer (time, provider, model, token counts, cost estimate), which Verne never sees.",
+            text: "**See it first.** Before sending, you can open the exact request, with your key shown as a placeholder. For installed-agent connections, the preview shows the task and context passed to the CLI; that CLI may add its own instructions and account metadata, and its provider policies and subscription quotas apply. Every call is also written to a spend ledger on your computer (time, provider, model, token counts, cost estimate), which Verne never sees.",
           },
           {
             kind: "p",
@@ -486,7 +486,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "Some parts of Asten work alongside services Verne does not control: Microsoft Word and Office.js for the Word task pane, Google Docs and Apps Script for the Docs sidebar, any AI provider you connect to the assistant with your own key, and Vercel, which hosts this website. Your use of those services is governed by their own terms and privacy policies, and Verne is not responsible for them.",
+            text: "Some parts of Asten work alongside services Verne does not control: Microsoft Word and Office.js for the Word task pane, Google Docs and Apps Script for the Docs sidebar, any AI provider you connect to the assistant with your own key or installed subscription CLI, and Vercel, which hosts this website. Your use of those services is governed by their own terms and privacy policies, and Verne is not responsible for them.",
           },
         ],
       },
@@ -918,7 +918,7 @@ export const legalDocs: LegalDoc[] = [
     ...legalIndex["/ai-policy"]!,
     summary: [
       "Asten’s checks run no AI model, local or cloud. They are deterministic rules over facts you confirm.",
-      "Release 0.0.1b adds an optional assistant to the desktop app. It is off by default, local models come first, a cloud provider needs your own key and your consent, and one switch turns it all off. It only explains, searches and proposes. It never writes your prose or changes your canon without you.",
+      "Release 0.0.1b adds an optional assistant to the desktop app. It is off by default, local models come first, a cloud provider needs your own key or an installed subscription CLI, and your consent, and one switch turns it all off. It only explains, searches and proposes. It never writes your prose or changes your canon without you.",
       "What is sent, when, and to whom is stated below. Your manuscript is never used to train a model, by Verne or by any provider Verne chooses.",
       "Asten will tell you in the interface before this policy changes.",
     ],
@@ -956,7 +956,7 @@ export const legalDocs: LegalDoc[] = [
               "**Proposals only.** AI output arrives as a proposal: a suggested fact, a possible contradiction, a question. Nothing takes effect until you accept it.",
               "**Never silent canon.** An AI proposal never becomes a confirmed fact on its own. Only you can confirm it; the assistant has no tool that does.",
               "**Local first.** Deterministic rules come first, then models that run on your computer (through Ollama or any OpenAI-compatible address on your machine). Nothing leaves your computer unless you decide it should.",
-              "**Your provider, your key, your consent.** Asten sends text to a cloud AI provider only if you choose that provider, use your own account and key, and consent to that provider. Consent is tied to the provider’s address, and the interface shows which provider a request goes to.",
+              "**Your provider, your account, your consent.** Asten sends text to a cloud AI provider only if you choose that provider, use your own account through an API key or an installed subscription CLI, and consent to that provider. Consent is tied to the provider’s address, and the interface shows which provider a request goes to.",
               "**A complete switch-off.** You can turn every AI feature off in one place (Settings, AI providers, Allow AI providers). Off means no model runs and nothing is sent. Offline mode allows only a model on your own machine, and a spending cap of zero means no call.",
               "**No training on manuscripts, ever.** Your manuscript will never be used to train or improve a model, by Verne or by any provider Verne chooses.",
               "**You can see what is sent.** Before a request leaves, you can open it exactly as the provider will receive it, with your key replaced by a placeholder. A local ledger records each call: when, which provider and model, how many tokens, and an estimated cost.",
@@ -1435,7 +1435,7 @@ export const legalDocs: LegalDoc[] = [
         blocks: [
           {
             kind: "p",
-            text: "None. Your manuscript is stored in SQLite on your computer and is never sent to Verne, so no vendor processes it on Verne’s behalf. The optional assistant in release 0.0.1b can send requests to an AI provider you choose with your own key and consent; that provider acts for you, under your own agreement with it, and Verne receives nothing through it. If a future build would send data to any other third party, the interface will say so first, and this page will be updated.",
+            text: "None. Your manuscript is stored in SQLite on your computer and is never sent to Verne, so no vendor processes it on Verne’s behalf. The optional assistant in release 0.0.1b can send requests to an AI provider you choose with your own key or an installed subscription CLI and consent; that provider acts for you, under your own agreement with it, and Verne receives nothing through it. If a future build would send data to any other third party, the interface will say so first, and this page will be updated.",
           },
         ],
       },
