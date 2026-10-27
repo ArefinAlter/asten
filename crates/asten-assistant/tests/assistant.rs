@@ -1173,17 +1173,36 @@ async fn the_key_appears_nowhere_but_the_authorization_header() {
 #[tokio::test]
 #[ignore = "real Claude subscription request; VERNE_TEST_SUBSCRIPTION=claude"]
 async fn native_subscription_provider_live() {
-    assert_eq!(std::env::var("VERNE_TEST_SUBSCRIPTION").as_deref(),Ok("claude"));
-    let fixture=Fixture::new().await;
-    fixture.assistant.config.update(|c| {
-        c.enabled=true;
-        let provider=c.providers.iter_mut().find(|p|p.id=="claude-subscription").unwrap();
-        provider.enabled=true;
-        provider.consent=Some(asten_assistant::config::Consent { accepted_at:chrono::Utc::now(),host:provider.host(),notice_version:asten_assistant::config::NOTICE_VERSION });
-        Ok(())
-    }).unwrap();
-    let sink=Collector::default();
-    let result=fixture.assistant.test_provider("claude-subscription",&sink,CancellationToken::new()).await.unwrap();
+    assert_eq!(
+        std::env::var("VERNE_TEST_SUBSCRIPTION").as_deref(),
+        Ok("claude")
+    );
+    let fixture = Fixture::new().await;
+    fixture
+        .assistant
+        .config
+        .update(|c| {
+            c.enabled = true;
+            let provider = c
+                .providers
+                .iter_mut()
+                .find(|p| p.id == "claude-subscription")
+                .unwrap();
+            provider.enabled = true;
+            provider.consent = Some(asten_assistant::config::Consent {
+                accepted_at: chrono::Utc::now(),
+                host: provider.host(),
+                notice_version: asten_assistant::config::NOTICE_VERSION,
+            });
+            Ok(())
+        })
+        .unwrap();
+    let sink = Collector::default();
+    let result = fixture
+        .assistant
+        .test_provider("claude-subscription", &sink, CancellationToken::new())
+        .await
+        .unwrap();
     assert!(result.trim().eq_ignore_ascii_case("ok"));
     assert!(fixture.keys.get("claude-subscription").unwrap().is_none());
 }
