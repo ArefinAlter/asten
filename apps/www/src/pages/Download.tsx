@@ -9,20 +9,20 @@ import { release } from "../content/release";
 import type { QA } from "../content/types";
 
 const faqs: QA[] = [
-  { q: "What is the pre-alpha?", a: "Release 0.0.1b is the second public build of Asten. It is early software: the engine, the desk, import, compile, backups and the optional assistant work, but expect rough edges and changes between releases. Keep your own copies of anything you write in it." },
-  { q: "What is the difference between the hosted copy and the desktop app?", a: "Both run the same engine. The desktop app runs it on your computer and keeps your projects in one file on your disk; it is the way to use Asten for real work. The hosted copy runs it on Verne’s server in a private sandbox per visitor, for trying Asten without installing anything. The sandbox and everything in it are deleted 24 hours after your first visit. Do not put your manuscript there. The hosted copy runs release 0.0.1a and has no assistant: it calls no AI provider." },
+  { q: "What is the alpha?", a: "Release 0.1.0-alpha.1 is the current Windows alpha; Linux remains on 0.0.1c. It is early software: the engine, the desk, import, compile, backups and the optional assistant work, but expect rough edges and changes between releases. Keep your own copies of anything you write in it." },
+  { q: "What is the difference between the hosted copy and the desktop app?", a: "Both run the same engine. The desktop app runs it on your computer and keeps your projects in one file on your disk; it is the way to use Asten for real work. The hosted copy runs it on Verne’s server in a private sandbox per visitor, for trying Asten without installing anything. The sandbox and everything in it are deleted 24 hours after your first visit. Do not put your manuscript there. The hosted copy has no assistant: it calls no AI provider." },
   { q: "Why does my system warn me before it runs?", a: "The installers are not code-signed yet. On Windows, SmartScreen shows “Windows protected your PC”; choose More info, then Run anyway. Compare the file’s SHA-256 with its line in SHA256SUMS.txt first (the “Verify downloads” link on this page). Signed installers are next on the [roadmap](/roadmap)." },
-  { q: "Is there a macOS build?", a: "Not in 0.0.1b. macOS comes later. On a Mac you can use the hosted copy in the meantime." },
+  { q: "Is there a macOS build?", a: "Not in this alpha. macOS comes later. On a Mac you can use the hosted copy in the meantime." },
   { q: "How much does Asten cost?", a: "Nothing today. Pricing hasn’t been decided. Whatever happens, your projects will stay readable and exportable without a subscription or a server." },
-  { q: "Does it update itself?", a: "No. Settings, This desk, Check for updates asks for a newer release only when you press it, and installs only after a second press. Nothing checks on its own." },
+  { q: "Does it update itself?", a: "No. Settings, This desk, Check for updates asks for a newer release only when you press it, and installs only after a second press. Nothing checks on its own. This alpha is a manual download; the existing updater channel remains on 0.0.1c." },
 ];
 
 export function Download() {
   return (
     <>
       <PageHero
-        title="Try the pre-alpha"
-        lede="Asten 0.0.1b is out as a pre-alpha. Open it in your browser on a sample novel, or install the desktop app for Windows or Linux and write on your own machine."
+        title="Try the alpha"
+        lede="Asten 0.1.0-alpha.1 is available for Windows. Linux has the previous 0.0.1c build. Try the browser sample, or write on your own machine."
       >
         <div className="btn-row">
           <HeroDownload />
@@ -44,7 +44,7 @@ export function Download() {
       <section className="register register--sunk" aria-label="Summary">
         <div className="wrap">
           <div data-reveal>
-            <Answer text="Asten 0.0.1b is a pre-alpha. The desktop app for Windows x64 and Linux x64 runs the engine on your own computer, keeps your projects in one file on your disk and offers “Open the sample novel”. The hosted copy runs the same engine on Verne’s server in a private sandbox per visitor, deleted 24 hours after the first visit. The builds are unsigned. macOS comes later." />
+            <Answer text="Asten 0.1.0-alpha.1 is a Windows alpha; Linux remains on 0.0.1c. The desktop app runs the engine on your own computer, keeps your projects in one file on your disk and offers “Open the sample novel”. The hosted copy runs the same engine on Verne’s server in a private sandbox per visitor, deleted 24 hours after the first visit. The builds are unsigned. macOS comes later." />
           </div>
         </div>
       </section>
@@ -80,8 +80,8 @@ export function Download() {
             </li>
             <li>
               <span>
-                Linux: make the AppImage executable with <code>chmod +x</code> and run it, or install the .deb with{" "}
-                <code>sudo apt install ./Asten_0.0.1-beta_amd64.deb</code>.
+                Linux (previous 0.0.1c): make the AppImage executable with <code>chmod +x</code> and run it, or install the .deb with{" "}
+                <code>sudo apt install ./Asten_0.0.1-beta.1_amd64.deb</code>.
               </span>
             </li>
             <li>
@@ -94,7 +94,7 @@ export function Download() {
       <section className="register" aria-labelledby="include-h">
         <div className="wrap split">
           <div data-reveal>
-            <h2 id="include-h">What 0.0.1b includes.</h2>
+            <h2 id="include-h">What the alpha includes.</h2>
           </div>
           <ul className="honest-list" data-reveal>
             <li>The desk, canon, cast, two clocks, and optional world tools</li>
@@ -102,14 +102,14 @@ export function Download() {
             <li>Compile to Markdown, plain text, Fountain, HTML, .docx, EPUB 3, and Final Draft (.fdx), and import of all but EPUB, with Word tracked changes and comments and long files split into chapters</li>
             <li>One-file projects (.asten) to move a project, library backups with restore, and rename and delete for projects</li>
             <li>The Word task pane and Google Docs sidebar, for sideloading against the desktop app</li>
-            <li>No account, no sync, no telemetry. An optional assistant in the desktop app (off by default) can call a model on your machine, or a cloud provider with your own key and consent; it never writes your prose, and you can read each request before it is sent</li>
+            <li>No account, no sync, no telemetry. An optional assistant in the desktop app (off by default) can call a model on your machine, or an installed agent subscription or a cloud provider with your own key and consent; it never writes your prose, and you can read each request before it is sent</li>
           </ul>
         </div>
       </section>
 
       <section className="register register--sunk" aria-labelledby="dfaq-h">
         <div className="wrap wrap-narrow">
-          <SectionHead id="dfaq-h" title="About the pre-alpha" />
+          <SectionHead id="dfaq-h" title="About the alpha" />
           <FaqList items={faqs} />
           <p style={{ marginTop: 24 }}>
             <Link to="/roadmap" className="link-arrow">

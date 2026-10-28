@@ -156,16 +156,19 @@ export function DownloadCards() {
           </a>
           <a className="dl-link" href={release.releaseUrl}>
             <UiIcon name="external" small />
-            All files and release notes on GitHub
+            Windows alpha files and release notes
           </a>
           <a className="dl-link" href={release.checksumsUrl}>
             <UiIcon name="shield" small />
-            Verify downloads (SHA-256)
+            Verify Windows alpha (SHA-256)
           </a>
         </div>
         <p className="dl-note">
-          To verify a file, compare its hash with the line in <a href={release.checksumsUrl}>{release.checksumsFile}</a>:{" "}
-          <code>certutil -hashfile &lt;file&gt; SHA256</code> on Windows, <code>sha256sum &lt;file&gt;</code> on Linux.
+          To verify a Windows alpha file, compare its hash with the line in <a href={release.checksumsUrl}>{release.checksumsFile}</a>:{" "}
+          <code>certutil -hashfile &lt;file&gt; SHA256</code>.
+        </p>
+        <p className="dl-note">
+          Linux 0.0.1c uses its own <a href="https://github.com/ArefinAlter/asten/releases/download/v0.0.1c/SHA256SUMS.txt">previous-release checksum file</a>.
         </p>
         <p className="dl-note">
           The builds are not signed yet, so Windows SmartScreen may warn before the first run: choose More info, then

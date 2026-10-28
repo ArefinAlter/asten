@@ -327,6 +327,15 @@ pub fn default_providers() -> Vec<ProviderConfig> {
             "default",
             "https://antigravity.local-agent.invalid/v1",
         ),
+        provider(
+            "grok-subscription",
+            "Grok Build (dedicated sign-in)",
+            Cloud,
+            Openai,
+            "subscription",
+            "default",
+            "https://grok.local-agent.invalid/v1",
+        ),
     ]
 }
 
@@ -669,9 +678,9 @@ mod tests {
                 .iter()
                 .all(|p| !p.enabled && p.consent.is_none())
         );
-        assert_eq!(c.providers.len(), 13);
+        assert_eq!(c.providers.len(), 14);
         let subscriptions: Vec<_> = c.providers.iter().filter(|p| p.is_subscription()).collect();
-        assert_eq!(subscriptions.len(), 4);
+        assert_eq!(subscriptions.len(), 5);
         assert!(subscriptions.iter().all(|p| p.family == "subscription"));
     }
 }

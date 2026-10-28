@@ -93,6 +93,8 @@ pub struct ProviderView {
     /// Why it cannot be used now; `None` when it is ready.
     not_ready: Option<String>,
     custom: bool,
+    /// Executable discovery only; the provider retains sign-in and entitlement checks.
+    installed: Option<bool>,
 }
 
 #[derive(Serialize)]
@@ -150,6 +152,8 @@ fn view(config: &AssistantConfig, p: &ProviderConfig) -> ProviderView {
         price: config.price_for(p),
         not_ready: Assistant::not_ready_reason(config, p),
         custom: p.family == "custom",
+        installed: asten_assistant::provider::local_agent::agent_for_url(&p.endpoint)
+            .map(asten_assistant::provider::local_agent::installed),
     }
 }
 

@@ -81,6 +81,7 @@ const desk = join(root, "apps/web/dist");
 function stage(files, { withDesk = false, windows = false } = {}) {
   const dir = mkdtempSync(join(tmpdir(), "asten-assets-"));
   for (const [from, name] of files) copyFileSync(from, join(dir, name));
+  copyFileSync(join(root, "LICENSE"), join(dir, "LICENSE"));
   writeFileSync(join(dir, "README.txt"), runtimeNote(windows));
   if (withDesk) {
     if (!existsSync(join(desk, "index.html")))
@@ -103,14 +104,14 @@ if (platform === "windows-x64") {
     `Asten ${version}, portable. Run Asten.exe. It needs the Microsoft Edge WebView2 runtime (part of Windows 10 and 11). Data lives in %APPDATA%\\com.asten.app. This build is unsigned: SmartScreen warns before the first run.\n`,
   );
   const portableZip = join(out, `Asten_${version}_windows_x64_portable.zip`);
-  execFileSync(tar, ["-a", "-c", "-f", portableZip, "-C", portable, "Asten.exe", "README.txt"]);
+  execFileSync(tar, ["-a", "-c", "-f", portableZip, "-C", portable, "Asten.exe", "README.txt", "LICENSE"]);
   console.log(`Asten_${version}_windows_x64_portable.zip`);
   const runtime = stage([[join(release, "asten-api.exe"), "asten-api.exe"]], {
     withDesk: true,
     windows: true,
   });
   const runtimeZip = join(out, `asten-api_${version}_windows_x64.zip`);
-  execFileSync(tar, ["-a", "-c", "-f", runtimeZip, "-C", runtime, "asten-api.exe", "README.txt", "desk"]);
+  execFileSync(tar, ["-a", "-c", "-f", runtimeZip, "-C", runtime, "asten-api.exe", "README.txt", "LICENSE", "desk"]);
   console.log(`asten-api_${version}_windows_x64.zip`);
   rmSync(portable, { recursive: true, force: true });
   rmSync(runtime, { recursive: true, force: true });
@@ -128,6 +129,7 @@ if (platform === "windows-x64") {
     runtime,
     "asten-api",
     "README.txt",
+    "LICENSE",
     "desk",
   ]);
   console.log(`asten-api_${version}_linux_x64.tar.gz`);

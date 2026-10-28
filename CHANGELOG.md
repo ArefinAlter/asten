@@ -7,6 +7,18 @@ major version is 0, a minor version may change behaviour.
 
 ## [Unreleased]
 
+## [0.1.0-alpha.1] - 2026-10-29
+
+Windows alpha: NSIS installer, portable desktop and API/desk bundle. The stable updater remains on 0.0.1c; Linux downloads retain that earlier release.
+
+- Includes the merged responsive workbench fixes: fitted panel bounds, keyboard resizing and reliable pointer-drag cancellation as the window changes size.
+- Shows installed official agent CLIs separately from authentication or subscription entitlement. Claude Code, Codex, Cursor and Antigravity use their existing CLI sign-ins; Grok Build uses an isolated official login profile and ACP transport with no native agent tool authority.
+- Keeps the assistant disabled until enabled with provider consent. Asten's rule against writing the author's manuscript prose remains enforced.
+- Includes the MIT license in portable/runtime archives, refreshed API version metadata and clear alpha/prior-Linux download links.
+- Fixes concurrent hosted-gateway test sandbox collisions caused by Windows clock resolution.
+
+See [Windows alpha acceptance](docs/ACCEPTANCE-0.1.0-alpha.1.md) for validation and account-testing limits.
+
 ## [0.0.1-beta] - 2026-10-27
 
 Tagged `v0.0.1b`, the second public pre-release (pre-alpha). The desktop app is

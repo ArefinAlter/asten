@@ -1281,7 +1281,7 @@ function About() {
         <div>
           <h1>Asten</h1>
           <p className="muted">
-            Pre-alpha release {RELEASE} · a writing desk with a memory · Verne
+            Alpha release {RELEASE} · a writing desk with a memory · Verne
             Ltd.
           </p>
         </div>
