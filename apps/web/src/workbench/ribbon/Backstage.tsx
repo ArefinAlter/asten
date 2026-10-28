@@ -634,7 +634,7 @@ export function Backstage({
               </div>
             </div>
             <div className="wb-card wb-rows">
-              <Row label="Release" value={`Pre-alpha release ${RELEASE}`} />
+              <Row label="Release" value={`Alpha release ${RELEASE}`} />
               <Row
                 label="Data"
                 value={

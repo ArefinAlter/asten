@@ -41,6 +41,8 @@ export interface ProviderView {
   /** Why it cannot be used now; null when it is ready. */
   not_ready: string | null;
   custom: boolean;
+  /** CLI discovery only; no sign-in or entitlement claim. */
+  installed?: boolean | null;
 }
 
 export interface Caps {

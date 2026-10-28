@@ -33,7 +33,7 @@ export const accessSteps: Step[] = [
   },
   {
     title: "Install the desktop app",
-    text: "Download release 0.0.1c for Windows x64 or Linux x64. It runs the engine on your own computer, with your projects in one file on your disk, and offers “Open the sample novel”. The installers are not signed yet, so your system warns before the first run.",
+    text: "Download alpha 0.1.0-alpha.1 for Windows x64, or the previous 0.0.1c build for Linux x64. It runs the engine on your own computer, with your projects in one file on your disk, and offers “Open the sample novel”. The installers are not signed yet, so your system warns before the first run.",
   },
   {
     title: "Start a project",
@@ -68,6 +68,6 @@ export const homeFaqs: QA[] = [
   },
   {
     q: "How do I get Asten?",
-    a: "Try the pre-alpha: open the hosted copy in your browser, or download release 0.0.1c for Windows x64 or Linux x64 from the [download page](/download). macOS comes later. The builds are unsigned, so your system warns before the first run.",
+    a: "Try the pre-alpha: open the hosted copy in your browser, or download alpha 0.1.0-alpha.1 for Windows x64 or the previous 0.0.1c build for Linux x64 from the [download page](/download). macOS comes later. The builds are unsigned, so your system warns before the first run.",
   },
 ];

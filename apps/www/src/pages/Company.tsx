@@ -89,7 +89,7 @@ export function About() {
                 </tr>
                 <tr>
                   <th scope="row">Status</th>
-                  <td>Pre-alpha (release 0.0.1b, Windows and Linux)</td>
+                  <td>Alpha (Windows 0.1.0-alpha.1; Linux 0.0.1c)</td>
                 </tr>
                 <tr>
                   <th scope="row">Contact</th>

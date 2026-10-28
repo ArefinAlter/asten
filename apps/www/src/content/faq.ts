@@ -163,7 +163,7 @@ export const faq: FaqGroup[] = [
     items: [
       {
         q: "Can I download Asten?",
-        a: "Yes. Release 0.0.1c, a pre-alpha, is on the [download page](/download) for Windows x64 and Linux x64, and a hosted copy runs in your browser in a private sandbox that is deleted after 24 hours. The installers are not signed yet, so your system warns before the first run. macOS comes later.",
+        a: "Yes. Alpha 0.1.0-alpha.1 for Windows x64 and the previous 0.0.1c for Linux x64 are on the [download page](/download), and a hosted copy runs in your browser in a private sandbox that is deleted after 24 hours. The installers are not signed yet, so your system warns before the first run. macOS comes later.",
       },
       {
         q: "How much does Asten cost?",
@@ -171,7 +171,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "What platforms does Asten run on?",
-        a: "Release 0.0.1c runs as a desktop app on Windows 10 and 11 (x64) and on Linux x86_64 (Ubuntu 22.04 or newer, or another desktop with WebKitGTK 4.1), and as a hosted copy in any modern browser. The same shell is configured for Windows on ARM, macOS 11 or later and Linux aarch64, but those builds still need building and verifying on hardware; macOS comes later. The desktop app keeps your projects on your machine; the hosted copy is a 24-hour sandbox for trying Asten.",
+        a: "Release 0.1.0-alpha.1 runs on Windows 10 and 11 (x64). The previous 0.0.1c runs on Linux x86_64 (Ubuntu 22.04 or newer, or another desktop with WebKitGTK 4.1), and as a hosted copy in any modern browser. The same shell is configured for Windows on ARM, macOS 11 or later and Linux aarch64, but those builds still need building and verifying on hardware; macOS comes later. The desktop app keeps your projects on your machine; the hosted copy is a 24-hour sandbox for trying Asten.",
       },
       {
         q: "Is there a mobile app for Asten?",
@@ -213,7 +213,7 @@ export const faq: FaqGroup[] = [
       },
       {
         q: "Who do I contact for press inquiries about Asten?",
-        a: "Press inquiries about Asten go to info@vernesystems.com, and [the brand page](/brand) covers the logo and how to use it. When describing Asten, please keep to what exists today: a local-first writing desk with deterministic canon checks, an optional assistant that never writes prose, and a public pre-alpha (release 0.0.1c) with unsigned installers.",
+        a: "Press inquiries about Asten go to info@vernesystems.com, and [the brand page](/brand) covers the logo and how to use it. When describing Asten, please keep to what exists today: a local-first writing desk with deterministic canon checks, an optional assistant that never writes prose, and a Windows alpha (release 0.1.0-alpha.1) with unsigned installers.",
       },
       {
         q: "Where can I find Verne’s company details?",

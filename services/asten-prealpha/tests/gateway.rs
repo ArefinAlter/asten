@@ -43,12 +43,17 @@ async fn harness(tune: impl FnOnce(&mut Config)) -> Harness {
 }
 
 fn uuid_like() -> String {
+    use std::sync::atomic::{AtomicU64, Ordering};
     use std::time::{SystemTime, UNIX_EPOCH};
+    // Windows clock resolution can give concurrently starting tests the same timestamp.
+    // The per-process sequence keeps their real SQLite sandbox directories independent.
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+    let sequence = NEXT.fetch_add(1, Ordering::Relaxed);
     let nanos = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .map(|d| d.as_nanos())
         .unwrap_or_default();
-    format!("{nanos:x}")
+    format!("{nanos:x}-{sequence:x}")
 }
 
 fn request(method: &str, path: &str, cookie: Option<&str>, body: Option<Value>) -> Request<Body> {

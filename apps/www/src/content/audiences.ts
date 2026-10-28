@@ -57,7 +57,7 @@ export const audiences: Audience[] = [
     },
     honest: [
       "Asten reads only plain attributes from your prose (hair, eyes, age, location, alive or dead, relations), and only when a name is in the same sentence. Anything subtler, you settle yourself.",
-      "It is a pre-alpha: release 0.0.1c for Windows and Linux, unsigned, with macOS later.",
+      "It is early software: alpha 0.1.0-alpha.1 for Windows and the previous 0.0.1c for Linux, unsigned, with macOS later.",
       "It won’t typeset your book. Compile to .docx for your editor or publisher.",
     ],
     faqs: [
@@ -193,7 +193,7 @@ export const audiences: Audience[] = [
     honest: [
       "Asten doesn’t import a franchise’s canon for you. You settle the facts that matter.",
       "There’s no posting integration; compile to HTML or Markdown and post as usual.",
-      "It is a pre-alpha (release 0.0.1c); expect rough edges.",
+      "It is an alpha (Windows release 0.1.0-alpha.1); expect rough edges.",
     ],
     faqs: [
       { q: "Is Asten good for writing fan fiction?", a: "Yes. Asten’s canon model fits fan fiction naturally: settle the facts of your version, keep changed source canon on file as contested, and get marks when your canon contradicts itself. Your writing stays on your computer." },
@@ -236,7 +236,7 @@ export const audiences: Audience[] = [
       ],
     },
     honest: [
-      "The assistant arrived in 0.0.1b. Release 0.0.1c adds installed Claude Code, Codex, Cursor and Antigravity CLI connections alongside API keys. A native Claude subscription request passed acceptance; the other account paths have protocol tests and still need live account checks. Direct Grok consumer-account sign-in is unavailable, though Cursor may expose a Grok model through its own entitlement. The checks that judge contradictions stay rule-based.",
+      "The assistant arrived in 0.0.1b. Release 0.0.1c adds installed Claude Code, Codex, Cursor and Antigravity CLI connections alongside API keys. A native Claude subscription request passed acceptance; the other account paths have protocol tests and still need live account checks. The Windows alpha adds Grok Build through a dedicated official CLI sign-in; its protocol fixtures pass, while live Grok entitlement remains untested. The checks that judge contradictions stay rule-based.",
       "Asten is open source under the MIT License; the source is on GitHub.",
       "The local API binds to loopback by default and answers only to paired clients. Don’t expose it to a network without TLS and an owner passphrase.",
     ],

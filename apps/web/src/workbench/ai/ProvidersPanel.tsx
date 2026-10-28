@@ -5,6 +5,7 @@ import { Card, Fixed, Head, SettingRow, Switch } from "../settings/parts";
 import {
   ai,
   newRunId,
+  refreshStatus,
   spendLine,
   useAi,
   type AiStatus,
@@ -121,7 +122,8 @@ export function ProvidersDesktop() {
       <Head title="AI providers">
         Use a local model, an API key or an installed agent's existing sign-in.
         Cloud connections require your consent. Your agent's plan limits and
-        extra-usage settings apply.
+        extra-usage settings apply. Grok Build needs its own official sign-in in a
+        dedicated profile; test the connection for setup instructions.
       </Head>
       {problem && (
         <p className="settings-problem" role="alert">
@@ -388,6 +390,17 @@ export function ProvidersDesktop() {
         )}
       </Card>
 
+      <Card title="Installed agent connections">
+        <p className="muted small">
+          Asten detects supported programs on this computer without reading their credentials.
+          Sign in using the agent's own app, then give consent and test its connection below.
+          Finding a program does not verify its sign-in or subscription.
+        </p>
+        <button className="wb-btn" disabled={busy === "connections"}
+          onClick={() => void guarded("connections", () => refreshStatus())}>
+          Refresh installed agents
+        </button>
+      </Card>
       <section className={`wb-card${status.enabled ? "" : " is-off"}`}>
         <h2>Ladder</h2>
         <p className="muted small">
@@ -419,7 +432,7 @@ export function ProvidersDesktop() {
                 </strong>
                 <small className="mono">
                   {p.endpoint.includes(".local-agent.invalid/")
-                    ? "Uses your installed agent"
+                    ? p.installed === true ? "Agent program found · sign-in verified when tested" : p.installed === false ? "Agent program not found · install it and sign in first" : "Uses your installed agent"
                     : p.host}
                 </small>
                 {p.enabled && p.not_ready && (

@@ -12,13 +12,14 @@ knowledge, relations, author invariants. Every mark explains itself and offers
 repairs the author owns. Word and Docs remain guests. No account, no sync. Asten never writes the
 prose; any AI feature follows the AI policy (D27).
 
-## Try the pre-alpha
+## Try the alpha
 
-Release [0.0.1c](https://github.com/ArefinAlter/asten/releases/tag/v0.0.1c)
-(pre-alpha) has unsigned desktop builds for Windows x64 and Linux x64. The
+Release [0.1.0-alpha.1](https://github.com/ArefinAlter/asten/releases/tag/v0.1.0-alpha.1)
+has unsigned Windows x64 desktop and API builds. Linux x64 remains on the
+[previous 0.0.1c release](https://github.com/ArefinAlter/asten/releases/tag/v0.0.1c). The
 desktop app runs the engine on your machine, can open a sample novel, imports
 Word, Markdown, HTML and plain text, moves a project as one `.asten` file,
-backs up its library, and has an optional bring-your-own-key assistant (off by
+backs up its library, and has an optional installed-agent or bring-your-own-key assistant (off by
 default; it explains, searches and proposes, never writes, and shows you the
 exact request before it is sent). The
 same workbench runs at <https://asten.103.191.50.32.sslip.io/> with the real
@@ -28,9 +29,9 @@ visit; it is for trying Asten, not for manuscripts. How it is hosted:
 
 ## Platforms
 
-Published today: release 0.0.1c for Windows x64 and Linux x64 (unsigned), and
-the hosted pre-alpha in any modern browser (it still runs 0.0.1a and has no
-assistant). Configured but not yet published:
+Current desktop releases: 0.1.0-alpha.1 for Windows x64 and 0.0.1c for Linux x64
+(unsigned), and
+the hosted visitor copy in any modern browser (it has no assistant). Configured but not yet published:
 Windows ARM64, macOS 11+ (one universal build), Linux aarch64, and the Android
 and iOS shells. A browser can also talk to the local API. See
 `docs/PLATFORMS.md` for the support matrix, build recipes and signing.

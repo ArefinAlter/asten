@@ -2118,10 +2118,10 @@ export function Workbench() {
             title={
               sample
                 ? "This release runs on sample data with no backend. See About."
-                : "Pre-alpha release"
+                : "Alpha release"
             }
           >
-            Pre-alpha release
+            Alpha release
           </span>
           <div className="layout-toggles">
             <button
