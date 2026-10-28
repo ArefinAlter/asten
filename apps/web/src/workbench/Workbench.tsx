@@ -1387,9 +1387,7 @@ export function Workbench() {
   // ───────────────────────── resizing ─────────────────────────
 
   const resizeBounds = (target: "sidebar" | "secondary" | "panel") => {
-    const body = bodyRef.current;
-    if (!body) return { min: 0, max: 0 };
-    const rect = body.getBoundingClientRect();
+    const rect = bodyRef.current?.getBoundingClientRect() ?? bodySize;
     if (target === "panel") {
       const max = Math.max(
         0,
@@ -1397,10 +1395,15 @@ export function Workbench() {
       );
       return { min: Math.min(120, max), max };
     }
-    const peer = body.querySelector<HTMLElement>(
-      target === "sidebar" ? ".secondary" : ".wb-sidebar",
-    );
-    const peerWidth = peer && !narrow ? peer.getBoundingClientRect().width : 0;
+    const peerWidth = narrow
+      ? 0
+      : target === "sidebar"
+        ? visible.secondary
+          ? fitted.secondaryWidth
+          : 0
+        : visible.sidebar
+          ? fitted.sidebarWidth
+          : 0;
     const max = Math.max(
       0,
       Math.min(
@@ -1410,6 +1413,22 @@ export function Workbench() {
     );
     const min = Math.min(target === "sidebar" ? 200 : 280, max);
     return { min, max };
+  };
+  const fitOtherPanel = (target: "sidebar" | "secondary" | "panel") => {
+    // User resizing starts from both panels' rendered sizes, including keyboard resizing.
+    // Otherwise a larger saved peer preference can shrink this panel while requesting growth.
+    if (target === "sidebar")
+      dispatch({
+        type: "resize",
+        target: "secondary",
+        size: fitted.secondaryWidth,
+      });
+    if (target === "secondary")
+      dispatch({
+        type: "resize",
+        target: "sidebar",
+        size: fitted.sidebarWidth,
+      });
   };
   const startResize =
     (target: "sidebar" | "secondary" | "panel") =>
@@ -1425,20 +1444,7 @@ export function Workbench() {
             (target === "sidebar"
               ? fitted.sidebarWidth
               : fitted.secondaryWidth));
-      // A person editing the layout starts from the actual peer sizes, preventing a stale
-      // larger preference from making the other panel jump as the drag begins.
-      if (target === "sidebar")
-        dispatch({
-          type: "resize",
-          target: "secondary",
-          size: fitted.secondaryWidth,
-        });
-      if (target === "secondary")
-        dispatch({
-          type: "resize",
-          target: "sidebar",
-          size: fitted.sidebarWidth,
-        });
+      fitOtherPanel(target);
       resizeStop.current = pointerResize(
         event,
         event.currentTarget as HTMLElement,
@@ -1490,6 +1496,7 @@ export function Workbench() {
                       (event.shiftKey ? 50 : 10),
                 ),
               );
+      fitOtherPanel(target);
       dispatch({ type: "resize", target, size });
     };
 
