@@ -74,7 +74,10 @@ export type LayoutAction =
   | { type: "toggle"; key: "ruler" | "navigationPane" | "split" };
 
 export const clamp = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, Math.round(value)));
+  Math.min(
+    max,
+    Math.max(min, Math.round(Number.isFinite(value) ? value : min)),
+  );
 
 export function layoutReducer(
   state: LayoutState,

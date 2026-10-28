@@ -31,6 +31,8 @@ import type {
   ProjectId,
   ProjectKind,
 } from "@asten/contracts";
+import { panelSpace } from "./panel-space";
+import { pointerResize } from "./pointer-resize";
 import { Binder } from "../binder/Binder";
 import { PaletteMark } from "../brand/Palette";
 import { ManuscriptEditor, type Jump } from "../editor/ManuscriptEditor";
@@ -239,6 +241,38 @@ export function Workbench() {
           : state,
   );
   const visible = visiblePanels(layout);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const resizeStop = useRef<() => void>(() => {});
+  const [bodySize, setBodySize] = useState({
+    width: window.innerWidth,
+    height: Math.max(0, window.innerHeight - 200),
+  });
+  useEffect(() => {
+    const body = bodyRef.current;
+    if (!body) return;
+    const measure = () => {
+      const rect = body.getBoundingClientRect();
+      setBodySize((previous) =>
+        previous.width === rect.width && previous.height === rect.height
+          ? previous
+          : { width: rect.width, height: rect.height },
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(body);
+    return () => {
+      observer.disconnect();
+      resizeStop.current();
+    };
+  }, []);
+  const fitted = panelSpace(
+    layout,
+    bodySize.width,
+    bodySize.height,
+    visible.sidebar && !narrow,
+    visible.secondary && !narrow,
+  );
 
   const [selectedProjectId, setSelectedProjectId] = useState<
     ProjectId | undefined
@@ -1352,35 +1386,111 @@ export function Workbench() {
 
   // ───────────────────────── resizing ─────────────────────────
 
+  const resizeBounds = (target: "sidebar" | "secondary" | "panel") => {
+    const body = bodyRef.current;
+    if (!body) return { min: 0, max: 0 };
+    const rect = body.getBoundingClientRect();
+    if (target === "panel") {
+      const max = Math.max(
+        0,
+        Math.floor(rect.height - Math.min(160, rect.height / 2)),
+      );
+      return { min: Math.min(120, max), max };
+    }
+    const peer = body.querySelector<HTMLElement>(
+      target === "sidebar" ? ".secondary" : ".wb-sidebar",
+    );
+    const peerWidth = peer && !narrow ? peer.getBoundingClientRect().width : 0;
+    const max = Math.max(
+      0,
+      Math.min(
+        target === "sidebar" ? 520 : 640,
+        rect.width - (narrow ? 0 : 48) - peerWidth - (narrow ? 0 : 320),
+      ),
+    );
+    const min = Math.min(target === "sidebar" ? 200 : 280, max);
+    return { min, max };
+  };
   const startResize =
     (target: "sidebar" | "secondary" | "panel") =>
     (event: React.PointerEvent) => {
+      if (event.button !== 0 || event.isPrimary === false) return;
+      resizeStop.current();
+      const panel = event.currentTarget.parentElement;
+      const rect = panel?.getBoundingClientRect();
+      const initial =
+        target === "panel"
+          ? (rect?.height ?? fitted.panelHeight)
+          : (rect?.width ??
+            (target === "sidebar"
+              ? fitted.sidebarWidth
+              : fitted.secondaryWidth));
+      // A person editing the layout starts from the actual peer sizes, preventing a stale
+      // larger preference from making the other panel jump as the drag begins.
+      if (target === "sidebar")
+        dispatch({
+          type: "resize",
+          target: "secondary",
+          size: fitted.secondaryWidth,
+        });
+      if (target === "secondary")
+        dispatch({
+          type: "resize",
+          target: "sidebar",
+          size: fitted.sidebarWidth,
+        });
+      resizeStop.current = pointerResize(
+        event,
+        event.currentTarget as HTMLElement,
+        {
+          axis: target === "panel" ? "y" : "x",
+          direction: target === "sidebar" ? 1 : -1,
+          initial,
+          bounds: () => resizeBounds(target),
+          change: (size) => dispatch({ type: "resize", target, size }),
+        },
+      );
+    };
+  const resizeKey =
+    (target: "sidebar" | "secondary" | "panel") =>
+    (event: React.KeyboardEvent) => {
+      const lower =
+        target === "panel"
+          ? "ArrowDown"
+          : target === "sidebar"
+            ? "ArrowLeft"
+            : "ArrowRight";
+      const higher =
+        target === "panel"
+          ? "ArrowUp"
+          : target === "sidebar"
+            ? "ArrowRight"
+            : "ArrowLeft";
+      if (![lower, higher, "Home", "End"].includes(event.key)) return;
       event.preventDefault();
-      const startX = event.clientX;
-      const startY = event.clientY;
-      const start =
-        target === "sidebar"
-          ? layout.sidebarWidth
-          : target === "secondary"
-            ? layout.secondaryWidth
-            : layout.panelHeight;
-      const move = (e: PointerEvent) => {
-        const size =
-          target === "sidebar"
-            ? start + (e.clientX - startX)
-            : target === "secondary"
-              ? start - (e.clientX - startX)
-              : start - (e.clientY - startY);
-        dispatch({ type: "resize", target, size });
-      };
-      const up = () => {
-        window.removeEventListener("pointermove", move);
-        window.removeEventListener("pointerup", up);
-        document.body.classList.remove("wb-resizing");
-      };
-      document.body.classList.add("wb-resizing");
-      window.addEventListener("pointermove", move);
-      window.addEventListener("pointerup", up);
+      event.stopPropagation();
+      const { min, max } = resizeBounds(target);
+      const current =
+        target === "panel"
+          ? fitted.panelHeight
+          : target === "sidebar"
+            ? fitted.sidebarWidth
+            : fitted.secondaryWidth;
+      const size =
+        event.key === "Home"
+          ? min
+          : event.key === "End"
+            ? max
+            : Math.max(
+                min,
+                Math.min(
+                  max,
+                  current +
+                    (event.key === higher ? 1 : -1) *
+                      (event.shiftKey ? 50 : 10),
+                ),
+              );
+      dispatch({ type: "resize", target, size });
     };
 
   const api: WorkbenchApi = {
@@ -1833,6 +1943,11 @@ export function Workbench() {
         aria-orientation="vertical"
         aria-label="Resize the right panel"
         onPointerDown={startResize("secondary")}
+        onKeyDown={resizeKey("secondary")}
+        tabIndex={0}
+        aria-valuenow={Math.min(fitted.secondaryWidth, bodySize.width)}
+        aria-valuemin={resizeBounds("secondary").min}
+        aria-valuemax={resizeBounds("secondary").max}
       />
       <div className="secondary-tabs" role="tablist">
         {(["agent", "inspector", "links"] as const).map((tab) => (
@@ -1903,9 +2018,9 @@ export function Workbench() {
       <div
         className={shellClass}
         style={{
-          ["--wb-sidebar-w" as string]: `${layout.sidebarWidth}px`,
-          ["--wb-secondary-w" as string]: `${layout.secondaryWidth}px`,
-          ["--wb-panel-h" as string]: `${layout.panelHeight}px`,
+          ["--wb-sidebar-w" as string]: `${fitted.sidebarWidth}px`,
+          ["--wb-secondary-w" as string]: `${fitted.secondaryWidth}px`,
+          ["--wb-panel-h" as string]: `${fitted.panelHeight}px`,
         }}
       >
         <a
@@ -2046,7 +2161,7 @@ export function Workbench() {
             )
           : null}
 
-        <div className="wb-body">
+        <div className="wb-body" ref={bodyRef}>
           <nav className="activitybar" aria-label="Workspace views">
             {ACTIVITY.map((a) => (
               <button
@@ -2119,6 +2234,11 @@ export function Workbench() {
                   aria-orientation="vertical"
                   aria-label="Resize the side bar"
                   onPointerDown={startResize("sidebar")}
+                  onKeyDown={resizeKey("sidebar")}
+                  tabIndex={0}
+                  aria-valuenow={fitted.sidebarWidth}
+                  aria-valuemin={resizeBounds("sidebar").min}
+                  aria-valuemax={resizeBounds("sidebar").max}
                 />
               )}
             </aside>
@@ -2143,7 +2263,12 @@ export function Workbench() {
               <Suspense fallback={viewFallback}>{mainView}</Suspense>
             </main>
             {visible.panel && (
-              <BottomPanel onResizeStart={startResize("panel")} />
+              <BottomPanel
+                onResizeStart={startResize("panel")}
+                onResizeKey={resizeKey("panel")}
+                panelSize={fitted.panelHeight}
+                panelMax={fitted.panelMax}
+              />
             )}
           </div>
 

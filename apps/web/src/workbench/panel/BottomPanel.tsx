@@ -21,8 +21,14 @@ const TABS: { id: PanelTab; label: string }[] = [
 
 export function BottomPanel({
   onResizeStart,
+  onResizeKey,
+  panelSize,
+  panelMax,
 }: {
   onResizeStart: (event: React.PointerEvent) => void;
+  onResizeKey: (event: React.KeyboardEvent) => void;
+  panelSize: number;
+  panelMax: number;
 }) {
   const api = useWorkbench();
   const { layout, dispatch } = api;
@@ -38,24 +44,30 @@ export function BottomPanel({
         aria-orientation="horizontal"
         aria-label="Resize the panel"
         onPointerDown={onResizeStart}
+        onKeyDown={onResizeKey}
+        tabIndex={0}
+        aria-valuenow={panelSize}
+        aria-valuemin={Math.min(120, panelMax)}
+        aria-valuemax={panelMax}
       />
-      <div className="panel-tabs" role="tablist">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            role="tab"
-            aria-selected={layout.panelTab === tab.id}
-            className={layout.panelTab === tab.id ? "active" : ""}
-            onClick={() => dispatch({ type: "showPanel", tab: tab.id })}
-          >
-            {tab.label}
-            {tab.id === "problems" && open.length > 0 && (
-              <span className="wb-count">{open.length}</span>
-            )}
-          </button>
-        ))}
-        <span className="spacer" />
+      <div className="panel-head">
+        <div className="panel-tabs" role="tablist">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={layout.panelTab === tab.id}
+              className={layout.panelTab === tab.id ? "active" : ""}
+              onClick={() => dispatch({ type: "showPanel", tab: tab.id })}
+            >
+              {tab.label}
+              {tab.id === "problems" && open.length > 0 && (
+                <span className="wb-count">{open.length}</span>
+              )}
+            </button>
+          ))}
+        </div>
         <button
           type="button"
           className="wb-icon-btn"
