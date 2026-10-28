@@ -1,0 +1,11 @@
+# Desktop panel resizing
+
+Preferred sidebar, assistant and bottom-panel sizes now fit the measured workbench. Side panels preserve at least 320 pixels for the center at desktop widths; the bottom panel preserves usable space above it. Automatically shrinking the window does not overwrite preferred sizes, so they return when space allows. A user drag starts from actual rendered sizes.
+
+Resize grips use pointer capture and clean up on release, cancellation, capture loss, Escape, focus loss, window resize and unmount. Keyboard arrows, Home and End use the same available-space bounds. Bottom-panel close/maximize controls remain outside the scrolling tab list. Compact drawers leave space for status and navigation.
+
+Three pure-layout regression tests passed for constrained widths/heights, restoration of preferences, hidden peers and corrupted values. Windows Edge checks exercised all three grips with release, pointer cancellation, blur, capture loss and Escape, plus window resize during a drag.
+
+Validation on 28 October 2026: frontend type checks, existing frontend tests and a production asset build passed. Fresh Windows Edge profiles passed an automated interaction run at 1366×768, 1024×600, 960×500, 800×600, 640×480, 390×500, 1280×400 and 1920×1080, including a return to the wide layout. Root scrolling stayed inside the window. Thread details could be opened, closed from within the pane, and reopened at narrow widths. Screenshots were inspected. These browser checks exercise the shared desktop CSS; installed Linux acceptance is not inferred from them.
+
+The additional Windows Edge route matrix passed 6 workspace views at 1024×600, 800×600, 640×480 and 1280×400. Windows native builds and WebView2 acceptance are recorded separately when complete. The existing 0.0.1c downloads are unchanged by this source patch.
