@@ -42,7 +42,7 @@ tauri-plugin-process = "2"
 tauri-plugin-single-instance = "2"
 tauri-plugin-updater = "2"
 thiserror = "2.0"
-tokio = { version = "1.47", features = ["fs", "macros", "net", "rt-multi-thread", "signal", "sync", "time", "process", "io-util"] }
+tokio = { version = "1.47", features = ["fs", "macros", "net", "rt-multi-thread", "signal", "sync", "time", "process", "io-util", "io-std"] }
 tower = "0.5"
 tower-http = { version = "0.6", features = ["catch-panic", "compression-gzip", "cors", "fs", "request-id", "set-header", "timeout", "trace"] }
 tracing = "0.1"

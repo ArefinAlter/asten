@@ -23,6 +23,11 @@ async fn main() -> anyhow::Result<()> {
             .context("failed to create database directory")?;
     }
     let application = asten_api::application_for_database(&database_path, config.auth_mode).await?;
+
+    if env::args().any(|a| a == "mcp" || a == "--mcp") {
+        let server = std::sync::Arc::new(asten_api::mcp::McpServer::new(std::sync::Arc::new(application)));
+        return server.run_stdio().await;
+    }
     let address: SocketAddr = env::var("ASTEN_BIND")
         .unwrap_or_else(|_| "127.0.0.1:4317".into())
         .parse()
