@@ -8,6 +8,7 @@ mod auth;
 mod extra;
 mod headers;
 mod history;
+pub mod mcp;
 pub mod openapi;
 mod story;
 
@@ -320,7 +321,8 @@ pub fn router(application: Application, config: ApiConfig) -> Router {
 
     let mut app = Router::new()
         .route("/health", get(health))
-        .nest("/api/v1", api);
+        .nest("/api/v1", api)
+        .merge(mcp::router());
 
     if let Some(desk) = &config.serve_desk {
         // The hashed assets get a directory service of their own, so a missing
