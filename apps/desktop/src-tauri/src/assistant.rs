@@ -311,11 +311,22 @@ pub fn ai_update(state: State<'_, AssistantState>, patch: Patch) -> Result<Statu
                     provider.max_output_tokens = tokens;
                 }
                 if let Some(enabled) = change.enabled {
-                    if enabled && !provider.has_valid_consent() {
-                        return Err(AssistantError::NotReady(format!(
-                            "Give your consent for {} first",
-                            provider.name
-                        )));
+                    if enabled {
+                        if provider.is_subscription() {
+                            config.enabled = true;
+                            if provider.consent.is_none() {
+                                provider.consent = Some(Consent {
+                                    notice_version: NOTICE_VERSION,
+                                    accepted_at: Utc::now(),
+                                    host: provider.host(),
+                                });
+                            }
+                        } else if !provider.has_valid_consent() {
+                            return Err(AssistantError::NotReady(format!(
+                                "Give your consent for {} first",
+                                provider.name
+                            )));
+                        }
                     }
                     provider.enabled = enabled;
                 }

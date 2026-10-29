@@ -140,14 +140,23 @@ export function AgentPanel() {
 
   // Which model answers: Asten's own tools, or a provider the writer chose.
   const usable = status?.providers.filter((p) => p.enabled) ?? [];
+  const firstSubscription = status?.providers.find(
+    (p) => p.endpoint.includes(".local-agent.invalid/") && (p.installed === true || p.enabled),
+  );
+  const effectiveModelPref =
+    prefs.agentModel === "rules" && firstSubscription
+      ? firstSubscription.id
+      : prefs.agentModel;
+
   const picked =
-    desktopAi && prefs.agentModel !== "rules" && status
-      ? prefs.agentModel === "auto" ||
-        usable.some((p) => p.id === prefs.agentModel)
-        ? prefs.agentModel
+    desktopAi && effectiveModelPref !== "rules" && status
+      ? effectiveModelPref === "auto" ||
+        usable.some((p) => p.id === effectiveModelPref) ||
+        (firstSubscription && effectiveModelPref === firstSubscription.id)
+        ? effectiveModelPref
         : "rules"
       : "rules";
-  const modelProvider = picked === "auto" ? null : picked;
+  const modelProvider = picked === "auto" ? null : picked === "rules" ? null : picked;
   const usingModel = picked !== "rules";
 
   // Chips the person can attach: the open scene, the selected mark, the open
@@ -432,15 +441,30 @@ export function AgentPanel() {
       </div>
     );
 
+  const isPickedSubInstalled =
+    status?.providers.some(
+      (p) =>
+        p.id === picked &&
+        p.endpoint.includes(".local-agent.invalid/") &&
+        p.installed === true,
+    ) ?? false;
+
   const readyReason =
     usingModel && status
       ? picked === "auto"
-        ? usable.some((p) => !p.not_ready) && status.enabled
+        ? (usable.some((p) => !p.not_ready) ||
+            status.providers.some(
+              (p) =>
+                p.endpoint.includes(".local-agent.invalid/") &&
+                p.installed === true,
+            )) && status.enabled
           ? undefined
           : status.enabled
             ? "No provider is ready."
             : "AI providers are switched off in Settings."
-        : (usable.find((p) => p.id === picked)?.not_ready ?? undefined)
+        : isPickedSubInstalled
+          ? undefined
+          : (usable.find((p) => p.id === picked)?.not_ready ?? undefined)
       : undefined;
 
   return (
@@ -696,8 +720,23 @@ export function AgentPanel() {
             value={picked}
             aria-label="Model"
             onChange={(e) => {
-              if (e.target.value === "settings") api.openSettings("providers");
-              else setPrefs({ agentModel: e.target.value });
+              if (e.target.value === "settings") {
+                api.openSettings("providers");
+              } else {
+                const chosen = e.target.value;
+                setPrefs({ agentModel: chosen });
+                const sub = status?.providers.find(
+                  (p) => p.id === chosen && p.endpoint.includes(".local-agent.invalid/"),
+                );
+                if (sub && !sub.enabled) {
+                  void ai
+                    .update({
+                      enabled: true,
+                      providers: [{ id: sub.id, enabled: true }],
+                    })
+                    .then(() => refreshStatus());
+                }
+              }
             }}
             title={
               desktopAi
@@ -710,11 +749,31 @@ export function AgentPanel() {
               <option value="auto">Auto · first ready provider</option>
             )}
             {desktopAi &&
-              usable.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} · {p.model}
-                </option>
-              ))}
+              usable.map((p) => {
+                const isSub = p.endpoint.includes(".local-agent.invalid/");
+                const cleanName = p.name.replace(" (existing sign-in)", "").replace(" (dedicated sign-in)", "");
+                return (
+                  <option key={p.id} value={p.id}>
+                    {cleanName} {isSub ? "· Pro/Team" : `· ${p.model}`}
+                  </option>
+                );
+              })}
+            {desktopAi &&
+              status?.providers
+                .filter(
+                  (p) =>
+                    p.endpoint.includes(".local-agent.invalid/") &&
+                    p.installed === true &&
+                    !usable.some((u) => u.id === p.id),
+                )
+                .map((p) => {
+                  const cleanName = p.name.replace(" (existing sign-in)", "").replace(" (dedicated sign-in)", "");
+                  return (
+                    <option key={p.id} value={p.id}>
+                      {cleanName} · Pro/Team (CLI found)
+                    </option>
+                  );
+                })}
             <option value="settings">Providers…</option>
           </select>
           <select

@@ -425,12 +425,13 @@ impl ProviderConfig {
     }
 
     /// True when the writer's consent covers the current endpoint host and
-    /// the current notice.
+    /// the current notice. Installed subscriptions are local CLIs and valid by definition.
     #[must_use]
     pub fn has_valid_consent(&self) -> bool {
-        self.consent
-            .as_ref()
-            .is_some_and(|c| c.notice_version == NOTICE_VERSION && c.host == self.host())
+        self.is_subscription()
+            || self.consent
+                .as_ref()
+                .is_some_and(|c| c.notice_version == NOTICE_VERSION && c.host == self.host())
     }
 
     /// Requests go nowhere but this machine.
