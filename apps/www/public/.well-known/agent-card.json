@@ -1,0 +1,60 @@
+{
+  "$schema": "https://agentclientprotocol.com/schemas/v1/agent-card.json",
+  "name": "Asten Continuity & Canon Agent",
+  "description": "Intelligent canon engine and editorial assistant for novelists and narrative designers. Audits manuscript continuity, timeline integrity, and character consistency without ghostwriting prose.",
+  "version": "0.1.0-alpha.1",
+  "supportedInterfaces": [
+    {
+      "url": "http://127.0.0.1:18640/api/a2a",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "provider": {
+    "organization": "Verne Systems Ltd",
+    "url": "https://asten-writing.vercel.app"
+  },
+  "capabilities": {
+    "streaming": true,
+    "pushNotifications": false,
+    "extendedAgentCard": false
+  },
+  "defaultInputModes": [
+    "application/json",
+    "text/plain"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "check_canon_consistency",
+      "name": "Check Canon Consistency",
+      "description": "Audit manuscript scenes against settled canon facts across seventeen rules in seven families.",
+      "tags": ["writing", "canon", "consistency", "rules"],
+      "examples": ["Evaluate chapter 12 for character trait and location contradictions"]
+    },
+    {
+      "id": "query_story_timeline",
+      "name": "Query Story Timeline",
+      "description": "Verify chronology and causal order across dual clocks (story time and reading order).",
+      "tags": ["timeline", "chronology", "story-time", "causality"],
+      "examples": ["Audit timeline between the siege and the coronation scenes"]
+    },
+    {
+      "id": "propose_canon_fact",
+      "name": "Propose Canon Fact",
+      "description": "Extract and propose entity traits and worldbuilding facts for explicit author confirmation.",
+      "tags": ["worldbuilding", "cast", "proposals", "hitl"],
+      "examples": ["Propose eye color and origin fact for Lady Jacqueline"]
+    },
+    {
+      "id": "inspect_contradictions",
+      "name": "Inspect Contradictions",
+      "description": "Retrieve diagnostic marks, sentence evidence, and rule explanations for identified narrative conflicts.",
+      "tags": ["diagnostics", "marks", "editorial-review"],
+      "examples": ["List all CANON-E013 and CANON-E101 marks in draft 3"]
+    }
+  ]
+}
+

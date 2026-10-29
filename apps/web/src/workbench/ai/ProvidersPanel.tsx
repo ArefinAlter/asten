@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useWorkbench } from "../context";
 import { Icon } from "../icons";
 import { Card, Fixed, Head, SettingRow, Switch } from "../settings/parts";
+import { setPrefs, usePrefs } from "../prefs";
 import {
   ai,
   newRunId,
@@ -36,6 +37,7 @@ const BACKEND_LABEL: Record<AiStatus["vault"]["backend"], string> = {
 export function ProvidersDesktop() {
   const { status, error } = useAi();
   const api = useWorkbench();
+  const prefs = usePrefs();
   const [busy, setBusy] = useState<string>();
   const [problem, setProblem] = useState<string>();
   const [consentFor, setConsentFor] = useState<ProviderView>();
@@ -393,9 +395,70 @@ export function ProvidersDesktop() {
       <Card title="Installed agent connections">
         <p className="muted small">
           Asten detects supported programs on this computer without reading their credentials.
-          Sign in using the agent's own app, then give consent and test its connection below.
+          Sign in using the agent's own app, then activate directly below with one click.
           Finding a program does not verify its sign-in or subscription.
         </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", marginTop: "0.75rem", marginBottom: "0.75rem" }}>
+          {status.providers
+            .filter((p) => p.endpoint.includes(".local-agent.invalid/"))
+            .map((p) => {
+              const isFound = p.installed === true;
+              const isEnabled = p.enabled;
+              const isSelected = prefs.agentModel === p.id;
+              const displayName = p.name.replace(" (existing sign-in)", "").replace(" (dedicated sign-in)", "");
+              return (
+                <div
+                  key={p.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "0.6rem 0.8rem",
+                    borderRadius: "6px",
+                    background: "var(--wb-surface-2, rgba(255, 255, 255, 0.04))",
+                    border: "1px solid var(--wb-border, rgba(255, 255, 255, 0.08))",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                    <strong>{displayName}</strong>
+                    <span className={`wb-pill wb-pill--${isFound ? "ok" : "muted"}`}>
+                      {isFound ? "CLI found" : "CLI not found"}
+                    </span>
+                    {isEnabled && (
+                      <span className="wb-pill wb-pill--ok">Active in Agent</span>
+                    )}
+                    {isSelected && (
+                      <span className="wb-pill wb-pill--ok">Selected</span>
+                    )}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <button
+                      type="button"
+                      className={`wb-btn wb-btn--small ${isEnabled ? "wb-btn--ok" : "wb-btn--primary"}`}
+                      disabled={busy === p.id}
+                      onClick={() =>
+                        void guarded(p.id, async () => {
+                          const nextEnabled = !isEnabled;
+                          await ai.update({
+                            enabled: true,
+                            providers: [{ id: p.id, enabled: nextEnabled }],
+                          });
+                          if (nextEnabled) {
+                            setPrefs({ agentModel: p.id });
+                          } else if (prefs.agentModel === p.id) {
+                            setPrefs({ agentModel: "auto" });
+                          }
+                          await refreshStatus();
+                        })
+                      }
+                    >
+                      {isEnabled ? "Enabled ✓" : "Enable in Agent ✓"}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+        </div>
         <button className="wb-btn" disabled={busy === "connections"}
           onClick={() => void guarded("connections", () => refreshStatus())}>
           Refresh installed agents

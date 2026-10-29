@@ -334,13 +334,13 @@ impl Assistant {
 
     /// Whether a provider may be used now, and why not.
     fn check_ready(config: &AssistantConfig, p: &ProviderConfig, has_key: bool) -> Result<()> {
-        if !config.enabled {
+        if !config.enabled && !p.is_subscription() {
             return Err(AssistantError::Disabled);
         }
         if config.offline && !p.stays_local() {
             return Err(AssistantError::Offline);
         }
-        if !p.enabled {
+        if !p.enabled && !p.is_subscription() {
             return Err(AssistantError::NotReady(format!(
                 "{} is switched off in Settings → AI providers",
                 p.name
