@@ -54,7 +54,7 @@ export const legalIndex: Record<string, LegalMeta> = {
     title: "AI policy",
     metaTitle: "AI policy: an editor, never a writer",
     description:
-      "Asten’s checks run no AI model. The optional assistant only proposes, runs locally first, needs your own key and consent for a cloud provider, switches off completely, and never trains on your manuscript.",
+      "Asten is an AI product built as an intelligent continuity editor. It pairs deep narrative auditing with local canon rules, while strictly handing creativity back to the writer—it never writes or ghostwrites your prose.",
   },
   "/accessibility": {
     path: "/accessibility",

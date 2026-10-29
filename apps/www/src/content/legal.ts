@@ -917,8 +917,8 @@ export const legalDocs: LegalDoc[] = [
   {
     ...legalIndex["/ai-policy"]!,
     summary: [
-      "Asten’s checks run no AI model, local or cloud. They are deterministic rules over facts you confirm.",
-      "Release 0.0.1b adds an optional assistant to the desktop app. It is off by default, local models come first, a cloud provider needs your own key and your consent, and one switch turns it all off. It only explains, searches and proposes. It never writes your prose or changes your canon without you.",
+      "Asten is an AI product designed as an intelligent continuity editor. Its canon engine checks your story against facts you confirm, while the AI assistant explains, searches and audits.",
+      "The assistant supports local models and cloud providers via your own key or direct subscriptions (Claude Code, Codex, Antigravity, Cursor, Grok). It strictly hands creativity back to the author: it never writes or ghostwrites your prose.",
       "What is sent, when, and to whom is stated below. Your manuscript is never used to train a model, by Verne or by any provider Verne chooses.",
       "Asten will tell you in the interface before this policy changes.",
     ],
