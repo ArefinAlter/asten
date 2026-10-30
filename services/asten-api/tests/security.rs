@@ -112,11 +112,11 @@ fn json_post(path: &str, body: serde_json::Value) -> axum::http::request::Builde
 /// Pair a guest from the page the API serves. Returns the session token the
 /// cookie carries; the test never prints it.
 async fn pair_from_the_desk(desk: &Desk) -> String {
-    let start = desk
-        .application
-        .start_pairing("phone", TokenKind::Guest)
-        .await
-        .unwrap();
+    pair_as(desk, TokenKind::Guest).await
+}
+
+async fn pair_as(desk: &Desk, kind: TokenKind) -> String {
+    let start = desk.application.start_pairing("phone", kind).await.unwrap();
     let body = serde_json::json!({ "code": start.code, "label": "phone" });
     let request = json_post("/api/v1/auth/pair", body.clone())
         .header(header::HOST, HOST)
@@ -550,7 +550,22 @@ async fn mcp_http_routes_require_pairing_authentication() {
             .await;
             assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
         }
-        let token = pair_from_the_desk(&desk).await;
+        let guest = pair_from_the_desk(&desk).await;
+        let forbidden = send(
+            &desk.router,
+            Request::builder()
+                .method("POST")
+                .uri(path)
+                .header(header::CONTENT_TYPE, "application/json")
+                .header(header::AUTHORIZATION, format!("Bearer {guest}"))
+                .body(Body::from(
+                    r#"{"jsonrpc":"2.0","id":1,"method":"initialize"}"#,
+                ))
+                .unwrap(),
+        )
+        .await;
+        assert_eq!(forbidden.status(), StatusCode::FORBIDDEN);
+        let token = pair_as(&desk, TokenKind::Desk).await;
         let response = send(
             &desk.router,
             Request::builder()

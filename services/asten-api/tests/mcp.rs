@@ -251,3 +251,48 @@ async fn rejects_wrong_project_types_unknown_arguments_and_ambiguous_project() {
         .await;
     assert_eq!(response.error.unwrap().code, -32602);
 }
+
+#[tokio::test]
+async fn bounded_storage_reads_limit_projects_and_entities() {
+    let (_ctx, app) = setup_app().await;
+    let mut project_id = None;
+    for name in ["One", "Two", "Three"] {
+        let project = app
+            .create_project(CreateProject {
+                name: name.into(),
+                kind: ProjectKind::Novel,
+                description: None,
+            })
+            .await
+            .unwrap();
+        project_id = Some(project.id);
+    }
+    assert_eq!(app.list_projects_limited(2).await.unwrap().len(), 2);
+    let project_id = project_id.unwrap();
+    for name in ["Alice", "Bob", "Carol"] {
+        app.create_entity(asten_application::CreateCanonEntity {
+            project_id,
+            kind: asten_domain::EntityKind::Character,
+            name: name.into(),
+            aliases: vec![],
+            notes: String::new(),
+            introduced_at: None,
+        })
+        .await
+        .unwrap();
+    }
+    assert_eq!(
+        app.list_entities_limited(project_id, 1)
+            .await
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        app.list_entities_limited(project_id, 10)
+            .await
+            .unwrap()
+            .len(),
+        3
+    );
+}

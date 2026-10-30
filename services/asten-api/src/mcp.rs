@@ -104,7 +104,7 @@ impl McpServer {
         }
         let projects = self
             .app
-            .list_projects()
+            .list_projects_limited(2)
             .await
             .map_err(|_| "Could not list projects")?;
         if projects.len() != 1 {
@@ -221,7 +221,7 @@ impl McpServer {
                         },
                         {
                             "name": "asten_timeline_list",
-                            "description": "Reads the chronological story timeline events and narrative sequence in story time and reading order.",
+                            "description": "Reads up to 100 chronological story timeline events in reading order.",
                             "inputSchema": {
                                 "type": "object",
                                 "additionalProperties": false,
@@ -334,13 +334,13 @@ impl McpServer {
                         {
                             "uri": "asten://entities",
                             "name": "Asten Cast and Canon Entities",
-                            "description": "Active registered cast members, characters, settings, and narrative entities in the active project.",
+                            "description": "Up to 100 active cast members, settings, and narrative entities in the selected project.",
                             "mimeType": "application/json"
                         },
                         {
                             "uri": "asten://timeline",
                             "name": "Asten Story Timeline Events",
-                            "description": "Chronological timeline event sequence and scene reading order in the active project.",
+                            "description": "Up to 100 timeline events in reading order for the selected project.",
                             "mimeType": "application/json"
                         }
                     ]
@@ -361,14 +361,20 @@ impl McpServer {
                     })),
                     "asten://entities" => match self.resolve_project(&Some(params.clone())).await {
                         Ok(project_id) => {
-                            let entities: Vec<_> = self
+                            let entities = match self
                                 .app
-                                .list_entities(project_id)
+                                .list_entities_limited(project_id, MAX_ITEMS as u32)
                                 .await
-                                .unwrap_or_default()
-                                .into_iter()
-                                .take(MAX_ITEMS)
-                                .collect();
+                            {
+                                Ok(rows) => rows,
+                                Err(_) => {
+                                    return rpc_error(
+                                        id,
+                                        -32000,
+                                        "Bounded entities read unavailable",
+                                    );
+                                }
+                            };
                             Ok(json!({
                                 "contents": [{
                                     "uri": "asten://entities",
@@ -387,14 +393,16 @@ impl McpServer {
                     },
                     "asten://timeline" => match self.resolve_project(&Some(params.clone())).await {
                         Ok(project_id) => {
-                            let events: Vec<_> = self
+                            let events = match self
                                 .app
-                                .list_events(project_id)
+                                .list_events_limited(project_id, MAX_ITEMS as u32)
                                 .await
-                                .unwrap_or_default()
-                                .into_iter()
-                                .take(MAX_ITEMS)
-                                .collect();
+                            {
+                                Ok(rows) => rows,
+                                Err(_) => {
+                                    return rpc_error(id, -32000, "Bounded events read unavailable");
+                                }
+                            };
                             Ok(json!({
                                 "contents": [{
                                     "uri": "asten://timeline",
@@ -741,7 +749,7 @@ impl McpServer {
         let project_id = self.resolve_project(&Some(args.clone())).await?;
         let events = self
             .app
-            .list_events(project_id)
+            .list_events_limited(project_id, MAX_ITEMS as u32)
             .await
             .map_err(|e| e.to_string())?;
 
@@ -767,7 +775,8 @@ impl McpServer {
                 "type": "text",
                 "text": serde_json::to_string_pretty(&json!({
                     "project_id": project_id.to_string(),
-                    "total_events": items.len(),
+                    "returned_events": items.len(),
+                    "limit": MAX_ITEMS,
                     "events": items
                 })).unwrap_or_default()
             }]
@@ -883,11 +892,18 @@ pub fn router() -> axum::Router<crate::ApiState> {
 
 pub async fn handle_http(
     axum::extract::State(state): axum::extract::State<crate::ApiState>,
+    axum::extract::Extension(crate::AuthenticatedClient(client)): axum::extract::Extension<
+        crate::AuthenticatedClient,
+    >,
     axum::Json(payload): axum::Json<JsonRpcRequest>,
-) -> axum::Json<JsonRpcResponse> {
+) -> Result<axum::Json<JsonRpcResponse>, axum::http::StatusCode> {
+    // Guest tokens have no project scope; only the owner/desk may expose MCP.
+    if !client.kind.can_administer() {
+        return Err(axum::http::StatusCode::FORBIDDEN);
+    }
     let server = McpServer::new(Arc::new(state.application.clone()));
     let resp = server.handle_request(payload).await;
-    axum::Json(resp)
+    Ok(axum::Json(resp))
 }
 
 fn rpc_error(id: Option<Value>, code: i64, message: &str) -> JsonRpcResponse {

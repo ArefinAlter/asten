@@ -276,6 +276,13 @@ pub struct UpdateWorldEntry {
 #[async_trait]
 pub trait Repository: Send + Sync {
     async fn list_projects(&self) -> Result<Vec<Project>>;
+    /// Bounded reads fail closed for providers that do not implement them.
+    async fn list_projects_limited(&self, limit: u32) -> Result<Vec<Project>> {
+        let _ = (limit);
+        Err(ApplicationError::Validation(
+            "bounded reads are unavailable".into(),
+        ))
+    }
     async fn find_project(&self, id: ProjectId) -> Result<Option<Project>>;
     async fn insert_project(&self, project: &Project) -> Result<()>;
     async fn update_project(&self, project: &Project) -> Result<()>;
@@ -320,12 +327,34 @@ pub trait Repository: Send + Sync {
     async fn update_world_entry(&self, entry: &WorldEntry) -> Result<()>;
 
     async fn list_entities(&self, project_id: ProjectId) -> Result<Vec<CanonEntity>>;
+    /// Bounded reads fail closed for providers that do not implement them.
+    async fn list_entities_limited(
+        &self,
+        project_id: ProjectId,
+        limit: u32,
+    ) -> Result<Vec<CanonEntity>> {
+        let _ = (project_id, limit);
+        Err(ApplicationError::Validation(
+            "bounded reads are unavailable".into(),
+        ))
+    }
     async fn find_entity(&self, id: EntityId) -> Result<Option<CanonEntity>>;
     async fn insert_entity(&self, entity: &CanonEntity) -> Result<()>;
     async fn update_entity(&self, entity: &CanonEntity) -> Result<()>;
     async fn delete_entity(&self, id: EntityId) -> Result<()>;
 
     async fn list_events(&self, project_id: ProjectId) -> Result<Vec<TimelineEvent>>;
+    /// Bounded reads fail closed for providers that do not implement them.
+    async fn list_events_limited(
+        &self,
+        project_id: ProjectId,
+        limit: u32,
+    ) -> Result<Vec<TimelineEvent>> {
+        let _ = (project_id, limit);
+        Err(ApplicationError::Validation(
+            "bounded reads are unavailable".into(),
+        ))
+    }
     async fn find_event(&self, id: TimelineEventId) -> Result<Option<TimelineEvent>>;
     async fn insert_event(&self, event: &TimelineEvent) -> Result<()>;
     async fn update_event(&self, event: &TimelineEvent) -> Result<()>;
@@ -489,6 +518,11 @@ impl Application {
                 tracing::warn!(%project_id, %error, "background analysis failed");
             }
         });
+    }
+
+    /// Read at most `limit` projects; the storage provider must enforce the bound.
+    pub async fn list_projects_limited(&self, limit: u32) -> Result<Vec<Project>> {
+        self.repository.list_projects_limited(limit.min(100)).await
     }
 
     pub async fn list_projects(&self) -> Result<Vec<Project>> {
