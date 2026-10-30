@@ -526,3 +526,44 @@ async fn repeated_forwarding_fields_do_not_let_a_client_reset_its_limit() {
     }
     assert!(last.contains("too many attempts"), "{last}");
 }
+
+#[tokio::test]
+async fn mcp_http_routes_require_pairing_authentication() {
+    let desk = open_desk(|_| {}).await;
+    for path in ["/mcp", "/api/v1/mcp"] {
+        for authorization in [None, Some("Bearer invalid-audit-token")] {
+            let mut request = Request::builder()
+                .method("POST")
+                .uri(path)
+                .header(header::CONTENT_TYPE, "application/json");
+            if let Some(value) = authorization {
+                request = request.header(header::AUTHORIZATION, value);
+            }
+            let response = send(
+                &desk.router,
+                request
+                    .body(Body::from(
+                        r#"{"jsonrpc":"2.0","id":1,"method":"initialize"}"#,
+                    ))
+                    .unwrap(),
+            )
+            .await;
+            assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+        }
+        let token = pair_from_the_desk(&desk).await;
+        let response = send(
+            &desk.router,
+            Request::builder()
+                .method("POST")
+                .uri(path)
+                .header(header::CONTENT_TYPE, "application/json")
+                .header(header::AUTHORIZATION, format!("Bearer {token}"))
+                .body(Body::from(
+                    r#"{"jsonrpc":"2.0","id":1,"method":"initialize"}"#,
+                ))
+                .unwrap(),
+        )
+        .await;
+        assert_eq!(response.status(), StatusCode::OK);
+    }
+}

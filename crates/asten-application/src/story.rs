@@ -383,6 +383,66 @@ impl Application {
         Ok(outcome.snapshot)
     }
 
+    /// Analyse on a private engine without updating suppressions, shared caches, or streams.
+    /// MCP callers use this because they must not persist story changes.
+    pub async fn analyze_project_readonly(
+        &self,
+        project_id: ProjectId,
+    ) -> Result<DiagnosticsSnapshot> {
+        let inputs = self.build_inputs(project_id).await?;
+        tokio::task::spawn_blocking(move || Engine::new().analyze(&inputs).snapshot)
+            .await
+            .map_err(|error| ApplicationError::Storage(error.to_string()))
+    }
+
+    /// Query cast data without changing the shared analysis engine or repository.
+    pub async fn cast_search_readonly(
+        &self,
+        project_id: ProjectId,
+        query: &str,
+    ) -> Result<Vec<CastSearchHit>> {
+        let inputs = self.build_inputs(project_id).await?;
+        let query = query.to_owned();
+        tokio::task::spawn_blocking(move || {
+            let mut engine = Engine::new();
+            engine.analyze(&inputs);
+            engine
+                .last_ir()
+                .map(|ir| asten_engine::cast_search(ir, &query, 12))
+                .unwrap_or_default()
+        })
+        .await
+        .map_err(|error| ApplicationError::Storage(error.to_string()))
+    }
+
+    /// Summarize a scene without changing the shared analysis engine or repository.
+    pub async fn scene_summary_readonly(
+        &self,
+        project_id: ProjectId,
+        document_id: DocumentId,
+    ) -> Result<SceneSummary> {
+        let inputs = self.build_inputs(project_id).await?;
+        let document = DocId::new(document_id.to_string());
+        tokio::task::spawn_blocking(move || {
+            let mut engine = Engine::new();
+            engine.analyze(&inputs);
+            engine
+                .last_ir()
+                .and_then(|ir| {
+                    asten_engine::scene_summary(
+                        ir,
+                        &inputs,
+                        engine.last_perceptions(),
+                        engine.last_diagnostics(),
+                        &document,
+                    )
+                })
+                .ok_or(ApplicationError::NotFound { entity: "scene" })
+        })
+        .await
+        .map_err(|error| ApplicationError::Storage(error.to_string()))?
+    }
+
     /// Analyse with one document's content replaced, without touching the
     /// project's engine or its delta. Used by merge previews and bisect.
     pub async fn analyze_with_override(

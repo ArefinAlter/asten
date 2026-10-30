@@ -1,7 +1,7 @@
 //! Model Context Protocol (MCP) server for Asten.
 //!
 //! Provides a production-grade MCP interface exposing all three core primitives:
-//! 1. Tools: Action layer (continuity marks, canon search, timeline, scene summary, check runs, fact proposals).
+//! 1. Tools: Action layer (continuity marks, canon search, timeline, scene summary, check runs).
 //! 2. Resources: Data layer (canon rule invariants catalog, cast entities, timeline ledger).
 //! 3. Prompts: Intent layer (audit_scene_continuity, resolve_timeline_conflict, flesh_out_cast_canon).
 //!
@@ -10,15 +10,19 @@
 //! - Intent-driven, model-optimized descriptions
 //! - Strict snake_case tool names
 //! - Graceful degraded responses with actionable recovery context
-//! - Asymmetric privilege guardrails (human-in-the-loop proposals)
+//! - Read-only agent tools; the author changes canon in the desk
 
-use std::sync::Arc;
-use asten_application::{Application, CreateFact};
-use asten_domain::{DocumentId, FactModality, FactStatus, ProjectId};
+use asten_application::Application;
+use asten_domain::{DocumentId, ProjectId};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
+use std::sync::Arc;
+use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader};
 use uuid::Uuid;
+
+const MAX_REQUEST_BYTES: usize = 1_048_576;
+const MAX_RESPONSE_BYTES: usize = 1_048_576;
+const MAX_ITEMS: usize = 100;
 
 const CANON_RULES_SCHEMA: &str = r#"{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -52,6 +56,7 @@ const CANON_RULES_SCHEMA: &str = r#"{
 }"#;
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct JsonRpcRequest {
     pub jsonrpc: String,
     #[serde(default)]
@@ -89,24 +94,48 @@ impl McpServer {
         Self { app }
     }
 
-    /// Resolve project ID from params or fall back to the first available project.
+    /// Omission is safe only when exactly one project is available.
     async fn resolve_project(&self, params: &Option<Value>) -> Result<ProjectId, String> {
-        if let Some(p) = params {
-            if let Some(id_str) = p.get("project_id").and_then(|v| v.as_str()) {
-                if let Ok(parsed) = Uuid::parse_str(id_str) {
-                    return Ok(ProjectId(parsed));
-                }
-            }
+        if let Some(raw) = params.as_ref().and_then(|p| p.get("project_id")) {
+            let id = raw.as_str().ok_or("project_id must be a UUID string")?;
+            return Uuid::parse_str(id)
+                .map(ProjectId)
+                .map_err(|_| "project_id must be a valid UUID".to_string());
         }
-        let projects = self.app.list_projects().await.map_err(|e| e.to_string())?;
-        projects
-            .into_iter()
-            .next()
-            .map(|p| p.id)
-            .ok_or_else(|| "No active project found in Asten. Create or open a project first.".to_string())
+        let projects = self
+            .app
+            .list_projects()
+            .await
+            .map_err(|_| "Could not list projects")?;
+        if projects.len() != 1 {
+            return Err("project_id is required unless exactly one project is available".into());
+        }
+        Ok(projects[0].id)
     }
 
     pub async fn handle_request(&self, req: JsonRpcRequest) -> JsonRpcResponse {
+        let id = req.id.clone();
+        let valid_id = id
+            .as_ref()
+            .is_none_or(|v| v.is_string() || v.is_number() || v.is_null());
+        if req.jsonrpc != "2.0"
+            || !valid_id
+            || req.method.len() > 128
+            || req.params.as_ref().is_some_and(|p| {
+                !p.is_object()
+                    || serde_json::to_vec(p).map_or(true, |v| v.len() > MAX_REQUEST_BYTES)
+            })
+        {
+            return rpc_error(id, -32600, "Invalid JSON-RPC request");
+        }
+        let response = self.dispatch(req).await;
+        if serde_json::to_vec(&response).map_or(true, |v| v.len() > MAX_RESPONSE_BYTES) {
+            return rpc_error(id, -32000, "Response exceeds 1 MiB; narrow the query");
+        }
+        response
+    }
+
+    async fn dispatch(&self, req: JsonRpcRequest) -> JsonRpcResponse {
         let id = req.id;
         match req.method.as_str() {
             "initialize" => JsonRpcResponse {
@@ -137,6 +166,7 @@ impl McpServer {
                             "description": "Lists open narrative continuity marks, plot discrepancies, and invariant warnings across the manuscript.",
                             "inputSchema": {
                                 "type": "object",
+                                "additionalProperties": false,
                                 "properties": {
                                     "project_id": {
                                         "type": "string",
@@ -156,6 +186,7 @@ impl McpServer {
                             "description": "Deep-dive analysis of a continuity mark: conflicting statements, evidence chain, settlement locations, and deterministic repairs.",
                             "inputSchema": {
                                 "type": "object",
+                                "additionalProperties": false,
                                 "properties": {
                                     "mark_id": {
                                         "type": "string",
@@ -174,6 +205,7 @@ impl McpServer {
                             "description": "Searches characters, cast members, locations, and narrative facts across settled and proposed canon.",
                             "inputSchema": {
                                 "type": "object",
+                                "additionalProperties": false,
                                 "properties": {
                                     "query": {
                                         "type": "string",
@@ -192,6 +224,7 @@ impl McpServer {
                             "description": "Reads the chronological story timeline events and narrative sequence in story time and reading order.",
                             "inputSchema": {
                                 "type": "object",
+                                "additionalProperties": false,
                                 "properties": {
                                     "project_id": {
                                         "type": "string",
@@ -206,6 +239,7 @@ impl McpServer {
                             "description": "Reads a scene's story time, narrative context, present characters, word count, and mark count without exposing manuscript prose.",
                             "inputSchema": {
                                 "type": "object",
+                                "additionalProperties": false,
                                 "properties": {
                                     "document_id": {
                                         "type": "string",
@@ -224,6 +258,7 @@ impl McpServer {
                             "description": "Re-runs the narrative continuity and canon check rules across the manuscript, returning fresh diagnostics.",
                             "inputSchema": {
                                 "type": "object",
+                                "additionalProperties": false,
                                 "properties": {
                                     "project_id": {
                                         "type": "string",
@@ -232,33 +267,8 @@ impl McpServer {
                                 },
                                 "required": []
                             }
-                        },
-                        {
-                            "name": "asten_fact_propose",
-                            "description": "Proposes a new narrative fact for character, setting, or plot canon (prepared for author confirmation).",
-                            "inputSchema": {
-                                "type": "object",
-                                "properties": {
-                                    "entity": {
-                                        "type": "string",
-                                        "description": "The name or key of the character or entity"
-                                    },
-                                    "predicate": {
-                                        "type": "string",
-                                        "description": "The attribute or fact predicate (e.g. eye_color, age, location)"
-                                    },
-                                    "value": {
-                                        "type": "string",
-                                        "description": "The proposed value of the fact"
-                                    },
-                                    "project_id": {
-                                        "type": "string",
-                                        "description": "Optional UUID of the project"
-                                    }
-                                },
-                                "required": ["entity", "predicate", "value"]
-                            }
                         }
+
                     ]
                 })),
                 error: None,
@@ -267,7 +277,13 @@ impl McpServer {
             "tools/call" => {
                 let params = req.params.unwrap_or(Value::Null);
                 let tool_name = params.get("name").and_then(|v| v.as_str()).unwrap_or("");
-                let arguments = params.get("arguments").cloned().unwrap_or(Value::Null);
+                let arguments = params
+                    .get("arguments")
+                    .cloned()
+                    .unwrap_or_else(|| json!({}));
+                if let Err(message) = validate_arguments(tool_name, &arguments) {
+                    return rpc_error(id, -32602, message);
+                }
 
                 let result = match tool_name {
                     "asten_marks_list" => self.tool_marks_list(&arguments).await,
@@ -276,11 +292,10 @@ impl McpServer {
                     "asten_timeline_list" => self.tool_timeline_list(&arguments).await,
                     "asten_scene_summary" => self.tool_scene_summary(&arguments).await,
                     "asten_checks_run" => self.tool_checks_run(&arguments).await,
-                    "asten_fact_propose" => self.tool_fact_propose(&arguments).await,
                     _ => Ok(json!({
                         "content": [{
                             "type": "text",
-                            "text": format!("Unknown tool: '{tool_name}'. Available tools: asten_marks_list, asten_mark_explain, asten_canon_search, asten_timeline_list, asten_scene_summary, asten_checks_run, asten_fact_propose.")
+                            "text": format!("Unknown tool: '{tool_name}'. Available tools: asten_marks_list, asten_mark_explain, asten_canon_search, asten_timeline_list, asten_scene_summary, asten_checks_run.")
                         }],
                         "isError": true
                     })),
@@ -346,7 +361,14 @@ impl McpServer {
                     })),
                     "asten://entities" => match self.resolve_project(&Some(params.clone())).await {
                         Ok(project_id) => {
-                            let entities = self.app.list_entities(project_id).await.unwrap_or_default();
+                            let entities: Vec<_> = self
+                                .app
+                                .list_entities(project_id)
+                                .await
+                                .unwrap_or_default()
+                                .into_iter()
+                                .take(MAX_ITEMS)
+                                .collect();
                             Ok(json!({
                                 "contents": [{
                                     "uri": "asten://entities",
@@ -365,7 +387,14 @@ impl McpServer {
                     },
                     "asten://timeline" => match self.resolve_project(&Some(params.clone())).await {
                         Ok(project_id) => {
-                            let events = self.app.list_events(project_id).await.unwrap_or_default();
+                            let events: Vec<_> = self
+                                .app
+                                .list_events(project_id)
+                                .await
+                                .unwrap_or_default()
+                                .into_iter()
+                                .take(MAX_ITEMS)
+                                .collect();
                             Ok(json!({
                                 "contents": [{
                                     "uri": "asten://timeline",
@@ -455,7 +484,10 @@ impl McpServer {
 
                 let result = match prompt_name {
                     "audit_scene_continuity" => {
-                        let scene = args.get("scene_name").and_then(|v| v.as_str()).unwrap_or("the scene");
+                        let scene = args
+                            .get("scene_name")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("the scene");
                         Ok(json!({
                             "description": format!("Audit continuity for {scene}"),
                             "messages": [{
@@ -468,7 +500,10 @@ impl McpServer {
                         }))
                     }
                     "resolve_timeline_conflict" => {
-                        let conflict = args.get("conflict_description").and_then(|v| v.as_str()).unwrap_or("timeline conflict");
+                        let conflict = args
+                            .get("conflict_description")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("timeline conflict");
                         Ok(json!({
                             "description": "Resolve timeline discrepancy",
                             "messages": [{
@@ -481,14 +516,17 @@ impl McpServer {
                         }))
                     }
                     "flesh_out_cast_canon" => {
-                        let char_name = args.get("character_name").and_then(|v| v.as_str()).unwrap_or("the character");
+                        let char_name = args
+                            .get("character_name")
+                            .and_then(|v| v.as_str())
+                            .unwrap_or("the character");
                         Ok(json!({
                             "description": format!("Flesh out canon for {char_name}"),
                             "messages": [{
                                 "role": "user",
                                 "content": {
                                     "type": "text",
-                                    "text": format!("Let's expand the established canon for '{char_name}'.\n1. Search existing facts with `asten_canon_search` for query '{char_name}'.\n2. Propose new consistent character facts (e.g. background, relationships, traits) using `asten_fact_propose`.\n3. Ensure none of the proposed facts violate existing rules.")
+                                    "text": format!("Let's expand the established canon for '{char_name}'.\n1. Search existing facts with `asten_canon_search` for query '{char_name}'.\n2. Draft consistent character facts for the author to review and add in the desk.\n3. Ensure none of the proposed facts violate existing rules.")
                                 }
                             }]
                         }))
@@ -531,7 +569,11 @@ impl McpServer {
 
     async fn tool_marks_list(&self, args: &Value) -> Result<Value, String> {
         let project_id = self.resolve_project(&Some(args.clone())).await?;
-        let snap = self.app.analyze_project(project_id).await.map_err(|e| e.to_string())?;
+        let snap = self
+            .app
+            .analyze_project_readonly(project_id)
+            .await
+            .map_err(|e| e.to_string())?;
         let severity_filter = args.get("severity").and_then(|v| v.as_str());
 
         let marks: Vec<Value> = snap
@@ -544,6 +586,7 @@ impl McpServer {
                     true
                 }
             })
+            .take(MAX_ITEMS)
             .map(|d| {
                 json!({
                     "id": d.id,
@@ -571,20 +614,31 @@ impl McpServer {
     }
 
     async fn tool_mark_explain(&self, args: &Value) -> Result<Value, String> {
-        let mark_id = args.get("mark_id").and_then(|v| v.as_str()).ok_or("mark_id is required")?;
+        let mark_id = args
+            .get("mark_id")
+            .and_then(|v| v.as_str())
+            .ok_or("mark_id is required")?;
         let project_id = self.resolve_project(&Some(args.clone())).await?;
-        let snap = self.app.analyze_project(project_id).await.map_err(|e| e.to_string())?;
+        let snap = self
+            .app
+            .analyze_project_readonly(project_id)
+            .await
+            .map_err(|e| e.to_string())?;
 
         let diag = snap.diagnostics.iter().find(|d| d.id == mark_id);
         match diag {
             Some(d) => {
-                let repairs: Vec<Value> = d.repairs.iter().map(|r| {
-                    json!({
-                        "kind": format!("{:?}", r.kind),
-                        "label": r.label,
-                        "cost": r.cost,
+                let repairs: Vec<Value> = d
+                    .repairs
+                    .iter()
+                    .map(|r| {
+                        json!({
+                            "kind": format!("{:?}", r.kind),
+                            "label": r.label,
+                            "cost": r.cost,
+                        })
                     })
-                }).collect();
+                    .collect();
 
                 Ok(json!({
                     "content": [{
@@ -620,7 +674,14 @@ impl McpServer {
         let query = args.get("query").and_then(|v| v.as_str()).unwrap_or("");
         let project_id = self.resolve_project(&Some(args.clone())).await?;
 
-        let hits = self.app.cast_search(project_id, query).await.unwrap_or_default();
+        let hits: Vec<_> = self
+            .app
+            .cast_search_readonly(project_id, query)
+            .await
+            .unwrap_or_default()
+            .into_iter()
+            .take(MAX_ITEMS)
+            .collect();
         let entities = self.app.list_entities(project_id).await.unwrap_or_default();
         let facts = self.app.list_facts(project_id).await.unwrap_or_default();
 
@@ -628,15 +689,20 @@ impl McpServer {
             .into_iter()
             .filter(|e| {
                 e.name.to_lowercase().contains(&query.to_lowercase())
-                    || e.aliases.iter().any(|a| a.to_lowercase().contains(&query.to_lowercase()))
+                    || e.aliases
+                        .iter()
+                        .any(|a| a.to_lowercase().contains(&query.to_lowercase()))
             })
-            .map(|e| json!({
-                "id": e.id.to_string(),
-                "name": e.name,
-                "aliases": e.aliases,
-                "kind": format!("{:?}", e.kind),
-                "notes": e.notes
-            }))
+            .take(MAX_ITEMS)
+            .map(|e| {
+                json!({
+                    "id": e.id.to_string(),
+                    "name": e.name,
+                    "aliases": e.aliases,
+                    "kind": format!("{:?}", e.kind),
+                    "notes": e.notes
+                })
+            })
             .collect();
 
         let matching_facts: Vec<Value> = facts
@@ -646,13 +712,16 @@ impl McpServer {
                     || f.predicate.to_lowercase().contains(&query.to_lowercase())
                     || f.value.to_lowercase().contains(&query.to_lowercase())
             })
-            .map(|f| json!({
-                "id": f.id.to_string(),
-                "entity_key": f.entity_key,
-                "predicate": f.predicate,
-                "value": f.value,
-                "status": format!("{:?}", f.status)
-            }))
+            .take(MAX_ITEMS)
+            .map(|f| {
+                json!({
+                    "id": f.id.to_string(),
+                    "entity_key": f.entity_key,
+                    "predicate": f.predicate,
+                    "value": f.value,
+                    "status": format!("{:?}", f.status)
+                })
+            })
             .collect();
 
         Ok(json!({
@@ -670,10 +739,15 @@ impl McpServer {
 
     async fn tool_timeline_list(&self, args: &Value) -> Result<Value, String> {
         let project_id = self.resolve_project(&Some(args.clone())).await?;
-        let events = self.app.list_events(project_id).await.map_err(|e| e.to_string())?;
+        let events = self
+            .app
+            .list_events(project_id)
+            .await
+            .map_err(|e| e.to_string())?;
 
         let items: Vec<Value> = events
             .into_iter()
+            .take(MAX_ITEMS)
             .map(|ev| {
                 json!({
                     "id": ev.id.to_string(),
@@ -701,13 +775,17 @@ impl McpServer {
     }
 
     async fn tool_scene_summary(&self, args: &Value) -> Result<Value, String> {
-        let doc_id_str = args.get("document_id").and_then(|v| v.as_str()).ok_or("document_id is required")?;
-        let doc_uuid = Uuid::parse_str(doc_id_str).map_err(|_| "document_id must be a valid UUID".to_string())?;
+        let doc_id_str = args
+            .get("document_id")
+            .and_then(|v| v.as_str())
+            .ok_or("document_id is required")?;
+        let doc_uuid = Uuid::parse_str(doc_id_str)
+            .map_err(|_| "document_id must be a valid UUID".to_string())?;
         let project_id = self.resolve_project(&Some(args.clone())).await?;
 
         let summary = self
             .app
-            .scene_summary(project_id, DocumentId(doc_uuid))
+            .scene_summary_readonly(project_id, DocumentId(doc_uuid))
             .await
             .map_err(|e| e.to_string())?;
 
@@ -721,7 +799,11 @@ impl McpServer {
 
     async fn tool_checks_run(&self, args: &Value) -> Result<Value, String> {
         let project_id = self.resolve_project(&Some(args.clone())).await?;
-        let snap = self.app.analyze_project(project_id).await.map_err(|e| e.to_string())?;
+        let snap = self
+            .app
+            .analyze_project_readonly(project_id)
+            .await
+            .map_err(|e| e.to_string())?;
 
         Ok(json!({
             "content": [{
@@ -738,55 +820,24 @@ impl McpServer {
         }))
     }
 
-    async fn tool_fact_propose(&self, args: &Value) -> Result<Value, String> {
-        let entity = args.get("entity").and_then(|v| v.as_str()).ok_or("entity is required")?;
-        let predicate = args.get("predicate").and_then(|v| v.as_str()).ok_or("predicate is required")?;
-        let value = args.get("value").and_then(|v| v.as_str()).ok_or("value is required")?;
-        let project_id = self.resolve_project(&Some(args.clone())).await?;
-
-        let fact = self
-            .app
-            .create_fact(CreateFact {
-                project_id,
-                entity_key: entity.to_string(),
-                predicate: predicate.to_string(),
-                value: value.to_string(),
-                status: FactStatus::Proposed,
-                modality: FactModality::default(),
-                valid_from: None,
-                valid_to: None,
-                source: None,
-                context: None,
-                anchor: None,
-                confidence: Some(1.0),
-                provenance: None,
-            })
-            .await
-            .map_err(|e| e.to_string())?;
-
-        Ok(json!({
-            "content": [{
-                "type": "text",
-                "text": serde_json::to_string_pretty(&json!({
-                    "status": "proposed",
-                    "fact_id": fact.id.to_string(),
-                    "entity": entity,
-                    "entity_key": fact.entity_key,
-                    "predicate": fact.predicate,
-                    "value": fact.value,
-                    "note": "Fact successfully registered in Proposed state. Ready for author acceptance card in the desk."
-                })).unwrap_or_default()
-            }]
-        }))
-    }
-
     /// Run stdio JSON-RPC loop for local coding agents.
     pub async fn run_stdio(self: Arc<Self>) -> anyhow::Result<()> {
         let stdin = tokio::io::stdin();
-        let mut reader = BufReader::new(stdin).lines();
+        let mut reader = BufReader::new(stdin);
         let mut stdout = tokio::io::stdout();
 
-        while let Some(line) = reader.next_line().await? {
+        loop {
+            let mut line = String::new();
+            let count = (&mut reader)
+                .take((MAX_REQUEST_BYTES + 1) as u64)
+                .read_line(&mut line)
+                .await?;
+            if count == 0 {
+                break;
+            }
+            if line.len() > MAX_REQUEST_BYTES {
+                return Err(anyhow::anyhow!("MCP request exceeds 1 MiB"));
+            }
             let trimmed = line.trim();
             if trimmed.is_empty() {
                 continue;
@@ -827,6 +878,7 @@ pub fn router() -> axum::Router<crate::ApiState> {
     axum::Router::new()
         .route("/mcp", axum::routing::post(handle_http))
         .route("/api/v1/mcp", axum::routing::post(handle_http))
+        .layer(axum::extract::DefaultBodyLimit::max(MAX_REQUEST_BYTES))
 }
 
 pub async fn handle_http(
@@ -836,4 +888,55 @@ pub async fn handle_http(
     let server = McpServer::new(Arc::new(state.application.clone()));
     let resp = server.handle_request(payload).await;
     axum::Json(resp)
+}
+
+fn rpc_error(id: Option<Value>, code: i64, message: &str) -> JsonRpcResponse {
+    JsonRpcResponse {
+        jsonrpc: "2.0".into(),
+        id,
+        result: None,
+        error: Some(JsonRpcError {
+            code,
+            message: message.into(),
+            data: None,
+        }),
+    }
+}
+
+fn validate_arguments(name: &str, args: &Value) -> Result<(), &'static str> {
+    let fields: &[&str] = match name {
+        "asten_marks_list" => &["project_id", "severity"],
+        "asten_mark_explain" => &["project_id", "mark_id"],
+        "asten_canon_search" => &["project_id", "query"],
+        "asten_timeline_list" | "asten_checks_run" => &["project_id"],
+        "asten_scene_summary" => &["project_id", "document_id"],
+        _ => return Err("Unknown tool"),
+    };
+    let object = args.as_object().ok_or("arguments must be an object")?;
+    for (key, value) in object {
+        if !fields.contains(&key.as_str()) {
+            return Err("Unknown argument");
+        }
+        let text = value.as_str().ok_or("Arguments must be strings")?;
+        let max = if key == "value" { 8192 } else { 1024 };
+        if text.len() > max || text.contains('\0') {
+            return Err("Argument exceeds its limit");
+        }
+    }
+    let required: &[&str] = match name {
+        "asten_mark_explain" => &["mark_id"],
+        "asten_canon_search" => &["query"],
+        "asten_scene_summary" => &["document_id"],
+        _ => &[],
+    };
+    if required.iter().any(|key| !object.contains_key(*key)) {
+        return Err("Missing required argument");
+    }
+    if object
+        .get("severity")
+        .is_some_and(|v| !["error", "warning", "information"].contains(&v.as_str().unwrap_or("")))
+    {
+        return Err("Invalid severity");
+    }
+    Ok(())
 }
