@@ -106,6 +106,17 @@ pub fn latest_migration() -> i64 {
 impl Repository for SqliteRepository {
     // ───────────────────────── projects ─────────────────────────
 
+    async fn list_projects_limited(&self, limit: u32) -> Result<Vec<Project>> {
+        sqlx::query("SELECT id, name, kind, description, created_at, updated_at FROM projects ORDER BY updated_at DESC LIMIT ?")
+            .bind(i64::from(limit))
+            .fetch_all(&self.pool)
+            .await
+            .map_err(storage_error)?
+            .into_iter()
+            .map(project_from_row)
+            .collect()
+    }
+
     async fn list_projects(&self) -> Result<Vec<Project>> {
         sqlx::query("SELECT id, name, kind, description, created_at, updated_at FROM projects ORDER BY updated_at DESC")
             .fetch_all(&self.pool)
@@ -538,6 +549,24 @@ impl Repository for SqliteRepository {
 
     // ───────────────────────── entities ─────────────────────────
 
+    async fn list_entities_limited(
+        &self,
+        project_id: ProjectId,
+        limit: u32,
+    ) -> Result<Vec<CanonEntity>> {
+        sqlx::query(&format!(
+            "SELECT {ENTITY_COLUMNS} FROM entities WHERE project_id = ? ORDER BY kind, name LIMIT ?"
+        ))
+        .bind(project_id.to_string())
+        .bind(i64::from(limit))
+        .fetch_all(&self.pool)
+        .await
+        .map_err(storage_error)?
+        .into_iter()
+        .map(entity_from_row)
+        .collect()
+    }
+
     async fn list_entities(&self, project_id: ProjectId) -> Result<Vec<CanonEntity>> {
         sqlx::query(&format!(
             "SELECT {ENTITY_COLUMNS} FROM entities WHERE project_id = ? ORDER BY kind, name"
@@ -610,6 +639,22 @@ impl Repository for SqliteRepository {
     }
 
     // ───────────────────────── events ─────────────────────────
+
+    async fn list_events_limited(
+        &self,
+        project_id: ProjectId,
+        limit: u32,
+    ) -> Result<Vec<TimelineEvent>> {
+        sqlx::query(&format!("SELECT {EVENT_COLUMNS} FROM timeline_events WHERE project_id = ? ORDER BY reading_order, created_at LIMIT ?"))
+            .bind(project_id.to_string())
+            .bind(i64::from(limit))
+            .fetch_all(&self.pool)
+            .await
+            .map_err(storage_error)?
+            .into_iter()
+            .map(event_from_row)
+            .collect()
+    }
 
     async fn list_events(&self, project_id: ProjectId) -> Result<Vec<TimelineEvent>> {
         sqlx::query(&format!("SELECT {EVENT_COLUMNS} FROM timeline_events WHERE project_id = ? ORDER BY reading_order, created_at"))

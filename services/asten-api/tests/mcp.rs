@@ -1,9 +1,9 @@
-use std::path::PathBuf;
-use std::sync::Arc;
 use asten_api::mcp::{JsonRpcRequest, McpServer};
 use asten_application::CreateProject;
 use asten_domain::ProjectKind;
 use serde_json::json;
+use std::path::PathBuf;
+use std::sync::Arc;
 use uuid::Uuid;
 
 struct TestContext {
@@ -62,7 +62,7 @@ async fn mcp_tools_list_and_call() {
         .await
         .unwrap();
 
-    let server = McpServer::new(Arc::new(app));
+    let server = McpServer::new(Arc::new(app.clone()));
 
     // List tools
     let list_req = JsonRpcRequest {
@@ -81,7 +81,7 @@ async fn mcp_tools_list_and_call() {
     assert!(tool_names.contains(&"asten_timeline_list"));
     assert!(tool_names.contains(&"asten_scene_summary"));
     assert!(tool_names.contains(&"asten_checks_run"));
-    assert!(tool_names.contains(&"asten_fact_propose"));
+    assert!(!tool_names.contains(&"asten_fact_propose"));
 
     // Call asten_canon_search
     let search_req = JsonRpcRequest {
@@ -100,28 +100,18 @@ async fn mcp_tools_list_and_call() {
     let content = &search_resp.result.unwrap()["content"][0]["text"];
     assert!(content.as_str().unwrap().contains("search_hits"));
 
-    // Call asten_fact_propose
+    // An agent cannot persist facts, even if it calls the retired tool directly.
     let propose_req = JsonRpcRequest {
         jsonrpc: "2.0".into(),
         id: Some(json!(4)),
         method: "tools/call".into(),
-        params: Some(json!({
-            "name": "asten_fact_propose",
-            "arguments": {
-                "project_id": project.id.to_string(),
-                "entity": "Commander Hayes",
-                "predicate": "rank",
-                "value": "Captain"
-            }
-        })),
+        params: Some(json!({"name":"asten_fact_propose", "arguments":{
+            "project_id":project.id.to_string(), "entity":"Commander Hayes", "predicate":"rank", "value":"Captain"
+        }})),
     };
-    let prop_resp = server.handle_request(propose_req).await;
-    let prop_text = prop_resp.result.unwrap()["content"][0]["text"]
-        .as_str()
-        .unwrap()
-        .to_string();
-    assert!(prop_text.contains("proposed"));
-    assert!(prop_text.contains("Commander Hayes"));
+    let response = server.handle_request(propose_req).await;
+    assert_eq!(response.error.unwrap().code, -32602);
+    assert!(app.list_facts(project.id).await.unwrap().is_empty());
 
     // Call asten_marks_list
     let marks_req = JsonRpcRequest {
@@ -215,4 +205,94 @@ async fn mcp_resources_and_prompts() {
         .to_string();
     assert!(msg_content.contains("Chapter 1 Opening"));
     assert!(msg_content.contains("asten_marks_list"));
+}
+
+#[tokio::test]
+async fn rejects_wrong_project_types_unknown_arguments_and_ambiguous_project() {
+    let (_ctx, app) = setup_app().await;
+    for name in ["One", "Two"] {
+        app.create_project(CreateProject {
+            name: name.into(),
+            kind: ProjectKind::Novel,
+            description: None,
+        })
+        .await
+        .unwrap();
+    }
+    let server = McpServer::new(Arc::new(app));
+    for arguments in [
+        json!({"query":"x", "project_id": 1}),
+        json!({"query":"x", "project_id":"../other"}),
+        json!({"query":"x"}),
+    ] {
+        let response = server
+            .handle_request(JsonRpcRequest {
+                jsonrpc: "2.0".into(),
+                id: Some(json!(1)),
+                method: "tools/call".into(),
+                params: Some(json!({"name":"asten_canon_search", "arguments":arguments})),
+            })
+            .await;
+        if let Some(error) = response.error {
+            assert_eq!(error.code, -32602);
+        } else {
+            assert_eq!(response.result.unwrap()["isError"], true);
+        }
+    }
+    let response = server
+        .handle_request(JsonRpcRequest {
+            jsonrpc: "2.0".into(),
+            id: Some(json!(2)),
+            method: "tools/call".into(),
+            params: Some(
+                json!({"name":"asten_canon_search", "arguments":{"query":"x", "extra":true}}),
+            ),
+        })
+        .await;
+    assert_eq!(response.error.unwrap().code, -32602);
+}
+
+#[tokio::test]
+async fn bounded_storage_reads_limit_projects_and_entities() {
+    let (_ctx, app) = setup_app().await;
+    let mut project_id = None;
+    for name in ["One", "Two", "Three"] {
+        let project = app
+            .create_project(CreateProject {
+                name: name.into(),
+                kind: ProjectKind::Novel,
+                description: None,
+            })
+            .await
+            .unwrap();
+        project_id = Some(project.id);
+    }
+    assert_eq!(app.list_projects_limited(2).await.unwrap().len(), 2);
+    let project_id = project_id.unwrap();
+    for name in ["Alice", "Bob", "Carol"] {
+        app.create_entity(asten_application::CreateCanonEntity {
+            project_id,
+            kind: asten_domain::EntityKind::Character,
+            name: name.into(),
+            aliases: vec![],
+            notes: String::new(),
+            introduced_at: None,
+        })
+        .await
+        .unwrap();
+    }
+    assert_eq!(
+        app.list_entities_limited(project_id, 1)
+            .await
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        app.list_entities_limited(project_id, 10)
+            .await
+            .unwrap()
+            .len(),
+        3
+    );
 }

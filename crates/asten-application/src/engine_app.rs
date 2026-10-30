@@ -236,6 +236,18 @@ pub struct ResolveTrackedChange {
 }
 
 impl crate::Application {
+    /// Read at most `limit` rows from the selected project.
+    pub async fn list_entities_limited(
+        &self,
+        project_id: ProjectId,
+        limit: u32,
+    ) -> Result<Vec<CanonEntity>> {
+        self.get_project(project_id).await?;
+        self.repository
+            .list_entities_limited(project_id, limit.min(100))
+            .await
+    }
+
     pub async fn list_entities(&self, project_id: ProjectId) -> Result<Vec<CanonEntity>> {
         self.get_project(project_id).await?;
         self.repository.list_entities(project_id).await
@@ -393,6 +405,18 @@ impl crate::Application {
         self.repository.delete_entity(source).await?;
         self.schedule_refresh(target_entity.project_id);
         Ok(target_entity)
+    }
+
+    /// Read at most `limit` rows from the selected project.
+    pub async fn list_events_limited(
+        &self,
+        project_id: ProjectId,
+        limit: u32,
+    ) -> Result<Vec<TimelineEvent>> {
+        self.get_project(project_id).await?;
+        self.repository
+            .list_events_limited(project_id, limit.min(100))
+            .await
     }
 
     pub async fn list_events(&self, project_id: ProjectId) -> Result<Vec<TimelineEvent>> {

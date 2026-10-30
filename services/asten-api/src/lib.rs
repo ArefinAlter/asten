@@ -322,7 +322,10 @@ pub fn router(application: Application, config: ApiConfig) -> Router {
     let mut app = Router::new()
         .route("/health", get(health))
         .nest("/api/v1", api)
-        .merge(mcp::router());
+        .merge(mcp::router().route_layer(middleware::from_fn_with_state(
+            state.clone(),
+            auth::require_auth,
+        )));
 
     if let Some(desk) = &config.serve_desk {
         // The hashed assets get a directory service of their own, so a missing
