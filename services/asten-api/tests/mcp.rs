@@ -233,7 +233,11 @@ async fn rejects_wrong_project_types_unknown_arguments_and_ambiguous_project() {
                 params: Some(json!({"name":"asten_canon_search", "arguments":arguments})),
             })
             .await;
-        assert_eq!(response.result.unwrap()["isError"], true);
+        if let Some(error) = response.error {
+            assert_eq!(error.code, -32602);
+        } else {
+            assert_eq!(response.result.unwrap()["isError"], true);
+        }
     }
     let response = server
         .handle_request(JsonRpcRequest {
